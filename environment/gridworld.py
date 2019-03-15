@@ -186,7 +186,7 @@ class GridWorld:
 
         state = {}
         for env_obj in objs_in_range:
-            state[env_obj.name] = env_obj.properties
+            state[env_obj.name] = env_obj.get_properties()
 
         return state
 

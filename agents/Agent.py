@@ -34,7 +34,7 @@ class Agent:
         self.rnd_gen = np.random.RandomState(self.rnd_seed)
 
     def define_action(self, state, possible_actions):
-        return None
+        pass
 
     def filter_state(self, state):
         # TODO

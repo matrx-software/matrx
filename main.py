@@ -55,7 +55,6 @@ grid_env.initialize()
 is_done = False
 while not is_done:
     is_done, tick_duration = grid_env.step()
-    grid_env.sleep()
 
 
 print()

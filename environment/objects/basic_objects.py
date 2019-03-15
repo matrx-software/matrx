@@ -4,6 +4,7 @@ import numpy as np
 class EnvObject:
 
     def __init__(self, obj_id, obj_name, locations, properties, is_passable=False):
+        # TODO  is_passable -> is_traversable
         self.obj_id = obj_id
         self.location = locations
         self.name = obj_name
@@ -40,6 +41,7 @@ class EnvObject:
             self.fills_multiple_locations = False
 
 
+# TODO : AgentObject -> AgentAvatar
 class AgentObject(EnvObject):
 
     def __init__(self, agent_id, agent_name, location, sense_capability, action_set, get_action_func,
