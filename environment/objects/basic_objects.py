@@ -3,13 +3,12 @@ import numpy as np
 
 class EnvObject:
 
-    def __init__(self, obj_id, obj_name, locations, properties, is_passable=False):
-        # TODO  is_passable -> is_traversable
+    def __init__(self, obj_id, obj_name, locations, properties, is_traversable=False):
         self.obj_id = obj_id
         self.location = locations
         self.name = obj_name
         self.properties = properties
-        self.is_passable = is_passable
+        self.is_traversable = is_traversable
         if len(np.array(self.location).shape) > 1 and np.array(self.location).shape[1] > 1:
             self.fills_multiple_locations = True
         else:
@@ -18,9 +17,10 @@ class EnvObject:
     def update_properties(self, grid_world):
         """
         Used to update some properties if needed. For example a 'status' property that changes over time or due to an
-        action of an agent.
+        action of an agent. If you want this functionality, you should create a new object that inherits from this
+        class EnvObject.
         :return: The new properties"""
-        return self.properties
+        pass
 
     def get_properties(self):
         """
@@ -30,7 +30,7 @@ class EnvObject:
         props = self.properties.copy()
         props['name'] = self.name
         props['location'] = self.location
-        props['is_passable'] = self.is_passable
+        props['is_traversable'] = self.is_traversable
         return props
 
     def set_location(self, locs):
@@ -41,8 +41,7 @@ class EnvObject:
             self.fills_multiple_locations = False
 
 
-# TODO : AgentObject -> AgentAvatar
-class AgentObject(EnvObject):
+class AgentAvatar(EnvObject):
 
     def __init__(self, agent_id, agent_name, location, sense_capability, action_set, get_action_func,
                  set_action_result_func, properties):

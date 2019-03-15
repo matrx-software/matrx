@@ -11,7 +11,7 @@ time_step = 1  # Wait this in seconds between performing all actions
 grid_size = [4, 4]  # horizontal and vertical size of grid
 max_duration = 1000  # number of time units the environment should run as a maximum
 
-strt_locations = [[0, 0], [0, 1]]
+start_locations = [[0, 0], [0, 1]]
 obj_locations = [[2, 2], [1, 1], [0, 3], [3, 0], [3, 3]]
 
 sim_goal = LimitedTimeGoal(max_duration)  # can be a list of goals
@@ -23,11 +23,11 @@ for nr_obj in range(len(obj_locations)):
     location = obj_locations[nr_obj]
     properties = {"type": np.random.RandomState(seed).choice(["lek", "brand"]),
                   "grootte": np.random.RandomState(seed).choice([0, 1, 2])}
-    is_passable = False
-    grid_env.add_env_object(obj_name, location, properties, is_passable)
+    is_traversable = False
+    grid_env.add_env_object(obj_name, location, properties, is_traversable)
 
 agents = []
-for nr_agent in range(len(strt_locations)):
+for nr_agent in range(len(start_locations)):
     agent_name = f"agent_{nr_agent}"
     poss_actions = [
         MoveNorth.__name__,
@@ -40,7 +40,7 @@ for nr_agent in range(len(strt_locations)):
         MoveNorthWest.__name__]
     senses = [[None, np.inf]]
     sense_capability = SenseCapability(senses)
-    agent = RandomAgent(name=agent_name, strt_location=strt_locations[nr_agent], possible_actions=poss_actions,
+    agent = RandomAgent(name=agent_name, strt_location=start_locations[nr_agent], possible_actions=poss_actions,
                         sense_capability=sense_capability)
     agents.append(agent)
 

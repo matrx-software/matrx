@@ -1,4 +1,3 @@
-from old.grid import EnvObject
 import numpy as np
 
 

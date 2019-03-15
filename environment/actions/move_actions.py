@@ -29,7 +29,7 @@ def possible_movement(grid_world, agent_id, dx, dy):
                 # Check if loc_obj_id is the id of an agent
                 if loc_obj_id in grid_world.registered_agents.keys():
                     # Check if the agent that takes the move action is not that agent and agents cannot be at the same
-                    # spot, if this is the case then is_passable is False.
+                    # spot, if this is the case then is_traversable is False.
                     if not grid_world.can_occupy_agent_locs and loc_obj_id != agent_id:
                         # The desired location contains a different agent and we cannot step at locations with agents
                         return MoveActionResult(MoveActionResult.RESULT_OCCUPIED, succeeded=False)
@@ -38,8 +38,8 @@ def possible_movement(grid_world, agent_id, dx, dy):
                 if loc_obj_id in grid_world.environment_objects.keys():
                     # get the actual object
                     loc_obj = grid_world.environment_objects[loc_obj_id]
-                    # Check if the object is not passable, if this is not the case is_passable is False
-                    if not loc_obj.is_passable:
+                    # Check if the object is not passable, if this is not the case is_traversable is False
+                    if not loc_obj.is_traversable:
                         # The desired location contains an object that is not passable
                         return MoveActionResult(MoveActionResult.RESULT_NOT_PASSABLE_OBJECT, succeeded=False)
 

@@ -1,23 +1,14 @@
 import datetime
+import inspect
 import math
 import time
 from collections import OrderedDict
+import warnings
 
 import numpy as np
 
 from environment.actions.move_actions import *
-from environment.objects.basic_objects import AgentObject, EnvObject
-
-ALL_ACTIONS = {  # Todo: Automatic discovery of this
-    MoveNorth.__name__: MoveNorth,
-    MoveNorthEast.__name__: MoveNorthEast,
-    MoveEast.__name__: MoveEast,
-    MoveSouthEast.__name__: MoveSouthEast,
-    MoveSouth.__name__: MoveSouth,
-    MoveSouthWest.__name__: MoveSouthWest,
-    MoveWest.__name__: MoveWest,
-    MoveNorthWest.__name__: MoveNorthWest,
-}
+from environment.objects.basic_objects import AgentAvatar, EnvObject
 
 
 class GridWorld:
@@ -28,6 +19,7 @@ class GridWorld:
         self.environment_objects = OrderedDict()
         self.current_nr_ticks = 0
         self.simulation_goal = simulation_goal
+        self.all_actions = self.__get_all_actions()
         self.current_available_id = 0
         self.can_occupy_agent_locs = can_occupy_agent_locs
         self.shape = shape
@@ -42,30 +34,27 @@ class GridWorld:
         self.__update_grid()
 
     def register_agent(self, agent_name, location, sense_capability, action_set, get_action_func,
-                       set_action_result_func, agent_properties, agent_type=AgentObject):
+                       set_action_result_func, agent_properties, agent_type=AgentAvatar):
         agent_id = agent_name
         agent_seed = self.rnd_gen.randint(1)
 
         if not callable(get_action_func):
             raise Exception("The given agent 'get_action_func' is not callable. Please provide this method.")
 
-        if agent_type == AgentObject:
-            agent_object = AgentObject(agent_id=agent_id, agent_name=agent_name, location=location,
+        if agent_type == AgentAvatar:
+            agent_object = AgentAvatar(agent_id=agent_id, agent_name=agent_name, location=location,
                                        sense_capability=sense_capability, action_set=action_set,
                                        get_action_func=get_action_func, properties=agent_properties,
                                        set_action_result_func=set_action_result_func)
-        elif False:
-            # TODO : You can add new agent that inherent from AgentObject that are more complex than the AgentObject.
-            pass
         else:
             raise Exception(f"Agent of type {agent_type} is not known to the environment.")
 
         self.registered_agents[agent_id] = agent_object
         return agent_id, agent_seed
 
-    def add_env_object(self, obj_name, location, obj_properties, is_passable=False):
+    def add_env_object(self, obj_name, location, obj_properties, is_traversable=False):
         obj_id = obj_name
-        env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties, is_passable=is_passable)
+        env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties, is_traversable=is_traversable)
 
         self.environment_objects[obj_id] = env_object
         return obj_id
@@ -98,7 +87,6 @@ class GridWorld:
 
         # Perform the update method of all objects
         for env_obj in self.environment_objects.values():
-            # TODO work this out...
             env_obj.update_properties(self)
 
         # Update the grid
@@ -132,8 +120,7 @@ class GridWorld:
             if self.curr_tick_duration < self.tick_duration:
                 time.sleep(self.tick_duration - self.curr_tick_duration)
             else:
-                pass
-                # TODO : send warning/notification if the step takes longer
+                self.__warn(f"The current tick took longer than the set tick duration of {self.tick_duration}")
 
     def check_simulation_goal(self):
 
@@ -207,8 +194,6 @@ class GridWorld:
                     distance <= sense_range:
                 env_objs.append(agent_obj)
 
-        # TODO Only return properties of object.
-
         return env_objs
 
     def __get_distance(self, coord1, coord2):
@@ -219,21 +204,23 @@ class GridWorld:
     def __get_possible_actions(self, action_set, agent_id):
         possible_actions = []
         for action_type in action_set:
-            if action_type in ALL_ACTIONS:
-                action_class = ALL_ACTIONS[action_type]
+            if action_type in self.all_actions:
+                action_class = self.all_actions[action_type]
                 action = action_class()
                 is_possible = action.is_possible(grid_world=self, agent_id=agent_id)
                 if is_possible:
                     possible_actions.append(action_type)
-        # TODO return error when not possible
+        if len(possible_actions) == 0:
+            warnings.warn(self.__warn("No possible actions for agent {agent_id}."))
+
         return possible_actions
 
     def __perform_action(self, agent_id, action_name):
         if action_name is None:  # If action is not None
             result = ActionResult(ActionResult.NO_ACTION_GIVEN, succeeded=True)
-        elif action_name in ALL_ACTIONS.keys():  # Check if action is known
+        elif action_name in self.all_actions.keys():  # Check if action is known
             # Get action class
-            action_class = ALL_ACTIONS[action_name]
+            action_class = self.all_actions[action_name]
             # Make instance of action
             action = action_class()
             # Apply world mutation
@@ -255,3 +242,22 @@ class GridWorld:
             self.grid[loc[1], loc[0]].append(agent_id)
         else:
             self.grid[loc[1], loc[0]] = [agent_id]
+
+    def __warn(self, warn_str):
+        return f"[@{self.current_nr_ticks}] {warn_str}"
+
+    def __get_all_actions(self):
+        subclasses = set()
+        work = [Action]
+        while work:
+            parent = work.pop()
+            for child in parent.__subclasses__():
+                if child not in subclasses:
+                    subclasses.add(child)
+                    work.append(child)
+
+        act_dict = {}
+        for action_class in subclasses:
+            act_dict[action_class.__name__] = action_class
+
+        return act_dict
