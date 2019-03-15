@@ -1,13 +1,13 @@
 import numpy as np
 
-from agents.Agent import Agent, RandomAgent
+from agents.Agent import Agent
 from agents.capabilities.capability import SenseCapability
 from environment.gridworld import GridWorld
 from environment.actions.move_actions import *
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 
 seed = 1
-time_step = 1  # Wait this in seconds between performing all actions
+time_step = 0.1  # Wait this in seconds between performing all actions
 grid_size = [4, 4]  # horizontal and vertical size of grid
 max_duration = 1000  # number of time units the environment should run as a maximum
 
@@ -40,8 +40,8 @@ for nr_agent in range(len(start_locations)):
         MoveNorthWest.__name__]
     senses = [[None, np.inf]]
     sense_capability = SenseCapability(senses)
-    agent = RandomAgent(name=agent_name, strt_location=start_locations[nr_agent], possible_actions=poss_actions,
-                        sense_capability=sense_capability)
+    agent = Agent(name=agent_name, strt_location=start_locations[nr_agent], action_set=poss_actions,
+                  sense_capability=sense_capability)
     agents.append(agent)
 
     agent_id, agent_seed = grid_env.register_agent(agent_name=agent.name, location=agent.location,
@@ -49,13 +49,12 @@ for nr_agent in range(len(start_locations)):
                                                    get_action_func=agent.get_action,
                                                    set_action_result_func=agent.set_action_result,
                                                    agent_properties=agent.get_properties(),
-                                                   action_set=agent.possible_actions)
+                                                   action_set=agent.action_set)
     agent.set_rnd_seed(agent_seed)
 
 grid_env.initialize()
 is_done = False
 while not is_done:
     is_done, tick_duration = grid_env.step()
-
 
 print()
