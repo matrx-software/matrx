@@ -4,6 +4,7 @@ from agents.Agent import Agent, RandomAgent
 from agents.capabilities.capability import SenseCapability
 from environment.gridworld import GridWorld
 from environment.actions.move_actions import *
+from environment.sim_goals.sim_goal import LimitedTimeGoal
 
 seed = 1
 time_step = 1  # Wait this in seconds between performing all actions
@@ -13,8 +14,8 @@ max_duration = 1000  # number of time units the environment should run as a maxi
 strt_locations = [[0, 0], [0, 1]]
 obj_locations = [[2, 2], [1, 1], [0, 3], [3, 0], [3, 3]]
 
-
-grid_env = GridWorld(grid_size, max_duration, time_step, can_occupy_agent_locs=True, rnd_seed=seed)
+sim_goal = LimitedTimeGoal(max_duration)  # can be a list of goals
+grid_env = GridWorld(grid_size, time_step, simulation_goal=sim_goal, can_occupy_agent_locs=True, rnd_seed=seed)
 
 objects = []
 for nr_obj in range(len(obj_locations)):
