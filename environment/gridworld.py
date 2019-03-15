@@ -22,14 +22,12 @@ ALL_ACTIONS = {  # Todo: Automatic discovery of this
 
 class GridWorld:
 
-    def __init__(self, shape, max_ticks, tick_duration, can_occupy_agent_locs=True, rnd_seed=1):
+    def __init__(self, shape, tick_duration, simulation_goal=None, can_occupy_agent_locs=True, rnd_seed=1):
         self.tick_duration = tick_duration
-        self.max_ticks = max_ticks
         self.registered_agents = OrderedDict()
         self.environment_objects = OrderedDict()
-        self.current_ticks = 0
-        # TODO : make goal assessment
-        self.goal_assessment = None
+        self.current_nr_ticks = 0
+        self.simulation_goal = simulation_goal
         self.current_available_id = 0
         self.can_occupy_agent_locs = can_occupy_agent_locs
         self.shape = shape
@@ -73,9 +71,13 @@ class GridWorld:
         return obj_id
 
     def step(self):
-        if self.current_ticks > self.max_ticks:
-            self.is_done = True
-            return self.is_done
+
+        # Check if we are done based on our global goal assessment function
+        self.is_done = self.check_simulation_goal()
+
+        # If this grid_world is done, we return immediately
+        if self.is_done:
+            return self.is_done, 0.
 
         # current time of the tick start
         tick_start_time = datetime.datetime.now()
@@ -102,25 +104,25 @@ class GridWorld:
         # Update the grid
         self.__update_grid()
 
-        # Check if we are done based on our global goal assessment function
-        if self.goal_assessment is not None:
-            self.is_done = self.goal_assessment.goal_reached(self)
-
-        # Check if we reached max ticks
-        if self.max_ticks <= self.current_ticks:
-            self.is_done = True
-
         # Increment the number of tick we performed
-        self.current_ticks += 1
+        self.current_nr_ticks += 1
 
         # Check how much time the tick lasted already
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time
         self.curr_tick_duration = tick_duration.total_seconds()
 
-        return self.is_done, tick_duration
+        # Sleep for the remaining time of self.tick_duration
+        self.__sleep()
 
-    def sleep(self):
+        # Compute the total time of our tick (including potential sleep)
+        tick_end_time = datetime.datetime.now()
+        tick_duration = tick_end_time - tick_start_time
+        self.curr_tick_duration = tick_duration.total_seconds()
+
+        return self.is_done, self.curr_tick_duration
+
+    def __sleep(self):
         """
         Sleeps the current python thread for the amount of time that is left after self.curr_tick_duration up to
         in self.tick_duration
@@ -132,6 +134,19 @@ class GridWorld:
             else:
                 pass
                 # TODO : send warning/notification if the step takes longer
+
+    def check_simulation_goal(self):
+
+        if self.simulation_goal is not None:
+            if isinstance(self.simulation_goal, list):
+                for sim_goal in self.simulation_goal:
+                    is_done = sim_goal.goal_reached(self)
+                    if is_done is False:
+                        return False
+            else:
+                return self.simulation_goal.goal_reached(self)
+
+        return False
 
     def __add_to_grid(self, grid_obj):
         if isinstance(grid_obj, EnvObject):
