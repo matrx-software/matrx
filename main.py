@@ -9,7 +9,7 @@ from environment.sim_goals.sim_goal import LimitedTimeGoal
 seed = 1
 time_step = 0.1  # Wait this in seconds between performing all actions
 grid_size = [4, 4]  # horizontal and vertical size of grid
-max_duration = 1000  # number of time units the environment should run as a maximum
+max_duration = 100  # number of time units the environment should run as a maximum
 
 start_locations = [[0, 0], [0, 1]]
 obj_locations = [[2, 2], [1, 1], [0, 3], [3, 0], [3, 3]]
