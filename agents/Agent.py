@@ -3,7 +3,7 @@ import numpy as np
 
 class Agent:
 
-    def __init__(self, name, strt_location, action_set, sense_capability):
+    def __init__(self, name, strt_location, action_set, sense_capability, properties=None):
         """
         Creates an Agent. All other agents should inherit from this class if you want smarter agents. This agent
         simply randomly selects an action from the possible actions it can do.
@@ -14,6 +14,11 @@ class Agent:
         :param sense_capability: A SenseCapability object; it states which object types the agent can perceive within
         what range.
         """
+        if properties is None:
+            self.properties = {"name": name}
+        else:
+            self.properties = properties.copy()
+            self.properties["name"] = name
         self.name = name
         self.location = strt_location
         self.action_set = action_set  # list of Action objects
@@ -53,6 +58,22 @@ class Agent:
         :return:
         """
         self.previous_action_result = action_result
+
+    def get_properties(self):
+        """
+        Returns all properties you want the grid world to have access to. These are the properties that other agents
+        will receive when the observe this agent. Also, these are the properties that will be used to visualize the
+        agent.
+
+        By default we add the agent's name to the properties. The grid world is responsible for adding the location to
+        it and any other default properties for the AgentAvatar class (the representation of the agent in the grid
+        world).
+
+        :return: A dictionary of properties, generally with strings as key and native types as values though is not
+        required at all.
+        """
+
+        return self.agent_properties
 
     def set_rnd_seed(self, seed):
         """
