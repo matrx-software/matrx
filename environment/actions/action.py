@@ -5,10 +5,10 @@ class Action:
     def __init__(self, name):
         self.name = name
 
-    def mutate(self, grid_world, agent_id):
+    def mutate(self, grid_world, agent_id, **kwargs):
         pass
 
-    def is_possible(self, grid_world, agent_id):
+    def is_possible(self, grid_world, agent_id, **kwargs):
         pass
 
 
