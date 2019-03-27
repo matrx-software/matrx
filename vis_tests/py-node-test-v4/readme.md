@@ -11,10 +11,10 @@ Receives user inputs from API request
 Python server (Flask)
 receives testbed updates, passes them on to correct agent client, sends back user inputs
     + receives testbed updates
-    - sends back user inputs
-    - pass testbed updates to client
+    + sends back user inputs
+    + pass testbed updates to client
 receives and safes user inputs from clients
-    - to do
+    + to do
 
 
 Python clients (agents etc.)
@@ -27,3 +27,10 @@ receives updates from python server -> updates visuals
     - to do
 catches user inputs and sends them back to the server
     + to do
+
+
+
+# installation requirements
+- eventlet
+- flask
+- flask_socketio

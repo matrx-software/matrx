@@ -2,16 +2,21 @@
 var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
 // Event handler for new connections.
-// The callback function is invoked when a connection with the
-// server is established.
 socket.on('connect', function() {
     socket.emit('my_event', {data: 'I\'m connected!'});
     console.log("Connected");
 });
 
-// receive an update from the python server
+// receive a test update from the python server
 socket.on('test', function(data){
-  console.log("got a message:", data);
+    console.log("got a message:", data);
+});
+
+
+// receive an update from the python server
+socket.on('update', function(data){
+    console.log("got a message:", data);
+
 });
 
 // send message to Python server every 1 second
@@ -43,4 +48,9 @@ function checkArrowKey(e) {
        // left arrow
        socket.emit("userinput", {"movement": 4});
     }
+}
+
+
+function draw_grid(grid) {
+
 }

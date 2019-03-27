@@ -31,17 +31,19 @@ def example_post(id):
 
 
 
-# POST request via API from testbed python main loop
+# update API of Python server / client / GUI
+# receives testbed update, passes it on to client / GUI
+# returns last userinput (if any)
 @app.route('/update/agent/<int:id>', methods=['POST'])
 def update_agent(id):
     data = request.json
-    params = data['params']
-    arr = np.array(data['arr'])
-    print(params, arr.shape)
 
-    # print("Received update request for id", id , " with data ")
-    # resp = "Response"
-    return jsonify(userinput)
+    # pass testbed update to client / GUI
+    data = request.json
+    socketio.emit('update', data)
+
+    # send back user input to testbed
+    return format_usr_inp()
 
 
 # route for agent, get the ID from the URL
@@ -59,20 +61,26 @@ def index(id):
 
 # can't be None, otherwise Flask flips out when returning it
 userinput = {}
-userinput = {'movement': 4}
+# userinput = {'movement': 4}
+
+def format_usr_inp():
+    global userinput
+    resp = jsonify(userinput)
+    userinput = {}
+    return resp
+
 
 @socketio.on('userinput')
-def handle_message(input):
+def handle_usr_inp(input):
     print('received userinput: %s' % input)
-
     # agent can do only 1 action at a time, so
-    # remember only the latest userinput
+    # remember only the latest userinput action
+    global userinput
     userinput = input
 
-    print("Userinput list currently: %s" % userinput)
 
 @socketio.on('test')
-def handle_message(message):
+def handle_test(message):
     print('received test: ' + message)
     socketio.emit('test', 'hai!')
 
