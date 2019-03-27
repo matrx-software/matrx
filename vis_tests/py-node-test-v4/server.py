@@ -1,35 +1,88 @@
+from flask import Flask, request, render_template, jsonify
+from flask_socketio import SocketIO
+from time import sleep
+import numpy as np
+
+# app = Flask(__name__)
+app = Flask(__name__, template_folder='static/templates')
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 
 
-# Python server which serves files
-# dynamically serve files, based on scenario manager agents?
+###############################################
+# Routes (agent / humanagent / god)
+###############################################
+
+# GET request via API from testbed python main loop
+@app.route('/example/<int:id>', methods=['GET'])
+def example_get(id):
+    data = request.args.get('gw')
+    print("Received update request for id", id , " with data ", data)
+    resp = "Response"
+    return resp
+
+# POST request via API from testbed python main loop
+@app.route('/example/<int:id>', methods=['POST'])
+def example_post(id):
+    data = request.args.get('gw')
+    print("Received update request for id", id , " with data ", data)
+    resp = "Response"
+    return resp
 
 
-user_inputs = []
+
+# POST request via API from testbed python main loop
+@app.route('/update/agent/<int:id>', methods=['POST'])
+def update_agent(id):
+    data = request.json
+    params = data['params']
+    arr = np.array(data['arr'])
+    print(params, arr.shape)
+
+    # print("Received update request for id", id , " with data ")
+    # resp = "Response"
+    return jsonify(userinput)
 
 
-@socketio.on('input')
-def user_inputs(id, data):
-    # catch user inputs
-    # Sort based on agent idea
-    # save to var
-    user_inputs[id] = data
-    pass
+# route for agent, get the ID from the URL
+@app.route('/agent/<int:id>')
+def index(id):
+    return render_template('index.html', id=id)
 
 
-# API for testbed Python mainloop
-# https://stackoverflow.com/questions/10313001/is-it-possible-to-make-post-request-in-flask
-@app.route('/update/<id>', methods = ['POST'])
-def update_text(id, data):
-    return update_client(id, data)
 
 
-# function for updating clients
-def update_client(id, data):
-    # send update with new data to the client (/agent)
-    socket.emit(id, data)
-    # return user inputs for that agent (if any)
-    return user_inputs[id]
+
+###############################################
+# server-client socket connections (agent / humanagent)
+###############################################
+
+# can't be None, otherwise Flask flips out when returning it
+userinput = {}
+userinput = {'movement': 4}
+
+@socketio.on('userinput')
+def handle_message(input):
+    print('received userinput: %s' % input)
+
+    # agent can do only 1 action at a time, so
+    # remember only the latest userinput
+    userinput = input
+
+    print("Userinput list currently: %s" % userinput)
+
+@socketio.on('test')
+def handle_message(message):
+    print('received test: ' + message)
+    socketio.emit('test', 'hai!')
 
 
-def main():
-    run_app()
+@socketio.on('connect')
+def test_connect():
+    print('got a connect')
+    socketio.emit('my response', {'data': 'Connected'})
+
+
+if __name__ == "__main__":
+    print("Starting server")
+    socketio.run(app, port=3000)
