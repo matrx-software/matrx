@@ -12,26 +12,26 @@ socketio = SocketIO(app)
 ###############################################
 # Routes human agent
 ###############################################
-#
-# # update API of Python server / client / GUI
-# # receives testbed update, passes it on to client / GUI
-# # returns last userinput (if any)
-# @app.route('/update/human-agent/<int:id>', methods=['POST'])
-# def update_agent(id):
-#     data = request.json
-#
-#     # pass testbed update to client / GUI
-#     data = request.json
-#     socketio.emit('update', data)
-#
-#     # send back user input to testbed
-#     return format_usr_inp()
-#
-#
-# # route for agent, get the ID from the URL
-# @app.route('/human-agent/<int:id>')
-# def index(id):
-#     return render_template('agent.html', id=id)
+
+# update API of Python server / client / GUI
+# receives testbed update, passes it on to client / GUI
+# returns last userinput (if any)
+@app.route('/update/human-agent/<int:id>', methods=['POST'])
+def update_human_agent(id):
+    data = request.json
+
+    # pass testbed update to client / GUI
+    data = request.json
+    socketio.emit('update', data)
+
+    # send back user input to testbed
+    return format_usr_inp()
+
+
+# route for agent, get the ID from the URL
+@app.route('/human-agent/<int:id>')
+def human_agent_view(id):
+    return render_template('human-agent.html', id=id)
 
 
 ###############################################
@@ -43,9 +43,7 @@ socketio = SocketIO(app)
 # returns last userinput (if any)
 @app.route('/update/agent/<id>', methods=['POST'])
 def update_agent(id):
-    data = request.json
-
-    print("Agent update request with agent id:", id)
+    # print("Agent update request with agent id:", id)
 
     # pass testbed update to client / GUI
     data = request.json
@@ -57,33 +55,31 @@ def update_agent(id):
 
 # route for agent, get the ID from the URL
 @app.route('/agent/<id>')
-def index(id):
+def agent_view(id):
     return render_template('agent.html', id=id)
 
 
 ###############################################
 # Routes God
 ###############################################
-#
-# # update API of Python server / client / GUI
-# # receives testbed update, passes it on to client / GUI
-# # returns last userinput (if any)
-# @app.route('/update/god', methods=['POST'])
-# def update_agent():
-#     data = request.json
-#
-#     # pass testbed update to client / GUI
-#     data = request.json
-#     socketio.emit('update', data)
-#
-#     # send back user input to testbed
-#     return True
-#
-#
-# # route for agent, get the ID from the URL
-# @app.route('/god')
-# def index():
-#     return render_template('god.html', id=id)
+
+# update API of Python server / client / GUI
+# receives testbed update, passes it on to client / GUI
+# returns last userinput (if any)
+@app.route('/update/god', methods=['POST'])
+def update_god():
+
+    # pass testbed update to client / GUI
+    data = request.json
+    socketio.emit('update', data)
+
+    return ""
+
+
+# route for agent, get the ID from the URL
+@app.route('/god')
+def god_view():
+    return render_template('god.html')
 
 
 ###############################################

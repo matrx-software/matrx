@@ -1,6 +1,7 @@
 import numpy as np
 import datetime
 import requests
+from visualization.helper_functions import sendGUIupdate
 
 class Agent:
 
@@ -45,8 +46,8 @@ class Agent:
         :return: An action string, which is the class name of one of the actions in the Action package.
         """
 
-        # send the agent state to the web app GUI
-        self.sync_agent_view_GUI(state, agent_id)
+        # send the agent state to the GUI web server for visualization
+        sendGUIupdate(state=state, grid_size=self.grid_size, type="agent", id=agent_id)
 
         state = self.ooda_observe(state)
         state = self.ooda_orient(state)
@@ -94,58 +95,6 @@ class Agent:
         """
         self.rnd_seed = seed
         self.rnd_gen = np.random.RandomState(self.rnd_seed)
-
-
-    # reorder the state such that it has the x,y coords as keys and can be JSON serialized
-    # Old state order: { 'object_name' : {obj_properties}, 'object_name2' : {obj_properties}}
-    # New state order: { 'x1_y1') : [obj1, obj2, agent1], 'x2_y1' : [obj1, obj2, agent1]}
-    def __reorder_state_for_GUI(self, state):
-        newState = {}
-        for obj in state:
-
-            # convert the [x,y] coords to a x_y notation so we can use it as a key which is
-            # also JSON serializable
-            strXYkey = str(state[obj]['location'][0]) + "_" + str(state[obj]['location'][1])
-
-            # create a new list with (x,y) as key if it does not exist yet in the newState dict
-            if strXYkey not in newState:
-                newState[strXYkey] = []
-
-            # add the object or agent to the list at the (x,y) location in the dict
-            newState[strXYkey].append( state[obj] )
-
-        return newState
-
-
-    def sync_agent_view_GUI(self, state, agent_id):
-        """
-        Send the state of the agent to the webserver such that it can be visualized
-        The state
-        """
-
-        newState = self.__reorder_state_for_GUI(state)
-        print("Agent state reordered:", newState)
-
-        print("Sending update to GUI API for agent %s" % agent_id)
-
-        # put data in a json array
-        data = {'params': {'grid_size': self.grid_size}, 'state': newState}
-
-        tick_start_time = datetime.datetime.now()
-
-        # send an update of the agent state to the GUI via its API
-        r = requests.post('http://localhost:3000/update/agent/' + agent_id, json=data)
-
-        tick_end_time = datetime.datetime.now()
-        tick_duration = tick_end_time - tick_start_time
-        print("Request + reply took:", tick_duration.total_seconds())
-        print("post url:", r.url)
-
-        # check for errors in the response
-        if r.status_code != requests.codes.ok:
-            print("Error in contacting GUI API for agent %s" % agent_id)
-        else:
-            print("Request returned ok. Status code:", r.status_code)
 
 
     def ooda_observe(self, state):

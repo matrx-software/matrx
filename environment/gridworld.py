@@ -10,6 +10,8 @@ import numpy as np
 from environment.actions.move_actions import *
 from environment.objects.basic_objects import AgentAvatar, EnvObject
 
+from visualization.helper_functions import sendGUIupdate
+
 
 class GridWorld:
 
@@ -174,9 +176,10 @@ class GridWorld:
 
     # get all objects and agents on the grid
     def __get_complete_state(self):
-
-        # get the grid size
-        grid_sz = self.shape
+        """
+        Compile all objects and agents on the grid in one state dictionary
+        :return: state with all objects and agents on the grid
+        """
 
         # create a state with all objects and agents
         state = {}
@@ -185,35 +188,15 @@ class GridWorld:
         for agent_id, agent in self.registered_agents.items():
             state[agent.name] = agent.get_properties()
 
-        return grid_sz, state
-
-
-    # reorder the state such that it has the x,y coords as keys
-    # Old state order: { 'object_name' : {obj_properties}, 'object_name2' : {obj_properties}}
-    # New state order: { (x1,y1) : [obj1, obj2, agent1], (x2,y1) : [obj1, obj2, agent1]}
-    def __reorder_state_for_GUI(self, state):
-        newState = {}
-        for obj in state:
-            # create a new list with (x,y) as key if it does not exist yet in the newState dict
-            if tuple(state[obj]['location']) not in newState:
-                newState[ tuple( state[obj]['location'] ) ] = []
-
-            # add the object or agent to the list at the (x,y) location in the dict
-            newState[ tuple( state[obj]['location'] ) ].append( state[obj] )
-
-        # print("sorted state:", newState)
-        return newState
-
-
-
+        return state
 
 
     def __sync_god_view_GUI(self):
-        grid_sz, state = self.__get_complete_state()
-        state = self.__reorder_state_for_GUI(state)
-        # print("State:", state)
-        # send the god view to the web app GUI
-        # TODO: add API request here
+        # get all objects and agents on the grid
+        state = self.__get_complete_state()
+
+        # send the grid / god view state to the GUI web server for visualization
+        sendGUIupdate(state=state, grid_size=self.shape, type="god")
 
 
     def __get_agent_state(self, agent_obj):

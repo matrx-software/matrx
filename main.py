@@ -22,11 +22,12 @@ objects = []
 for nr_obj in range(len(obj_locations)):
     obj_name = f"object_{nr_obj}"
     location = obj_locations[nr_obj]
+    # NOTE: np ints / floats, etc can't be JSONserialized, so convert to float!
     properties = {"type": np.random.choice(["lek", "brand"]),
-                  "grootte": int(np.random.RandomState(seed).choice([0, 1, 2])), # np ints etc. can't be serialized, so convert to float!
+                  "grootte": int(np.random.RandomState(seed).choice([0, 1, 2])),
                   "shape": 0,
                   "colour": np.random.choice(["#286625", "#678fd9", "#FF5733"]),
-                  "size": np.random.choice(["#286625", "#678fd9", "#FF5733"])}
+                  "size": float(np.random.random())}
     is_traversable = False
     grid_env.add_env_object(obj_name, location, properties, is_traversable)
 
