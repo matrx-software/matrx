@@ -17,6 +17,8 @@ socket.on('test', function(data){
 socket.on('update', function(data){
     console.log("got a message:", data);
 
+    // draw the screen again
+    requestAnimationFrame(drawSim);
 });
 
 // send message to Python server every 1 second
@@ -51,6 +53,155 @@ function checkArrowKey(e) {
 }
 
 
-function draw_grid(grid) {
+// gamemap stuff
+var ctx = null;
+var gameMap = [
+	0, 1, 2, 3, 4, 0, 0, 0, 0, 0,
+	0, 1, 1, 1, 0, 1, 1, 1, 1, 0,
+	0, 1, 0, 0, 0, 1, 0, 0, 0, 0,
+	0, 1, 3, 1, 4, 1, 1, 1, 1, 0,
+	0, 1, 0, 1, 0, 0, 0, 1, 1, 0,
+	0, 1, 0, 1, 3, 1, 0, 0, 1, 0,
+	0, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+	0, 1, 0, 0, 0, 0, 0, 1, 0, 0,
+	0, 1, 1, 1, 0, 1, 1, 1, 1, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+];
+var tileW = 40, tileH = 40;
+var mapW = 10, mapH = 10;
+var currentSecond = 0, frameCount = 0, framesLastSecond = 0;
 
+
+// Shapes of tiles
+var tileShapes = {
+    0 : "square",
+    1 : "triangle"
+}
+
+// tileTypes
+//
+var tileTypes = {
+	0 : { colour:"#685b48", shape:0, size:1},
+	1 : { colour:"#5aa457", shape:0, size:1},
+	2 : { colour:"#000000", shape:0, size:0.5},
+	3 : { colour:"#286625", shape:1, size:1},
+	4 : { colour:"#678fd9", shape:1, size:0.5}
+};
+
+window.onload = function()
+{
+    // Get the grid canvas
+	ctx = document.getElementById('grid').getContext("2d");
+    // request the canvas to draw the grid with our drawSim function
+	requestAnimationFrame(drawSim);
+	ctx.font = "bold 10pt sans-serif";
+};
+
+function drawSim() {
+	if(ctx==null) { return; }
+
+    console.log("Drawing sim")
+
+    // Keep track of our Frames per second
+	var sec = Math.floor(Date.now()/1000);
+	if(sec!=currentSecond)
+	{
+		currentSecond = sec;
+		framesLastSecond = frameCount;
+		frameCount = 1;
+	}
+	else { frameCount++; }
+
+
+    // draw the grid
+	for(var y = 0; y < mapH; ++y)
+	{
+		for(var x = 0; x < mapW; ++x)
+		{
+
+            // set colour of tile
+            ctx.fillStyle = tileTypes[gameMap[toIndex(x,y)]].colour;
+            sz = tileTypes[gameMap[toIndex(x,y)]].size
+
+            // draw the shape
+            switch(tileTypes[gameMap[toIndex(x,y)]].shape)
+			{
+                case 1:
+					drawTriangle(x*tileW, y*tileH, tileW, tileH, sz);
+					break;
+				default:
+                    drawRectangle(x*tileW, y*tileH, tileW, tileH, sz)
+					// ctx.fillRect( x*tileW, y*tileH, tileW, tileH);
+            }
+		}
+	}
+
+    // Draw the FPS to the canvas
+	ctx.fillStyle = "#ff0000";
+	ctx.fillText("FPS: " + framesLastSecond, 10, 20);
+
+    // request another animationFrame, which will draw the map again
+	// requestAnimationFrame(drawSim);
+}
+
+// convert x,y coord to map index
+function toIndex(x, y) {
+	return((y * mapW) + x);
+}
+
+// draw rectangle
+// x = x location of tile (top left)
+// y = y location of tile (top left)
+// tileW = width of normal tile
+// tileH = height of normal tile
+// size = size ratio (0-1) of normal tile
+function drawRectangle(x, y, tileW, tileH, size) {
+    // full size rect
+    // ctx.fillRect( x*tileW, y*tileH, tileW, tileH);
+
+    // coords of top left corner
+    top_left_x = x + ((1 - size) * 0.5 * tileW);
+    top_left_y = y + ((1 - size) * 0.5 * tileH);
+    // width and height of rectangle
+    w = size * tileW;
+    h = size * tileH;
+
+    ctx.fillRect( top_left_x, top_left_y, w, h);
+}
+
+// draw a triangle
+// x = x location of tile (top left)
+// y = y location of tile (top left)
+// tileW = width of normal tile
+// tileH = height of normal tile
+// size = size ratio (0-1) of normal tile
+function drawTriangle(x, y, tileW, tileH, size) {
+
+    console.log(x, y, tileW, tileH, size)
+
+    // calc the coordinates of the top corner of the triangle
+    topX = x + 0.5 * tileW;
+    topY = y + ((1 - size) * 0.5 * tileH);
+    // calc the coordinates of the bottom left corner of the triangle
+    bt_leftX = x + ((1 - size) * 0.5 * tileW);
+    bt_leftY = y + tileH - ((1 - size) * 0.5 * tileH);
+    // calc the coordinates of the bottom right corner of the triangle
+    bt_rightX = x + tileW - ((1 - size) * 0.5 * tileW);
+    bt_rightY = y + tileH - ((1 - size) * 0.5 * tileH);
+
+
+    ctx.beginPath();
+    ctx.moveTo(topX, topY); // center top
+    ctx.lineTo(bt_leftX, bt_leftY); // bottom left
+    ctx.lineTo(bt_rightX, bt_rightY); // bottom right
+    ctx.closePath();
+
+
+
+    // ctx.beginPath();
+    // ctx.moveTo(x + (tileW * 0.5), y); // center top
+    // ctx.lineTo(x, y + tileH); // bottom left
+    // ctx.lineTo(x + tileW, y + tileH); // bottom right
+    // ctx.closePath();
+    ctx.fill();
 }
