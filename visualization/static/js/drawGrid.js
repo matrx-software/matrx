@@ -47,12 +47,12 @@ function drawSim(grid_size, state) {
             // draw any objects
             key = x + "_" + y;
             if (key in state){
-                console.log("Objects for key ", key, ":", state[key]);
+                // console.log("Objects for key ", key, ":", state[key]);
 
                 // loop through objects for this possition and draw them
                 for (var objKey in state[key]) {
                     obj = state[key][objKey]
-                    console.log('obj:', obj);
+                    // console.log('obj:', obj);
 
                     // set the correct colour
                     ctx.fillStyle = obj['colour'];
@@ -69,9 +69,9 @@ function drawSim(grid_size, state) {
                 }
 
             }
-            else {
-                console.log("No objects for key ", key);
-            }
+            // else {
+            //     console.log("No objects for key ", key);
+            // }
 
             // // set colour of tile
             // ctx.fillStyle = tileTypes[gameMap[toIndex(x,y)]].colour;

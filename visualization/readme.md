@@ -36,3 +36,4 @@ catches user inputs and sends them back to the server
 - flask_socketio
 - python 3.6 (Jasper string formats)
 - requests
+- simplejson

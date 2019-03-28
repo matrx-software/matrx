@@ -22,24 +22,34 @@ socket.on('update', function(data){
 
 // Catch userinput with arrow keys
 // Arrows keys: up=1, right=2, down=3, left=4
-// document.onkeydown = checkArrowKey;
-// function checkArrowKey(e) {
-//     e = e || window.event;
-//
-//     if (e.keyCode == '38') {
-//         // up arrow
-//         socket.emit("userinput", {"movement": 1});
-//     }
-//     else if (e.keyCode == '39') {
-//        // right arrow
-//        socket.emit("userinput", {"movement": 2});
-//     }
-//     else if (e.keyCode == '40') {
-//         // down arrow
-//         socket.emit("userinput", {"movement": 3});
-//     }
-//     else if (e.keyCode == '37') {
-//        // left arrow
-//        socket.emit("userinput", {"movement": 4});
-//     }
-// }
+document.onkeydown = checkArrowKey;
+function checkArrowKey(e) {
+    e = e || window.event;
+
+    // filter for arrow keys (for now)
+    if (e.keyCode < 37 || e.keyCode > 40) {
+        return
+    }
+
+    // get ID which is saved in the HTML
+    var id = document.getElementById('id').innerHTML;
+    console.log("id:", id)
+
+    // send an update for every arrow key pressed
+    if (e.keyCode == '38') {
+        // up arrow
+        socket.emit("userinput", {"movement": 1, 'id': id});
+    }
+    else if (e.keyCode == '39') {
+       // right arrow
+       socket.emit("userinput", {"movement": 2, 'id': id});
+    }
+    else if (e.keyCode == '40') {
+        // down arrow
+        socket.emit("userinput", {"movement": 3, 'id': id});
+    }
+    else if (e.keyCode == '37') {
+       // left arrow
+       socket.emit("userinput", {"movement": 4, 'id': id});
+    }
+}

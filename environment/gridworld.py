@@ -196,7 +196,7 @@ class GridWorld:
         state = self.__get_complete_state()
 
         # send the grid / god view state to the GUI web server for visualization
-        sendGUIupdate(state=state, grid_size=self.shape, type="god")
+        sendGUIupdate(state=state, grid_size=self.shape, type="god", verbose=False)
 
 
     def __get_agent_state(self, agent_obj):

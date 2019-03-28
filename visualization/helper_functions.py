@@ -27,24 +27,27 @@ def reorder_state_for_GUI(state):
 
 
 
-def sendGUIupdate(state, grid_size, type, id=None):
+def sendGUIupdate(state, grid_size, type, verbose, id=None):
     """
     A function that can be called by the (human)agents or the gridworld, which
     will send an update to the GUI server with an update of the world state
     :param state: state of all visible objects for that entity
     :param grid_size: grid size of the grid in shape [x, y]
     :param type: type of entity, either 'god', 'agent' or 'humanagent'
+    :param verbose: print debugging information or not
     :param id (optional): ID of the object
     :return: userinput if type humanagent, otherwise True
     """
     # reorder state so it is can be send to and read more easily by the GUI server
     newState = reorder_state_for_GUI(state)
-    # print(f"{type} state reordered: {newState}")
 
-    # if type is 'god':
-    #     print(f"Sending update to GUI API for god view")
-    # else:
-    #     print(f"Sending update to GUI API for {type} with ID: {id}")
+    if verbose:
+        print(f"{type} state reordered: {newState}")
+
+        if type is 'god':
+            print(f"Sending update to GUI API for god view")
+        else:
+            print(f"Sending update to GUI API for {type} with ID: {id}")
 
     # put data in a json array
     data = {'params': {'grid_size': grid_size}, 'state': newState}
@@ -56,7 +59,7 @@ def sendGUIupdate(state, grid_size, type, id=None):
     elif type == "god":
         url += "update/god"
     elif type == "humanagent":
-        url += "update/agent/" + id
+        url += "update/human-agent/" + id
 
     tick_start_time = datetime.datetime.now()
 
@@ -66,8 +69,9 @@ def sendGUIupdate(state, grid_size, type, id=None):
 
     tick_end_time = datetime.datetime.now()
     tick_duration = tick_end_time - tick_start_time
-    # print("Request + reply took:", tick_duration.total_seconds())
-    # print("post url:", r.url)
+    if verbose:
+        print("Request + reply took:", tick_duration.total_seconds())
+        print("post url:", r.url)
 
     # check for errors in the response
     if r.status_code != requests.codes.ok:
@@ -80,7 +84,7 @@ def sendGUIupdate(state, grid_size, type, id=None):
 
     # return userinputs for humanagent
     if type is "humanagent":
-        return r.json
+        return r.json()
 
     # otherwise return nothing
     return ""
