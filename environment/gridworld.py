@@ -32,6 +32,8 @@ class GridWorld:
     def initialize(self):
         # We update the grid, which fills everything with added objects and agents
         self.__update_grid()
+        # We send all visible objects to the God view GUI
+        self.__sync_god_view_GUI()
 
     def register_agent(self, agent_name, location, sense_capability, action_set, get_action_func,
                        set_action_result_func, agent_properties, agent_type=AgentAvatar):
@@ -48,6 +50,11 @@ class GridWorld:
                                        set_action_result_func=set_action_result_func)
         else:
             raise Exception(f"Agent of type {agent_type} is not known to the environment.")
+
+        # add colour and shape properties (for testing)
+        agent_object.add_properties(propName="colour", propVal=np.random.choice(["#900C3F", "#581845"]))
+        agent_object.add_properties(propName="shape", propVal=1)
+        agent_object.add_properties(propName="size", propVal=1)
 
         self.registered_agents[agent_id] = agent_object
         return agent_id, agent_seed
@@ -78,7 +85,7 @@ class GridWorld:
         for agent_id, agent_obj in self.registered_agents.items():
             state = self.__get_agent_state(agent_obj)
             possible_actions = self.__get_possible_actions(agent_id=agent_id, action_set=agent_obj.action_set)
-            action = agent_obj.get_action_func(state=state, possible_actions=possible_actions)
+            action = agent_obj.get_action_func(state=state, possible_actions=possible_actions, agent_id=agent_id)
             action_buffer[agent_id] = action
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
@@ -91,6 +98,7 @@ class GridWorld:
 
         # Update the grid
         self.__update_grid()
+        self.__sync_god_view_GUI()
 
         # Increment the number of tick we performed
         self.current_nr_ticks += 1
@@ -162,6 +170,51 @@ class GridWorld:
             self.__add_to_grid(obj)
         for agent_id, agent in self.registered_agents.items():
             self.__add_to_grid(agent)
+
+
+    # get all objects and agents on the grid
+    def __get_complete_state(self):
+
+        # get the grid size
+        grid_sz = self.shape
+
+        # create a state with all objects and agents
+        state = {}
+        for obj_id, obj in self.environment_objects.items():
+            state[obj.name] = obj.get_properties()
+        for agent_id, agent in self.registered_agents.items():
+            state[agent.name] = agent.get_properties()
+
+        return grid_sz, state
+
+
+    # reorder the state such that it has the x,y coords as keys
+    # Old state order: { 'object_name' : {obj_properties}, 'object_name2' : {obj_properties}}
+    # New state order: { (x1,y1) : [obj1, obj2, agent1], (x2,y1) : [obj1, obj2, agent1]}
+    def __reorder_state_for_GUI(self, state):
+        newState = {}
+        for obj in state:
+            # create a new list with (x,y) as key if it does not exist yet in the newState dict
+            if tuple(state[obj]['location']) not in newState:
+                newState[ tuple( state[obj]['location'] ) ] = []
+
+            # add the object or agent to the list at the (x,y) location in the dict
+            newState[ tuple( state[obj]['location'] ) ].append( state[obj] )
+
+        # print("sorted state:", newState)
+        return newState
+
+
+
+
+
+    def __sync_god_view_GUI(self):
+        grid_sz, state = self.__get_complete_state()
+        state = self.__reorder_state_for_GUI(state)
+        # print("State:", state)
+        # send the god view to the web app GUI
+        # TODO: add API request here
+
 
     def __get_agent_state(self, agent_obj):
         agent_loc = agent_obj.location

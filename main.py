@@ -11,6 +11,7 @@ time_step = 0.1  # Wait this in seconds between performing all actions
 grid_size = [4, 4]  # horizontal and vertical size of grid
 max_duration = 100  # number of time units the environment should run as a maximum
 
+# start locations of agents = thus 2 agents
 start_locations = [[0, 0], [0, 1]]
 obj_locations = [[2, 2], [1, 1], [0, 3], [3, 0], [3, 3]]
 
@@ -21,8 +22,11 @@ objects = []
 for nr_obj in range(len(obj_locations)):
     obj_name = f"object_{nr_obj}"
     location = obj_locations[nr_obj]
-    properties = {"type": np.random.RandomState(seed).choice(["lek", "brand"]),
-                  "grootte": np.random.RandomState(seed).choice([0, 1, 2])}
+    properties = {"type": np.random.choice(["lek", "brand"]),
+                  "grootte": int(np.random.RandomState(seed).choice([0, 1, 2])), # np ints etc. can't be serialized, so convert to float!
+                  "shape": 0,
+                  "colour": np.random.choice(["#286625", "#678fd9", "#FF5733"]),
+                  "size": np.random.choice(["#286625", "#678fd9", "#FF5733"])}
     is_traversable = False
     grid_env.add_env_object(obj_name, location, properties, is_traversable)
 
@@ -41,7 +45,7 @@ for nr_agent in range(len(start_locations)):
     senses = [[None, np.inf]]
     sense_capability = SenseCapability(senses)
     agent = Agent(name=agent_name, strt_location=start_locations[nr_agent], action_set=poss_actions,
-                  sense_capability=sense_capability)
+                  sense_capability=sense_capability, grid_size=grid_env.shape)
     agents.append(agent)
 
     agent_id, agent_seed = grid_env.register_agent(agent_name=agent.name, location=agent.location,
