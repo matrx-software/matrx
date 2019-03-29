@@ -1,5 +1,7 @@
-// make connection with python server via socket
-var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+// specify a namespace, so that we only listen to messages from the server for this specific agent
+var namespace = "/agent/" + document.getElementById('id').innerHTML;
+// make connection with the python server via a (web)socket
+var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
 // Event handler for new connections.
 socket.on('connect', function() {

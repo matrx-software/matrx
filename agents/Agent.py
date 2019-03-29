@@ -47,7 +47,7 @@ class Agent:
         """
 
         # send the agent state to the GUI web server for visualization
-        # sendGUIupdate(state=state, grid_size=self.grid_size, type="agent", verbose=False, id=agent_id)
+        sendGUIupdate(state=state, grid_size=self.grid_size, type="agent", verbose=False, id=agent_id)
 
         state = self.ooda_observe(state)
         state = self.ooda_orient(state)

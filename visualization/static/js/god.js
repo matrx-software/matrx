@@ -1,5 +1,6 @@
 // make connection with python server via socket
-var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + "/god/1_kaka");
+var namespace = "/god"
+var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
 // Event handler for new connections.
 socket.on('connect', function() {

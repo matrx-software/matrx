@@ -23,7 +23,7 @@ def update_human_agent(id):
 
     # pass testbed update to client / GUI
     data = request.json
-    socketio.emit('update', data)
+    socketio.emit('update', data, namespace=f"/human-agent/{id}")
 
     # send back user input to testbed
     return format_usr_inp(id)
@@ -46,9 +46,9 @@ def human_agent_view(id):
 def update_agent(id):
     # print("Agent update request with agent id:", id)
 
-    # pass testbed update to client / GUI
+    # pass testbed update to client / GUI of agent with specified ID
     data = request.json
-    socketio.emit('update', data)
+    socketio.emit('update', data, namespace=f"/agent/{id}")
 
     # send back user input to testbed
     return ""
@@ -72,7 +72,7 @@ def update_god():
 
     # pass testbed update to client / GUI of Godview
     data = request.json
-    socketio.emit('update', data, namespace="/god/1_kaka")
+    socketio.emit('update', data, namespace="/god")
 
     return ""
 

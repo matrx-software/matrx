@@ -1,5 +1,7 @@
+// specify a namespace, so that we only listen to messages from the server for this specific agent
+var namespace = "/human-agent/" + document.getElementById('id').innerHTML;
 // make connection with python server via socket
-var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
 // Event handler for new connections.
 socket.on('connect', function() {
@@ -19,10 +21,18 @@ socket.on('update', function(data){
     });
 });
 
+var id = -1;
+
+$(document).ready(function(){
+    // bind key listener
+    document.onkeydown = checkArrowKey;
+
+    // get the ID of the current human_agent from the html
+    id = document.getElementById('id').innerHTML;
+})
 
 // Catch userinput with arrow keys
 // Arrows keys: up=1, right=2, down=3, left=4
-document.onkeydown = checkArrowKey;
 function checkArrowKey(e) {
     e = e || window.event;
 
