@@ -1,0 +1,111 @@
+    
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+hr {
+    height: 1px;
+    background-color: rgba(0,0,0,.2);
+    border: none;
+}
+
+button {
+  background-color: #4CAF50; /* Green */
+  border: 1px solid transparent;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.green-btn {background-color: #4CAF50;} /* Green */
+.blue-btn {background-color: #008CBA;} /* Blue */
+.red-btn {background-color: #f44336;} /* Red */
+.gray-btn {background-color: #e7e7e7; color: black;} /* Gray */
+.black-btn {background-color: #555555;} /* Black */
+
+button:hover {
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+.container {
+    background-color: #fafafa;
+    color: rgba(0,0,0,.87);
+}
+
+.block {
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+    transition: box-shadow 280ms cubic-bezier(.4,0,.2,1);
+    display: block;
+    position: relative;
+    padding: 16px;
+    border-radius: 4px;
+    margin: 20px;
+    background: #fff;
+    color: rgba(0,0,0,.87);
+    font-family: Roboto,"Helvetica Neue",sans-serif;
+}
+
+.block-title {
+    font-size: 24px;
+    font-weight: 500;
+}
+
+
+/* Lists  */
+ul#list {
+    padding: 0;
+}
+
+#list li {
+    background: #ebe8f1;
+    margin-bottom: 2px;
+    display: block;
+    height: 50px;
+    -webkit-tap-highlight-color: transparent;
+    width: 100%;
+    padding: 0;
+    color: rgba(0,0,0,.87);
+    font-size: 16px;
+    font-family: Roboto,"Helvetica Neue",sans-serif;
+}
+
+#list-item-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 0 0 16px;
+    position: relative;
+    height: inherit;
+    justify-content: space-between;
+}
+
+#list li button {
+    float: right;
+}
+
+
+/* Header */
+nav {
+    background: #673ab7;
+    color: #fff;
+    height: 64px;
+    display: flex;
+    box-sizing: border-box;
+    padding: 0 16px;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    white-space: nowrap;
+    font: 500 20px/32px Roboto,"Helvetica Neue",sans-serif;
+    margin: 0;
+}
+
+nav .page-title {
+    margin-left: 20px;
+}
