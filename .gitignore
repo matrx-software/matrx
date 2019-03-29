@@ -1,2 +1,5 @@
 .idea/
 old/
+__pycache__/
+*.pyc
+node_modules/

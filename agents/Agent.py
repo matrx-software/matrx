@@ -1,9 +1,11 @@
 import numpy as np
-
+import datetime
+import requests
+from visualization.helper_functions import sendGUIupdate
 
 class Agent:
 
-    def __init__(self, name, strt_location, action_set, sense_capability, properties=None):
+    def __init__(self, name, strt_location, action_set, sense_capability, grid_size, properties=None):
         """
         Creates an Agent. All other agents should inherit from this class if you want smarter agents. This agent
         simply randomly selects an action from the possible actions it can do.
@@ -13,6 +15,8 @@ class Agent:
         existing action in the package Actions.
         :param sense_capability: A SenseCapability object; it states which object types the agent can perceive within
         what range.
+        :param grid_size: The size of the grid. The agent needs to send this along with other information to the
+        webapp managing the Agent GUI
         """
         if properties is None:
             self.properties = {"name": name}
@@ -28,8 +32,9 @@ class Agent:
         self.rnd_gen = None
         self.previous_action = None
         self.previous_action_result = None
+        self.grid_size = grid_size
 
-    def get_action(self, state, possible_actions):
+    def get_action(self, state, possible_actions, agent_id):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
         for this agent to select an action.
@@ -40,6 +45,10 @@ class Agent:
         world resulting in the appriopriate ActionResult.
         :return: An action string, which is the class name of one of the actions in the Action package.
         """
+
+        # send the agent state to the GUI web server for visualization
+        sendGUIupdate(state=state, grid_size=self.grid_size, type="agent", verbose=False, id=agent_id)
+
         state = self.ooda_observe(state)
         state = self.ooda_orient(state)
         action = self.ooda_decide(state, possible_actions)
@@ -75,6 +84,7 @@ class Agent:
 
         return self.agent_properties
 
+
     def set_rnd_seed(self, seed):
         """
         The function that seeds this agent's random seed.
@@ -85,6 +95,7 @@ class Agent:
         """
         self.rnd_seed = seed
         self.rnd_gen = np.random.RandomState(self.rnd_seed)
+
 
     def ooda_observe(self, state):
         """

@@ -22,6 +22,15 @@ class EnvObject:
         :return: The new properties"""
         pass
 
+
+    def add_properties(self, propName, propVal):
+
+        if propName in self.properties:
+            print("Property already exists, update with update_properties instead")
+        else:
+            self.properties[propName] = propVal
+
+
     def get_properties(self):
         """
         Returns the properties of this object, but also its name and location(s).
