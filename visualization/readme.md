@@ -3,7 +3,7 @@
 Testbed main loop
 sends an API request to the Python Flask server with updated data (grid world, etc.),
     + example grid
-    - real grid
+    + real grid
 Receives user inputs from API request
     + done
 
@@ -24,13 +24,13 @@ server-client setup
 shows GUI with gridworld etc.
     + to do
 receives updates from python server -> updates visuals
-    - to do
+    + to do
 catches user inputs and sends them back to the server
     + to do
 
 
-# To do:
-- add on.document load wrappers
+Todo:
+- add human agent
 
 
 # installation requirements
