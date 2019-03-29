@@ -1,28 +1,61 @@
 
 // gamemap stuff
+var canvas = null;
 var ctx = null;
-var tileW = 40, tileH = 40;
+// width and height of 1 cell = square
+// var tileW = 40, tileH = 40;
+var px_per_cell = 40;
+// number of cells in width and height of map
 var mapW = 10, mapH = 10;
 var currentSecond = 0, frameCount = 0, framesLastSecond = 0;
-
+// init
+var firstDraw = true;
 
 // Colour of the default BG tile
 var bgTileColour = "#C2C2C2";
 
 window.onload = function()
 {
-    // Get the grid canvas
-	ctx = document.getElementById('grid').getContext("2d");
-    // request the canvas to draw the grid with our drawSim function
-	// requestAnimationFrame(drawSim);
+    canvas = document.getElementById('grid');
+	ctx = canvas.getContext("2d");
+
+    // // resize the canvas to be fullscreen
+    // fixCanvasSize();
+
 	ctx.font = "bold 10pt sans-serif";
 };
 
-function drawSim(grid_size, state) {
-	if(ctx==null) { return; }
 
-    console.log("Drawing sim")
+// Changet the size of the canvas on a resize such that it is always fullscreen
+window.addEventListener("resize", fixCanvasSize );
+function fixCanvasSize() {
 
+    // get canvas from html
+    canvas = document.getElementById('grid');
+
+    // resize to current window size
+    canvas.width = document.body.clientWidth; //document.width is obsolete
+    canvas.height = document.body.clientHeight; //document.height is obsolete
+
+    console.log("Reset canvas size to:", canvas.width, canvas.height);
+
+    // change the tiles such that the complete grid fits on the screen
+    fixTileSize(canvas.width, canvas.height);
+}
+
+// change the tile size such that it optimally fits on the screen
+function fixTileSize(canvasW, canvasH) {
+
+    // calc the pixel per cell ratio in the x and y direcetion, and use
+    // the smallest one as the width ANd height of the cells, to keep them square
+    var px_per_cell_x = canvasW / mapW;
+    var px_per_cell_y = canvasH / mapH;
+    px_per_cell = Math.min(px_per_cell_x, px_per_cell_y);
+
+    console.log("Fixed tile size. x, y, min", px_per_cell_x, px_per_cell_y, px_per_cell);
+}
+
+function calc_fps() {
     // Keep track of our Frames per second
 	var sec = Math.floor(Date.now()/1000);
 	if(sec!=currentSecond)
@@ -32,7 +65,38 @@ function drawSim(grid_size, state) {
 		frameCount = 1;
 	}
 	else { frameCount++; }
+}
 
+// check if the grid size has changed, and recalculate the tile sizes if so
+function updateGridSize() {
+    if (grid_size[0] != mapW || grid_size[1] != mapH) {
+
+        // save the new grid size
+        mapW = grid_size[0];
+        mapH = grid_size[1];
+
+        // recalculate the sizes of the tiles
+        fixTileSize(canvas.width, canvas.height);
+    }
+}
+
+function drawSim(grid_size, state) {
+    // return in the case that the canvas has disappeared
+	if(ctx==null) { return; }
+
+    calc_fps();
+
+    // on the first draw run, calculate the optimal screen size based on the grid size
+    if (firstDraw) {
+        console.log("First draw, resetting canvas and tile sizes");
+        fixCanvasSize();
+        firstDraw = false;
+    }
+
+    // save the number of cells in x and y direction of the map
+    updateGridSize();
+
+    console.log("Drawing sim")
 
     // draw the grid
     // Traverse along Y axis
@@ -42,7 +106,7 @@ function drawSim(grid_size, state) {
 		for(var x = 0; x < grid_size[0]; ++x)
 		{
             // draw a default bg tile
-            drawBgTile(x, y, tileW, tileH);
+            drawBgTile(x, y, px_per_cell, px_per_cell);
 
             // draw any objects
             key = x + "_" + y;
@@ -60,10 +124,10 @@ function drawSim(grid_size, state) {
                     sz = obj['size'];
 
                     if (obj['shape'] == 0) {
-                        drawRectangle(x*tileW, y*tileH, tileW, tileH, sz)
+                        drawRectangle(x*px_per_cell, y*px_per_cell, px_per_cell, px_per_cell, sz)
                     }
                     else if (obj['shape'] == 1) {
-                        drawTriangle(x*tileW, y*tileH, tileW, tileH, sz);
+                        drawTriangle(x*px_per_cell, y*px_per_cell, px_per_cell, px_per_cell, sz);
                     }
 
                 }
