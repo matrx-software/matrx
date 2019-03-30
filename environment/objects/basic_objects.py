@@ -24,7 +24,9 @@ class EnvObject:
 
 
     def add_properties(self, propName, propVal):
-
+        """
+        Adds a new(!) property with its value to the agent.
+        """
         if propName in self.properties:
             print("Property already exists, update with update_properties instead")
         else:

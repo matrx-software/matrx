@@ -203,11 +203,15 @@ class GridWorld:
         agent_loc = agent_obj.location
         sense_capabilities = agent_obj.sense_capability.get_capabilities()
         objs_in_range = []
+
+        # Check which objects can be sensed with the agents' capabilities, from
+        # its current position.
         for obj_type, sense_range in sense_capabilities.items():
             env_objs = self.__get_objects_in_range(agent_loc, obj_type, sense_range)
             objs_in_range.extend(env_objs)
 
         state = {}
+        # Save all properties of the sensed objects in a state dictionary
         for env_obj in objs_in_range:
             state[env_obj.name] = env_obj.get_properties()
 

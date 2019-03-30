@@ -1,14 +1,10 @@
-
-// gamemap stuff
 var canvas = null;
 var ctx = null;
 // width and height of 1 cell = square
-// var tileW = 40, tileH = 40;
 var px_per_cell = 40;
 // number of cells in width and height of map
 var mapW = 10, mapH = 10;
 var currentSecond = 0, frameCount = 0, framesLastSecond = 0;
-// init
 var firstDraw = true;
 
 // Colour of the default BG tile
@@ -19,18 +15,17 @@ window.onload = function()
     canvas = document.getElementById('grid');
 	ctx = canvas.getContext("2d");
 
-    // // resize the canvas to be fullscreen
-    // fixCanvasSize();
-
 	ctx.font = "bold 10pt sans-serif";
 };
 
 
-// Changet the size of the canvas on a resize such that it is always fullscreen
+/**
+ * Changet the size of the canvas on a window resize such that it is always fullscreen
+ */
 window.addEventListener("resize", fixCanvasSize );
 function fixCanvasSize() {
 
-    // get canvas from html
+    // get canvas element from html
     canvas = document.getElementById('grid');
 
     // resize to current window size
@@ -43,20 +38,25 @@ function fixCanvasSize() {
     fixTileSize(canvas.width, canvas.height);
 }
 
-// change the tile size such that it optimally fits on the screen
+/**
+ * change the tile size such that it optimally fits on the screen
+ */
 function fixTileSize(canvasW, canvasH) {
 
-    // calc the pixel per cell ratio in the x and y direcetion, and use
-    // the smallest one as the width ANd height of the cells, to keep them square
+    // calc the pixel per cell ratio in the x and y direcetion
     var px_per_cell_x = canvasW / mapW;
     var px_per_cell_y = canvasH / mapH;
+
+    // Use the smallest one as the width AND height of the cells to keep tiles square
     px_per_cell = Math.min(px_per_cell_x, px_per_cell_y);
 
     console.log("Fixed tile size. x, y, min", px_per_cell_x, px_per_cell_y, px_per_cell);
 }
 
+/**
+ * Keep track of how often the visualization is updated as frames per second
+ */
 function calc_fps() {
-    // Keep track of our Frames per second
 	var sec = Math.floor(Date.now()/1000);
 	if(sec!=currentSecond)
 	{
@@ -67,7 +67,9 @@ function calc_fps() {
 	else { frameCount++; }
 }
 
-// check if the grid size has changed, and recalculate the tile sizes if so
+/**
+ * check if the grid size has changed and recalculate the tile sizes if so
+ */
 function updateGridSize() {
     if (grid_size[0] != mapW || grid_size[1] != mapH) {
 
@@ -80,13 +82,17 @@ function updateGridSize() {
     }
 }
 
+/**
+ * Draw the grid on screen
+ */
 function drawSim(grid_size, state) {
     // return in the case that the canvas has disappeared
 	if(ctx==null) { return; }
 
     calc_fps();
 
-    // on the first draw run, calculate the optimal screen size based on the grid size
+    // for the first time drawing the visualization, calculate the optimal
+    // screen size based on the grid size
     if (firstDraw) {
         console.log("First draw, resetting canvas and tile sizes");
         fixCanvasSize();
@@ -98,8 +104,8 @@ function drawSim(grid_size, state) {
 
     console.log("Drawing sim")
 
-    // draw the grid
-    // Traverse along Y axis
+    // Draw the grid
+    // traverse along Y axis
 	for(var y = 0; y < grid_size[1]; ++y)
 	{
         // traverse along X axis
@@ -108,7 +114,7 @@ function drawSim(grid_size, state) {
             // draw a default bg tile
             drawBgTile(x, y, px_per_cell, px_per_cell);
 
-            // draw any objects
+            // draw any objects on top
             key = x + "_" + y;
             if (key in state){
                 // console.log("Objects for key ", key, ":", state[key]);
@@ -118,109 +124,92 @@ function drawSim(grid_size, state) {
                     obj = state[key][objKey]
                     // console.log('obj:', obj);
 
-                    // set the correct colour
-                    ctx.fillStyle = obj['colour'];
-
+                    // get the object colour and size
+                    clr = obj['colour'];
                     sz = obj['size'];
 
+                    // draw the object with the correct shape, size and colour
                     if (obj['shape'] == 0) {
-                        drawRectangle(x*px_per_cell, y*px_per_cell, px_per_cell, px_per_cell, sz)
+                        drawRectangle(x*px_per_cell, y*px_per_cell, px_per_cell, px_per_cell, clr, sz)
                     }
                     else if (obj['shape'] == 1) {
-                        drawTriangle(x*px_per_cell, y*px_per_cell, px_per_cell, px_per_cell, sz);
+                        drawTriangle(x*px_per_cell, y*px_per_cell, px_per_cell, px_per_cell, clr, sz);
                     }
-
                 }
-
             }
-            // else {
-            //     console.log("No objects for key ", key);
-            // }
-
-            // // set colour of tile
-            // ctx.fillStyle = tileTypes[gameMap[toIndex(x,y)]].colour;
-            // sz = tileTypes[gameMap[toIndex(x,y)]].size
-            //
-            // // draw the shape
-            // switch(tileTypes[gameMap[toIndex(x,y)]].shape)
-			// {
-            //     case 1:
-			// 		drawTriangle(x*tileW, y*tileH, tileW, tileH, sz);
-			// 		break;
-			// 	default:
-            //         drawRectangle(x*tileW, y*tileH, tileW, tileH, sz)
-            // }
 		}
 	}
 
-    // Draw the FPS to the canvas as last so it's drawn over other things
+    // Draw the FPS to the canvas as last so it's drawn on top
 	ctx.fillStyle = "#ff0000";
 	ctx.fillText("FPS: " + framesLastSecond, 10, 20);
-
-    // request another animationFrame, which will draw the map again
-	// requestAnimationFrame(drawSim);
 }
 
-
-
-// convert x,y coord to map index
-function toIndex(x, y) {
-	return((y * mapW) + x);
-}
-
-// Draw a bg tile with a default colour
+/**
+ * Draw a background tile with the default colour
+ */
 function drawBgTile(x, y, tileW, tileH) {
     // full size rect
     ctx.fillStyle = bgTileColour;
     ctx.fillRect( x*tileW, y*tileH, tileW, tileH);
 }
 
-
-// draw rectangle
-// x = x location of tile (top left)
-// y = y location of tile (top left)
-// tileW = width of normal tile
-// tileH = height of normal tile
-// size = size ratio (0-1) of normal tile
-function drawRectangle(x, y, tileW, tileH, size) {
-    // full size rect
-    // ctx.fillRect( x*tileW, y*tileH, tileW, tileH);
-
+/**
+ * Draw a rectangle on screen
+ *
+ * @param {int} x: x location of tile (top left)
+ * @param {int} y: y location of tile (top left)
+ * @param {int} tileW: width of normal tile
+ * @param {int} tileH: height of normal tile
+ * @param {str} clr: colour to be used to fill the figure
+ * @param {float} size: size ratio (0-1) of this tile compared to a full tile
+ */
+function drawRectangle(x, y, tileW, tileH, clr, size) {
     // coords of top left corner
     top_left_x = x + ((1 - size) * 0.5 * tileW);
     top_left_y = y + ((1 - size) * 0.5 * tileH);
+
     // width and height of rectangle
     w = size * tileW;
     h = size * tileH;
 
+    // draw the rectangle
+    ctx.fillStyle = clr;
     ctx.fillRect( top_left_x, top_left_y, w, h);
 }
 
-// draw a triangle
-// x = x location of tile (top left)
-// y = y location of tile (top left)
-// tileW = width of normal tile
-// tileH = height of normal tile
-// size = size ratio (0-1) of normal tile
-function drawTriangle(x, y, tileW, tileH, size) {
 
+/**
+ * Draw a triangle on screen
+ *
+ * @param {int} x: x location of tile (top left)
+ * @param {int} y: y location of tile (top left)
+ * @param {int} tileW: width of normal tile
+ * @param {int} tileH: height of normal tile
+ * @param {str} clr: colour to be used to fill the figure
+ * @param {float} size: size ratio (0-1) of this tile compared to a full tile
+ */
+function drawTriangle(x, y, tileW, tileH, clr, size) {
     // calc the coordinates of the top corner of the triangle
     topX = x + 0.5 * tileW;
     topY = y + ((1 - size) * 0.5 * tileH);
+
     // calc the coordinates of the bottom left corner of the triangle
     bt_leftX = x + ((1 - size) * 0.5 * tileW);
     bt_leftY = y + tileH - ((1 - size) * 0.5 * tileH);
+
     // calc the coordinates of the bottom right corner of the triangle
     bt_rightX = x + tileW - ((1 - size) * 0.5 * tileW);
     bt_rightY = y + tileH - ((1 - size) * 0.5 * tileH);
 
-    // draw triangle
+    // draw triangle point by point
     ctx.beginPath();
     ctx.moveTo(topX, topY); // center top
     ctx.lineTo(bt_leftX, bt_leftY); // bottom left
     ctx.lineTo(bt_rightX, bt_rightY); // bottom right
     ctx.closePath();
 
-    // fill with colour
+    // fill the shape with colour
+    ctx.fillStyle = clr;
     ctx.fill();
 }

@@ -1,7 +1,8 @@
 $(document).ready(function(){
 
-    // specify a namespace, so that we only listen to messages from the server for this specific agent
+    // specify a namespace, so that we only listen to messages from the server for this specific human agent
     var namespace = "/human-agent/" + document.getElementById('id').innerHTML;
+
     // make connection with python server via socket
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
@@ -14,10 +15,11 @@ $(document).ready(function(){
     socket.on('update', function(data){
         console.log("Received an update from the server:", data);
 
+        // unpack received data
         grid_size = data.params.grid_size;
         state = data.state;
 
-        // draw the screen again
+        // draw the grid again
         requestAnimationFrame(function() {
             drawSim(grid_size, state);
         });
@@ -33,8 +35,11 @@ $(document).ready(function(){
     id = document.getElementById('id').innerHTML;
 
 
-    // Catch userinput with arrow keys
-    // Arrows keys: up=1, right=2, down=3, left=4
+    /**
+     * Catch userinput with arrow keys
+     *
+     * Arrows keys: up=1, right=2, down=3, left=4
+     */
     function checkArrowKey(e) {
         e = e || window.event;
 
@@ -42,10 +47,6 @@ $(document).ready(function(){
         if (e.keyCode < 37 || e.keyCode > 40) {
             return
         }
-
-        // get ID which is saved in the HTML
-        var id = document.getElementById('id').innerHTML;
-        console.log("id:", id)
 
         // send an update for every arrow key pressed
         if (e.keyCode == '38') {
@@ -65,5 +66,4 @@ $(document).ready(function(){
            socket.emit("userinput", {"movement": 4, 'id': id});
         }
     }
-
 });
