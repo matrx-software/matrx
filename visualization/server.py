@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, jsonify
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, join_room, emit
 from time import sleep
 import numpy as np
 import json
@@ -8,6 +8,10 @@ import json
 app = Flask(__name__, template_folder='static/templates')
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+
+
+# When you want to emit from a regular route you have to use socketio.emit(),
+# only socket handlers have the socketio context necessary to call the plain emit().
 
 
 ###############################################
@@ -19,11 +23,12 @@ socketio = SocketIO(app)
 # returns last userinput (if any)
 @app.route('/update/human-agent/<id>', methods=['POST'])
 def update_human_agent(id):
-    print("Human Agent update request with agent id:", id)
+    # print("Human Agent update request with agent id:", id)
 
     # pass testbed update to client / GUI
     data = request.json
-    socketio.emit('update', data, namespace=f"/human-agent/{id}")
+    room = f"/humanagent/{id}"
+    socketio.emit('update', data, room=room, namespace="/humanagent")
 
     # send back user input to testbed
     return format_usr_inp(id)
@@ -48,7 +53,8 @@ def update_agent(id):
 
     # pass testbed update to client / GUI of agent with specified ID
     data = request.json
-    socketio.emit('update', data, namespace=f"/agent/{id}")
+    room = f"/agent/{id}"
+    socketio.emit('update', data, room=room, namespace="/agent")
 
     # send back user input to testbed
     return ""
@@ -83,6 +89,23 @@ def god_view():
     return render_template('god.html')
 
 
+
+###############################################
+# Managing rooms
+###############################################
+# add client to a room for their specific (human) agent ID
+@socketio.on('join', namespace='/agent')
+@socketio.on('join', namespace='/humanagent')
+def join(message):
+    join_room(message['room'])
+    print("Added client to room:", message["room"])
+
+    # emit('test', "Hey room " + message['room'] + "!", room=message['room'])
+    print("sending message to room", message['room'])
+
+
+
+
 ###############################################
 # server-client socket connections (agent / humanagent)
 ###############################################
@@ -108,28 +131,27 @@ def format_usr_inp(id):
     return resp
 
 
-@socketio.on('userinput')
+@socketio.on('userinput', namespace="/humanagent")
 def handle_usr_inp(input):
-    # print('received userinput: %s' % input)
+    print('received userinput: %s' % input)
 
     id = input['id']
-    movement = input['movement']
+    action = input['action']
 
-    # save the movement to the userinput of that human agent
-    # agent can do only 1 action at a time, so remember only the latest
+    # save the userinput action to the userinput dict of that human agent.
+    # As the agent can do only 1 action at a time remember only the latest
     # userinput action of each human agent
     global userinput
     if id not in userinput:
-        userinput[id] = {"movement": movement}
+        userinput[id] = {"action": action}
     else:
-        userinput[id]["movement"] = movement
+        userinput[id]["action"] = action
 
 
 
 @socketio.on('connect')
 def test_connect():
     print('got a connect')
-    socketio.emit('my response', {'data': 'Connected'})
 
 
 if __name__ == "__main__":

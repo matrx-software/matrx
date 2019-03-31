@@ -84,7 +84,14 @@ def sendGUIupdate(state, grid_size, type, verbose, id=None):
 
     # return userinputs for humanagent
     if type is "humanagent":
-        return r.json()
+        repl = r.json()
+
+        # return None if there was no userinput
+        if repl == {}:
+            return None
+
+        # otherwise return the userinput
+        return repl['action']
 
     # otherwise return nothing
     return ""
