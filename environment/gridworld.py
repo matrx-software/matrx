@@ -57,7 +57,8 @@ class GridWorld:
         agent_object.add_properties(propName="colour", propVal=np.random.choice(["#900C3F", "#581845"]))
         agent_object.add_properties(propName="shape", propVal=1)
         agent_object.add_properties(propName="size", propVal=1)
-
+        agent_object.add_properties(propName="carrying", propVal = [])
+        
         self.registered_agents[agent_id] = agent_object
         return agent_id, agent_seed
 
