@@ -20,7 +20,7 @@ def possible_grab(grid_world, agent_id):
     if loc_obj_ids is None:
         return GrabActionResult(GrabActionResult.RESULT_NO_OBJECT, succeeded=False)
     else:
-         # Go through all objects at the desired locations
+         ## Go through all objects at the desired locations
         for loc_obj_id in loc_obj_ids:
             # Check if loc_obj_id is the id of an agent
             if loc_obj_id in grid_world.registered_agents.keys():
