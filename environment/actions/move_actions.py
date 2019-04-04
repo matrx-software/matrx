@@ -1,22 +1,26 @@
 from environment.actions.action import Action, ActionResult
+from environment.objects.basic_objects import AgentAvatar
 
 
 def act_move(grid_world, agent_id, dx, dy):
-    result = possible_movement(grid_world, agent_id, dx, dy)
-    if result.succeeded:
-        loc = grid_world.registered_agents[agent_id].location
-        new_loc = (loc[0] + dx, loc[1] + dy)
-        grid_world.registered_agents[agent_id].location = new_loc
-    return result
+    agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentAvatar)
+    loc = agent_avatar.location
+    new_loc = (loc[0] + dx, loc[1] + dy)
+    grid_world.registered_agents[agent_id].location = new_loc
+    return True
 
 
 def is_possible_movement(grid_world, agent_id, dx, dy):
     result = possible_movement(grid_world, agent_id, dx, dy)
-    return result.succeeded
+    return result.succeeded, result.result
 
 
 def possible_movement(grid_world, agent_id, dx, dy):
-    loc = grid_world.registered_agents[agent_id].location
+
+    agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentAvatar)
+    assert agent_avatar is not None
+
+    loc = agent_avatar.location
     new_loc = (loc[0] + dx, loc[1] + dy)
     if 0 <= new_loc[0] < grid_world.shape[0] and 0 <= new_loc[1] < grid_world.shape[1]:
         loc_obj_ids = grid_world.grid[new_loc[1], new_loc[0]]
@@ -61,9 +65,8 @@ class MoveActionResult(ActionResult):
 
 class MoveNorth(Action):
 
-    def __init__(self, name=None):
-        if name is None:
-            name = MoveNorth.__name__
+    def __init__(self):
+        name = MoveNorth.__name__
         super().__init__(name)
         self.dx = 0
         self.dy = -1
@@ -77,9 +80,8 @@ class MoveNorth(Action):
 
 class MoveNorthEast(Action):
 
-    def __init__(self, name=None):
-        if name is None:
-            name = MoveNorthEast.__name__
+    def __init__(self):
+        name = MoveNorthEast.__name__
         super().__init__(name)
         self.dx = +1
         self.dy = -1
@@ -93,9 +95,8 @@ class MoveNorthEast(Action):
 
 class MoveEast(Action):
 
-    def __init__(self, name=None):
-        if name is None:
-            name = MoveEast.__name__
+    def __init__(self):
+        name = MoveEast.__name__
         super().__init__(name)
         self.dx = +1
         self.dy = 0
@@ -109,9 +110,8 @@ class MoveEast(Action):
 
 class MoveSouthEast(Action):
 
-    def __init__(self, name=None):
-        if name is None:
-            name = MoveSouthEast.__name__
+    def __init__(self):
+        name = MoveSouthEast.__name__
         super().__init__(name)
         self.dx = +1
         self.dy = +1
@@ -125,9 +125,8 @@ class MoveSouthEast(Action):
 
 class MoveSouth(Action):
 
-    def __init__(self, name=None):
-        if name is None:
-            name = MoveSouth.__name__
+    def __init__(self):
+        name = MoveSouth.__name__
         super().__init__(name)
         self.dx = 0
         self.dy = +1
@@ -141,9 +140,8 @@ class MoveSouth(Action):
 
 class MoveSouthWest(Action):
 
-    def __init__(self, name=None):
-        if name is None:
-            name = MoveSouthWest.__name__
+    def __init__(self):
+        name = MoveSouthWest.__name__
         super().__init__(name)
         self.dx = -1
         self.dy = +1
@@ -157,9 +155,8 @@ class MoveSouthWest(Action):
 
 class MoveWest(Action):
 
-    def __init__(self, name=None):
-        if name is None:
-            name = MoveWest.__name__
+    def __init__(self):
+        name = MoveWest.__name__
         super().__init__(name)
         self.dx = -1
         self.dy = 0
@@ -173,9 +170,8 @@ class MoveWest(Action):
 
 class MoveNorthWest(Action):
 
-    def __init__(self, name=None):
-        if name is None:
-            name = MoveNorthWest.__name__
+    def __init__(self):
+        name = MoveNorthWest.__name__
         super().__init__(name)
         self.dx = -1
         self.dy = -1

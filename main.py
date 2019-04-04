@@ -34,7 +34,6 @@ for nr_obj in range(len(obj_locations)):
     is_traversable = False
     grid_env.add_env_object(obj_name, location, properties, is_traversable)
 
-
 agents = []
 # Initialize agents
 for nr_agent in range(len(agent_start_locations)):
@@ -50,18 +49,17 @@ for nr_agent in range(len(agent_start_locations)):
         MoveNorthWest.__name__]
     senses = [[None, np.inf]]
     sense_capability = SenseCapability(senses)
-    agent = Agent(name=agent_name, strt_location=agent_start_locations[nr_agent], action_set=poss_actions,
+    agent = Agent(name=agent_name, action_set=poss_actions,
                   sense_capability=sense_capability, grid_size=grid_env.shape)
     agents.append(agent)
 
-    agent_id, agent_seed = grid_env.register_agent(agent_name=agent.name, location=agent.location,
+    agent_id, agent_seed = grid_env.register_agent(agent_name=agent.name, location=agent_start_locations[nr_agent],
                                                    sense_capability=agent.sense_capability,
                                                    get_action_func=agent.get_action,
                                                    set_action_result_func=agent.set_action_result,
                                                    agent_properties=agent.get_properties(),
                                                    action_set=agent.action_set)
     agent.set_rnd_seed(agent_seed)
-
 
 human_agents = []
 # Initialize human agents
@@ -81,19 +79,19 @@ for nr_human_agent in range(len(human_agent_start_locations)):
     }
     senses = [[None, np.inf]]
     sense_capability = SenseCapability(senses)
-    human_agent = HumanAgent(name=human_agent_name, strt_location=human_agent_start_locations[nr_human_agent], action_set=poss_actions,
-                  sense_capability=sense_capability, grid_size=grid_env.shape, usrinp_action_map=usrinp_action_map)
+    human_agent = HumanAgent(name=human_agent_name, action_set=poss_actions,
+                             sense_capability=sense_capability, grid_size=grid_env.shape,
+                             usrinp_action_map=usrinp_action_map)
     human_agents.append(human_agent)
 
-    human_agent_id, human_agent_seed = grid_env.register_agent(agent_name=human_agent.name, location=human_agent.location,
-                                                   sense_capability=human_agent.sense_capability,
-                                                   get_action_func=human_agent.get_action,
-                                                   set_action_result_func=human_agent.set_action_result,
-                                                   agent_properties=human_agent.get_properties(),
-                                                   action_set=human_agent.action_set)
+    human_agent_id, human_agent_seed = grid_env.register_agent(agent_name=human_agent.name,
+                                                               location=human_agent_start_locations[nr_human_agent],
+                                                               sense_capability=human_agent.sense_capability,
+                                                               get_action_func=human_agent.get_action,
+                                                               set_action_result_func=human_agent.set_action_result,
+                                                               agent_properties=human_agent.get_properties(),
+                                                               action_set=human_agent.action_set)
     human_agent.set_rnd_seed(human_agent_seed)
-
-
 
 grid_env.initialize()
 is_done = False
