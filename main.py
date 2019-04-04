@@ -10,11 +10,11 @@ from environment.sim_goals.sim_goal import LimitedTimeGoal
 seed = 1
 time_step = 0.1  # Wait this in seconds between performing all actions
 grid_size = [10, 10]  # horizontal and vertical size of grid
-max_duration = 100  # number of time units the environment should run as a maximum
+max_duration = -1  # number of time units the environment should run as a maximum
 
 # start locations of agents = thus 2 agents
 agent_start_locations = [[0, 0], [0, 1]]
-human_agent_start_locations = [[6, 6], [9,9]]
+human_agent_start_locations = [[6, 6], [9, 9]]
 obj_locations = [[2, 2], [1, 1], [0, 3], [3, 0], [3, 3]]
 
 sim_goal = LimitedTimeGoal(max_duration)  # can be a list of goals
