@@ -62,6 +62,7 @@ class GridWorld:
         return agent_id, agent_seed
 
     def add_env_object(self, obj_name, location, obj_properties, is_traversable=False):
+        # This function adds the objects
         obj_id = obj_name
         env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties, is_traversable=is_traversable)
 
@@ -93,7 +94,10 @@ class GridWorld:
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
         for agent_id, action in action_buffer.items():
             self.__perform_action(agent_id, action)
-
+            
+            # Always perform a grab if possible
+            self.__perform_action(agent_id, "GrabAction")
+        
         # Perform the update method of all objects
         for env_obj in self.environment_objects.values():
             env_obj.update_properties(self)
@@ -271,18 +275,31 @@ class GridWorld:
         set_action_result = self.registered_agents[agent_id].set_action_result_func
         # Send result of mutation to agent
         set_action_result(result)
+        
+        ### DOES THIS DO ANYTHING? ###
         # Update world if needed
         if action_name is not None:
             self.__update_agent_location(agent_id)
+        ####
+        
         return result
-
+        
+    ### DOES THIS DO ANYTHING? 
     def __update_agent_location(self, agent_id):
         loc = self.registered_agents[agent_id].location
         if self.grid[loc[1], loc[0]] is not None:
             self.grid[loc[1], loc[0]].append(agent_id)
         else:
             self.grid[loc[1], loc[0]] = [agent_id]
-
+    ### DOES THIS DO ANYTHING
+    
+    def __update_obj_location(self, obj_id): 
+        loc = self.environment_objects[obj_id].location
+        if self.grid[loc[1], loc[0]] is not None:
+            self.grid[loc[1], loc[0]].append(obj_id)
+        else:
+            self.grid[loc[1], loc[0]] = [obj_id]        
+    
     def __warn(self, warn_str):
         return f"[@{self.current_nr_ticks}] {warn_str}"
 
