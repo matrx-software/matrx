@@ -66,7 +66,8 @@ class GridWorld:
         # This function adds the objects
         obj_id = obj_name
         env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties, is_traversable=is_traversable)
-
+        env_object.add_properties(propName="carried", propVal = False)
+        
         self.environment_objects[obj_id] = env_object
         return obj_id
 
