@@ -10,7 +10,7 @@ import numpy as np
 from environment.actions.move_actions import *
 from environment.objects.basic_objects import AgentAvatar, EnvObject
 
-from visualization.helper_functions import sendGUIupdate
+from visualization.helper_functions import sendGUIupdate, initGUI
 
 
 class GridWorld:
@@ -34,8 +34,11 @@ class GridWorld:
     def initialize(self):
         # We update the grid, which fills everything with added objects and agents
         self.__update_grid()
+        # initialize GUI by sending the grid size
+        initGUI(self.shape, verbose=True)
         # We send all visible objects to the God view GUI
         self.__sync_god_view_GUI()
+
 
     def register_agent(self, agent_name, location, sense_capability, action_set, get_action_func,
                        set_action_result_func, agent_properties, agent_type=AgentAvatar):
@@ -264,7 +267,7 @@ class GridWorld:
         state = self.__get_complete_state()
 
         # send the grid / god view state to the GUI web server for visualization
-        sendGUIupdate(state=state, grid_size=self.shape, type="god", verbose=False)
+        sendGUIupdate(state=state, type="god", verbose=False)
 
     def __get_agent_state(self, agent_obj):
         agent_loc = agent_obj.location

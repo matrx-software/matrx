@@ -50,7 +50,7 @@ for nr_agent in range(len(agent_start_locations)):
     senses = [[None, np.inf]]
     sense_capability = SenseCapability(senses)
     agent = Agent(name=agent_name, action_set=poss_actions,
-                  sense_capability=sense_capability, grid_size=grid_env.shape)
+                  sense_capability=sense_capability)
     agents.append(agent)
 
     agent_id, agent_seed = grid_env.register_agent(agent_name=agent.name, location=agent_start_locations[nr_agent],
@@ -80,7 +80,7 @@ for nr_human_agent in range(len(human_agent_start_locations)):
     senses = [[None, np.inf]]
     sense_capability = SenseCapability(senses)
     human_agent = HumanAgent(name=human_agent_name, action_set=poss_actions,
-                             sense_capability=sense_capability, grid_size=grid_env.shape,
+                             sense_capability=sense_capability,
                              usrinp_action_map=usrinp_action_map)
     human_agents.append(human_agent)
 

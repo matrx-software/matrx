@@ -9,7 +9,7 @@ from agents.Agent import Agent
 
 class HumanAgent(Agent):
 
-    def __init__(self, name, action_set, sense_capability, grid_size, usrinp_action_map, properties=None):
+    def __init__(self, name, action_set, sense_capability, usrinp_action_map, properties=None):
         """
         Creates an Human Agent which is an agent that can be controlled by a human.
 
@@ -23,8 +23,7 @@ class HumanAgent(Agent):
         webapp managing the Agent GUI
         """
 
-        super().__init__(name=name, action_set=action_set, sense_capability=sense_capability, grid_size=grid_size,
-                         properties=properties)
+        super().__init__(name=name, action_set=action_set, sense_capability=sense_capability, properties=properties)
 
         self.usrinp_action_map = usrinp_action_map
 
@@ -47,7 +46,7 @@ class HumanAgent(Agent):
 
         # send the agent state to the GUI web server for visualization, and
         # receive the user input
-        userInput = sendGUIupdate(state=state, grid_size=self.grid_size, type="humanagent", verbose=False, id=agent_id)
+        userInput = sendGUIupdate(state=state, type="humanagent", verbose=False, id=agent_id)
 
         # if there was no userinput do nothing
         if userInput is None:

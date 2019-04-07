@@ -70,7 +70,7 @@ function calc_fps() {
 /**
  * check if the grid size has changed and recalculate the tile sizes if so
  */
-function updateGridSize() {
+function updateGridSize(grid_size) {
     if (grid_size[0] != mapW || grid_size[1] != mapH) {
 
         // save the new grid size
@@ -100,7 +100,7 @@ function drawSim(grid_size, state) {
     }
 
     // save the number of cells in x and y direction of the map
-    updateGridSize();
+    updateGridSize(grid_size);
 
     console.log("Drawing sim")
 

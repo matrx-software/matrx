@@ -2,6 +2,8 @@ $(document).ready(function(){
 
     var id = document.getElementById('id').innerHTML;
 
+    var grid_sz = [4, 4]
+
     // specify a namespace, so that we only listen to messages from the server for this specific agent
     var namespace = "/agent";
 
@@ -19,17 +21,35 @@ $(document).ready(function(){
         socket.emit('join', {room: room});
     });
 
+    // Event handler for new connections.
+    socket.on('connect', function() {
+        console.log("Connected");
+
+        var room = "/agent/" + id;
+
+        // request to be added to room
+        console.log("Requesting to be added to room:", room)
+        socket.emit('join', {room: room});
+    });
+
+    // Event handler for new connections.
+    socket.on('init', function(data) {
+        console.log("Init grid with grid_size:", grid_sz);
+
+        grid_sz = data.params.grid_size;
+    });
+
     // receive an update from the python server
     socket.on('update', function(data){
         console.log("Received an update from the server:", data);
 
         // unpack received data
-        grid_size = data.params.grid_size;
+        // grid_size = data.params.grid_size;
         state = data.state;
 
         // draw the grid again
         requestAnimationFrame(function() {
-            drawSim(grid_size, state);
+            drawSim(grid_sz, state);
         });
     });
 

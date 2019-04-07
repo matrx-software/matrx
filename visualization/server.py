@@ -15,6 +15,22 @@ socketio = SocketIO(app)
 
 
 ###############################################
+# Routes initialization
+###############################################
+@app.route('/init', methods=['POST'])
+def init_GUI():
+
+    # pass testbed init to client / GUI
+    data = request.json
+    socketio.emit('init', data, namespace="/humanagent")
+    socketio.emit('init', data, namespace="/agent")
+    socketio.emit('init', data, namespace="/god")
+
+    return ""
+
+
+
+###############################################
 # Routes human agent
 ###############################################
 
