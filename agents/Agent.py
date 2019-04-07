@@ -51,7 +51,7 @@ class Agent:
         action = self.ooda_act(action)
 
         # send the agent state to the GUI web server for visualization
-        sendGUIupdate(state=state, type="agent", verbose=False, id=agent_id)
+        # sendGUIupdate(state=state, type="agent", verbose=True, id=agent_id)
 
         return action, action_kwargs
 

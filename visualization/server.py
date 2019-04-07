@@ -1,14 +1,17 @@
 from flask import Flask, request, render_template, jsonify
 from flask_socketio import SocketIO, join_room, emit
-from time import sleep
+from time import sleep, time
 import numpy as np
 import json
+import datetime
 
 # app = Flask(__name__)
 app = Flask(__name__, template_folder='static/templates')
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
+
+grid_sz = [4, 4]
 
 # When you want to emit from a regular route you have to use socketio.emit(),
 # only socket handlers have the socketio context necessary to call the plain emit().
@@ -20,11 +23,16 @@ socketio = SocketIO(app)
 @app.route('/init', methods=['POST'])
 def init_GUI():
 
-    # pass testbed init to client / GUI
+    # pass testbed init to clients / GUIs
     data = request.json
-    socketio.emit('init', data, namespace="/humanagent")
-    socketio.emit('init', data, namespace="/agent")
-    socketio.emit('init', data, namespace="/god")
+    # socketio.emit('init', data, namespace="/humanagent")
+    # socketio.emit('init', data, namespace="/agent")
+    # socketio.emit('init', data, namespace="/god")
+
+    global grid_sz
+    grid_sz = data["params"]["grid_size"]
+
+    print("Init received:", grid_sz)
 
     return ""
 
@@ -43,6 +51,7 @@ def update_human_agent(id):
 
     # pass testbed update to client / GUI
     data = request.json
+    data["params"]["grid_size"] = grid_sz
     room = f"/humanagent/{id}"
     socketio.emit('update', data, room=room, namespace="/humanagent")
 
@@ -69,6 +78,7 @@ def update_agent(id):
 
     # pass testbed update to client / GUI of agent with specified ID
     data = request.json
+    data["params"]["grid_size"] = grid_sz
     room = f"/agent/{id}"
     socketio.emit('update', data, room=room, namespace="/agent")
 
@@ -92,8 +102,14 @@ def agent_view(id):
 @app.route('/update/god', methods=['POST'])
 def update_god():
 
+    ms = round(time()*1000.0)
+    
     # pass testbed update to client / GUI of Godview
     data = request.json
+    # add grid size
+    data["params"]["grid_size"] = grid_sz
+    # add timestamp for message
+    data["params"]["timestamp"] = ms
     socketio.emit('update', data, namespace="/god")
 
     return ""

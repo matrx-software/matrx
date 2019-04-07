@@ -46,8 +46,9 @@ class HumanAgent(Agent):
 
         # send the agent state to the GUI web server for visualization, and
         # receive the user input
-        userInput = sendGUIupdate(state=state, type="humanagent", verbose=False, id=agent_id)
-
+        # userInput = sendGUIupdate(state=state, type="humanagent", verbose=False, id=agent_id)
+        userInput = None
+        
         # if there was no userinput do nothing
         if userInput is None:
             return None, {}

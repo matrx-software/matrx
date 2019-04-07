@@ -28,6 +28,9 @@ def reorder_state_for_GUI(state):
 
 
 def initGUI(grid_size, verbose):
+    """
+    Send an initialization message to the GUI webserver, which sends the grid_size.
+    """
     data = {'params': {'grid_size': grid_size} }
 
     url = 'http://localhost:3000/init'

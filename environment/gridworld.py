@@ -35,7 +35,7 @@ class GridWorld:
         # We update the grid, which fills everything with added objects and agents
         self.__update_grid()
         # initialize GUI by sending the grid size
-        initGUI(self.shape, verbose=True)
+        initGUI(self.shape, verbose=False)
         # We send all visible objects to the God view GUI
         self.__sync_god_view_GUI()
 
@@ -120,6 +120,8 @@ class GridWorld:
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time
         self.curr_tick_duration = tick_duration.total_seconds()
+
+        print("Currente tick duration:", self.curr_tick_duration)
 
         # Sleep for the remaining time of self.tick_duration
         self.__sleep()
