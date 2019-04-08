@@ -10,7 +10,8 @@ import numpy as np
 from environment.actions.move_actions import *
 from environment.objects.basic_objects import AgentAvatar, EnvObject
 
-from visualization.helper_functions import sendGUIupdate, initGUI
+# from visualization.helper_functions import sendGUIupdate, initGUI
+from visualization.visualizer import Visualizer
 
 
 class GridWorld:
@@ -34,14 +35,19 @@ class GridWorld:
     def initialize(self):
         # We update the grid, which fills everything with added objects and agents
         self.__update_grid()
-        # initialize GUI by sending the grid size
-        initGUI(self.shape, verbose=False)
-        # We send all visible objects to the God view GUI
-        self.__sync_god_view_GUI()
+
+        # Initialize the visualizer
+        self.visualizer = Visualizer(self.shape)
+
+        # # initialize GUI by sending the grid size
+        # initGUI(self.shape, verbose=False)
+        #
+        # # We send all visible objects to the God view GUI
+        # self.__sync_god_view_GUI()
 
 
     def register_agent(self, agent_name, location, sense_capability, action_set, get_action_func,
-                       set_action_result_func, agent_properties, agent_type=AgentAvatar):
+                       set_action_result_func, agent_properties, type, agent_type=AgentAvatar):
         agent_id = agent_name
         agent_seed = self.rnd_gen.randint(1)
 
@@ -52,7 +58,7 @@ class GridWorld:
             agent_object = AgentAvatar(agent_id=agent_id, agent_name=agent_name, location=location,
                                        sense_capability=sense_capability, action_set=action_set,
                                        get_action_func=get_action_func, properties=agent_properties,
-                                       set_action_result_func=set_action_result_func)
+                                       set_action_result_func=set_action_result_func, type=type)
         else:
             raise Exception(f"Agent of type {agent_type} is not known to the environment.")
 
@@ -90,9 +96,14 @@ class GridWorld:
         for agent_id, agent_obj in self.registered_agents.items():
             state = self.__get_agent_state(agent_obj)
             possible_actions = self.__get_possible_actions(agent_id=agent_id, action_set=agent_obj.action_set)
-            action_class_name, action_kwargs = agent_obj.get_action_func(state=state, possible_actions=possible_actions,
-                                                                         agent_id=agent_id)
+            filtered_agent_state, action_class_name, action_kwargs = agent_obj.get_action_func(state=state, possible_actions=possible_actions, agent_id=agent_id)
             action_buffer[agent_id] = (action_class_name, action_kwargs)
+
+            # save what the agent observed to the visualizer
+            self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state)
+
+        # save the god state in the visualizer
+        self.visualizer.save_state(type="god", id="god", state=self.__get_complete_state())
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
         for agent_id, action in action_buffer.items():
@@ -109,9 +120,14 @@ class GridWorld:
         for env_obj in self.environment_objects.values():
             env_obj.update_properties(self)
 
+        # update the visualization
+        self.visualizer.updateGUIs()
+
         # Update the grid
         self.__update_grid()
-        self.__sync_god_view_GUI()
+
+
+
 
         # Increment the number of tick we performed
         self.current_nr_ticks += 1

@@ -53,7 +53,7 @@ class Agent:
         # send the agent state to the GUI web server for visualization
         # sendGUIupdate(state=state, type="agent", verbose=True, id=agent_id)
 
-        return action, action_kwargs
+        return state, action, action_kwargs
 
     def set_action_result(self, action_result):
         """
