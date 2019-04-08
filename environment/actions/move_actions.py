@@ -11,7 +11,12 @@ def act_move(grid_world, agent_id, dx, dy):
     # Carrying action is done here
     if len(grid_world.registered_agents[agent_id].properties['carrying']) != 0:
         for obj_carried in grid_world.registered_agents[agent_id].properties['carrying']:
-            grid_world.environment_objects[obj_carried].location = new_loc
+            # Check, it could be that the object was deleted
+            if obj_carried in grid_world.environment_objects:
+                grid_world.environment_objects[obj_carried].location = new_loc
+            else:
+                # Apparently the object has been removed. Thus removing from carrying
+                grid_world.registered_agents[agent_id].properties['carrying'].remove(obj_carried)
 
     return True
 

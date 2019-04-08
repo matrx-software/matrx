@@ -40,6 +40,8 @@ class GridWorld:
     def register_agent(self, agent_name, location, sense_capability, action_set, get_action_func,
                        set_action_result_func, agent_properties, agent_type=AgentAvatar):
         agent_id = agent_name
+
+        # Random seed for agent between 1 and 1000, might need to be adjusted still
         agent_seed = self.rnd_gen.randint(1, 1000)
 
         if not callable(get_action_func):
@@ -57,7 +59,7 @@ class GridWorld:
         agent_object.add_properties(propName="colour", propVal=np.random.choice(["#900C3F", "#581845"]))
         agent_object.add_properties(propName="shape", propVal=1)
         agent_object.add_properties(propName="size", propVal=1)
-        agent_object.add_properties(propName="carrying", propVal = [])
+        agent_object.add_properties(propName="carrying", propVal=[])
 
         self.registered_agents[agent_id] = agent_object
 

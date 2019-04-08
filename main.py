@@ -7,6 +7,7 @@ from environment.gridworld import GridWorld
 from environment.actions.move_actions import *
 from environment.actions.grab_actions import *
 from environment.actions.drop_actions import *
+from environment.actions.object_actions import *
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 
 seed = 1
