@@ -5,6 +5,8 @@ from agents.HumanAgent import HumanAgent
 from agents.capabilities.capability import SenseCapability
 from environment.gridworld import GridWorld
 from environment.actions.move_actions import *
+from environment.actions.grab_actions import *
+from environment.actions.drop_actions import *
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 
 seed = 1
@@ -13,9 +15,10 @@ grid_size = [10, 10]  # horizontal and vertical size of grid
 max_duration = -1  # number of time units the environment should run as a maximum
 
 # start locations of agents = thus 2 agents
-agent_start_locations = [[0, 0], [0, 1]]
+agent_start_locations = [[0, 0], [0, 1], [8, 8]]
 human_agent_start_locations = [[6, 6], [9, 9]]
-obj_locations = [[2, 2], [1, 1], [0, 3], [3, 0], [3, 3]]
+obj_locations = [[2, 2], [1, 5], [0, 3], [6, 0], [3, 3], [9, 6], [6, 3],
+                 [3, 5], [7, 8], [2, 6], [8, 3]]
 
 sim_goal = LimitedTimeGoal(max_duration)  # can be a list of goals
 grid_env = GridWorld(grid_size, time_step, simulation_goal=sim_goal, can_occupy_agent_locs=True, rnd_seed=seed)
@@ -32,9 +35,16 @@ for nr_obj in range(len(obj_locations)):
                   "shape": 0,
                   "colour": rng.choice(["#286625", "#678fd9", "#FF5733"]),
                   "size": float(rng.rand())}
-    is_traversable = False
+    
+    if properties["colour"] == "#286625": 
+        is_traversable = False
+    else:
+        is_traversable = True
+        
     grid_env.add_env_object(obj_name, location, properties, is_traversable)
 
+# Traversable objects
+    
 agents = []
 # Initialize agents
 for nr_agent in range(len(agent_start_locations)):
@@ -47,7 +57,10 @@ for nr_agent in range(len(agent_start_locations)):
         MoveSouth.__name__,
         MoveSouthWest.__name__,
         MoveWest.__name__,
-        MoveNorthWest.__name__]
+        MoveNorthWest.__name__,
+        GrabAction.__name__,
+        DropAction.__name__]
+
     senses = [[None, np.inf]]
     sense_capability = SenseCapability(senses)
     agent = Agent(name=agent_name, action_set=poss_actions,

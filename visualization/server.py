@@ -4,6 +4,9 @@ from time import sleep
 import numpy as np
 import json
 
+# Using PyCharm:
+# runfile('visualization/server.py')
+
 # app = Flask(__name__)
 app = Flask(__name__, template_folder='static/templates')
 app.config['SECRET_KEY'] = 'secret!'
