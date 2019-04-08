@@ -6,6 +6,7 @@ from agents.capabilities.capability import SenseCapability
 from environment.gridworld import GridWorld
 from environment.actions.move_actions import *
 from environment.actions.grab_actions import *
+from environment.actions.drop_actions import *
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 
 seed = 1
@@ -55,7 +56,9 @@ for nr_agent in range(len(agent_start_locations)):
         MoveSouthWest.__name__,
         MoveWest.__name__,
         MoveNorthWest.__name__,
-        GrabAction.__name__]
+        GrabAction.__name__,
+        DropAction.__name__]
+
     senses = [[None, np.inf]]
     sense_capability = SenseCapability(senses)
     agent = Agent(name=agent_name, strt_location=agent_start_locations[nr_agent], action_set=poss_actions,

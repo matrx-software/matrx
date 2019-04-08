@@ -2,15 +2,18 @@ from environment.actions.action import Action, ActionResult
 
 
 def act_grab(grid_world, agent_id):
+    # Checking if grab is possible
     result = possible_grab(grid_world, agent_id) 
     if result.succeeded:
+        # Loading properties
         reg_ag = grid_world.registered_agents[agent_id] #Registered Agent
         env_obj = grid_world.environment_objects[result.obj_id] #Environment object
 
+        # Updating properties
         reg_ag.properties['carrying'].append(result.obj_id)  
         env_obj.properties['carried'] = True
-        
-        print(reg_ag.properties['carrying'])
+
+        # Moving the object with the Agent is done in Movement
     return result
 
 
@@ -32,7 +35,7 @@ def possible_grab(grid_world, agent_id):
     if len(reg_ag.properties['carrying']) != 0:
         return GrabActionResult(GrabActionResult.RESULT_CARRIES_OBJECT, succeeded=False)
 
-     # Go through all objects at the desired locations
+    # Go through all objects at the desired locations
     for loc_obj_id in loc_obj_ids:
         # Check if loc_obj_id is the id of an agent
         if loc_obj_id in grid_world.registered_agents.keys():
