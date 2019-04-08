@@ -3,17 +3,19 @@ import requests
 
 from visualization.helper_functions import reorder_state_for_GUI
 
+
 class Visualizer():
 
     def __init__(self, grid_size):
         self.agent_states = {}
         self.hu_ag_states = {}
         self.god_state = {}
+        self.verbose = False
 
-        self.__initGUI(grid_size=grid_size, verbose=False)
+        self.__initGUI(grid_size=grid_size)
 
 
-    def __initGUI(self, grid_size, verbose):
+    def __initGUI(self, grid_size):
         """
         Send an initialization message to the GUI webserver, which sends the grid_size.
         """
@@ -28,7 +30,7 @@ class Visualizer():
 
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time
-        if verbose:
+        if self.verbose:
             print("Request + reply took:", tick_duration.total_seconds())
             print("post url:", r.url)
 
@@ -36,6 +38,29 @@ class Visualizer():
         if r.status_code != requests.codes.ok:
             print("Error in initializing GUI")
 
+    def __reorder_state_for_GUI(self, state):
+        """
+        Reorder the state such that it has the x,y coords as keys and can be JSON serialized
+        Old state order: { 'object_name' : {obj_properties}, 'object_name2' : {obj_properties}, ....}
+        New state order: { 'x1_y1') : [obj1, obj2, agent1], 'x2_y1' : [obj3, obj4, agent1], ...}
+        :param state: state of all visible objects for that entity
+        :return: state reordered
+        """
+        newState = {}
+        for obj in state:
+
+            # convert the [x,y] coords to a x_y notation so we can use it as a key which is
+            # also JSON serializable
+            strXYkey = str(state[obj]['location'][0]) + "_" + str(state[obj]['location'][1])
+
+            # create a new list with (x,y) as key if it does not exist yet in the newState dict
+            if strXYkey not in newState:
+                newState[strXYkey] = []
+
+            # add the object or agent to the list at the (x,y) location in the dict
+            newState[strXYkey].append( state[obj] )
+
+        return newState
 
 
     def reset(self):
@@ -46,11 +71,9 @@ class Visualizer():
         self.god_state = {}
 
 
+
     def save_state(self, type, id, state, params=None):
         """ Save the filtered agent state which we will visualize later on """
-
-        print(f"Saving state in visualizer for type {type} and id {id} and state")
-        # print(state)
 
         # add state for specific entity with ID to states dict
         if type == "god":
@@ -68,21 +91,29 @@ class Visualizer():
         visualizations.
         """
 
+        # reorder god state
+        self.god_state = self.__reorder_state_for_GUI(self.god_state)
 
-        # update god
-        self.god_state = reorder_state_for_GUI(self.god_state)
+        # reorder agents state
+        for agent_id in self.agent_states:
+            self.agent_states[agent_id] = self.__reorder_state_for_GUI(self.agent_states[agent_id])
 
-        # update agents
+        # reorder human states
+        for hu_ag_id in self.hu_ag_states:
+            self.hu_ag_states[hu_ag_id] = self.__reorder_state_for_GUI(self.hu_ag_states[hu_ag_id])
 
-        # update human agents
+        # send the update to the webserver
+        self.__sendGUIupdate()
 
 
-    def visualize(self, grid_size, type):
+    def __sendGUIupdate(self):
+        """
+        Send the states of all (human)agents and god to the webserver for updating of the GUI
+        """
 
         # put data in a json array
-        data = {'params': {'grid_size': grid_size}, 'states': self.states}
+        data = {'god': self.god_state, 'agent_states': self.agent_states, 'hu_ag_states': self.hu_ag_states}
         url = 'http://localhost:3000/update'
-
 
         tick_start_time = datetime.datetime.now()
 
@@ -92,7 +123,7 @@ class Visualizer():
 
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time
-        if verbose:
+        if self.verbose:
             print("Request + reply took:", tick_duration.total_seconds())
             print("post url:", r.url)
 

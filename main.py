@@ -8,8 +8,8 @@ from environment.actions.move_actions import *
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 
 seed = 1
-time_step = 0.5  # Wait this in seconds between performing all actions
-grid_size = [10, 10]  # horizontal and vertical size of grid
+time_step = 0.001  # Wait this in seconds between performing all actions
+grid_size = [50, 50]  # horizontal and vertical size of grid
 max_duration = -1  # number of time units the environment should run as a maximum
 
 # start locations of agents = thus 2 agents

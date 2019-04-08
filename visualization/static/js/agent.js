@@ -1,3 +1,12 @@
+var doVisualUpdates = true;
+
+/**
+ * Check if the current tab is in focus or not
+ */
+document.addEventListener('visibilitychange', function(){
+  doVisualUpdates = !document.hidden;
+});
+
 $(document).ready(function(){
 
     var id = document.getElementById('id').innerHTML;
@@ -8,7 +17,9 @@ $(document).ready(function(){
     // make connection with the python server via a (web)socket
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
-    // Event handler for new connections.
+    /**
+     * Event handler for new connections.
+     */
     socket.on('connect', function() {
         console.log("Connected");
 
@@ -19,16 +30,14 @@ $(document).ready(function(){
         socket.emit('join', {room: room});
     });
 
-    // // Event handler for new connections.
-    // socket.on('init', function(data) {
-    //     console.log("Init grid with grid_size:", grid_sz);
-    //
-    //     grid_sz = data.params.grid_size;
-    // });
-
-    // receive an update from the python server
+    /**
+     * receive an update from the python server
+     */
     socket.on('update', function(data){
-        console.log("Received an update from the server:", data);
+        if (!doVisualUpdates) {
+            console.log("Chrome in background, skipping");
+            return;
+        }
 
         // unpack received data
         grid_size = data.params.grid_size;
@@ -40,8 +49,4 @@ $(document).ready(function(){
         });
     });
 
-    // // receive a test update from the python server
-    // socket.on('test', function(data){
-    //     console.log("got a message:", data);
-    // });
 });

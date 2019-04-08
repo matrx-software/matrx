@@ -14,12 +14,16 @@ $(document).ready(function(){
     // make connection with python server via socket
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
-    // Event handler for new connections.
+    /**
+     * Event handler for new connections.
+     */
     socket.on('connect', function() {
         console.log("Connected");
     });
 
-    // receive an update from the python server
+    /**
+     * receive an update from the python server
+     */
     socket.on('update', function(data){
         // console.log("Received an update from the server:", data);
 

@@ -37,6 +37,46 @@ def init_GUI():
     return ""
 
 
+###############################################
+# Route for receiving testbed updates
+###############################################
+@app.route('/update', methods=['POST'])
+def update_GUI():
+
+    print("Received update from testbed")
+
+    # Fetch data from message
+    data = request.json
+    god = data["god"]
+    agent_states = data["agent_states"]
+    hu_ag_states = data["hu_ag_states"]
+
+    # send update to god
+    new_data = {'params': {"grid_size": grid_sz}, 'state': god}
+    socketio.emit('update', new_data, namespace="/god")
+
+
+    # send updates to agents
+    for agent_id in agent_states:
+        new_data = {'params': {"grid_size": grid_sz}, 'state': agent_states[agent_id]}
+        room = f"/agent/{agent_id}"
+        socketio.emit('update', new_data, room=room, namespace="/agent")
+
+
+    # send updates to human agents
+    for hu_ag_id in hu_ag_states:
+        new_data = {'params': {"grid_size": grid_sz}, 'state': hu_ag_states[hu_ag_id]}
+        room = f"/humanagent/{hu_ag_id}"
+        socketio.emit('update', new_data, room=room, namespace="/humanagent")
+
+
+
+
+    # return user inputs
+    # format_usr_inp(id)
+
+    return ""
+
 
 ###############################################
 # Routes human agent
@@ -102,14 +142,10 @@ def agent_view(id):
 @app.route('/update/god', methods=['POST'])
 def update_god():
 
-    ms = round(time()*1000.0)
-    
     # pass testbed update to client / GUI of Godview
     data = request.json
     # add grid size
     data["params"]["grid_size"] = grid_sz
-    # add timestamp for message
-    data["params"]["timestamp"] = ms
     socketio.emit('update', data, namespace="/god")
 
     return ""
