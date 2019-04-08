@@ -40,7 +40,7 @@ class GridWorld:
     def register_agent(self, agent_name, location, sense_capability, action_set, get_action_func,
                        set_action_result_func, agent_properties, agent_type=AgentAvatar):
         agent_id = agent_name
-        agent_seed = self.rnd_gen.randint(1)
+        agent_seed = self.rnd_gen.randint(1, 1000)
 
         if not callable(get_action_func):
             raise Exception("The given agent 'get_action_func' is not callable. Please provide this method.")

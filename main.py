@@ -43,8 +43,6 @@ for nr_obj in range(len(obj_locations)):
         
     grid_env.add_env_object(obj_name, location, properties, is_traversable)
 
-# Traversable objects
-    
 agents = []
 # Initialize agents
 for nr_agent in range(len(agent_start_locations)):
