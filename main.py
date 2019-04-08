@@ -15,9 +15,9 @@ grid_size = [10, 10]  # horizontal and vertical size of grid
 max_duration = 100  # number of time units the environment should run as a maximum
 
 # start locations of agents = thus 2 agents
-agent_start_locations = [[0, 0], [0, 1],[8,8]]
-human_agent_start_locations = [[6, 6], [6,8]]
-obj_locations = [[2, 2], [1, 5], [0, 3], [6, 0], [3, 3], [9, 6], [6,3]]
+agent_start_locations = [[0, 0], [0, 1], [8, 8]]
+human_agent_start_locations = [[6, 6], [6, 8]]
+obj_locations = [[2, 2], [1, 5], [0, 3], [6, 0], [3, 3], [9, 6], [6, 3]]
 
 sim_goal = LimitedTimeGoal(max_duration)  # can be a list of goals
 grid_env = GridWorld(grid_size, time_step, simulation_goal=sim_goal, can_occupy_agent_locs=True, rnd_seed=seed)

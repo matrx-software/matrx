@@ -61,9 +61,6 @@ class GridWorld:
 
         self.registered_agents[agent_id] = agent_object
 
-        # XXX REMOVE TEMP XXX
-        self.registered_agents[agent_id].once_carried = False
-
         return agent_id, agent_seed
 
     def add_env_object(self, obj_name, location, obj_properties, is_traversable=False):
@@ -99,14 +96,6 @@ class GridWorld:
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
         for agent_id, action in action_buffer.items():
-
-            # XXX REMOVE TEMP XXX
-            # Always perform a grab if possible
-            if not self.registered_agents[agent_id].once_carried:
-                result = self.__perform_action(agent_id, "GrabAction")
-                if result.succeeded:
-                    self.registered_agents[agent_id].once_carried = True
-
             self.__perform_action(agent_id, action)
 
         # Perform the update method of all objects
