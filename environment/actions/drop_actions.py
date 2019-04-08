@@ -15,7 +15,7 @@ def act_drop(grid_world, agent_id, obj_id):
         # If all objects were dropped:
         if len(reg_ag.properties['carrying']) == 0:
             env_obj.properties['carried'] = False
-    return result
+    return True
 
 
 def is_possible_drop(grid_world, agent_id, obj_id):

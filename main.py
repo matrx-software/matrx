@@ -56,9 +56,7 @@ for nr_agent in range(len(agent_start_locations)):
         MoveSouth.__name__,
         MoveSouthWest.__name__,
         MoveWest.__name__,
-        MoveNorthWest.__name__,
-        GrabAction.__name__,
-        DropAction.__name__]
+        MoveNorthWest.__name__]
 
     senses = [[None, np.inf]]
     sense_capability = SenseCapability(senses)

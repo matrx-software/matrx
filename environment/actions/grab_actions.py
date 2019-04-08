@@ -14,7 +14,7 @@ def act_grab(grid_world, agent_id):
         env_obj.properties['carried'] = True
 
         # Moving the object with the Agent is done in Movement
-    return result
+    return True
 
 
 def is_possible_grab(grid_world, agent_id):
