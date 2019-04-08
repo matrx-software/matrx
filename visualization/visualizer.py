@@ -11,6 +11,7 @@ class Visualizer():
         self.hu_ag_states = {}
         self.god_state = {}
         self.verbose = False
+        self.userinputs = {}
 
         self.__initGUI(grid_size=grid_size)
 
@@ -127,7 +128,19 @@ class Visualizer():
             print("Request + reply took:", tick_duration.total_seconds())
             print("post url:", r.url)
 
-        # handle user_inputs
-
+        # reset saved states
         self.reset()
-        pass
+
+        # check if there was any user input for a human agent
+        repl = r.json()
+
+        if self.verbose:
+            print("User inputs received:")
+            print(repl)
+
+        # return None if there was no userinput
+        if repl == {}:
+            self.userinputs = {}
+
+        # otherwise return the userinput
+        self.userinputs = repl

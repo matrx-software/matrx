@@ -10,7 +10,6 @@ import numpy as np
 from environment.actions.move_actions import *
 from environment.objects.basic_objects import AgentAvatar, EnvObject
 
-# from visualization.helper_functions import sendGUIupdate, initGUI
 from visualization.visualizer import Visualizer
 
 
@@ -96,7 +95,17 @@ class GridWorld:
         for agent_id, agent_obj in self.registered_agents.items():
             state = self.__get_agent_state(agent_obj)
             possible_actions = self.__get_possible_actions(agent_id=agent_id, action_set=agent_obj.action_set)
-            filtered_agent_state, action_class_name, action_kwargs = agent_obj.get_action_func(state=state, possible_actions=possible_actions, agent_id=agent_id)
+
+            if agent_obj.type == "agent":
+                filtered_agent_state, action_class_name, action_kwargs = agent_obj.get_action_func(state=state, possible_actions=possible_actions,
+                        agent_id=agent_id)
+
+            # For a humanagent, we check if it has received any userinputs, and sends them along if so
+            elif agent_obj.type == "humanagent":
+                usrinp = self.visualizer.userinputs[agent_id]["action"] if agent_id in self.visualizer.userinputs else None
+                filtered_agent_state, action_class_name, action_kwargs = agent_obj.get_action_func(state=state, possible_actions=possible_actions,
+                        agent_id=agent_id, userinput=usrinp)
+
             action_buffer[agent_id] = (action_class_name, action_kwargs)
 
             # save what the agent observed to the visualizer
@@ -120,7 +129,7 @@ class GridWorld:
         for env_obj in self.environment_objects.values():
             env_obj.update_properties(self)
 
-        # update the visualization
+        # update the visualizations of all (human)agents and god
         self.visualizer.updateGUIs()
 
         # Update the grid
@@ -136,8 +145,6 @@ class GridWorld:
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time
         self.curr_tick_duration = tick_duration.total_seconds()
-
-        print("Currente tick duration:", self.curr_tick_duration)
 
         # Sleep for the remaining time of self.tick_duration
         self.__sleep()

@@ -2,8 +2,6 @@ import numpy as np
 import datetime
 import requests
 
-from visualization.helper_functions import sendGUIupdate
-
 from agents.Agent import Agent
 
 
@@ -28,7 +26,7 @@ class HumanAgent(Agent):
         self.usrinp_action_map = usrinp_action_map
 
 
-    def get_action(self, state, possible_actions, agent_id):
+    def get_action(self, state, possible_actions, agent_id, userinput):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
         for this agent to select an action.
@@ -47,10 +45,13 @@ class HumanAgent(Agent):
         # first filter the state to only show things this particular agent can see
         state = self.ooda_observe(state)
 
-        # send the agent state to the GUI web server for visualization
-        # sendGUIupdate(state=state, type="agent", verbose=True, id=agent_id)
+        # if there was no userinput do nothing
+        if userinput is None:
+            return state, None, {}
 
-        return state, None, {}
+        # otherwise check which action is mapped to that key and return it
+        return state, self.usrinp_action_map[userinput], {}
+
 
 
     def ooda_observe(self, state):
