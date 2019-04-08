@@ -11,7 +11,7 @@ from environment.actions.object_actions import *
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 
 seed = 1
-time_step = 0.15  # Wait this in seconds between performing all actions
+time_step = 0.1  # Wait this in seconds between performing all actions
 grid_size = [10, 10]  # horizontal and vertical size of grid
 max_duration = -1  # number of time units the environment should run as a maximum
 
@@ -36,12 +36,12 @@ for nr_obj in range(len(obj_locations)):
                   "shape": 0,
                   "colour": rng.choice(["#286625", "#678fd9", "#FF5733"]),
                   "size": float(rng.rand())}
-    
-    if properties["colour"] == "#286625": 
+
+    if properties["colour"] == "#286625":
         is_traversable = False
     else:
         is_traversable = True
-        
+
     grid_env.add_env_object(obj_name, location, properties, is_traversable)
 
 agents = []
