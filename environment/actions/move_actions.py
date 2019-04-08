@@ -12,6 +12,7 @@ def act_move(grid_world, agent_id, dx, dy):
     if len(grid_world.registered_agents[agent_id].properties['carrying']) != 0:
         for obj_carried in grid_world.registered_agents[agent_id].properties['carrying']:
             grid_world.environment_objects[obj_carried].location = new_loc
+
     return True
 
 
@@ -67,11 +68,43 @@ class MoveActionResult(ActionResult):
     def __init__(self, result, succeeded):
         super().__init__(result, succeeded)
 
-class Move(Action):
+
+class MoveNorth(Action):
+
     def __init__(self):
-        name = Move.__name__
+        name = MoveNorth.__name__
         super().__init__(name)
         self.dx = 0
+        self.dy = -1
+
+    def is_possible(self, grid_world, agent_id, **kwargs):
+        return is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+
+    def mutate(self, grid_world, agent_id, **kwargs):
+        return act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+
+
+class MoveNorthEast(Action):
+
+    def __init__(self):
+        name = MoveNorthEast.__name__
+        super().__init__(name)
+        self.dx = +1
+        self.dy = -1
+
+    def is_possible(self, grid_world, agent_id, **kwargs):
+        return is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+
+    def mutate(self, grid_world, agent_id, **kwargs):
+        return act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+
+
+class MoveEast(Action):
+
+    def __init__(self):
+        name = MoveEast.__name__
+        super().__init__(name)
+        self.dx = +1
         self.dy = 0
 
     def is_possible(self, grid_world, agent_id, **kwargs):
@@ -80,36 +113,20 @@ class Move(Action):
     def mutate(self, grid_world, agent_id, **kwargs):
         return act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
 
-class MoveNorth(Action):
-    def __init__(self):
-        name = MoveNorth.__name__
-        super().__init__(name)
-        self.dx = 0
-        self.dy = -1
-
-
-class MoveNorthEast(Action):
-    def __init__(self):
-        name = MoveNorthEast.__name__
-        super().__init__(name)
-        self.dx = +1
-        self.dy = -1
-
-
-class MoveEast(Action):
-    def __init__(self):
-        name = MoveEast.__name__
-        super().__init__(name)
-        self.dx = +1
-        self.dy = 0
-
 
 class MoveSouthEast(Action):
+
     def __init__(self):
         name = MoveSouthEast.__name__
         super().__init__(name)
         self.dx = +1
         self.dy = +1
+
+    def is_possible(self, grid_world, agent_id, **kwargs):
+        return is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+
+    def mutate(self, grid_world, agent_id, **kwargs):
+        return act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
 
 
 class MoveSouth(Action):
@@ -120,6 +137,12 @@ class MoveSouth(Action):
         self.dx = 0
         self.dy = +1
 
+    def is_possible(self, grid_world, agent_id, **kwargs):
+        return is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+
+    def mutate(self, grid_world, agent_id, **kwargs):
+        return act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+
 
 class MoveSouthWest(Action):
 
@@ -129,18 +152,38 @@ class MoveSouthWest(Action):
         self.dx = -1
         self.dy = +1
 
+    def is_possible(self, grid_world, agent_id, **kwargs):
+        return is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+
+    def mutate(self, grid_world, agent_id, **kwargs):
+        return act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+
 
 class MoveWest(Action):
+
     def __init__(self):
         name = MoveWest.__name__
         super().__init__(name)
         self.dx = -1
         self.dy = 0
 
+    def is_possible(self, grid_world, agent_id, **kwargs):
+        return is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+
+    def mutate(self, grid_world, agent_id, **kwargs):
+        return act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+
 
 class MoveNorthWest(Action):
+
     def __init__(self):
         name = MoveNorthWest.__name__
         super().__init__(name)
         self.dx = -1
         self.dy = -1
+
+    def is_possible(self, grid_world, agent_id, **kwargs):
+        return is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+
+    def mutate(self, grid_world, agent_id, **kwargs):
+        return act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)

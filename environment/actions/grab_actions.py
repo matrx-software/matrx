@@ -4,22 +4,22 @@ from environment.actions.action import Action, ActionResult
 def act_grab(grid_world, agent_id):
     # Checking if grab is possible
     result = possible_grab(grid_world, agent_id) 
-    if result.succeeded:
-        # Loading properties
-        reg_ag = grid_world.registered_agents[agent_id] #Registered Agent
-        env_obj = grid_world.environment_objects[result.obj_id] #Environment object
 
-        # Updating properties
-        reg_ag.properties['carrying'].append(result.obj_id)  
-        env_obj.properties['carried'] = True
+    # Loading properties
+    reg_ag = grid_world.registered_agents[agent_id] #Registered Agent
+    env_obj = grid_world.environment_objects[result.obj_id] #Environment object
 
-        # Moving the object with the Agent is done in Movement
+    # Updating properties
+    reg_ag.properties['carrying'].append(result.obj_id)
+    env_obj.properties['carried'] = True
+
+    # Moving the object with the Agent is done in Movement
     return True
 
 
 def is_possible_grab(grid_world, agent_id):
     result = possible_grab(grid_world, agent_id)
-    return result.succeeded
+    return result.succeeded, result.result
 
 
 def possible_grab(grid_world, agent_id):

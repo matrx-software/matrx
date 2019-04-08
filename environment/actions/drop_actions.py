@@ -4,23 +4,23 @@ from environment.actions.action import Action, ActionResult
 def act_drop(grid_world, agent_id, obj_id):
     # Checking if drop is possible
     result = possible_drop(grid_world, agent_id, obj_id)
-    if result.succeeded:
-        # Loading properties
-        reg_ag = grid_world.registered_agents[agent_id] #Registered Agent
-        env_obj = grid_world.environment_objects[obj_id] #Environment object
 
-        # Updating properties
-        reg_ag.properties['carrying'].remove(obj_id)
+    # Loading properties
+    reg_ag = grid_world.registered_agents[agent_id] #Registered Agent
+    env_obj = grid_world.environment_objects[obj_id] #Environment object
 
-        # If all objects were dropped:
-        if len(reg_ag.properties['carrying']) == 0:
-            env_obj.properties['carried'] = False
+    # Updating properties
+    reg_ag.properties['carrying'].remove(obj_id)
+
+    # If all objects were dropped:
+    if len(reg_ag.properties['carrying']) == 0:
+        env_obj.properties['carried'] = False
     return True
 
 
 def is_possible_drop(grid_world, agent_id, obj_id):
     result = possible_drop(grid_world, agent_id, obj_id)
-    return result.succeeded
+    return result.succeeded, result.result
 
 
 def possible_drop(grid_world, agent_id, obj_id):
