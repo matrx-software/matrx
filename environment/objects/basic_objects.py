@@ -44,8 +44,8 @@ class EnvObject:
         props['is_traversable'] = self.is_traversable
         return props
 
-    def set_location(self, locs):
-        self.location = locs
+    def set_location(self, loc):
+        self.location = loc
         if len(np.array(self.location).shape) > 1 and np.array(self.location).shape[1] > 1:
             self.fills_multiple_locations = True
         else:

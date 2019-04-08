@@ -1,22 +1,23 @@
 import numpy as np
-import datetime
-import requests
 from visualization.helper_functions import sendGUIupdate
+
+from environment.actions.object_actions import RemoveObject
+
 
 class Agent:
 
-    def __init__(self, name, strt_location, action_set, sense_capability, grid_size, properties=None):
+    def __init__(self, name, action_set, sense_capability, grid_size, properties=None):
         """
         Creates an Agent. All other agents should inherit from this class if you want smarter agents. This agent
         simply randomly selects an action from the possible actions it can do.
         :param name: The name of the agent.
-        :param strt_location: The initial location of the agent.
         :param action_set: The actions the agent can perform. A list of strings, with each string a class name of an
         existing action in the package Actions.
         :param sense_capability: A SenseCapability object; it states which object types the agent can perceive within
         what range.
         :param grid_size: The size of the grid. The agent needs to send this along with other information to the
         webapp managing the Agent GUI
+
         """
         if properties is None:
             self.properties = {"name": name}
@@ -24,12 +25,11 @@ class Agent:
             self.properties = properties.copy()
             self.properties["name"] = name
         self.name = name
-        self.location = strt_location
         self.action_set = action_set  # list of Action objects
         self.sense_capability = sense_capability
         self.agent_properties = {}
+        self.rnd_gen = np.random.RandomState()
         self.rnd_seed = None
-        self.rnd_gen = None
         self.previous_action = None
         self.previous_action_result = None
         self.grid_size = grid_size
@@ -49,12 +49,13 @@ class Agent:
         # send the agent state to the GUI web server for visualization
         sendGUIupdate(state=state, grid_size=self.grid_size, type="agent", verbose=False, id=agent_id)
 
+
         state = self.ooda_observe(state)
         state = self.ooda_orient(state)
-        action = self.ooda_decide(state, possible_actions)
+        action, action_kwargs = self.ooda_decide(state, possible_actions)
         action = self.ooda_act(action)
 
-        return action
+        return action, action_kwargs
 
     def set_action_result(self, action_result):
         """
@@ -84,7 +85,6 @@ class Agent:
 
         return self.agent_properties
 
-
     def set_rnd_seed(self, seed):
         """
         The function that seeds this agent's random seed.
@@ -95,7 +95,6 @@ class Agent:
         """
         self.rnd_seed = seed
         self.rnd_gen = np.random.RandomState(self.rnd_seed)
-
 
     def ooda_observe(self, state):
         """
@@ -137,7 +136,10 @@ class Agent:
 
         This is the Decide phase. In this phase you actually compute your action. For example, this default agent simply
         randomly selects an action from the possible_actions list. However, for smarter agents you need the state
-        representation for example to know what a good action is.
+        representation for example to know what a good action is. In addition you should also return a dictionary of
+        potential keyword arguments your intended action may require. You can set this to an empty dictionary if there
+        are none. Though if you do not provide a required keyword argument (or wronly name it), the action will through
+        an Exception and the environment will crash.
 
         :param state: A state description containing all properties of EnvObject that are within a certain range as
         defined by self.sense_capability. It is a list of properties in a dictionary
@@ -147,13 +149,37 @@ class Agent:
         might become impossible if another agent also decided to remove that object and who was a higher in the priority
         list).
         :return: An action string of the class name of an action that is also in self.action_set (it is not required to
-        also be in possible_actions, though then the action will automatically fail.)
+        also be in possible_actions, though then the action will automatically fail.) You should also return a
+        dictionary of action arguments the world might need to perform this action. See the implementation of the action
+        to know which keyword arguments it requires. For example if you want to remove an object, you should provide
+        it object ID with a specific key (e.g. 'object_id' = some_object_id_agent_should_remove).
         """
         if possible_actions:
             action = self.rnd_gen.choice(possible_actions)
         else:
             action = None
-        return action
+
+        action_kwargs = {}
+
+        if action == RemoveObject.__name__:
+            # Get all perceived objects
+            objects = list(state.keys())
+            # Remove yourself from the object id list
+            objects.remove(self.name)
+            # Remove all objects that have 'agent' in the name (so we do not remove those, though agents without agent
+            # in their name can still be removed).
+            objects = [obj for obj in objects if 'agent' not in obj]
+            # Choose a random object id
+            object_id = self.rnd_gen.choice(objects)
+            # Assign it
+            action_kwargs['object_id'] = object_id
+            # Select range as just enough to remove that object
+            remove_range = int(np.ceil(np.linalg.norm(
+                np.array(state[object_id]['location'])-np.array(state[self.name]['location']))))
+            # Assign it to the arguments list
+            action_kwargs['remove_range'] = remove_range
+
+        return action, action_kwargs
 
     def ooda_act(self, action):
         """

@@ -6,9 +6,10 @@ from visualization.helper_functions import sendGUIupdate
 
 from agents.Agent import Agent
 
+
 class HumanAgent(Agent):
 
-    def __init__(self, name, strt_location, action_set, sense_capability, grid_size, usrinp_action_map, properties=None):
+    def __init__(self, name, action_set, sense_capability, grid_size, usrinp_action_map, properties=None):
         """
         Creates an Human Agent which is an agent that can be controlled by a human.
 
@@ -22,11 +23,10 @@ class HumanAgent(Agent):
         webapp managing the Agent GUI
         """
 
-        super().__init__(name=name, strt_location=strt_location, action_set=action_set, \
-            sense_capability=sense_capability, grid_size=grid_size, properties=properties)
+        super().__init__(name=name, action_set=action_set, sense_capability=sense_capability, grid_size=grid_size,
+                         properties=properties)
 
         self.usrinp_action_map = usrinp_action_map
-
 
     def get_action(self, state, possible_actions, agent_id):
         """
@@ -51,7 +51,7 @@ class HumanAgent(Agent):
 
         # if there was no userinput do nothing
         if userInput is None:
-            return None
+            return None, {}
 
         # otherwise check which action is mapped to that key and return it
-        return self.usrinp_action_map[userInput]
+        return self.usrinp_action_map[userInput], {}

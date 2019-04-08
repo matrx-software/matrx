@@ -43,10 +43,13 @@ class LimitedTimeGoal(SimulationGoal):
 
     def goal_reached(self, grid_world):
         nr_ticks = grid_world.current_nr_ticks
-        if nr_ticks >= self.max_nr_ticks:
-            self.is_done = True
-        else:
+        if self.max_nr_ticks == np.inf or self.max_nr_ticks <= 0:
             self.is_done = False
+        else:
+            if nr_ticks >= self.max_nr_ticks:
+                self.is_done = True
+            else:
+                self.is_done = False
         return self.is_done
 
     def get_progress(self, grid_world):
