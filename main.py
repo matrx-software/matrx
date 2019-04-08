@@ -11,7 +11,7 @@ from environment.actions.object_actions import *
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 
 seed = 1
-time_step = 0.1  # Wait this in seconds between performing all actions
+time_step = 0.15  # Wait this in seconds between performing all actions
 grid_size = [10, 10]  # horizontal and vertical size of grid
 max_duration = -1  # number of time units the environment should run as a maximum
 
@@ -63,7 +63,7 @@ for nr_agent in range(len(agent_start_locations)):
     senses = [[None, np.inf]]
     sense_capability = SenseCapability(senses)
     agent = Agent(name=agent_name, action_set=poss_actions,
-                  sense_capability=sense_capability, grid_size=grid_env.shape)
+                  sense_capability=sense_capability)
     agents.append(agent)
 
     agent_id, agent_seed = grid_env.register_agent(agent_name=agent.name, location=agent_start_locations[nr_agent],
@@ -71,7 +71,8 @@ for nr_agent in range(len(agent_start_locations)):
                                                    get_action_func=agent.get_action,
                                                    set_action_result_func=agent.set_action_result,
                                                    agent_properties=agent.get_properties(),
-                                                   action_set=agent.action_set)
+                                                   action_set=agent.action_set,
+                                                   type="agent")
     agent.set_rnd_seed(agent_seed)
 
 human_agents = []
@@ -93,7 +94,7 @@ for nr_human_agent in range(len(human_agent_start_locations)):
     senses = [[None, np.inf]]
     sense_capability = SenseCapability(senses)
     human_agent = HumanAgent(name=human_agent_name, action_set=poss_actions,
-                             sense_capability=sense_capability, grid_size=grid_env.shape,
+                             sense_capability=sense_capability,
                              usrinp_action_map=usrinp_action_map)
     human_agents.append(human_agent)
 
@@ -103,7 +104,8 @@ for nr_human_agent in range(len(human_agent_start_locations)):
                                                                get_action_func=human_agent.get_action,
                                                                set_action_result_func=human_agent.set_action_result,
                                                                agent_properties=human_agent.get_properties(),
-                                                               action_set=human_agent.action_set)
+                                                               action_set=human_agent.action_set,
+                                                               type="humanagent")
     human_agent.set_rnd_seed(human_agent_seed)
 
 grid_env.initialize()

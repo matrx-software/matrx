@@ -10,6 +10,7 @@ var firstDraw = true;
 // Colour of the default BG tile
 var bgTileColour = "#C2C2C2";
 
+
 window.onload = function()
 {
     canvas = document.getElementById('grid');
@@ -18,9 +19,8 @@ window.onload = function()
 	ctx.font = "bold 10pt sans-serif";
 };
 
-
 /**
- * Changet the size of the canvas on a window resize such that it is always fullscreen
+ * Changes the size of the canvas on a window resize such that it is always fullscreen
  */
 window.addEventListener("resize", fixCanvasSize );
 function fixCanvasSize() {
@@ -32,10 +32,12 @@ function fixCanvasSize() {
     canvas.width = document.body.clientWidth; //document.width is obsolete
     canvas.height = document.body.clientHeight; //document.height is obsolete
 
-    console.log("Reset canvas size to:", canvas.width, canvas.height);
+    // console.log("Reset canvas size to:", canvas.width, canvas.height);
 
     // change the tiles such that the complete grid fits on the screen
     fixTileSize(canvas.width, canvas.height);
+
+    console.log("Fixed canvas size");
 }
 
 /**
@@ -50,7 +52,7 @@ function fixTileSize(canvasW, canvasH) {
     // Use the smallest one as the width AND height of the cells to keep tiles square
     px_per_cell = Math.min(px_per_cell_x, px_per_cell_y);
 
-    console.log("Fixed tile size. x, y, min", px_per_cell_x, px_per_cell_y, px_per_cell);
+    // console.log("Fixed tile size. x, y, min", px_per_cell_x, px_per_cell_y, px_per_cell);
 }
 
 /**
@@ -70,7 +72,7 @@ function calc_fps() {
 /**
  * check if the grid size has changed and recalculate the tile sizes if so
  */
-function updateGridSize() {
+function updateGridSize(grid_size) {
     if (grid_size[0] != mapW || grid_size[1] != mapH) {
 
         // save the new grid size
@@ -86,6 +88,7 @@ function updateGridSize() {
  * Draw the grid on screen
  */
 function drawSim(grid_size, state) {
+
     // return in the case that the canvas has disappeared
 	if(ctx==null) { return; }
 
@@ -100,9 +103,10 @@ function drawSim(grid_size, state) {
     }
 
     // save the number of cells in x and y direction of the map
-    updateGridSize();
+    updateGridSize(grid_size);
 
-    console.log("Drawing sim")
+    // draw a default bg tile
+    drawBg();
 
     // Draw the grid
     // traverse along Y axis
@@ -111,8 +115,6 @@ function drawSim(grid_size, state) {
         // traverse along X axis
 		for(var x = 0; x < grid_size[0]; ++x)
 		{
-            // draw a default bg tile
-            drawBgTile(x, y, px_per_cell, px_per_cell);
 
             // draw any objects on top
             key = x + "_" + y;
@@ -146,13 +148,15 @@ function drawSim(grid_size, state) {
 }
 
 /**
- * Draw a background tile with the default colour
+ * Draw a background with the default colour
  */
-function drawBgTile(x, y, tileW, tileH) {
+function drawBg() {
     // full size rect
     ctx.fillStyle = bgTileColour;
-    ctx.fillRect( x*tileW, y*tileH, tileW, tileH);
+    ctx.fillRect( 0, 0, mapW * px_per_cell, mapH * px_per_cell);
 }
+
+
 
 /**
  * Draw a rectangle on screen

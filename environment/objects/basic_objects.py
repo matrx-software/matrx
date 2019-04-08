@@ -55,9 +55,10 @@ class EnvObject:
 class AgentAvatar(EnvObject):
 
     def __init__(self, agent_id, agent_name, location, sense_capability, action_set, get_action_func,
-                 set_action_result_func, properties):
+                 set_action_result_func, properties, type):
         super().__init__(obj_id=agent_id, obj_name=agent_name, locations=location, properties=properties)
         self.sense_capability = sense_capability
         self.action_set = action_set
         self.get_action_func = get_action_func
         self.set_action_result_func = set_action_result_func
+        self.type = type # "agent" or "humanagent"

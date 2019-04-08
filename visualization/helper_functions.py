@@ -27,7 +27,33 @@ def reorder_state_for_GUI(state):
 
 
 
-def sendGUIupdate(state, grid_size, type, verbose, id=None):
+def initGUI(grid_size, verbose):
+    """
+    Send an initialization message to the GUI webserver, which sends the grid_size.
+    """
+    data = {'params': {'grid_size': grid_size} }
+
+    url = 'http://localhost:3000/init'
+
+    tick_start_time = datetime.datetime.now()
+
+    # send an update of the agent state to the GUI via its API
+    r = requests.post(url, json=data)
+
+
+    tick_end_time = datetime.datetime.now()
+    tick_duration = tick_end_time - tick_start_time
+    if verbose:
+        print("Request + reply took:", tick_duration.total_seconds())
+        print("post url:", r.url)
+
+    # check for errors in the response
+    if r.status_code != requests.codes.ok:
+        print("Error in initializing GUI")
+
+
+
+def sendGUIupdate(state, type, verbose, id=None):
     """
     A function that can be called by the (human)agents or the gridworld, which
     will send an update to the GUI server with an update of the world state
@@ -50,7 +76,7 @@ def sendGUIupdate(state, grid_size, type, verbose, id=None):
             print(f"Sending update to GUI API for {type} with ID: {id}")
 
     # put data in a json array
-    data = {'params': {'grid_size': grid_size}, 'state': newState}
+    data = {'params': {}, 'state': newState}
 
     # construct the update url
     url = 'http://localhost:3000/'

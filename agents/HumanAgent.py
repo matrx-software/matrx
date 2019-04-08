@@ -2,14 +2,12 @@ import numpy as np
 import datetime
 import requests
 
-from visualization.helper_functions import sendGUIupdate
-
 from agents.Agent import Agent
 
 
 class HumanAgent(Agent):
 
-    def __init__(self, name, action_set, sense_capability, grid_size, usrinp_action_map, properties=None):
+    def __init__(self, name, action_set, sense_capability, usrinp_action_map, properties=None):
         """
         Creates an Human Agent which is an agent that can be controlled by a human.
 
@@ -23,12 +21,12 @@ class HumanAgent(Agent):
         webapp managing the Agent GUI
         """
 
-        super().__init__(name=name, action_set=action_set, sense_capability=sense_capability, grid_size=grid_size,
-                         properties=properties)
+        super().__init__(name=name, action_set=action_set, sense_capability=sense_capability, properties=properties)
 
         self.usrinp_action_map = usrinp_action_map
 
-    def get_action(self, state, possible_actions, agent_id):
+
+    def get_action(self, state, possible_actions, agent_id, userinput):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
         for this agent to select an action.
@@ -44,14 +42,34 @@ class HumanAgent(Agent):
         world resulting in the appriopriate ActionResult.
         :return: An action string, which is the class name of one of the actions in the Action package.
         """
-
-        # send the agent state to the GUI web server for visualization, and
-        # receive the user input
-        userInput = sendGUIupdate(state=state, grid_size=self.grid_size, type="humanagent", verbose=False, id=agent_id)
+        # first filter the state to only show things this particular agent can see
+        state = self.ooda_observe(state)
 
         # if there was no userinput do nothing
-        if userInput is None:
-            return None, {}
+        if userinput is None:
+            return state, None, {}
 
         # otherwise check which action is mapped to that key and return it
-        return self.usrinp_action_map[userInput], {}
+        return state, self.usrinp_action_map[userinput], {}
+
+
+
+    def ooda_observe(self, state):
+        """
+        All our agent work through the OODA-loop paradigm; first you observe, then you orient/pre-process, followed by
+        a decision process of an action after which we act upon the action.
+
+        However, as a human agent is controlled by a human, only the observe part is executed.
+
+        This is the Observe phase. In this phase you filter the state further to only those properties the agent is
+        actually SUPPOSED to see. Since the grid world returns ALL properties of ALL objects within a certain range(s),
+        but perhaps some objects are obscured because they are behind walls, or an agent is not able to see some
+        properties an certain objects.
+
+        This filtering is what you do here.
+
+        :param state: A state description containing all properties of EnvObject that are within a certain range as
+        defined by self.sense_capability. It is a list of properties in a dictionary
+        :return: A filtered state.
+        """
+        return state
