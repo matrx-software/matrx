@@ -11,7 +11,7 @@ def act_grab(grid_world, agent_id):
 
     # Updating properties
     reg_ag.properties['carrying'].append(result.obj_id)
-    env_obj.properties['carried'] = True
+    env_obj.properties['carried'].append(agent_id)
 
     # Moving the object with the Agent is done in Movement
     return True
