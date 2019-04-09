@@ -30,6 +30,7 @@ class GridWorld:
         self.rnd_seed = rnd_seed
         self.rnd_gen = np.random.RandomState(seed=self.rnd_seed)
         self.curr_tick_duration = 0.
+        self.carry_dict = {}
 
     def initialize(self):
         # We update the grid, which fills everything with added objects and agents
@@ -77,7 +78,7 @@ class GridWorld:
         # This function adds the objects
         obj_id = obj_name
         env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties, is_traversable=is_traversable)
-        env_object.add_properties(propName="carried", propVal=False)
+        env_object.add_properties(propName="carried", propVal=[])
         
         self.environment_objects[obj_id] = env_object
         return obj_id
@@ -228,9 +229,25 @@ class GridWorld:
                 self.grid[loc[1], loc[0]] = None
 
         # Remove object from the list of registered agents or environmental objects
-        success = self.registered_agents.pop(object_id, default=False)  # if it is an agent, we get it otherwise False
-        if success is False:  # if it was not an agent, it must be an environmental object!
-            success = self.environment_objects.pop(object_id, default=False)
+        # Check if it is an agent
+        if object_id in self.registered_agents.keys():
+            # Check if the agent was carrying something, if so remove property from carried item
+            for obj_id in self.registered_agents[object_id].properties['carrying']:
+                self.environment_objects[obj_id].properties['carried'].remove(object_id)
+
+            # Remove agent
+            success = self.registered_agents.pop(object_id, default=False)  # if it is an agent, we get it otherwise False
+
+        # Else, check if it is an object
+        elif object_id in self.environment_objects.keys():
+            # If the object was carried, remove this from the agent properties as well
+            for agent_id in self.environment_objects[object_id].properties['carried']:
+                self.registered_agents[agent_id].properties['carrying'].remove(object_id)
+
+            # Remove object
+            success = self.environment_objects.pop(object_id, default=False)  # if it is an agent, we get it otherwise False
+        else:
+            success = False # Object type not specified
 
         if success is not False:  # it was not an agent nor environment object, so success! Otherwise, success if False
             success = True

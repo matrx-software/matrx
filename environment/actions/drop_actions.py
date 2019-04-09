@@ -11,10 +11,7 @@ def act_drop(grid_world, agent_id, obj_id):
 
     # Updating properties
     reg_ag.properties['carrying'].remove(obj_id)
-
-    # If all objects were dropped:
-    if len(reg_ag.properties['carrying']) == 0:
-        env_obj.properties['carried'] = False
+    env_obj.properties['carried'].remove(agent_id)
     return True
 
 
