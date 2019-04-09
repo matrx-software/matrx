@@ -131,6 +131,8 @@ class GridWorld:
                 action_kwargs = {}
             # Actually perform the action (if possible)
             self.__perform_action(agent_id, action_class_name, action_kwargs)
+            # Update the grid
+            self.__update_grid()
 
         # Perform the update method of all objects
         for env_obj in self.environment_objects.values():
@@ -139,8 +141,7 @@ class GridWorld:
         # update the visualizations of all (human)agents and god
         self.visualizer.updateGUIs()
 
-        # Update the grid
-        self.__update_grid()
+
 
 
 
@@ -183,22 +184,21 @@ class GridWorld:
         return obj
 
     def get_objects_in_range(self, agent_loc, object_type, sense_range):
-        env_objs = []
-        for _, env_obj in self.environment_objects.items():
+        env_objs = OrderedDict()
+        for obj_id, env_obj in self.environment_objects.items():
             coordinates = env_obj.location
             distance = self.__get_distance(coordinates, agent_loc)
             if (object_type is None or object_type == "*" or isinstance(env_obj, object_type)) and \
                     distance <= sense_range:
-                env_objs.append(env_obj)
+                env_objs[obj_id] = env_obj
 
-        for _, agent_obj in self.registered_agents.items():
+        for agent_id, agent_obj in self.registered_agents.items():
             coordinates = agent_obj.location
             distance = self.__get_distance(coordinates, agent_loc)
 
             if object_type is None or object_type == "*" or isinstance(agent_obj, object_type) and \
                     distance <= sense_range:
-                env_objs.append(agent_obj)
-
+                env_objs[agent_id] = agent_obj
         return env_objs
 
     def check_simulation_goal(self):
@@ -320,18 +320,18 @@ class GridWorld:
     def __get_agent_state(self, agent_obj):
         agent_loc = agent_obj.location
         sense_capabilities = agent_obj.sense_capability.get_capabilities()
-        objs_in_range = []
+        objs_in_range = OrderedDict()
 
         # Check which objects can be sensed with the agents' capabilities, from
         # its current position.
         for obj_type, sense_range in sense_capabilities.items():
             env_objs = self.get_objects_in_range(agent_loc, obj_type, sense_range)
-            objs_in_range.extend(env_objs)
+            objs_in_range.update(env_objs)
 
         state = {}
         # Save all properties of the sensed objects in a state dictionary
         for env_obj in objs_in_range:
-            state[env_obj.name] = env_obj.get_properties()
+            state[env_obj] = objs_in_range[env_obj].get_properties()
 
         return state
 
