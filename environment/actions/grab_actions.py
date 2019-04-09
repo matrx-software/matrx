@@ -1,5 +1,5 @@
 from environment.actions.action import Action, ActionResult
-
+import numpy as np
 
 class GrabAction(Action):
     """
@@ -12,17 +12,10 @@ class GrabAction(Action):
             name = GrabAction.__name__
         super().__init__(name)
 
-    def is_possible(self, grid_world, agent_id, **kwargs):
+    def is_possible(self, grid_world, agent_id):
         # Check if object_id is specified
-        if 'object_id' in kwargs.keys():  # assert if object_id is given.
-            object_id = kwargs['object_id']  # assign
-        else:
-            return False, GrabActionResult.RESULT_NO_OBJECT
-
-        if 'grab_range' in kwargs.keys():
-            grab_range = kwargs['grab_range']
-        else:
-            grab_range = 0  # default remove range
+        object_id = None
+        grab_range = np.inf  # we do not know the intended range, so assume infinite
 
         possible, reason = is_possible_grab(grid_world, agent_id=agent_id, object_id=object_id, grab_range=grab_range)
         return possible, reason
@@ -36,16 +29,26 @@ class GrabAction(Action):
 
         :param grid_world: The current GridWorld
         :param agent_id: The agent that performs the action.
-        :param kwargs: Requires an 'object_id' that exists in the GridWorld and the optional 'grab_range' to specify
+        :param kwargs: Requires an optional 'object_id' that exists in the GridWorld (if none is specified
+        a random object within range is chosen) and the optional 'grab_range' to specify
         the range in which the object can be removed. If a range is not given, defaults to 0.
         :return: An ObjectActionResult.
         """
 
         # Additional check
-        possible, reason = self.is_possible(grid_world, agent_id, **kwargs)
+        if 'object_id' in kwargs:
+            object_id = kwargs['object_id']
+        else:
+            object_id = None
+
+        if 'grab_range' in kwargs:
+            grab_range = kwargs['grab_range']
+        else:
+            grab_range = 0
+
+        possible, reason = is_possible_grab(grid_world, agent_id, object_id, grab_range)
 
         if possible:
-            assert 'object_id' in kwargs.keys()
             object_id = kwargs['object_id']  # assign
 
             # Loading properties
@@ -56,6 +59,9 @@ class GrabAction(Action):
             reg_ag.properties['carrying'].append(object_id)
             env_obj.properties['carried'].append(agent_id)
 
+            # Updating Location
+            env_obj.location = reg_ag.location
+
             # Moving the object with the Agent is done in Movement
             return True, GrabActionResult.RESULT_SUCCESS
         else:
@@ -63,8 +69,8 @@ class GrabAction(Action):
 
 
 def is_possible_grab(grid_world, agent_id, object_id, grab_range):
-    reg_ag = grid_world.registered_agents[agent_id] #Registered Agent
-    loc_agent = reg_ag.location        
+    reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
+    loc_agent = reg_ag.location  # Agent location
 
     # Already carries an object
     if len(reg_ag.properties['carrying']) != 0:
@@ -72,15 +78,28 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range):
 
     # Go through all objects at the desired locations
     objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type="*", sense_range=grab_range)
-    objects_in_range.remove(agent_id)
+    objects_in_range.pop(agent_id)
+
+    # Set random object in range
+    if not object_id:
+        # Remove all non objects from the list
+        for obj in list(objects_in_range.keys()):
+            if obj not in grid_world.environment_objects.keys():
+                objects_in_range.pop(obj)
+
+        # Select a random object
+        if objects_in_range:
+            object_id = grid_world.rnd_gen.choice(list(objects_in_range.keys()))
+        else:
+            return False, GrabActionResult.NOT_IN_RANGE
 
     # Check if object is in range
     if object_id not in objects_in_range:
         return False, GrabActionResult.NOT_IN_RANGE
 
-    # Check if loc_obj_id is the id of an agent
+    # Check if object_id is the id of an agent
     if object_id in grid_world.registered_agents.keys():
-        # If it is an agent at that location, grabing is not possible
+        # If it is an agent at that location, grabbing is not possible
         return False, GrabActionResult.RESULT_AGENT
 
     # Check if it is an object
@@ -93,7 +112,7 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range):
             # Success
             return True, None
     else:
-        return GrabActionResult(GrabActionResult.RESULT_UNKNOWN_OBJECT_TYPE, succeeded=False)
+        return False, GrabActionResult.RESULT_UNKNOWN_OBJECT_TYPE
 
 
 class GrabActionResult(ActionResult):
