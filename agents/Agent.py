@@ -1,6 +1,7 @@
 import numpy as np
 
 from environment.actions.object_actions import RemoveObject
+from environment.actions.grab_actions import GrabAction
 
 class Agent:
 
@@ -180,6 +181,31 @@ class Agent:
             else:
                 action_kwargs['object_id'] = None
                 action_kwargs['remove_range'] = 0
+
+        # if action == GrabAction.__name__:
+        #     # Get all perceived objects
+        #     objects = list(state.keys())
+        #     # Remove yourself from the object id list
+        #     objects.remove(self.name)
+        #     # Remove all objects that have 'agent' in the name (so we do not remove those, though agents without agent
+        #     # in their name can still be removed).
+        #     objects = [obj for obj in objects if 'agent' not in obj]
+        #     # Choose a random object id (safety for when it is empty)
+        #     if objects:
+        #         object_id = self.rnd_gen.choice(objects)
+        #         # Assign it
+        #         action_kwargs['object_id'] = object_id
+        #         # Select range as just enough to remove that object
+        #         remove_range = int(np.ceil(np.linalg.norm(
+        #             np.array(state[object_id]['location'])-np.array(state[self.name]['location']))))
+        #         # Safety for if object and agent are in the same location
+        #         remove_range = max(remove_range, 0)
+        #         # Assign it to the arguments list
+        #         action_kwargs['remove_range'] = remove_range
+        #     else:
+        #         action_kwargs['object_id'] = None
+        #         action_kwargs['remove_range'] = 0
+
 
         return action, action_kwargs
 
