@@ -38,16 +38,10 @@ class GridWorld:
         # Initialize the visualizer
         self.visualizer = Visualizer(self.shape)
 
-        # # initialize GUI by sending the grid size
-        # initGUI(self.shape, verbose=False)
-        #
-        # # We send all visible objects to the God view GUI
-        # self.__sync_god_view_GUI()
 
-
-    def register_agent(self, agent_name, location, sense_capability, action_set, get_action_func,
-                       set_action_result_func, agent_properties, type, agent_type=AgentAvatar):
-        agent_id = agent_name
+    def register_agent(self, agent_id, sense_capability, action_set, get_action_func,
+                       set_action_result_func, agent_properties, properties_agent_writable,
+                       type, agent_type=AgentAvatar):
 
         # Random seed for agent between 1 and 1000, might need to be adjusted still
         agent_seed = self.rnd_gen.randint(1, 1000)
@@ -56,18 +50,14 @@ class GridWorld:
             raise Exception("The given agent 'get_action_func' is not callable. Please provide this method.")
 
         if agent_type == AgentAvatar:
-            agent_object = AgentAvatar(agent_id=agent_id, agent_name=agent_name, location=location,
+            agent_object = AgentAvatar(agent_id=agent_id,
                                        sense_capability=sense_capability, action_set=action_set,
-                                       get_action_func=get_action_func, properties=agent_properties,
-                                       set_action_result_func=set_action_result_func, type=type)
+                                       get_action_func=get_action_func, agent_properties=agent_properties,
+                                       set_action_result_func=set_action_result_func,
+                                       properties_agent_writable=properties_agent_writable,
+                                       type=type)
         else:
             raise Exception(f"Agent of type {agent_type} is not known to the environment.")
-
-        # add colour and shape properties (for testing)
-        agent_object.add_properties(propName="colour", propVal=np.random.choice(["#900C3F", "#581845"]))
-        agent_object.add_properties(propName="shape", propVal=1)
-        agent_object.add_properties(propName="size", propVal=1)
-        agent_object.add_properties(propName="carrying", propVal=[])
 
         self.registered_agents[agent_id] = agent_object
 
@@ -78,7 +68,7 @@ class GridWorld:
         obj_id = obj_name
         env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties, is_traversable=is_traversable)
         env_object.add_properties(propName="carried", propVal=False)
-        
+
         self.environment_objects[obj_id] = env_object
         return obj_id
 
@@ -95,30 +85,40 @@ class GridWorld:
         tick_start_time = datetime.datetime.now()
 
         # Go over all agents, detect what each can detect, figure out what actions are possible and send these to
-        # that agent. Then receive the action back, store it in a buffer and go to the next agent. This blocks until
-        # a response from the agent is received (hence a tick can take longer than self.tick_duration!!)
+        # that agent. Then receive the action back and store the action in a buffer.
+        # Also, update the local copy of the agent properties, and save the agent's perceived state for the GUI.
+        # Then go to the next agent.
+        # This blocks until a response from the agent is received (hence a tick can take longer than self.tick_duration!!)
         action_buffer = OrderedDict()
         for agent_id, agent_obj in self.registered_agents.items():
+
             state = self.__get_agent_state(agent_obj)
             possible_actions = self.__get_possible_actions(agent_id=agent_id, action_set=agent_obj.action_set)
 
             if agent_obj.type == "agent":
-                filtered_agent_state, action_class_name, action_kwargs = agent_obj.get_action_func(state=state, possible_actions=possible_actions,
-                        agent_id=agent_id)
+                filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(state=state,
+                        agent_properties=agent_obj.get_properties(), possible_actions=possible_actions, agent_id=agent_id)
 
-            # For a humanagent, we check if it has received any userinputs, and sends them along if so
+            # For a humanagent any userinputs from the GUI for this humanagent are send along
             elif agent_obj.type == "humanagent":
                 usrinp = self.visualizer.userinputs[agent_id]["action"] if agent_id in self.visualizer.userinputs else None
-                filtered_agent_state, action_class_name, action_kwargs = agent_obj.get_action_func(state=state, possible_actions=possible_actions,
-                        agent_id=agent_id, userinput=usrinp)
+                filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(state=state,
+                        agent_properties=agent_obj.get_properties(), possible_actions=possible_actions, agent_id=agent_id, userinput=usrinp)
 
+            # store the action in the buffer
             action_buffer[agent_id] = (action_class_name, action_kwargs)
+
+            # the Agent (in the OODA loop) might have updated its properties,
+            # process these changes in the Avatar Agent
+            agent_obj.set_agent_changed_properties(agent_properties)
 
             # save what the agent observed to the visualizer
             self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state)
 
-        # save the god state in the visualizer
+
+        # save the state of the god view in the visualizer
         self.visualizer.save_state(type="god", id="god", state=self.__get_complete_state())
+
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
         for agent_id, action in action_buffer.items():
@@ -142,8 +142,6 @@ class GridWorld:
         self.__update_grid()
 
 
-
-
         # Increment the number of tick we performed
         self.current_nr_ticks += 1
 
@@ -151,6 +149,8 @@ class GridWorld:
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time
         self.curr_tick_duration = tick_duration.total_seconds()
+
+        print(f"Tick took {self.curr_tick_duration} seconds")
 
         # Sleep for the remaining time of self.tick_duration
         self.__sleep()
@@ -392,14 +392,14 @@ class GridWorld:
 
         # Update the Agent Avatar's location as well
         self.registered_agents[agent_id].set_location(loc=loc)
-    
-    def __update_obj_location(self, obj_id): 
+
+    def __update_obj_location(self, obj_id):
         loc = self.environment_objects[obj_id].location
         if self.grid[loc[1], loc[0]] is not None:
             self.grid[loc[1], loc[0]].append(obj_id)
         else:
-            self.grid[loc[1], loc[0]] = [obj_id]        
-    
+            self.grid[loc[1], loc[0]] = [obj_id]
+
     def __warn(self, warn_str):
         return f"[@{self.current_nr_ticks}] {warn_str}"
 
