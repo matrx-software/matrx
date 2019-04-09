@@ -31,7 +31,7 @@ class RemoveObject(Action):
         remove_range = 1  # default remove range
         if 'remove_range' in kwargs.keys():  # if remove range is present
             assert isinstance(kwargs['remove_range'], int)  # should be of integer
-            assert kwargs['remove_range'] >= 1  # should be equal or larger than 1
+            assert kwargs['remove_range'] >= 0  # should be equal or larger than 0
             remove_range = kwargs['remove_range']  # assign
 
         # get the current agent (exists, otherwise the is_possible failed)
