@@ -1,8 +1,6 @@
 import numpy as np
-from visualization.helper_functions import sendGUIupdate
 
 from environment.actions.object_actions import RemoveObject
-
 
 class Agent:
 

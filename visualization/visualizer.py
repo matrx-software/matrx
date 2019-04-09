@@ -1,9 +1,6 @@
 import datetime
 import requests
 
-from visualization.helper_functions import reorder_state_for_GUI
-
-
 class Visualizer():
 
     def __init__(self, grid_size):
