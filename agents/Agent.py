@@ -183,7 +183,7 @@ class Agent:
                 action_kwargs['remove_range'] = 0
 
         if action == GrabAction.__name__:
-            grab_range = 1
+            grab_range = 0
             # Assign it to the arguments list
             action_kwargs['grab_range'] = grab_range
 

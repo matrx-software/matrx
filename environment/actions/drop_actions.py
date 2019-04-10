@@ -20,6 +20,16 @@ class DropAction(Action):
         return possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id)
 
     def mutate(self, grid_world, agent_id, **kwargs):
+        """
+        This function drops one of the items carried by the agent.
+        It drops the item at the current location of the agent.
+
+        :param grid_world: pointer to current GridWorld
+        :param agent_id: agent that acts
+        :param kwargs: Optional an "object_id" can be given. If an agent is carrying
+        two or more items, this specifies which item should be dropped.
+        :return: Always True
+        """
         reg_ag = grid_world.registered_agents[agent_id]
 
         # If no object id is given, the last item is dropped
@@ -32,9 +42,6 @@ class DropAction(Action):
 
 
 def act_drop(grid_world, agent_id, obj_id):
-    # Checking if drop is possible
-    result = possible_drop(grid_world, agent_id, obj_id)
-
     # Loading properties
     reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
     env_obj = grid_world.environment_objects[obj_id]  # Environment object
@@ -73,6 +80,7 @@ def possible_drop(grid_world, agent_id, obj_id):
         if loc_obj_id in grid_world.environment_objects.keys():
             return False, DropActionResult.RESULT_OBJECT
         else:
+            # We have checked for agent and object, unknown what to do
             return False, DropActionResult.RESULT_UNKNOWN_OBJECT_TYPE
 
 

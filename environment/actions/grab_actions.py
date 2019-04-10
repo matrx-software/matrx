@@ -13,12 +13,19 @@ class GrabAction(Action):
         super().__init__(name)
 
     def is_possible(self, grid_world, agent_id):
+        """
+        This function checks if grabbing an object is possible.
+        For this it assumes a infinite grab range and a random object in that range
+        The check if an object is within range is done within 'mutate'
+        :param grid_world: The current GridWorld
+        :param agent_id: The agent that performes the action
+        :return:
+        """
         # Check if object_id is specified
         object_id = None
         grab_range = np.inf  # we do not know the intended range, so assume infinite
 
-        possible, reason = is_possible_grab(grid_world, agent_id=agent_id, object_id=object_id, grab_range=grab_range)
-        return possible, reason
+        return is_possible_grab(grid_world, agent_id=agent_id, object_id=object_id, grab_range=grab_range)
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
@@ -104,7 +111,7 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range):
 
     # Check if it is an object
     if object_id in grid_world.environment_objects.keys():
-        env_obj = grid_world.environment_objects[object_id] # Environment object
+        env_obj = grid_world.environment_objects[object_id]  # Environment object
         # Check if the object is not carried by another agent
         if env_obj.properties['carried']:
             return False, GrabActionResult.RESULT_OBJECT_CARRIED
@@ -123,7 +130,6 @@ class GrabActionResult(ActionResult):
     RESULT_CARRIES_OBJECT = 'Agent already carries an object'
     RESULT_OBJECT_CARRIED = 'Object is already carried'
     RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
-    RESULT_UNKNOWN_ERROR = 'Some unknown error happened, not picked up'
     
     def __init__(self, result, succeeded):
         super().__init__(result, succeeded)
