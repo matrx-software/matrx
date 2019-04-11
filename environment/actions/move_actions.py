@@ -15,8 +15,7 @@ def act_move(grid_world, agent_id, dx, dy):
             if obj_carried in grid_world.environment_objects:
                 grid_world.environment_objects[obj_carried].location = new_loc
             else:
-                # Apparently the object has been removed. Thus removing from carrying
-                grid_world.registered_agents[agent_id].properties['carrying'].remove(obj_carried)
+                assert False, "Object no longer in grid_world.environment_objects, but still carried"
 
     return True
 

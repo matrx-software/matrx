@@ -31,21 +31,21 @@ class RemoveObject(Action):
         remove_range = 1  # default remove range
         if 'remove_range' in kwargs.keys():  # if remove range is present
             assert isinstance(kwargs['remove_range'], int)  # should be of integer
-            assert kwargs['remove_range'] >= 1  # should be equal or larger than 1
+            assert kwargs['remove_range'] >= 0  # should be equal or larger than 0
             remove_range = kwargs['remove_range']  # assign
 
         # get the current agent (exists, otherwise the is_possible failed)
-        agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentAvatar)
+        agent_avatar = grid_world.registered_agents[agent_id]
         agent_loc = agent_avatar.location  # current location
 
         # Get all objects in the remove_range
         objects_in_range = grid_world.get_objects_in_range(agent_loc, object_type="*", sense_range=remove_range)
 
         # You can't remove yourself
-        objects_in_range.remove(agent_avatar)
+        objects_in_range.pop(agent_id)
 
         for obj in objects_in_range:  # loop through all objects in range
-            if obj.obj_id == object_id:  # if object is in that list
+            if obj == object_id:  # if object is in that list
                 success = grid_world.remove_from_grid(object_id)  # remove it, success is whether GridWorld succeeded
                 if success:  # if we succeeded in removal return the appriopriate ActionResult
                     return True, ObjectActionResult.OBJECT_REMOVED \
@@ -69,7 +69,7 @@ class RemoveObject(Action):
         objects_in_range = grid_world.get_objects_in_range(agent_loc, object_type="*", sense_range=remove_range)
 
         # You can't remove yourself
-        objects_in_range.remove(agent_avatar)
+        objects_in_range.pop(agent_avatar.obj_id)
 
         if len(objects_in_range) == 0:  # if there are no objects in infinite range besides ourselves, we return fail
             return False, ObjectActionResult.NO_OBJECTS_IN_RANGE \
