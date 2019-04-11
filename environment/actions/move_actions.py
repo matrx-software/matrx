@@ -5,7 +5,7 @@ from environment.objects.basic_objects import AgentAvatar
 def act_move(grid_world, agent_id, dx, dy):
     agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentAvatar)
     loc = agent_avatar.location
-    new_loc = (loc[0] + dx, loc[1] + dy)
+    new_loc = [loc[0] + dx, loc[1] + dy]
     grid_world.registered_agents[agent_id].location = new_loc
 
     # Carrying action is done here
@@ -31,7 +31,7 @@ def possible_movement(grid_world, agent_id, dx, dy):
     assert agent_avatar is not None
 
     loc = agent_avatar.location
-    new_loc = (loc[0] + dx, loc[1] + dy)
+    new_loc = [loc[0] + dx, loc[1] + dy]
     if 0 <= new_loc[0] < grid_world.shape[0] and 0 <= new_loc[1] < grid_world.shape[1]:
         loc_obj_ids = grid_world.grid[new_loc[1], new_loc[0]]
         if loc_obj_ids is None:

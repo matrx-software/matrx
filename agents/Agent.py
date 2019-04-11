@@ -5,25 +5,19 @@ from environment.actions.grab_actions import GrabAction
 
 class Agent:
 
-    def __init__(self, name, action_set, sense_capability, properties=None):
+    def __init__(self, action_set, sense_capability, agent_properties, properties_agent_writable):
         """
         Creates an Agent. All other agents should inherit from this class if you want smarter agents. This agent
         simply randomly selects an action from the possible actions it can do.
-        :param name: The name of the agent.
         :param action_set: The actions the agent can perform. A list of strings, with each string a class name of an
         existing action in the package Actions.
         :param sense_capability: A SenseCapability object; it states which object types the agent can perceive within
         what range.
+        :param agent_properties: the properties of this agent, including location etc.
+        :param properties_agent_writable: which of the agent_properties can be changed by this agent
         :param grid_size: The size of the grid. The agent needs to send this along with other information to the
         webapp managing the Agent GUI
-
         """
-        if properties is None:
-            self.properties = {"name": name}
-        else:
-            self.properties = properties.copy()
-            self.properties["name"] = name
-        self.name = name
         self.action_set = action_set  # list of Action objects
         self.sense_capability = sense_capability
         self.agent_properties = {}
@@ -32,27 +26,42 @@ class Agent:
         self.previous_action = None
         self.previous_action_result = None
 
-    def get_action(self, state, possible_actions, agent_id):
+        # specifies the agent_properties
+        self.agent_properties = agent_properties
+        # specifies the keys of properties in self.agent_properties which can
+        # be changed by this Agent in this file. If it is not writable, it can only be
+        # updated through performing an action which updates that property (done by the environment).
+        # NOTE: Changing which properties are writable cannot be done during runtime! Only in
+        # the scenario manager
+        self.keys_of_agent_writable_props = properties_agent_writable
+
+
+
+    def get_action(self, state, agent_properties, possible_actions, agent_id):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
         for this agent to select an action.
         :param state: A state description containing all properties of EnvObject that are within a certain range as
         defined by self.sense_capability. It is a list of properties in a dictionary
+        :param agent_properties: The properties of the agent, which might have been changed by the
+        environment as a result of actions of this or other agents.
         :param possible_actions: The possible actions the agent can perform according to the grid world. The agent can
         send any other action (as long as it excists in the Action package), but these will not be performed in the
         world resulting in the appriopriate ActionResult.
-        :return: An action string, which is the class name of one of the actions in the Action package.
+        :param agent_id: the ID of this agent
+        :return: The filtered state of this agent, the agent properties which the agent might have changed,
+        and an action string, which is the class name of one of the actions in the Action package.
         """
+        # Process any properties of this agent which were updated in the environment as a result of
+        # actions
+        self.agent_properties = agent_properties
 
         state = self.ooda_observe(state)
         state = self.ooda_orient(state)
         action, action_kwargs = self.ooda_decide(state, possible_actions)
         action = self.ooda_act(action)
 
-        # send the agent state to the GUI web server for visualization
-        # sendGUIupdate(state=state, type="agent", verbose=True, id=agent_id)
-
-        return state, action, action_kwargs
+        return state, self.agent_properties, action, action_kwargs
 
     def set_action_result(self, action_result):
         """
