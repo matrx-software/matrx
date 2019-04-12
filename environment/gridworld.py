@@ -285,7 +285,7 @@ class GridWorld:
         if self.sleep_duration > 0:
             time.sleep(self.sleep_duration)
         else:
-            self.__warn(f"The ticks took longer than the set tick duration of {self.tick_duration}")
+            self.__warn(f"The average tick took longer than the set tick duration of {self.tick_duration}. Programm is to heavy to run real time")
 
     def __update_grid(self):
         self.grid = np.array([[None for x in range(self.shape[0])] for y in range(self.shape[1])])
