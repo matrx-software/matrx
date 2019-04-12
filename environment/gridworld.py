@@ -31,6 +31,8 @@ class GridWorld:
         self.rnd_gen = np.random.RandomState(seed=self.rnd_seed)
         self.curr_tick_duration = 0.
         self.carry_dict = {}
+        self.tick_start_time = datetime.datetime.now()
+        self.sleep_duration = tick_duration
 
     def initialize(self):
         # We update the grid, which fills everything with added objects and agents
@@ -82,8 +84,8 @@ class GridWorld:
         if self.is_done:
             return self.is_done, 0.
 
-        # current time of the tick start
-        tick_start_time = datetime.datetime.now()
+        # Set tick start of current tick
+        tick_start_time_current_tick = datetime.datetime.now()
 
         # Go over all agents, detect what each can detect, figure out what actions are possible and send these to
         # that agent. Then receive the action back and store the action in a buffer.
@@ -141,16 +143,15 @@ class GridWorld:
         # update the visualizations of all (human)agents and god
         self.visualizer.updateGUIs()
 
-
-
-
         # Increment the number of tick we performed
         self.current_nr_ticks += 1
 
         # Check how much time the tick lasted already
         tick_end_time = datetime.datetime.now()
-        tick_duration = tick_end_time - tick_start_time
+        tick_duration = tick_end_time - tick_start_time_current_tick
         self.curr_tick_duration = tick_duration.total_seconds()
+        total_time = (tick_end_time - self.tick_start_time)
+        self.sleep_duration = self.tick_duration * self.current_nr_ticks - total_time.total_seconds()
 
         print(f"Tick took {self.curr_tick_duration} seconds")
 
@@ -159,7 +160,7 @@ class GridWorld:
 
         # Compute the total time of our tick (including potential sleep)
         tick_end_time = datetime.datetime.now()
-        tick_duration = tick_end_time - tick_start_time
+        tick_duration = tick_end_time - tick_start_time_current_tick
         self.curr_tick_duration = tick_duration.total_seconds()
 
         return self.is_done, self.curr_tick_duration
@@ -281,11 +282,10 @@ class GridWorld:
         in self.tick_duration
         :return:
         """
-        if self.tick_duration > 0:
-            if self.curr_tick_duration < self.tick_duration:
-                time.sleep(self.tick_duration - self.curr_tick_duration)
-            else:
-                self.__warn(f"The current tick took longer than the set tick duration of {self.tick_duration}")
+        if self.sleep_duration > 0:
+            time.sleep(self.sleep_duration)
+        else:
+            self.__warn(f"The ticks took longer than the set tick duration of {self.tick_duration}")
 
     def __update_grid(self):
         self.grid = np.array([[None for x in range(self.shape[0])] for y in range(self.shape[1])])
