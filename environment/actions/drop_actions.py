@@ -66,7 +66,7 @@ def possible_drop(grid_world, agent_id, obj_id):
         return False, DropActionResult.RESULT_NO_OBJECT
 
     # No other object/agent is in that location, then drop is a success
-    if len(loc_obj_ids) == 2:
+    if len(loc_obj_ids) == len(reg_ag.properties['carrying']) + 1:
         return True, DropActionResult.RESULT_SUCCESS
 
     # Go through all objects at the desired locations

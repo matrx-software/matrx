@@ -58,7 +58,8 @@ for nr_agent in range(len(agent_start_locations)):
         MoveWest.__name__,
         MoveNorthWest.__name__,
         GrabAction.__name__,
-        DropAction.__name__]
+        DropAction.__name__
+    ]
 
     # specify the agent properties
     agent_properties = {"size": 1, "name": f"agent_{nr_agent}", "carrying": [],

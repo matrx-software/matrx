@@ -192,9 +192,15 @@ class Agent:
                 action_kwargs['remove_range'] = 0
 
         if action == GrabAction.__name__:
-            grab_range = 0
+            # Set grab range
+            grab_range = 1
+
+            # Set max amount of objects
+            max_objects = 3
+
             # Assign it to the arguments list
             action_kwargs['grab_range'] = grab_range
+            action_kwargs['max_objects'] = max_objects
 
             # Get all perceived objects
             objects = list(state.keys())

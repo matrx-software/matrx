@@ -24,8 +24,10 @@ class GrabAction(Action):
         # Check if object_id is specified
         object_id = None
         grab_range = np.inf  # we do not know the intended range, so assume infinite
+        max_objects = np.inf
 
-        return is_possible_grab(grid_world, agent_id=agent_id, object_id=object_id, grab_range=grab_range)
+        return is_possible_grab(grid_world, agent_id=agent_id, object_id=object_id, grab_range=grab_range,
+                                max_objects=max_objects)
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
@@ -36,9 +38,12 @@ class GrabAction(Action):
 
         :param grid_world: The current GridWorld
         :param agent_id: The agent that performs the action.
-        :param kwargs: Requires an optional 'object_id' that exists in the GridWorld (if none is specified
-        a random object within range is chosen) and the optional 'grab_range' to specify
-        the range in which the object can be removed. If a range is not given, defaults to 0.
+        :param kwargs: An optional 'object_id' that exists in the GridWorld (if none is specified
+        a random object within range is chosen).\n
+        Optional 'grab_range' to specify the range in which the object can be removed.
+        If a range is not given, defaults to 0. \n
+        Optional 'max_objects' for the amount of objects the agent can carry.
+        If no 'max_objects' is set, default is set to 1.
         :return: An ObjectActionResult.
         """
 
@@ -53,7 +58,12 @@ class GrabAction(Action):
         else:
             grab_range = 0
 
-        possible, reason = is_possible_grab(grid_world, agent_id, object_id, grab_range)
+        if 'max_objects' in kwargs:
+            max_objects = kwargs['max_objects']
+        else:
+            max_objects = 1
+
+        possible, reason = is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects)
 
         if possible:
             object_id = kwargs['object_id']  # assign
@@ -75,17 +85,21 @@ class GrabAction(Action):
             return False, reason
 
 
-def is_possible_grab(grid_world, agent_id, object_id, grab_range):
+def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
     reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
     loc_agent = reg_ag.location  # Agent location
 
     # Already carries an object
-    if len(reg_ag.properties['carrying']) != 0:
+    if len(reg_ag.properties['carrying']) >= max_objects:
         return False, GrabActionResult.RESULT_CARRIES_OBJECT
 
     # Go through all objects at the desired locations
     objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type="*", sense_range=grab_range)
     objects_in_range.pop(agent_id)
+
+    # Removing carried objects
+    for obj in reg_ag.properties['carrying']:
+        objects_in_range.pop(obj)
 
     # Set random object in range
     if not object_id:
@@ -127,7 +141,7 @@ class GrabActionResult(ActionResult):
     NOT_IN_RANGE = 'Object not in range'
     RESULT_AGENT = 'This is an agent, cannot be picked up'
     RESULT_NO_OBJECT = 'No Object specified'
-    RESULT_CARRIES_OBJECT = 'Agent already carries an object'
+    RESULT_CARRIES_OBJECT = 'Agent already carries the maximum amount of objects'
     RESULT_OBJECT_CARRIED = 'Object is already carried'
     RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
     
