@@ -2,7 +2,7 @@
 
 class Action:
 
-    def __init__(self, name):
+    def __init__(self, name, duration=1):
         """
         The core action class. This class is empty and should be overridden if you want to make a new action that is not
         yet supported. You may also extend other actions, as long as their super class is this class.
@@ -13,11 +13,14 @@ class Action:
 
         :param name: The name of the action. By default this should be the class name. Hence you should assign this in
         the constructor of your custom action class to;
-
         `name = self.__class__`
+        :param duration: The duration of the action. By default this is 1. For an action which takes multiple ticks and
+        blocks the user, you should assign a custom duration in the constructor of your custom action class.
 
         """
         self.name = name
+        # number of ticks the action takes to complete
+        self.duration = duration
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
