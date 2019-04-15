@@ -71,7 +71,7 @@ class GridWorld:
         obj_id = obj_name
         env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties, is_traversable=is_traversable)
         env_object.add_properties(propName="carried", propVal=[])
-        
+
         self.environment_objects[obj_id] = env_object
         return obj_id
 
@@ -94,6 +94,10 @@ class GridWorld:
         # This blocks until a response from the agent is received (hence a tick can take longer than self.tick_duration!!)
         action_buffer = OrderedDict()
         for agent_id, agent_obj in self.registered_agents.items():
+
+            # go to the next agent, if this agent is still busy performing an action
+            if agent_obj.check_agent_busy(curr_tick=self.current_nr_ticks):
+                continue
 
             state = self.__get_agent_state(agent_obj)
             possible_actions = self.__get_possible_actions(agent_id=agent_id, action_set=agent_obj.action_set)
@@ -131,6 +135,7 @@ class GridWorld:
             action_kwargs = action[1]
             if action_kwargs is None:  # If kwargs is none, make an empty dict out of it
                 action_kwargs = {}
+
             # Actually perform the action (if possible)
             self.__perform_action(agent_id, action_class_name, action_kwargs)
             # Update the grid
@@ -377,6 +382,9 @@ class GridWorld:
             if is_possible[0]:  # First return value is the boolean (seceond is reason why, optional)
                 # Apply world mutation
                 result = action.mutate(self, agent_id, **action_kwargs)
+
+                # The agent is now busy performing this action
+                self.registered_agents[agent_id].set_agent_busy(curr_tick=self.current_nr_ticks, action_duration=action.duration)
             else:
                 # If the action is not possible, send a failed ActionResult with the is_possible message if given,
                 # otherwise use the default one.

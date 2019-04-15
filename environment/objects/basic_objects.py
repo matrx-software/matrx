@@ -86,6 +86,11 @@ class AgentAvatar(EnvObject):
         self.type = type
         self.properties_agent_writable = properties_agent_writable
 
+        # defines an agent is blocked by an action which takes multiple timesteps
+        self.blocked = False
+        # is the last action performed by the agent, at what tick and how long it takes
+        self.last_action = {"duration": 0, "tick": 0}
+
 
     def __check_properties_validity(self, id, props):
         """
@@ -99,6 +104,21 @@ class AgentAvatar(EnvObject):
                 raise Exception(f"The (human) agent with {id} is missing the property {prop}. \
                         All of the following required properties need to be defined: {self.required_props}.")
 
+
+    def set_agent_busy(self, curr_tick, action_duration):
+        """
+        specify the duration of the action currently being executed by the
+        agent, and its starting tick
+        """
+        self.last_action = {"duration": action_duration, "tick": curr_tick}
+
+
+    def check_agent_busy(self, curr_tick):
+        """
+        check if the agent is done with executing the action
+        """
+        self.blocked = (curr_tick < self.last_action["duration"] + self.last_action["tick"])
+        return self.blocked
 
 
     def set_agent_changed_properties(self, props):
