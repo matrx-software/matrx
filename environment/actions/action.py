@@ -2,7 +2,7 @@
 
 class Action:
 
-    def __init__(self, name, duration=1):
+    def __init__(self, name, duration_in_ticks = 1):
         """
         The core action class. This class is empty and should be overridden if you want to make a new action that is not
         yet supported. You may also extend other actions, as long as their super class is this class.
@@ -20,7 +20,7 @@ class Action:
         """
         self.name = name
         # number of ticks the action takes to complete
-        self.duration = duration
+        self.duration_in_ticks = duration_in_ticks
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """

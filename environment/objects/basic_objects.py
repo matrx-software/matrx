@@ -63,10 +63,11 @@ class AgentAvatar(EnvObject):
     """
 
     def __init__(self, agent_id, sense_capability, action_set, get_action_func,
-                 set_action_result_func, agent_properties, properties_agent_writable, type):
+                 set_action_result_func, ooda_observe, ooda_orient, agent_properties,
+                 properties_agent_writable, type):
 
         # define which properties are required for the agent
-        self.required_props = ["location", "size", "is_traversable", "colour", "shape", "name"]
+        self.required_props = ["location", "size", "is_traversable", "colour", "shape", "name", "agent_speed_in_ticks"]
 
         # check validity of the passed properties
         self.__check_properties_validity(agent_id, agent_properties)
@@ -83,13 +84,15 @@ class AgentAvatar(EnvObject):
         self.action_set = action_set
         self.get_action_func = get_action_func
         self.set_action_result_func = set_action_result_func
+        self.ooda_observe = ooda_observe
+        self.ooda_orient = ooda_orient
         self.type = type
         self.properties_agent_writable = properties_agent_writable
 
         # defines an agent is blocked by an action which takes multiple timesteps
         self.blocked = False
         # is the last action performed by the agent, at what tick and how long it takes
-        self.last_action = {"duration": 0, "tick": 0}
+        self.last_action = {"duration_in_ticks": 0, "tick": 0}
 
 
     def __check_properties_validity(self, id, props):
@@ -107,17 +110,17 @@ class AgentAvatar(EnvObject):
 
     def set_agent_busy(self, curr_tick, action_duration):
         """
-        specify the duration of the action currently being executed by the
+        specify the duration of the action in ticks currently being executed by the
         agent, and its starting tick
         """
-        self.last_action = {"duration": action_duration, "tick": curr_tick}
+        self.last_action = {"duration_in_ticks": action_duration, "tick": curr_tick}
 
 
     def check_agent_busy(self, curr_tick):
         """
         check if the agent is done with executing the action
         """
-        self.blocked = (curr_tick < self.last_action["duration"] + self.last_action["tick"])
+        self.blocked = (curr_tick < self.last_action["tick"] + self.last_action["duration_in_ticks"] + self.properties["agent_speed_in_ticks"])
         return self.blocked
 
 
