@@ -77,7 +77,7 @@ class Move(Action):
     def __init__(self, name=None):
         if not name:
             name = Move.__name__
-        super().__init__(name, 3)
+        super().__init__(name)
         self.dx = 0
         self.dy = 0
 

@@ -36,7 +36,6 @@ class Agent:
         self.keys_of_agent_writable_props = properties_agent_writable
 
 
-
     def get_action(self, state, agent_properties, possible_actions, agent_id):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time

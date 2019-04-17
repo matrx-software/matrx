@@ -63,7 +63,8 @@ class AgentAvatar(EnvObject):
     """
 
     def __init__(self, agent_id, sense_capability, action_set, get_action_func,
-                 set_action_result_func, agent_properties, properties_agent_writable, type):
+                 set_action_result_func, ooda_observe, ooda_orient, agent_properties,
+                 properties_agent_writable, type):
 
         # define which properties are required for the agent
         self.required_props = ["location", "size", "is_traversable", "colour", "shape", "name"]
@@ -83,6 +84,8 @@ class AgentAvatar(EnvObject):
         self.action_set = action_set
         self.get_action_func = get_action_func
         self.set_action_result_func = set_action_result_func
+        self.ooda_observe = ooda_observe
+        self.ooda_orient = ooda_orient
         self.type = type
         self.properties_agent_writable = properties_agent_writable
 

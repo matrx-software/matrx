@@ -43,8 +43,8 @@ class GridWorld:
 
 
     def register_agent(self, agent_id, sense_capability, action_set, get_action_func,
-                       set_action_result_func, agent_properties, properties_agent_writable,
-                       type, agent_type=AgentAvatar):
+                       set_action_result_func, ooda_observe, ooda_orient, agent_properties,
+                       properties_agent_writable, type, agent_type=AgentAvatar):
 
         # Random seed for agent between 1 and 1000, might need to be adjusted still
         agent_seed = self.rnd_gen.randint(1, 1000)
@@ -57,6 +57,7 @@ class GridWorld:
                                        sense_capability=sense_capability, action_set=action_set,
                                        get_action_func=get_action_func, agent_properties=agent_properties,
                                        set_action_result_func=set_action_result_func,
+                                       ooda_observe=ooda_observe, ooda_orient=ooda_orient,
                                        properties_agent_writable=properties_agent_writable,
                                        type=type)
         else:
@@ -95,11 +96,16 @@ class GridWorld:
         action_buffer = OrderedDict()
         for agent_id, agent_obj in self.registered_agents.items():
 
+            state = self.__get_agent_state(agent_obj)
+
             # go to the next agent, if this agent is still busy performing an action
             if agent_obj.check_agent_busy(curr_tick=self.current_nr_ticks):
+                # only do the observe and orient of the OODA loop
+                filtered_agent_state = agent_obj.ooda_observe(state)
+                filtered_agent_state = agent_obj.ooda_orient(filtered_agent_state)
+                self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state)
                 continue
 
-            state = self.__get_agent_state(agent_obj)
             possible_actions = self.__get_possible_actions(agent_id=agent_id, action_set=agent_obj.action_set)
 
             if agent_obj.type == "agent":
