@@ -389,7 +389,7 @@ class GridWorld:
             # Check if action is possible, if so we can perform the action otherwise we send an ActionResult that it was
             # not possible.
             is_possible = action.is_possible(self, agent_id)
-            print(f"Action possible? {is_possible}")
+
             if is_possible[0]:  # First return value is the boolean (seceond is reason why, optional)
                 # Apply world mutation
                 result = action.mutate(self, agent_id, **action_kwargs)
