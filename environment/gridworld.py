@@ -8,7 +8,9 @@ import warnings
 import numpy as np
 
 from environment.actions.move_actions import *
-from environment.objects.basic_objects import AgentAvatar, EnvObject
+from environment.objects.basic_objects import EnvObject
+from environment.objects.agent_avatar import AgentAvatar
+
 
 from visualization.visualizer import Visualizer
 
@@ -144,7 +146,8 @@ class GridWorld:
                 action_kwargs = {}
 
             # Actually perform the action (if possible)
-            self.__perform_action(agent_id, action_class_name, action_kwargs)
+            result = self.__perform_action(agent_id, action_class_name, action_kwargs)
+
             # Update the grid
             self.__update_grid()
 
@@ -386,6 +389,7 @@ class GridWorld:
             # Check if action is possible, if so we can perform the action otherwise we send an ActionResult that it was
             # not possible.
             is_possible = action.is_possible(self, agent_id)
+            print(f"Action possible? {is_possible}")
             if is_possible[0]:  # First return value is the boolean (seceond is reason why, optional)
                 # Apply world mutation
                 result = action.mutate(self, agent_id, **action_kwargs)

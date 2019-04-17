@@ -1,5 +1,5 @@
 from environment.actions.action import Action, ActionResult
-from environment.objects.basic_objects import AgentAvatar
+from environment.objects.agent_avatar import AgentAvatar
 
 
 def act_move(grid_world, agent_id, dx, dy):

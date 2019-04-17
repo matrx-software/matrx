@@ -1,5 +1,5 @@
 from environment.actions.action import Action, ActionResult
-from environment.objects.basic_objects import AgentAvatar
+from environment.objects.agent_avatar import AgentAvatar
 import numpy as np
 
 

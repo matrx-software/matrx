@@ -129,6 +129,8 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
         # Check if the object is not carried by another agent
         if env_obj.properties['carried']:
             return False, GrabActionResult.RESULT_OBJECT_CARRIED
+        elif env_obj.properties["movable"]:
+            return False, GrabActionResult.RESULT_OBJECT_UNMOVABLE
         else:
             # Success
             return True, None
@@ -144,6 +146,7 @@ class GrabActionResult(ActionResult):
     RESULT_CARRIES_OBJECT = 'Agent already carries the maximum amount of objects'
     RESULT_OBJECT_CARRIED = 'Object is already carried'
     RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
+    RESULT_OBJECT_UNMOVABLE = 'Object is not movable'
 
     def __init__(self, result, succeeded):
         super().__init__(result, succeeded)
