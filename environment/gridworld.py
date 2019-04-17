@@ -390,7 +390,7 @@ class GridWorld:
                 result = action.mutate(self, agent_id, **action_kwargs)
 
                 # The agent is now busy performing this action
-                self.registered_agents[agent_id].set_agent_busy(curr_tick=self.current_nr_ticks, action_duration=action.duration)
+                self.registered_agents[agent_id].set_agent_busy(curr_tick=self.current_nr_ticks, action_duration=action.duration_in_ticks)
             else:
                 # If the action is not possible, send a failed ActionResult with the is_possible message if given,
                 # otherwise use the default one.

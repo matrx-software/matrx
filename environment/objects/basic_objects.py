@@ -92,7 +92,7 @@ class AgentAvatar(EnvObject):
         # defines an agent is blocked by an action which takes multiple timesteps
         self.blocked = False
         # is the last action performed by the agent, at what tick and how long it takes
-        self.last_action = {"duration": 0, "tick": 0}
+        self.last_action = {"duration_in_ticks": 0, "tick": 0}
 
 
     def __check_properties_validity(self, id, props):
@@ -110,17 +110,17 @@ class AgentAvatar(EnvObject):
 
     def set_agent_busy(self, curr_tick, action_duration):
         """
-        specify the duration of the action currently being executed by the
+        specify the duration of the action in ticks currently being executed by the
         agent, and its starting tick
         """
-        self.last_action = {"duration": action_duration, "tick": curr_tick}
+        self.last_action = {"duration_in_ticks": action_duration, "tick": curr_tick}
 
 
     def check_agent_busy(self, curr_tick):
         """
         check if the agent is done with executing the action
         """
-        self.blocked = (curr_tick < self.last_action["duration"] + self.last_action["tick"])
+        self.blocked = (curr_tick < self.last_action["duration_in_ticks"] + self.last_action["tick"])
         return self.blocked
 
 
