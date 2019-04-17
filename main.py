@@ -87,49 +87,49 @@ for nr_agent in range(len(agent_start_locations)):
                                                    action_set=agent.action_set,
                                                    type="agent")
     agent.set_rnd_seed(agent_seed)
-#
-# human_agents = []
-# # Initialize human agents
-# for nr_human_agent in range(len(human_agent_start_locations)):
-#     human_agent_id = f"human_agent_{nr_human_agent}"
-#     poss_actions = [
-#         MoveNorth.__name__,
-#         MoveEast.__name__,
-#         MoveSouth.__name__,
-#         MoveWest.__name__
-#     ]
-#     usrinp_action_map = {
-#         'arrowkey:up': MoveNorth.__name__,
-#         'arrowkey:right': MoveEast.__name__,
-#         'arrowkey:down': MoveSouth.__name__,
-#         'arrowkey:left': MoveWest.__name__
-#     }
-#
-#     # specify the agent properties
-#     hu_ag_properties = {"size": 1, "name": f"human_agent_{nr_human_agent}", "carrying": [],
-#             "location": human_agent_start_locations[nr_human_agent], "is_traversable": False,
-#             "colour": np.random.choice(["#900C3F", "#581845"]), "shape": 1}
-#     # specify which agent properties can be instantly changed by the agent without cost / action
-#     properties_human_agent_writable = ["colour", "shape"]
-#
-#     senses = [[None, np.inf]]
-#     sense_capability = SenseCapability(senses)
-#     human_agent = HumanAgent(action_set=poss_actions,
-#                              sense_capability=sense_capability,
-#                              usrinp_action_map=usrinp_action_map,
-#                              agent_properties=hu_ag_properties,
-#                              properties_agent_writable=properties_human_agent_writable)
-#     human_agents.append(human_agent)
-#
-#     human_agent_id, human_agent_seed = grid_env.register_agent(agent_id=human_agent_id,
-#                                                                sense_capability=human_agent.sense_capability,
-#                                                                get_action_func=human_agent.get_action,
-#                                                                set_action_result_func=human_agent.set_action_result,
-#                                                                agent_properties=hu_ag_properties,
-#                                                                properties_agent_writable=properties_agent_writable,
-#                                                                action_set=human_agent.action_set,
-#                                                                type="humanagent")
-#     human_agent.set_rnd_seed(human_agent_seed)
+
+human_agents = []
+# Initialize human agents
+for nr_human_agent in range(len(human_agent_start_locations)):
+    human_agent_id = f"human_agent_{nr_human_agent}"
+    poss_actions = [
+        MoveNorth.__name__,
+        MoveEast.__name__,
+        MoveSouth.__name__,
+        MoveWest.__name__
+    ]
+    usrinp_action_map = {
+        'arrowkey:up': MoveNorth.__name__,
+        'arrowkey:right': MoveEast.__name__,
+        'arrowkey:down': MoveSouth.__name__,
+        'arrowkey:left': MoveWest.__name__
+    }
+
+    # specify the agent properties
+    hu_ag_properties = {"size": 1, "name": f"human_agent_{nr_human_agent}", "carrying": [],
+            "location": human_agent_start_locations[nr_human_agent], "is_traversable": False,
+            "colour": np.random.choice(["#900C3F", "#581845"]), "shape": 1}
+    # specify which agent properties can be instantly changed by the agent without cost / action
+    properties_human_agent_writable = ["colour", "shape"]
+
+    senses = [[None, np.inf]]
+    sense_capability = SenseCapability(senses)
+    human_agent = HumanAgent(action_set=poss_actions,
+                             sense_capability=sense_capability,
+                             usrinp_action_map=usrinp_action_map,
+                             agent_properties=hu_ag_properties,
+                             properties_agent_writable=properties_human_agent_writable)
+    human_agents.append(human_agent)
+
+    human_agent_id, human_agent_seed = grid_env.register_agent(agent_id=human_agent_id,
+                                                               sense_capability=human_agent.sense_capability,
+                                                               get_action_func=human_agent.get_action,
+                                                               set_action_result_func=human_agent.set_action_result,
+                                                               agent_properties=hu_ag_properties,
+                                                               properties_agent_writable=properties_agent_writable,
+                                                               action_set=human_agent.action_set,
+                                                               type="humanagent")
+    human_agent.set_rnd_seed(human_agent_seed)
 
 grid_env.initialize()
 is_done = False
