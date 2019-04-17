@@ -129,7 +129,7 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
         # Check if the object is not carried by another agent
         if env_obj.properties['carried']:
             return False, GrabActionResult.RESULT_OBJECT_CARRIED
-        elif env_obj.properties["movable"]:
+        elif not env_obj.properties["movable"]:
             return False, GrabActionResult.RESULT_OBJECT_UNMOVABLE
         else:
             # Success

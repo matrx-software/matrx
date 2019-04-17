@@ -16,27 +16,31 @@ grid_size = [15, 15]  # horizontal and vertical size of grid
 max_duration = -1  # number of time units the environment should run as a maximum
 
 # start locations of agents = thus 2 agents
-agent_start_locations = [[0, 0], [0, 1], [8, 8]]
+agent_start_locations = [[14, 14], [0, 1], [8, 8]]
 human_agent_start_locations = [[6, 6], [9, 9]]
 obj_locations = [[2, 2], [1, 5], [0, 3], [6, 0], [3, 3], [9, 6], [6, 3],
                  [3, 5], [7, 8], [2, 6], [8, 3]]
+wall_obj_locations = [[0,0], [1,0], [2,0], [3,0], [4,0], [5,0]]
+
 
 sim_goal = LimitedTimeGoal(max_duration)  # can be a list of goals
 grid_env = GridWorld(grid_size, time_step, simulation_goal=sim_goal, can_occupy_agent_locs=True, rnd_seed=seed)
 
 objects = []
 rng = np.random.RandomState(seed)
-# Initialize objects
+# Initialize custom objects
 for nr_obj in range(len(obj_locations)):
     obj_name = f"object_{nr_obj}"
     location = obj_locations[nr_obj]
     # NOTE: np ints / floats, etc can't be JSONserialized, so convert to float!
-    properties = {"type": rng.choice(["lek", "brand"]),
+    properties = {
+                    # "type": rng.choice(["lek", "brand"]),
                   "grootte": int(rng.choice([0, 1, 2])),
                   "shape": 0,
                   "colour": rng.choice(["#286625", "#678fd9", "#FF5733"]),
                   "size": float(rng.rand()),
-                  "movable": bool(rng.choice([False, True]))}
+                  "movable": bool(rng.choice([False, True])),
+                  "carried": []}
 
     if properties["colour"] == "#286625":
         is_traversable = False
@@ -44,6 +48,18 @@ for nr_obj in range(len(obj_locations)):
         is_traversable = True
 
     grid_env.add_env_object(obj_name, location, properties, is_traversable)
+
+
+# initialize walls
+for nr_obj in range(len(wall_obj_locations)):
+    obj_name = f"wall_object_{nr_obj}"
+    location = wall_obj_locations[nr_obj]
+
+    properties = {"type": "Wall"}
+
+    grid_env.add_env_object(obj_name, location, properties)
+
+
 
 agents = []
 # Initialize agents

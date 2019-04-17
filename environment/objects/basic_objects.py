@@ -51,3 +51,28 @@ class EnvObject:
             self.fills_multiple_locations = True
         else:
             self.fills_multiple_locations = False
+
+
+class Wall(EnvObject):
+
+    def __init__(self, obj_id, obj_name, locations, properties):
+
+        # default properties for the wall object
+        properties["type"] = "wall"
+        properties["shape"] = 0 # square
+        properties["size"] = 1
+        properties["movable"] = False
+        properties["carried"] = []
+
+        # changable properties for a wall object
+        if "grootte" not in properties:
+            properties["grootte"] = 1
+
+        if "colour" not in properties:
+            properties["colour"] = "#000000"
+
+        super().__init__(   obj_id=obj_id,
+                            obj_name=obj_name,
+                            locations=locations,
+                            properties=properties,
+                            is_traversable=False)

@@ -4,11 +4,12 @@ import math
 import time
 from collections import OrderedDict
 import warnings
+import sys
 
 import numpy as np
 
 from environment.actions.move_actions import *
-from environment.objects.basic_objects import EnvObject
+from environment.objects.basic_objects import *
 from environment.objects.agent_avatar import AgentAvatar
 
 
@@ -70,10 +71,18 @@ class GridWorld:
         return agent_id, agent_seed
 
     def add_env_object(self, obj_name, location, obj_properties, is_traversable=False):
-        # This function adds the objects
+        """ this function adds the objects """
         obj_id = obj_name
-        env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties, is_traversable=is_traversable)
-        env_object.add_properties(propName="carried", propVal=[])
+        env_object = None
+
+        # check if we need to add an existing object
+        if 'type' in obj_properties:
+            # call the constructor for the defined object type
+            env_object = eval(obj_properties["type"])(obj_id, obj_name, locations=location, properties=obj_properties)
+
+        # otherwise, it is a custom object
+        else:
+            env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties, is_traversable=is_traversable)
 
         self.environment_objects[obj_id] = env_object
         return obj_id
