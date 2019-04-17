@@ -90,7 +90,7 @@ class GridWorld:
 
         # Go over all agents, detect what each can detect, figure out what actions are possible and send these to
         # that agent. Then receive the action back and store the action in a buffer.
-        # Also, update the local copy of the agent properties, and save the agent's perceived state for the GUI.
+        # Also, update the local copy of the agent properties, and save the agent's state for the GUI.
         # Then go to the next agent.
         # This blocks until a response from the agent is received (hence a tick can take longer than self.tick_duration!!)
         action_buffer = OrderedDict()
@@ -100,7 +100,7 @@ class GridWorld:
 
             # go to the next agent, if this agent is still busy performing an action
             if agent_obj.check_agent_busy(curr_tick=self.current_nr_ticks):
-                # only do the observe and orient of the OODA loop
+                # only do the observe and orient of the OODA loop to update the GUI
                 filtered_agent_state = agent_obj.ooda_observe(state)
                 filtered_agent_state = agent_obj.ooda_orient(filtered_agent_state)
                 self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state)
@@ -108,6 +108,7 @@ class GridWorld:
 
             possible_actions = self.__get_possible_actions(agent_id=agent_id, action_set=agent_obj.action_set)
 
+            # perform the OODA loop and get an action back
             if agent_obj.type == "agent":
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(state=state,
                         agent_properties=agent_obj.get_properties(), possible_actions=possible_actions, agent_id=agent_id)

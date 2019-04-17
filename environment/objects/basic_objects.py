@@ -67,7 +67,7 @@ class AgentAvatar(EnvObject):
                  properties_agent_writable, type):
 
         # define which properties are required for the agent
-        self.required_props = ["location", "size", "is_traversable", "colour", "shape", "name"]
+        self.required_props = ["location", "size", "is_traversable", "colour", "shape", "name", "agent_speed_in_ticks"]
 
         # check validity of the passed properties
         self.__check_properties_validity(agent_id, agent_properties)
@@ -120,7 +120,7 @@ class AgentAvatar(EnvObject):
         """
         check if the agent is done with executing the action
         """
-        self.blocked = (curr_tick < self.last_action["duration_in_ticks"] + self.last_action["tick"])
+        self.blocked = (curr_tick < self.last_action["tick"] + self.last_action["duration_in_ticks"] + self.properties["agent_speed_in_ticks"])
         return self.blocked
 
 
