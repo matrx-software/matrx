@@ -21,6 +21,7 @@ human_agent_start_locations = [[6, 6], [9, 9]]
 obj_locations = [[2, 2], [1, 5], [0, 3], [6, 0], [3, 3], [9, 6], [6, 3],
                  [3, 5], [7, 8], [2, 6], [8, 3]]
 wall_obj_locations = [[0,0], [1,0], [2,0], [3,0], [4,0], [5,0]]
+block_obj_locations = [[6,0], [7,0], [8,0], [9,0], [10,0], [11,0]]
 
 
 sim_goal = LimitedTimeGoal(max_duration)  # can be a list of goals
@@ -56,6 +57,15 @@ for nr_obj in range(len(wall_obj_locations)):
     location = wall_obj_locations[nr_obj]
 
     properties = {"type": "Wall"}
+
+    grid_env.add_env_object(obj_name, location, properties)
+
+# initialize blocks
+for nr_obj in range(len(block_obj_locations)):
+    obj_name = f"block_object_{nr_obj}"
+    location = block_obj_locations[nr_obj]
+
+    properties = {"type": "Block"}
 
     grid_env.add_env_object(obj_name, location, properties)
 

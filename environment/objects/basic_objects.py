@@ -53,26 +53,46 @@ class EnvObject:
             self.fills_multiple_locations = False
 
 
+def set_default_properties(properties, default_values):
+    for val in default_values:
+        properties[val] = default_values[val]
+    return properties
+
+
+def set_default_for_customizable_properties(properties, default_values):
+    for val in default_values:
+        if val not in properties:
+            properties[val] = default_values[val]
+    return properties
+
+
+class Block(EnvObject):
+
+    def __init__(self, obj_id, obj_name, locations, properties):
+
+        # set default properties of this object
+        default_props = {"shape": 0, "carried": []}
+        properties = set_default_properties(properties, default_props)
+
+        # set default for customizable properties, if they are not given
+        defaults_for_customizable_props = {"grootte": 1, "colour": "#0876b8", "movable": True, "size": 0.5, "is_traversable": True}
+        properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
+
+        super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
+                            properties=properties, is_traversable=properties["is_traversable"])
+
+
 class Wall(EnvObject):
 
     def __init__(self, obj_id, obj_name, locations, properties):
 
-        # default properties for the wall object
-        properties["type"] = "wall"
-        properties["shape"] = 0 # square
-        properties["size"] = 1
-        properties["movable"] = False
-        properties["carried"] = []
+        # set default properties of this object
+        default_props = {"shape": 0, "size": 1, "movable": False, "carried": []}
+        properties = set_default_properties(properties, default_props)
 
-        # changable properties for a wall object
-        if "grootte" not in properties:
-            properties["grootte"] = 1
+        # set default for customizable properties, if they are not given
+        defaults_for_customizable_props = {"grootte": 1, "colour": "#000000"}
+        properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
-        if "colour" not in properties:
-            properties["colour"] = "#000000"
-
-        super().__init__(   obj_id=obj_id,
-                            obj_name=obj_name,
-                            locations=locations,
-                            properties=properties,
-                            is_traversable=False)
+        super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
+                            properties=properties, is_traversable=False)
