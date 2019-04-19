@@ -366,6 +366,8 @@ class GridWorld:
 
     def __get_possible_actions(self, action_set, agent_id):
         # List where we store our possible actions in for a specific agent
+
+        print("Action_set:", action_set)
         possible_actions = []
         # Go through the action set
         for action_type in action_set:

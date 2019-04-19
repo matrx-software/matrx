@@ -2,6 +2,7 @@ import numpy as np
 
 from environment.actions.object_actions import RemoveObject
 from environment.actions.grab_actions import GrabAction
+from environment.actions.door_actions import OpenDoorAction
 
 class Agent:
 
@@ -190,7 +191,7 @@ class Agent:
                 action_kwargs['object_id'] = None
                 action_kwargs['remove_range'] = 0
 
-        if action == GrabAction.__name__:
+        elif action == GrabAction.__name__:
             # Set grab range
             grab_range = 1
 
@@ -227,6 +228,14 @@ class Agent:
                 action_kwargs['object_id'] = object_id
             else:
                 action_kwargs['object_id'] = None
+
+
+        elif action == OpenDoorAction.__name__:
+
+            action_kwargs['door_range'] = np.inf
+
+            print(f"Agent tried OpenDoorAction, state: {state}")
+
 
         return action, action_kwargs
 
