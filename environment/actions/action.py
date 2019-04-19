@@ -44,7 +44,7 @@ class Action:
         """
         pass
 
-    def is_possible(self, grid_world, agent_id):
+    def is_possible(self, grid_world, agent_id, **kwargs):
         """
         Checks whether the action is possible in the world when performed by the given agent. This method needs to be
         overridden, to perform this check for the action you want to implement. It returns a boolean stating whether

@@ -102,22 +102,6 @@ class Area(EnvObject):
         super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
                             properties=properties, is_traversable=True)
 
-class Area(EnvObject):
-    """ Area base object, can be used to define rooms """
-
-    def __init__(self, obj_id, obj_name, locations, properties):
-        # set default properties of this object
-        default_props = {"shape": 0, "size": 1, "movable": False, "carried": []}
-        properties = set_default_properties(properties, default_props)
-
-        # set default for customizable properties, if they are not given
-        defaults_for_customizable_props = {"grootte": 1, "colour": "#fbf0c3"}
-        properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
-
-        super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
-                            properties=properties, is_traversable=True)
-
-
 class Door(EnvObject):
     """ Door base object, can be used to define rooms """
 
