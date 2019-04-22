@@ -233,7 +233,7 @@ class GridWorld:
             distance = self.__get_distance(coordinates, agent_loc)
 
             # check if the env object is of the specified type, adn within range
-            if object_type is None or object_type == "*" or isinstance(agent_obj, object_type) and \
+            if (object_type is None or object_type == "*" or isinstance(agent_obj, object_type)) and \
                     distance <= sense_range:
                 env_objs[agent_id] = agent_obj
         return env_objs

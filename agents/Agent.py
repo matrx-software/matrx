@@ -234,7 +234,7 @@ class Agent:
         # if we randomly chose to do a open or close door action, find a door to open/close
         elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:
 
-            action_kwargs['door_range'] = np.inf
+            action_kwargs['door_range'] = 1 #np.inf
             action_kwargs['object_id'] = None
 
             # Get all doors from the perceived objects

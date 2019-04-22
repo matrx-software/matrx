@@ -14,7 +14,7 @@ class OpenDoorAction(Action):
         """
         if name is None:
             name = OpenDoorAction.__name__
-        super().__init__(name)
+        super().__init__(name, 3)
 
 
     def mutate(self, grid_world, agent_id, **kwargs):
@@ -38,9 +38,10 @@ class OpenDoorAction(Action):
         # get obj
         obj = grid_world.environment_objects[object_id]
 
-        # set door to open, and change colour
+        # set door to open, traversable, and change colour
         obj.properties["door_open"] = True
         obj.properties["colour"] = "#9c9c9c"
+        obj.is_traversable = True
 
         return True, OpenDoorActionResult.OPEN_RESULT_SUCCESS
 
@@ -93,7 +94,7 @@ class CloseDoorAction(Action):
         """
         if name is None:
             name = CloseDoorAction.__name__
-        super().__init__(name)
+        super().__init__(name, 3)
 
 
     def mutate(self, grid_world, agent_id, **kwargs):
@@ -117,9 +118,10 @@ class CloseDoorAction(Action):
         # get obj
         obj = grid_world.environment_objects[object_id]
 
-        # set door to open, and change colour
+        # set door to closed, intraversable, and change colour
         obj.properties["door_open"] = False
         obj.properties["colour"] = "#5a5a5a"
+        obj.is_traversable = False
 
         return True, CloseDoorActionResult.CLOSE_RESULT_SUCCESS
 
@@ -147,6 +149,7 @@ class CloseDoorActionResult(OpenDoorActionResult):
     NOT_A_DOOR = "Closedoor action could not be performed, as object isn't a door"
     RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
     DOOR_ALREADY_CLOSED = "Can't close door, door is already closed."
+    DOOR_BLOCKED = "Can't close door, object or agent is blocking the door opening."
     NO_OBJECT_SPECIFIED = "No object_id of a door specified to close."
 
     def __init__(self, result, succeeded):
@@ -197,5 +200,13 @@ def is_possible_door_open_close(grid_world, agent_id, open_close, object_id=None
     elif open_close == "close" and not obj.properties["door_open"]:
         return False, CloseDoorActionResult.DOOR_ALREADY_CLOSED
 
+    # when closing, check that there are no objects in the door opening
+    if open_close == "close":
+        # get all objects at the location of the door
+        objects_in_dooropening = grid_world.get_objects_in_range(obj.location, object_type="*", sense_range=0)
+
+        # more than 1 object at that location (the door itself) means the door is blocked
+        if len(objects_in_dooropening) > 1:
+            return False, CloseDoorActionResult.DOOR_BLOCKED
 
     return True, None
