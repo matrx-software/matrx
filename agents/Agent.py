@@ -2,6 +2,7 @@ import numpy as np
 
 from environment.actions.object_actions import RemoveObject
 from environment.actions.grab_actions import GrabAction
+from environment.actions.door_actions import *
 
 class Agent:
 
@@ -190,7 +191,8 @@ class Agent:
                 action_kwargs['object_id'] = None
                 action_kwargs['remove_range'] = 0
 
-        if action == GrabAction.__name__:
+        # if the agent randomly chose a grab action, choose a random object to pickup
+        elif action == GrabAction.__name__:
             # Set grab range
             grab_range = 1
 
@@ -227,6 +229,21 @@ class Agent:
                 action_kwargs['object_id'] = object_id
             else:
                 action_kwargs['object_id'] = None
+
+
+        # if we randomly chose to do a open or close door action, find a door to open/close
+        elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:
+
+            action_kwargs['door_range'] = 1 #np.inf
+            action_kwargs['object_id'] = None
+
+            # Get all doors from the perceived objects
+            objects = list(state.keys())
+            doors = [obj for obj in objects if 'type' in state[obj] and state[obj]['type'] == "Door"]
+
+            # choose a random door
+            if len(doors) > 0:
+                action_kwargs['object_id'] = self.rnd_gen.choice(doors)
 
         return action, action_kwargs
 

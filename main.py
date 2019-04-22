@@ -8,6 +8,7 @@ from environment.actions.move_actions import *
 from environment.actions.grab_actions import *
 from environment.actions.drop_actions import *
 from environment.actions.object_actions import *
+from environment.actions.door_actions import *
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 
 seed = 1
@@ -16,13 +17,15 @@ grid_size = [15, 15]  # horizontal and vertical size of grid
 max_duration = -1  # number of time units the environment should run as a maximum
 
 # start locations of agents = thus 2 agents
-agent_start_locations = [[14, 14], [0, 1], [8, 8]]
+agent_start_locations = [[14, 14], [1, 1], [8, 8]]
 human_agent_start_locations = [[6, 6], [9, 9]]
-obj_locations = [[2, 2], [1, 5], [0, 3], [6, 0], [3, 3], [9, 6], [6, 3],
+obj_locations = [[1, 5], [6, 0], [9, 6], [6, 3],
                  [3, 5], [7, 8], [2, 6], [8, 3]]
-wall_obj_locations = [[0,0], [1,0], [2,0], [3,0], [4,0], [5,0]]
-block_obj_locations = [[6,0], [7,0], [8,0], [9,0], [10,0], [11,0]]
 
+wall_obj_locations = [[0,0], [1,0], [2,0], [3,0], [3,1], [3,2], [3,4], [2,4], [1,4], [0,4], [0,3], [0,2], [0,1]]
+block_obj_locations = [[6,0], [7,0], [8,0], [9,0], [10,0], [11,0]]
+area_obj_locations = [[1,1], [2,1], [1,2], [2,2], [1,3], [2,3]]
+door_obj_locations = [[3,3]]
 
 sim_goal = LimitedTimeGoal(max_duration)  # can be a list of goals
 grid_env = GridWorld(grid_size, time_step, simulation_goal=sim_goal, can_occupy_agent_locs=True, rnd_seed=seed)
@@ -69,6 +72,25 @@ for nr_obj in range(len(block_obj_locations)):
 
     grid_env.add_env_object(obj_name, location, properties)
 
+# initialize areas
+for nr_obj in range(len(area_obj_locations)):
+    obj_name = f"area_object_{nr_obj}"
+    location = area_obj_locations[nr_obj]
+
+    properties = {"type": "Area"}
+
+    grid_env.add_env_object(obj_name, location, properties)
+
+# initialize doors
+for nr_obj in range(len(door_obj_locations)):
+    obj_name = f"door_object_{nr_obj}"
+    location = door_obj_locations[nr_obj]
+
+    properties = {"type": "Door"}
+
+    grid_env.add_env_object(obj_name, location, properties)
+
+
 
 
 agents = []
@@ -85,13 +107,15 @@ for nr_agent in range(len(agent_start_locations)):
         MoveWest.__name__,
         MoveNorthWest.__name__,
         GrabAction.__name__,
-        DropAction.__name__
+        DropAction.__name__,
+        OpenDoorAction.__name__,
+        CloseDoorAction.__name__
     ]
 
     # specify the agent properties
     agent_properties = {"size": 1, "name": f"agent_{nr_agent}", "carrying": [],
             "location": agent_start_locations[nr_agent], "is_traversable": False,
-            "colour": np.random.choice(["#900C3F", "#581845"]), "shape": 1, "agent_speed_in_ticks" : 1}
+            "colour": np.random.choice(["#900C3F", "#581845"]), "shape": 1, "agent_speed_in_ticks" : 3}
     # specify which agent properties can be changed by the agent
     properties_agent_writable = ["colour", "shape"]
 

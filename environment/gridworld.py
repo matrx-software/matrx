@@ -189,6 +189,7 @@ class GridWorld:
 
         return self.is_done, self.curr_tick_duration
 
+
     def get_env_object(self, requested_id, obj_type=None):
         obj = None
 
@@ -209,19 +210,30 @@ class GridWorld:
         return obj
 
     def get_objects_in_range(self, agent_loc, object_type, sense_range):
+        """
+        Get all objects of a obj type (normal objects or agent) within a
+        certain range around the agent's location
+        """
+
         env_objs = OrderedDict()
+        # loop through all environment objects
         for obj_id, env_obj in self.environment_objects.items():
+            # get the distance from the agent location to the object
             coordinates = env_obj.location
             distance = self.__get_distance(coordinates, agent_loc)
+
+            # check if the env object is of the specified type, and within range
             if (object_type is None or object_type == "*" or isinstance(env_obj, object_type)) and \
                     distance <= sense_range:
                 env_objs[obj_id] = env_obj
 
+        # agents are also environment objects, but stored seperatly. Also check them.
         for agent_id, agent_obj in self.registered_agents.items():
             coordinates = agent_obj.location
             distance = self.__get_distance(coordinates, agent_loc)
 
-            if object_type is None or object_type == "*" or isinstance(agent_obj, object_type) and \
+            # check if the env object is of the specified type, adn within range
+            if (object_type is None or object_type == "*" or isinstance(agent_obj, object_type)) and \
                     distance <= sense_range:
                 env_objs[agent_id] = agent_obj
         return env_objs
@@ -366,6 +378,7 @@ class GridWorld:
 
     def __get_possible_actions(self, action_set, agent_id):
         # List where we store our possible actions in for a specific agent
+
         possible_actions = []
         # Go through the action set
         for action_type in action_set:
@@ -377,7 +390,8 @@ class GridWorld:
                 action = action_class()
                 # Then we check if the action is possible, which returns a boolean, and a string that we ignore
                 # (contains the reason why the action is not possible)
-                is_possible, _ = action.is_possible(grid_world=self, agent_id=agent_id)
+                is_possible, reason = action.is_possible(grid_world=self, agent_id=agent_id, kwargs={})
+
                 # If the action is possible, we append it to possible actions list
                 if is_possible:
                     possible_actions.append(action_type)
@@ -397,7 +411,7 @@ class GridWorld:
             action = action_class()
             # Check if action is possible, if so we can perform the action otherwise we send an ActionResult that it was
             # not possible.
-            is_possible = action.is_possible(self, agent_id)
+            is_possible = action.is_possible(self, agent_id, **action_kwargs)
 
             if is_possible[0]:  # First return value is the boolean (seceond is reason why, optional)
                 # Apply world mutation

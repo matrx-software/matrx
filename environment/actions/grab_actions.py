@@ -12,7 +12,7 @@ class GrabAction(Action):
             name = GrabAction.__name__
         super().__init__(name)
 
-    def is_possible(self, grid_world, agent_id):
+    def is_possible(self, grid_world, agent_id, **kwargs):
         """
         This function checks if grabbing an object is possible.
         For this it assumes a infinite grab range and a random object in that range

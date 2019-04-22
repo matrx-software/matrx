@@ -59,7 +59,7 @@ class RemoveObject(Action):
             .replace('remove_range'.upper(), str(remove_range)) \
             .replace('object_id'.upper(), str(object_id))
 
-    def is_possible(self, grid_world, agent_id):
+    def is_possible(self, grid_world, agent_id, **kwargs):
         agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentAvatar)  # get ourselves
         assert agent_avatar is not None  # check if we actually exist
         agent_loc = agent_avatar.location  # get our location

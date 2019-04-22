@@ -225,5 +225,5 @@ def test_connect():
 
 
 if __name__ == "__main__":
-    print("Starting server")
+    print("Server running")
     socketio.run(app, host='0.0.0.0', port=3000)

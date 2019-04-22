@@ -67,7 +67,7 @@ class MoveActionResult(ActionResult):
     RESULT_SUCCESS = 'Move action success'
     RESULT_OUT_OF_BOUNDS = 'Move action out of bounds'
     RESULT_OCCUPIED = 'Move action towards occupied space'
-    RESULT_NOT_PASSABLE_OBJECT = 'Move action toward space which is not movable by agent due object'
+    RESULT_NOT_PASSABLE_OBJECT = 'Move action toward space which is not traversable by agent due object'
 
     def __init__(self, result, succeeded):
         super().__init__(result, succeeded)

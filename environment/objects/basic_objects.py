@@ -1,5 +1,5 @@
 import numpy as np
-
+from environment.objects.helper_functions import *
 
 class EnvObject:
 
@@ -53,20 +53,8 @@ class EnvObject:
             self.fills_multiple_locations = False
 
 
-def set_default_properties(properties, default_values):
-    for val in default_values:
-        properties[val] = default_values[val]
-    return properties
-
-
-def set_default_for_customizable_properties(properties, default_values):
-    for val in default_values:
-        if val not in properties:
-            properties[val] = default_values[val]
-    return properties
-
-
 class Block(EnvObject):
+    """ Block base object """
 
     def __init__(self, obj_id, obj_name, locations, properties):
 
@@ -83,6 +71,7 @@ class Block(EnvObject):
 
 
 class Wall(EnvObject):
+    """ Wall base object """
 
     def __init__(self, obj_id, obj_name, locations, properties):
 
@@ -92,6 +81,37 @@ class Wall(EnvObject):
 
         # set default for customizable properties, if they are not given
         defaults_for_customizable_props = {"grootte": 1, "colour": "#000000"}
+        properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
+
+        super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
+                            properties=properties, is_traversable=False)
+
+
+class Area(EnvObject):
+    """ Area base object, can be used to define rooms """
+
+    def __init__(self, obj_id, obj_name, locations, properties):
+        # set default properties of this object
+        default_props = {"shape": 0, "size": 1, "movable": False, "carried": []}
+        properties = set_default_properties(properties, default_props)
+
+        # set default for customizable properties, if they are not given
+        defaults_for_customizable_props = {"grootte": 1, "colour": "#fbf0c3"}
+        properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
+
+        super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
+                            properties=properties, is_traversable=True)
+
+class Door(EnvObject):
+    """ Door base object, can be used to define rooms """
+
+    def __init__(self, obj_id, obj_name, locations, properties):
+        # set default properties of this object
+        default_props = {"shape": 0, "size": 1, "movable": False, "colour": "#5a5a5a", "carried": []}
+        properties = set_default_properties(properties, default_props)
+
+        # set default for customizable properties, if they are not given
+        defaults_for_customizable_props = {"grootte": 1, "door_open": False}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
