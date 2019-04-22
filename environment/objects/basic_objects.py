@@ -107,11 +107,11 @@ class Door(EnvObject):
 
     def __init__(self, obj_id, obj_name, locations, properties):
         # set default properties of this object
-        default_props = {"shape": 0, "size": 1, "movable": False, "carried": []}
+        default_props = {"shape": 0, "size": 1, "movable": False, "colour": "#5a5a5a", "carried": []}
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
-        defaults_for_customizable_props = {"grootte": 1, "colour": "#5a5a5a", "door_open": False}
+        defaults_for_customizable_props = {"grootte": 1, "door_open": False}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,

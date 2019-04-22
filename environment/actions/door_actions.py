@@ -109,7 +109,7 @@ class CloseDoorAction(Action):
         """
 
         # fetch options
-        door_range = 0 if 'door_range' not in kwargs else kwargs['door_range']
+        door_range = 1 if 'door_range' not in kwargs else kwargs['door_range']
         # object_id is required
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
         if object_id == None:
