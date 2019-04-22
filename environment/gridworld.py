@@ -66,6 +66,9 @@ class GridWorld:
         else:
             raise Exception(f"Agent of type {agent_type} is not known to the environment.")
 
+        # check if the agent can be succesfully placed at that location
+        self.validate_obj_placement(agent_object)
+
         self.registered_agents[agent_id] = agent_object
 
         return agent_id, agent_seed
@@ -84,8 +87,32 @@ class GridWorld:
         else:
             env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties, is_traversable=is_traversable)
 
+        # check if the object can be succesfully placed at that location
+        self.validate_obj_placement(env_object)
+
         self.environment_objects[obj_id] = env_object
         return obj_id
+
+    def validate_obj_placement(self, env_object):
+        """
+        Checks whether an object can be succesfully placed on the grid
+        """
+        obj_loc = env_object.location
+
+        # get the objects at the target object location
+        objs_at_loc = self.get_objects_in_range(obj_loc, "*", 0)
+
+        # check how many of these objects are intraversable
+        intraversable_objs = []
+        for obj in objs_at_loc:
+            if not objs_at_loc[obj].is_traversable:
+                intraversable_objs.append(objs_at_loc[obj].obj_id)
+
+        # two intraversable objects can't be at the same location
+        if not env_object.is_traversable and len(intraversable_objs) > 0:
+            raise Exception(f"Invalid scenario. Could not place object {env_object.obj_id} in grid, location already occupied by intraversable object: {intraversable_objs}")
+
+
 
     def step(self):
 
