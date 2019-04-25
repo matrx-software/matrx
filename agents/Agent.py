@@ -56,12 +56,12 @@ class Agent:
         # actions
         self.agent_properties = agent_properties
 
-        state = self.ooda_observe(state)
+        filtered_state = self.ooda_observe(state)
         state = self.ooda_orient(state)
         action, action_kwargs = self.ooda_decide(state, possible_actions)
         action = self.ooda_act(action)
 
-        return state, self.agent_properties, action, action_kwargs
+        return filtered_state, self.agent_properties, action, action_kwargs
 
     def set_action_result(self, action_result):
         """

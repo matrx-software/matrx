@@ -22,10 +22,10 @@ human_agent_start_locations = [[6, 6], [9, 9]]
 obj_locations = [[1, 5], [6, 0], [9, 6], [6, 3],
                  [3, 5], [7, 8], [2, 6], [8, 3]]
 
-wall_obj_locations = [[0,0], [1,0], [2,0], [3,0], [3,1], [3,2], [3,4], [2,4], [1,4], [0,4], [0,3], [0,2], [0,1]]
-block_obj_locations = [[6,0], [7,0], [8,0], [9,0], [10,0], [11,0]]
-area_obj_locations = [[1,1], [2,1], [1,2], [2,2], [1,3], [2,3]]
-door_obj_locations = [[3,3]]
+wall_obj_locations = [] #[[0,0], [1,0], [2,0], [3,0], [3,1], [3,2], [3,4], [2,4], [1,4], [0,4], [0,3], [0,2], [0,1]]
+block_obj_locations = [] #[[6,0], [7,0], [8,0], [9,0], [10,0], [11,0]]
+area_obj_locations = [] #[[1,1], [2,1], [1,2], [2,2], [1,3], [2,3]]
+door_obj_locations = [] #[[3,3]]
 
 sim_goal = LimitedTimeGoal(max_duration)  # can be a list of goals
 grid_env = GridWorld(grid_size, time_step, simulation_goal=sim_goal, can_occupy_agent_locs=True, rnd_seed=seed)
