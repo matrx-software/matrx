@@ -63,7 +63,7 @@ class Block(EnvObject):
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
-        defaults_for_customizable_props = {"grootte": 1, "colour": "#0876b8", "movable": True, "size": 0.5, "is_traversable": True}
+        defaults_for_customizable_props = {"colour": "#0876b8", "movable": True, "size": 0.5, "is_traversable": True}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
@@ -80,7 +80,7 @@ class Wall(EnvObject):
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
-        defaults_for_customizable_props = {"grootte": 1, "colour": "#000000"}
+        defaults_for_customizable_props = {"colour": "#000000"}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
@@ -96,7 +96,7 @@ class Area(EnvObject):
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
-        defaults_for_customizable_props = {"grootte": 1, "colour": "#fbf0c3"}
+        defaults_for_customizable_props = {"colour": "#fbf0c3"}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
@@ -111,7 +111,7 @@ class Door(EnvObject):
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
-        defaults_for_customizable_props = {"grootte": 1, "door_open": False}
+        defaults_for_customizable_props = {"door_open": False}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,

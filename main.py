@@ -38,8 +38,6 @@ for nr_obj in range(len(obj_locations)):
     location = obj_locations[nr_obj]
     # NOTE: np ints / floats, etc can't be JSONserialized, so convert to float!
     properties = {
-                    # "type": rng.choice(["lek", "brand"]),
-                  "grootte": int(rng.choice([0, 1, 2])),
                   "shape": 0,
                   "colour": rng.choice(["#286625", "#678fd9", "#FF5733"]),
                   "size": float(rng.rand()),
