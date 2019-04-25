@@ -44,6 +44,11 @@ class GridWorld:
         # Initialize the visualizer
         self.visualizer = Visualizer(self.shape)
 
+    def run(self):
+        self.initialize()
+        is_done = False
+        while not is_done:
+            is_done, tick_duration = self.step()
 
     def register_agent(self, agent_id, sense_capability, action_set, get_action_func,
                        set_action_result_func, ooda_observe, ooda_orient, agent_properties,
