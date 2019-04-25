@@ -184,7 +184,7 @@ for nr_human_agent in range(len(human_agent_start_locations)):
                                                                ooda_observe=human_agent.ooda_observe,
                                                                ooda_orient=human_agent.ooda_orient,
                                                                agent_properties=hu_ag_properties,
-                                                               properties_agent_writable=properties_agent_writable,
+                                                               properties_agent_writable=properties_human_agent_writable,
                                                                action_set=human_agent.action_set,
                                                                type="humanagent")
     human_agent.set_rnd_seed(human_agent_seed)
