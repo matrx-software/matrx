@@ -35,6 +35,7 @@ class AgentAvatar(EnvObject):
         self.ooda_orient = ooda_orient
         self.type = type
         self.properties_agent_writable = properties_agent_writable
+        self.prev_location = agent_properties["location"] # used for visualization
 
         # defines an agent is blocked by an action which takes multiple timesteps
         self.blocked = False
@@ -106,3 +107,5 @@ class AgentAvatar(EnvObject):
             # update normal properties
             else:
                 self.properties = props[prop]
+        # update prev location used for visualizer
+        self.prev_location = self.location

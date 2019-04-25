@@ -169,7 +169,7 @@ class GridWorld:
             agent_obj.set_agent_changed_properties(agent_properties)
 
             # save what the agent observed to the visualizer
-            self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state)
+            self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state, params={"prev_location": agent_obj.prev_location})
 
 
         # save the state of the god view in the visualizer
