@@ -1,7 +1,7 @@
 import numpy as np
 
-from environment.actions.object_actions import RemoveObject
-from environment.actions.grab_actions import GrabAction
+from environment.actions.remove_action import RemoveObject
+from environment.actions.grab_action import GrabAction
 from environment.actions.door_actions import *
 
 class Agent:
