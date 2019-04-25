@@ -145,7 +145,6 @@ class GridWorld:
             if agent_obj.check_agent_busy(curr_tick=self.current_nr_ticks):
                 # only do the observe and orient of the OODA loop to update the GUI
                 filtered_agent_state = agent_obj.ooda_observe(state)
-                filtered_agent_state = agent_obj.ooda_orient(filtered_agent_state)
                 self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state)
                 continue
 
@@ -176,6 +175,8 @@ class GridWorld:
         # save the state of the god view in the visualizer
         self.visualizer.save_state(type="god", id="god", state=self.__get_complete_state())
 
+        # update the visualizations of all (human)agents and god
+        # self.visualizer.updateGUIs()
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
         for agent_id, action in action_buffer.items():
@@ -195,9 +196,6 @@ class GridWorld:
         # Perform the update method of all objects
         for env_obj in self.environment_objects.values():
             env_obj.update_properties(self)
-
-        # update the visualizations of all (human)agents and god
-        self.visualizer.updateGUIs()
 
         # Increment the number of tick we performed
         self.current_nr_ticks += 1

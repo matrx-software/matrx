@@ -113,9 +113,10 @@ for nr_agent in range(len(agent_start_locations)):
     ]
 
     # specify the agent properties
+    speeds = [1, 3, 6]
     agent_properties = {"size": 1, "name": f"agent_{nr_agent}", "carrying": [],
             "location": agent_start_locations[nr_agent], "is_traversable": False,
-            "colour": np.random.choice(["#900C3F", "#581845"]), "shape": 1, "agent_speed_in_ticks" : 3}
+            "colour": "#900C3F", "shape": 1, "agent_speed_in_ticks": speeds[nr_agent]}
     # specify which agent properties can be changed by the agent
     properties_agent_writable = ["colour", "shape"]
 
@@ -127,6 +128,7 @@ for nr_agent in range(len(agent_start_locations)):
                     properties_agent_writable=properties_agent_writable)
     agents.append(agent)
 
+    print(f'Created agent with speed {agent_properties["agent_speed_in_ticks"]}')
 
 
     agent_id, agent_seed = grid_env.register_agent(agent_id=agent_id,
@@ -162,7 +164,7 @@ for nr_human_agent in range(len(human_agent_start_locations)):
     # specify the agent properties
     hu_ag_properties = {"size": 1, "name": f"human_agent_{nr_human_agent}", "carrying": [],
             "location": human_agent_start_locations[nr_human_agent], "is_traversable": False,
-            "colour": np.random.choice(["#900C3F", "#581845"]), "shape": 1, "agent_speed_in_ticks": 1}
+            "colour": "#fde500", "shape": 1, "agent_speed_in_ticks": 1}
     # specify which agent properties can be instantly changed by the agent without cost / action
     properties_human_agent_writable = ["colour", "shape"]
 
