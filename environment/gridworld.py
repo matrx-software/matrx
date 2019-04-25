@@ -86,11 +86,11 @@ class GridWorld:
         # check if we need to add an existing object
         if 'type' in obj_properties:
             # call the constructor for the defined object type
-            env_object = eval(obj_properties["type"])(obj_id, obj_name, locations=location, properties=obj_properties)
+            env_object = eval(obj_properties["type"])(obj_id, obj_name, location=location, properties=obj_properties)
 
         # otherwise, it is a custom object
         else:
-            env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties, is_traversable=is_traversable)
+            env_object = EnvObject(obj_id, obj_name, location=location, properties=obj_properties, is_traversable=is_traversable)
 
         # check if the object can be succesfully placed at that location
         self.validate_obj_placement(env_object)
@@ -176,7 +176,7 @@ class GridWorld:
         self.visualizer.save_state(type="god", id="god", state=self.__get_complete_state())
 
         # update the visualizations of all (human)agents and god
-        # self.visualizer.updateGUIs()
+        self.visualizer.updateGUIs()
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
         for agent_id, action in action_buffer.items():
@@ -285,15 +285,10 @@ class GridWorld:
         # Remove object first from grid
         grid_obj = self.get_env_object(object_id)  # get the object
         loc = grid_obj.location  # its location
-        if grid_obj.fills_multiple_locations:  # check if it fills multiple locations in which case 'loc' is a list
-            for l in loc:
-                self.grid[l[1], l[0]].remove(grid_obj.obj_id)  # remove the object id from the list at that location
-                if len(self.grid[l[1], l[0]]) == 0:  # if the list is empty, just add None there
-                    self.grid[l[1], l[0]] = None
-        else:  # else 'loc' is just one location
-            self.grid[loc[1], loc[0]].remove(grid_obj.obj_id)  # remove the object id from the list at that location
-            if len(self.grid[loc[1], loc[0]]) == 0:  # if the list is empty, just add None there
-                self.grid[loc[1], loc[0]] = None
+
+        self.grid[loc[1], loc[0]].remove(grid_obj.obj_id)  # remove the object id from the list at that location
+        if len(self.grid[loc[1], loc[0]]) == 0:  # if the list is empty, just add None there
+            self.grid[loc[1], loc[0]] = None
 
         # Remove object from the list of registered agents or environmental objects
         # Check if it is an agent
@@ -323,18 +318,11 @@ class GridWorld:
 
     def add_to_grid(self, grid_obj):
         if isinstance(grid_obj, EnvObject):
-            if grid_obj.fills_multiple_locations:
-                for loc in grid_obj.location:
-                    if self.grid[loc[1], loc[0]] is not None:
-                        self.grid[loc[1], loc[0]].append(grid_obj.obj_id)
-                    else:
-                        self.grid[loc[1], loc[0]] = [grid_obj.obj_id]
+            loc = grid_obj.location
+            if self.grid[loc[1], loc[0]] is not None:
+                self.grid[loc[1], loc[0]].append(grid_obj.obj_id)
             else:
-                loc = grid_obj.location
-                if self.grid[loc[1], loc[0]] is not None:
-                    self.grid[loc[1], loc[0]].append(grid_obj.obj_id)
-                else:
-                    self.grid[loc[1], loc[0]] = [grid_obj.obj_id]
+                self.grid[loc[1], loc[0]] = [grid_obj.obj_id]
         else:
             loc = grid_obj.location
             if self.grid[loc[1], loc[0]] is not None:

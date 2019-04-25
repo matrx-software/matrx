@@ -22,7 +22,7 @@ class AgentAvatar(EnvObject):
         # create an Env obj from this agent
         super().__init__(   obj_id=agent_id,
                             obj_name=agent_properties["name"],
-                            locations=agent_properties["location"],
+                            location=agent_properties["location"],
                             properties=agent_properties,
                             is_traversable=agent_properties["is_traversable"])
 
