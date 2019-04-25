@@ -5,9 +5,9 @@ from agents.HumanAgent import HumanAgent
 from agents.capabilities.capability import SenseCapability
 from environment.gridworld import GridWorld
 from environment.actions.move_actions import *
-from environment.actions.grab_actions import *
-from environment.actions.drop_actions import *
-from environment.actions.object_actions import *
+from environment.actions.grab_action import *
+from environment.actions.drop_action import *
+from environment.actions.remove_action import *
 from environment.actions.door_actions import *
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 
@@ -189,9 +189,6 @@ for nr_human_agent in range(len(human_agent_start_locations)):
                                                                type="humanagent")
     human_agent.set_rnd_seed(human_agent_seed)
 
-grid_env.initialize()
-is_done = False
-while not is_done:
-    is_done, tick_duration = grid_env.step()
+grid_env.run()
 
 print()
