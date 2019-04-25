@@ -60,7 +60,7 @@ class Agent:
         state = self.ooda_orient(state)
         action, action_kwargs = self.ooda_decide(state, possible_actions)
         action = self.ooda_act(action)
-
+        
         return filtered_state, self.agent_properties, action, action_kwargs
 
     def set_action_result(self, action_result):

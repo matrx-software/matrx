@@ -106,8 +106,7 @@ for nr_agent in range(len(agent_start_locations)):
         MoveNorthWest.__name__,
         GrabAction.__name__,
         DropAction.__name__,
-        OpenDoorAction.__name__,
-        CloseDoorAction.__name__
+        OpenDoorAction.__name__
     ]
 
     # specify the agent properties

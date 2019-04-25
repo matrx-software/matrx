@@ -434,6 +434,11 @@ class GridWorld:
     def __perform_action(self, agent_id, action_name, action_kwargs):
         if action_name is None:  # If action is None, we send an action result that no action was given (and succeeded)
             result = ActionResult(ActionResult.NO_ACTION_GIVEN, succeeded=True)
+
+        # action known, but agent not capable of performing it
+        elif action_name in self.all_actions.keys() and not action_name in self.registered_agents[agent_id].action_set:
+            result = ActionResult(ActionResult.AGENT_NOT_CAPABLE, succeeded=False)
+
         elif action_name in self.all_actions.keys():  # Check if action is known
             # Get action class
             action_class = self.all_actions[action_name]
@@ -459,6 +464,7 @@ class GridWorld:
                     result = ActionResult(ActionResult.ACTION_NOT_POSSIBLE, succeeded=False)
         else:  # If the action is not known
             result = ActionResult(ActionResult.UNKNOWN_ACTION, succeeded=False)
+
         # Get agent's send_result function
         set_action_result = self.registered_agents[agent_id].set_action_result_func
         # Send result of mutation to agent
