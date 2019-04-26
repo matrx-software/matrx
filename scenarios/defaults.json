@@ -1,0 +1,80 @@
+{
+  "simulation_defaults" :
+  {
+    "random_seed" : 1,
+    "size" : [25, 25],
+    "step_duration" : 0.1,
+    "time_focus": "step",
+    "run_visualisation_server" : false,
+    "run_sail_api": false,
+    "simulation_goal": {
+      "goal_class": "LimitedTimeGoal",
+      "arguments": {
+        "max_nr_ticks": -1
+      }
+    }
+  },
+  "agent_defaults":
+  {
+    "name": "Agent",
+    "agent_class": "Agent",
+    "agent_speed_in_ticks": 1,
+    "senses": [["*", "inf"]],
+    "possible_actions": ["*"],
+    "additional_agent_properties": {},
+    "visualisation_properties":
+    {
+      "size": 1.0,
+      "colour": "#900C3F",
+      "shape": 0
+    },
+    "agent_properties_writable": ["colour", "shape"]
+  },
+  "human_agent_defaults":
+  {
+    "name": "Human Agent",
+    "agent_class": "HumanAgent",
+    "agent_speed_in_ticks": 1,
+    "senses": [["*", "inf"]],
+    "input_action_map":
+    {
+      "arrowkey:up": "MoveNorth",
+      "arrowkey:right": "MoveEast",
+      "arrowkey:down": "MoveSouth",
+      "arrowkey:left": "MoveWest"
+    },
+    "additional_agent_properties": {},
+    "visualisation_properties":
+    {
+      "size": 1.0,
+      "colour": "#fde500",
+      "shape": 0
+    }
+  },
+  "object_defaults":
+  {
+      "name": "Object",
+      "object_class": "Block",
+      "movable": false,
+      "additional_object_properties":
+      {
+          "foo": "bar"
+      },
+      "visualisation_properties":
+      {
+          "colour": "#024f21",
+          "size": 1.0
+      }
+  },
+  "area_defaults":
+  {
+    "name": "Area",
+    "has_walls": false,
+    "doors": [[]],
+    "visualisation_properties":
+    {
+      "walls": {"colour": "#000000"},
+      "area": {"colour": "#cccccc"}
+    }
+  }
+}
