@@ -1,0 +1,64 @@
+{
+  "simulation_settings" :
+  {
+    "random_seed" : 1,
+    "size" : [5, 5],
+    "step_duration" : 0.1,
+    "time_focus": "step",
+    "run_visualisation_server" : false,
+    "run_sail_api": false,
+    "simulation_goal":
+    {
+      "goal_class": "LimitedTimeGoal"
+    }
+  },
+  "agents" :
+  [
+    {
+      "name": "Human Agent",
+      "start_location": [2, 2],
+      "agent_class": "HumanAgent",
+      "agent_speed_in_ticks": 1
+    },
+    {
+      "name": "Agent",
+      "start_location": [2, 3],
+      "agent_speed_in_ticks": 2
+    },
+    {
+      "start_location": [3, 3],
+      "agent_speed_in_ticks": 3
+    }
+  ],
+  "areas":
+  [
+    {
+      "name": "Room 1",
+      "has_walls": true,
+      "corners": [[9, 19], [14, 19], [14 , 23], [9, 23]],
+      "doors": [[11, 19]],
+      "visualisation_properties":
+      {
+        "walls": {"colour": "#000000"},
+        "area": {"colour": "#cccccc"}
+      }
+    }
+  ],
+  "objects":
+  [
+    {
+      "name": "Block 1",
+      "object_class": "Door",
+      "location": [],
+      "movable": false,
+      "additional_object_properties":
+      {
+        "foo": "bar"
+      }
+    },
+    {
+      "location": [0,0],
+      "object_class": "Wall"
+    }
+  ]
+}

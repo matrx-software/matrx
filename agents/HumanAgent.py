@@ -8,7 +8,7 @@ from agents.Agent import Agent
 class HumanAgent(Agent):
 
     def __init__(self, action_set, sense_capability, usrinp_action_map, agent_properties,
-                properties_agent_writable):
+                 properties_agent_writable):
         """
         Creates an Human Agent which is an agent that can be controlled by a human.
 
@@ -23,10 +23,10 @@ class HumanAgent(Agent):
         :param properties_agent_writable: which of the agent_properties can be changed by this agent
         """
 
-        super().__init__(   action_set=action_set,
-                            sense_capability=sense_capability,
-                            agent_properties=agent_properties,
-                            properties_agent_writable=properties_agent_writable)
+        super().__init__(action_set=action_set,
+                         sense_capability=sense_capability,
+                         agent_properties=agent_properties,
+                         properties_agent_writable=properties_agent_writable)
 
         # specifies the agent_properties
         self.agent_properties = agent_properties
@@ -39,7 +39,6 @@ class HumanAgent(Agent):
 
         # a list which maps user inputs to actions, defined in the scenario manager
         self.usrinp_action_map = usrinp_action_map
-
 
     def get_action(self, state, agent_properties, possible_actions, agent_id, userinput):
         """
@@ -75,9 +74,6 @@ class HumanAgent(Agent):
 
         # otherwise check which action is mapped to that key and return it
         return state, self.agent_properties, self.usrinp_action_map[userinput], {}
-
-
-
 
     def ooda_observe(self, state):
         """

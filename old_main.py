@@ -140,7 +140,7 @@ for nr_agent in range(len(agent_start_locations)):
                                                    agent_properties=agent_properties,
                                                    properties_agent_writable=properties_agent_writable,
                                                    action_set=agent.action_set,
-                                                   type="agent")
+                                                   class_name_agent="agent")
     agent.set_rnd_seed(agent_seed)
 
 
@@ -186,7 +186,7 @@ for nr_human_agent in range(len(human_agent_start_locations)):
                                                                agent_properties=hu_ag_properties,
                                                                properties_agent_writable=properties_human_agent_writable,
                                                                action_set=human_agent.action_set,
-                                                               type="humanagent")
+                                                               class_name_agent="humanagent")
     human_agent.set_rnd_seed(human_agent_seed)
 
 grid_env.run()

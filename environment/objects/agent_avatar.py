@@ -11,7 +11,7 @@ class AgentAvatar(EnvObject):
 
     def __init__(self, agent_id, sense_capability, action_set, get_action_func,
                  set_action_result_func, ooda_observe, ooda_orient, agent_properties,
-                 properties_agent_writable, type):
+                 properties_agent_writable, class_name_agent):
 
         # define which properties are required for the agent
         self.required_props = ["location", "size", "is_traversable", "colour", "shape", "name", "agent_speed_in_ticks"]
@@ -33,7 +33,7 @@ class AgentAvatar(EnvObject):
         self.set_action_result_func = set_action_result_func
         self.ooda_observe = ooda_observe
         self.ooda_orient = ooda_orient
-        self.type = type
+        self.class_name_agent = class_name_agent
         self.properties_agent_writable = properties_agent_writable
 
         # defines an agent is blocked by an action which takes multiple timesteps

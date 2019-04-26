@@ -9,7 +9,8 @@
     "run_sail_api": false,
     "simulation_goal": {
       "goal_class": "LimitedTimeGoal",
-      "arguments": {
+      "arguments":
+      {
         "max_nr_ticks": -1
       }
     }
@@ -20,6 +21,7 @@
     "agent_class": "Agent",
     "agent_speed_in_ticks": 1,
     "senses": [["*", "inf"]],
+    "is_traversable": true,
     "possible_actions": ["*"],
     "additional_agent_properties": {},
     "visualisation_properties":
@@ -28,7 +30,8 @@
       "colour": "#900C3F",
       "shape": 0
     },
-    "agent_properties_writable": ["colour", "shape"]
+    "agent_properties_writable": ["colour", "shape"],
+    "class_specific_kwargs": {}
   },
   "human_agent_defaults":
   {
@@ -36,6 +39,7 @@
     "agent_class": "HumanAgent",
     "agent_speed_in_ticks": 1,
     "senses": [["*", "inf"]],
+    "is_traversable": true,
     "input_action_map":
     {
       "arrowkey:up": "MoveNorth",
@@ -43,21 +47,22 @@
       "arrowkey:down": "MoveSouth",
       "arrowkey:left": "MoveWest"
     },
+    "possible_actions": [],
     "additional_agent_properties": {},
     "visualisation_properties":
     {
       "size": 1.0,
       "colour": "#fde500",
       "shape": 0
-    }
+    },
+    "agent_properties_writable": ["colour", "shape"]
   },
   "object_defaults":
   {
       "name": "Object",
       "object_class": "EnvObject",
       "movable": false,
-      "additional_object_properties":
-      {},
+      "additional_object_properties": {},
       "visualisation_properties":
       {
           "colour": "#024f21",

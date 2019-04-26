@@ -12,13 +12,15 @@ from environment.actions.move_actions import *
 from environment.objects.basic_objects import *
 from environment.objects.agent_avatar import AgentAvatar
 
-
 from visualization.visualizer import Visualizer
 
 
 class GridWorld:
+    TIME_FOCUS_TICK_DURATION = 'aim_for_constant_tick_duration'
+    TIME_FOCUS_SIMULATION_DURATION = 'aim_for_accurate_global_tick_duration'
 
-    def __init__(self, shape, tick_duration, simulation_goal=None, rnd_seed=1):
+    def __init__(self, shape, tick_duration, simulation_goal=None, run_sail_api=True, run_visualisation_server=True,
+                 time_focus=TIME_FOCUS_TICK_DURATION, rnd_seed=1,):
         self.tick_duration = tick_duration
         self.registered_agents = OrderedDict()
         self.environment_objects = OrderedDict()
@@ -27,6 +29,9 @@ class GridWorld:
         self.all_actions = self.__get_all_actions()
         self.current_available_id = 0
         self.shape = shape
+        self.run_sail_api = run_sail_api
+        self.run_visualisation_server = run_visualisation_server
+        self.time_focus = time_focus
         self.grid = np.array([[None for x in range(shape[0])] for y in range(shape[1])])
         self.is_done = False
         self.rnd_seed = rnd_seed
@@ -52,7 +57,7 @@ class GridWorld:
 
     def register_agent(self, agent_id, sense_capability, action_set, get_action_func,
                        set_action_result_func, ooda_observe, ooda_orient, agent_properties,
-                       properties_agent_writable, type, agent_type=AgentAvatar):
+                       properties_agent_writable, class_name_agent, agent_type=AgentAvatar):
 
         # Random seed for agent between 1 and 1000, might need to be adjusted still
         agent_seed = self.rnd_gen.randint(1, 1000)
@@ -67,7 +72,7 @@ class GridWorld:
                                        set_action_result_func=set_action_result_func,
                                        ooda_observe=ooda_observe, ooda_orient=ooda_orient,
                                        properties_agent_writable=properties_agent_writable,
-                                       type=type)
+                                       class_name_agent=class_name_agent)
         else:
             raise Exception(f"Agent of type {agent_type} is not known to the environment.")
 
@@ -120,8 +125,6 @@ class GridWorld:
             raise Exception(f"Invalid scenario. Could not place object {env_object.obj_id} in grid, location already "
                             f"occupied by intraversable object {intraversable_objs} at location {obj_loc}")
 
-
-
     def step(self):
 
         # Check if we are done based on our global goal assessment function
@@ -155,14 +158,18 @@ class GridWorld:
 
             # perform the OODA loop and get an action back
             if agent_obj.type == "agent":
-                filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(state=state,
-                        agent_properties=agent_obj.get_properties(), possible_actions=possible_actions, agent_id=agent_id)
+                filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
+                    state=state,
+                    agent_properties=agent_obj.get_properties(), possible_actions=possible_actions, agent_id=agent_id)
 
             # For a humanagent any userinputs from the GUI for this humanagent are send along
             elif agent_obj.type == "humanagent":
-                usrinp = self.visualizer.userinputs[agent_id]["action"] if agent_id in self.visualizer.userinputs else None
-                filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(state=state,
-                        agent_properties=agent_obj.get_properties(), possible_actions=possible_actions, agent_id=agent_id, userinput=usrinp)
+                usrinp = self.visualizer.userinputs[agent_id][
+                    "action"] if agent_id in self.visualizer.userinputs else None
+                filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
+                    state=state,
+                    agent_properties=agent_obj.get_properties(), possible_actions=possible_actions, agent_id=agent_id,
+                    userinput=usrinp)
 
             # store the action in the buffer
             action_buffer[agent_id] = (action_class_name, action_kwargs)
@@ -173,7 +180,6 @@ class GridWorld:
 
             # save what the agent observed to the visualizer
             self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state)
-
 
         # save the state of the god view in the visualizer
         self.visualizer.save_state(type="god", id="god", state=self.__get_complete_state())
@@ -221,7 +227,6 @@ class GridWorld:
         self.curr_tick_duration = tick_duration.total_seconds()
 
         return self.is_done, self.curr_tick_duration
-
 
     def get_env_object(self, requested_id, obj_type=None):
         obj = None
@@ -306,7 +311,8 @@ class GridWorld:
                 self.environment_objects[obj_id].properties['carried'].remove(object_id)
 
             # Remove agent
-            success = self.registered_agents.pop(object_id, default=False)  # if it is an agent, we get it otherwise False
+            success = self.registered_agents.pop(object_id,
+                                                 default=False)  # if it is an agent, we get it otherwise False
 
         # Else, check if it is an object
         elif object_id in self.environment_objects.keys():
@@ -315,9 +321,10 @@ class GridWorld:
                 self.registered_agents[agent_id].properties['carrying'].remove(object_id)
 
             # Remove object
-            success = self.environment_objects.pop(object_id, default=False)  # if it is an agent, we get it otherwise False
+            success = self.environment_objects.pop(object_id,
+                                                   default=False)  # if it is an agent, we get it otherwise False
         else:
-            success = False # Object type not specified
+            success = False  # Object type not specified
 
         if success is not False:  # it was not an agent nor environment object, so success! Otherwise, success if False
             success = True
@@ -354,7 +361,8 @@ class GridWorld:
         if self.sleep_duration > 0:
             time.sleep(self.sleep_duration)
         else:
-            self.__warn(f"The average tick took longer than the set tick duration of {self.tick_duration}. Programm is to heavy to run real time")
+            self.__warn(
+                f"The average tick took longer than the set tick duration of {self.tick_duration}. Programm is to heavy to run real time")
 
     def __update_grid(self):
         self.grid = np.array([[None for x in range(self.shape[0])] for y in range(self.shape[1])])
@@ -451,7 +459,8 @@ class GridWorld:
                 result = action.mutate(self, agent_id, **action_kwargs)
 
                 # The agent is now busy performing this action
-                self.registered_agents[agent_id].set_agent_busy(curr_tick=self.current_nr_ticks, action_duration=action.duration_in_ticks)
+                self.registered_agents[agent_id].set_agent_busy(curr_tick=self.current_nr_ticks,
+                                                                action_duration=action.duration_in_ticks)
             else:
                 # If the action is not possible, send a failed ActionResult with the is_possible message if given,
                 # otherwise use the default one.
