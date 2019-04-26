@@ -43,7 +43,7 @@ def possible_movement(grid_world, agent_id, dx, dy):
                 # Check if loc_obj_id is the id of an agent
                 if loc_obj_id in grid_world.registered_agents.keys():
                     # get the actual agent
-                    loc_obj = grid_world.environment_objects[loc_obj_id]
+                    loc_obj = grid_world.registered_agents[loc_obj_id]
                     # Check if the agent that takes the move action is not that agent at that location (meaning that
                     # for some reason the move action has no effect. If this is the case, we send the apriopriate
                     # result

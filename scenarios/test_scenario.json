@@ -285,18 +285,17 @@
     [
         {
             "name": "Block 1",
-            "object_class": "Block",
+            "object_class": "Door",
             "location": [],
             "movable": false,
             "additional_object_properties":
             {
                 "foo": "bar"
-            },
-            "visualisation_properties":
-            {
-                "colour": "#024f21",
-                "size": 1.0
             }
-        }
+        },
+      {
+        "location": [0,0],
+        "object_class": "Wall"
+      }
     ]
 }

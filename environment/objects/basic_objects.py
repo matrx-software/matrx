@@ -9,6 +9,7 @@ class EnvObject:
         self.location = locations
         self.name = obj_name
         self.properties = properties
+        self.carried_by_agent_id = None
         self.is_traversable = is_traversable
         if len(np.array(self.location).shape) > 1 and np.array(self.location).shape[1] > 1:
             self.fills_multiple_locations = True

@@ -84,7 +84,7 @@ class GridWorld:
         env_object = None
 
         # check if we need to add an existing object
-        if 'type' in obj_properties:
+        if 'object_class' in obj_properties:
             # call the constructor for the defined object type
             env_object = eval(obj_properties["object_class"])(obj_id, obj_name, locations=location,
                                                               properties=obj_properties)

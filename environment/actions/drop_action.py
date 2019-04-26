@@ -37,6 +37,8 @@ class DropAction(Action):
             obj_id = kwargs['object_id']
         elif len(reg_ag.properties['carrying']) > 0:
             obj_id = reg_ag.properties['carrying'][-1]
+        else:
+            return False
 
         return act_drop(grid_world, agent_id=agent_id, obj_id=obj_id)
 
@@ -48,7 +50,7 @@ def act_drop(grid_world, agent_id, obj_id):
 
     # Updating properties
     reg_ag.properties['carrying'].remove(obj_id)
-    env_obj.properties['carried'].remove(agent_id)
+    env_obj.carried_by_agent_id = None
     return True
 
 

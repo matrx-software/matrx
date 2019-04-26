@@ -74,7 +74,7 @@ class GrabAction(Action):
 
             # Updating properties
             reg_ag.properties['carrying'].append(object_id)
-            env_obj.properties['carried'].append(agent_id)
+            env_obj.carried_by_agent_id = agent_id
 
             # Updating Location
             env_obj.location = reg_ag.location
@@ -97,7 +97,7 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
     objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type="*", sense_range=grab_range)
     objects_in_range.pop(agent_id)
 
-    # Removing carried objects
+    # Removing objects in range that the agent already carries
     for obj in reg_ag.properties['carrying']:
         objects_in_range.pop(obj)
 
@@ -127,8 +127,8 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
     if object_id in grid_world.environment_objects.keys():
         env_obj = grid_world.environment_objects[object_id]  # Environment object
         # Check if the object is not carried by another agent
-        if env_obj.properties['carried']:
-            return False, GrabActionResult.RESULT_OBJECT_CARRIED
+        if env_obj.carried_by_agent_id is not None:
+            return False, GrabActionResult.RESULT_OBJECT_CARRIED.replace("{AGENT_ID}", env_obj.carried_by_agent_id)
         elif not env_obj.properties["movable"]:
             return False, GrabActionResult.RESULT_OBJECT_UNMOVABLE
         else:
@@ -144,7 +144,7 @@ class GrabActionResult(ActionResult):
     RESULT_AGENT = 'This is an agent, cannot be picked up'
     RESULT_NO_OBJECT = 'No Object specified'
     RESULT_CARRIES_OBJECT = 'Agent already carries the maximum amount of objects'
-    RESULT_OBJECT_CARRIED = 'Object is already carried'
+    RESULT_OBJECT_CARRIED = 'Object is already carried by {AGENT_ID}'
     RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
     RESULT_OBJECT_UNMOVABLE = 'Object is not movable'
 

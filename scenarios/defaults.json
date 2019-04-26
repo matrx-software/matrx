@@ -54,16 +54,15 @@
   "object_defaults":
   {
       "name": "Object",
-      "object_class": "Block",
+      "object_class": "EnvObject",
       "movable": false,
       "additional_object_properties":
-      {
-          "foo": "bar"
-      },
+      {},
       "visualisation_properties":
       {
           "colour": "#024f21",
-          "size": 1.0
+          "size": 1.0,
+          "shape": 0
       }
   },
   "area_defaults":
