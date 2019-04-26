@@ -42,10 +42,17 @@ def possible_movement(grid_world, agent_id, dx, dy):
             for loc_obj_id in loc_obj_ids:
                 # Check if loc_obj_id is the id of an agent
                 if loc_obj_id in grid_world.registered_agents.keys():
-                    # Check if the agent that takes the move action is not that agent and agents cannot be at the same
-                    # spot, if this is the case then is_traversable is False.
-                    if not grid_world.can_occupy_agent_locs and loc_obj_id != agent_id:
+                    # get the actual agent
+                    loc_obj = grid_world.environment_objects[loc_obj_id]
+                    # Check if the agent that takes the move action is not that agent at that location (meaning that
+                    # for some reason the move action has no effect. If this is the case, we send the apriopriate
+                    # result
+                    if loc_obj_id == agent_id:
                         # The desired location contains a different agent and we cannot step at locations with agents
+                        return MoveActionResult(MoveActionResult.RESULT_NO_MOVE, succeeded=False)
+                    # Check if the agent on the other location (if not itself) is traverable. Otherwise we return that
+                    # the location is occupied.
+                    elif not loc_obj.is_traversable:
                         return MoveActionResult(MoveActionResult.RESULT_OCCUPIED, succeeded=False)
                 # If there are no agents at the desired location or we can move on top of other agents, we check if
                 # there are objects in the way that are not passable.
@@ -64,6 +71,7 @@ def possible_movement(grid_world, agent_id, dx, dy):
 
 
 class MoveActionResult(ActionResult):
+    RESULT_NO_MOVE = 'Move action resulted in a new location with the agent already present.'
     RESULT_SUCCESS = 'Move action success'
     RESULT_OUT_OF_BOUNDS = 'Move action out of bounds'
     RESULT_OCCUPIED = 'Move action towards occupied space'
