@@ -115,4 +115,4 @@ class Door(EnvObject):
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
-                            properties=properties, is_traversable=False)
+                         properties=properties, is_traversable=properties["door_open"])
