@@ -42,10 +42,11 @@ $(document).ready(function(){
         // unpack received data
         grid_size = data.params.grid_size;
         state = data.state;
+        tick = data.params.tick;
 
         // draw the grid again
         requestAnimationFrame(function() {
-            drawSim(grid_size, state);
+            drawSim(grid_size, state, tick);
         });
     });
 

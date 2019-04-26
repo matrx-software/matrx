@@ -88,7 +88,7 @@ class Visualizer():
             self.hu_ag_states[id] = state
 
 
-    def updateGUIs(self):
+    def updateGUIs(self, tick):
         """
         Update the (human)agent and god views, by sending the updated filtered
         state of each to the Visualizer webserver which will update the
@@ -106,6 +106,8 @@ class Visualizer():
         for hu_ag_id in self.hu_ag_states:
             self.hu_ag_states[hu_ag_id] = self.__reorder_state_for_GUI(self.hu_ag_states[hu_ag_id])
 
+        self.tick = tick
+
         # send the update to the webserver
         self.__sendGUIupdate()
 
@@ -116,7 +118,7 @@ class Visualizer():
         """
 
         # put data in a json array
-        data = {'god': self.god_state, 'agent_states': self.agent_states, 'hu_ag_states': self.hu_ag_states}
+        data = {'god': self.god_state, 'agent_states': self.agent_states, 'hu_ag_states': self.hu_ag_states, 'tick': self.tick}
         url = 'http://localhost:3000/update'
 
         tick_start_time = datetime.datetime.now()

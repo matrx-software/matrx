@@ -176,7 +176,7 @@ class GridWorld:
         self.visualizer.save_state(type="god", id="god", state=self.__get_complete_state())
 
         # update the visualizations of all (human)agents and god
-        self.visualizer.updateGUIs()
+        self.visualizer.updateGUIs(tick=self.current_nr_ticks)
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
         for agent_id, action in action_buffer.items():

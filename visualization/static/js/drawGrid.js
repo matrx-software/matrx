@@ -4,12 +4,16 @@ var ctx = null;
 var px_per_cell = 40;
 // number of cells in width and height of map
 var mapW = 10, mapH = 10;
-var currentSecond = 0, frameCount = 0, framesLastSecond = 0;
+var currentSecondTicks = 0, tpsCount = 0, ticksLastSecond = 0;
+var currentSecondFrames = 0, fpsCount = 0, framesListSecond = 0;
 var firstDraw = true;
 
 // Colour of the default BG tile
 var bgTileColour = "#C2C2C2";
+var highestTickSoFar = 0;
 
+// keep track of the objects
+objects =
 
 window.onload = function()
 {
@@ -56,18 +60,34 @@ function fixTileSize(canvasW, canvasH) {
 }
 
 /**
- * Keep track of how often the visualization is updated as frames per second
+ * Keep track of how many ticks per second are received
  */
 function calc_fps() {
 	var sec = Math.floor(Date.now()/1000);
-	if(sec!=currentSecond)
+	if(sec!=currentSecondFrames)
 	{
-		currentSecond = sec;
-		framesLastSecond = frameCount;
-		frameCount = 1;
+		currentSecondFrames = sec;
+		framesLastSecond = fpsCount;
+		fpsCount = 1;
 	}
-	else { frameCount++; }
+	else { fpsCount++; }
 }
+
+/**
+ * Calculate how many frames per second are visualized
+ */
+function calc_tps() {
+    var sec = Math.floor(Date.now()/1000);
+	if(sec!=currentSecondTicks)
+	{
+		currentSecondTicks = sec;
+		ticksLastSecond = tpsCount;
+		tpsCount = 1;
+	}
+	else { tpsCount++; }
+}
+
+
 
 /**
  * check if the grid size has changed and recalculate the tile sizes if so
@@ -84,16 +104,11 @@ function updateGridSize(grid_size) {
     }
 }
 
+
 /**
- * Draw the grid on screen
+ * called when a new tick is received by the agent
  */
-function drawSim(grid_size, state) {
-
-    // return in the case that the canvas has disappeared
-	if(ctx==null) { return; }
-
-    calc_fps();
-
+function tick(grid_size, state, curr_tick) {
     // for the first time drawing the visualization, calculate the optimal
     // screen size based on the grid size
     if (firstDraw) {
@@ -101,6 +116,39 @@ function drawSim(grid_size, state) {
         fixCanvasSize();
         firstDraw = false;
     }
+
+    // calc the ticks per second
+    highestTickSoFar = curr_tick;
+    calc_tps();
+
+    // if we have less than 60 ticks per second
+    if (ticksLastSecond < 60) {
+        // draw the grid recusively with animated movement
+        drawSim(grid_size, state, curr_tick, True);
+    }
+    else {
+        drawSim(grid_size, state, curr_tick, False);
+    }
+}
+
+
+
+
+/**
+ * Draw the grid on screen
+ */
+function drawSim(grid_size, state, curr_tick, animateMovement) {
+
+    // return in the case that the canvas has disappeared
+	if(ctx==null) { return; }
+
+    // return in case there is a new tick, and we are still updating the old tick
+    if (curr_tick < highestTickSoFar) {
+        highestTickSoFar = curr_tick;
+        return;
+    }
+
+    calc_fps();
 
     // save the number of cells in x and y direction of the map
     updateGridSize(grid_size);
@@ -145,6 +193,8 @@ function drawSim(grid_size, state) {
     // Draw the FPS to the canvas as last so it's drawn on top
 	ctx.fillStyle = "#ff0000";
 	ctx.fillText("FPS: " + framesLastSecond, 10, 20);
+	ctx.fillText("TPS: " + ticksLastSecond, 65, 20);
+
 }
 
 /**

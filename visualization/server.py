@@ -52,22 +52,23 @@ def update_GUI():
     god = data["god"]
     agent_states = data["agent_states"]
     hu_ag_states = data["hu_ag_states"]
+    tick = data['tick']
 
     # send update to god
-    new_data = {'params': {"grid_size": grid_sz}, 'state': god}
+    new_data = {'params': {"grid_size": grid_sz, "tick": tick}, 'state': god}
     socketio.emit('update', new_data, namespace="/god")
 
 
     # send updates to agents
     for agent_id in agent_states:
-        new_data = {'params': {"grid_size": grid_sz}, 'state': agent_states[agent_id]}
+        new_data = {'params': {"grid_size": grid_sz, "tick": tick}, 'state': agent_states[agent_id]}
         room = f"/agent/{agent_id}"
         socketio.emit('update', new_data, room=room, namespace="/agent")
 
 
     # send updates to human agents
     for hu_ag_id in hu_ag_states:
-        new_data = {'params': {"grid_size": grid_sz}, 'state': hu_ag_states[hu_ag_id]}
+        new_data = {'params': {"grid_size": grid_sz, "tick": tick}, 'state': hu_ag_states[hu_ag_id]}
         room = f"/humanagent/{hu_ag_id}"
         socketio.emit('update', new_data, room=room, namespace="/humanagent")
 
