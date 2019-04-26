@@ -18,7 +18,7 @@ from visualization.visualizer import Visualizer
 
 class GridWorld:
 
-    def __init__(self, shape, tick_duration, simulation_goal=None, can_occupy_agent_locs=True, rnd_seed=1):
+    def __init__(self, shape, tick_duration, simulation_goal=None, rnd_seed=1):
         self.tick_duration = tick_duration
         self.registered_agents = OrderedDict()
         self.environment_objects = OrderedDict()
@@ -26,7 +26,6 @@ class GridWorld:
         self.simulation_goal = simulation_goal
         self.all_actions = self.__get_all_actions()
         self.current_available_id = 0
-        self.can_occupy_agent_locs = can_occupy_agent_locs
         self.shape = shape
         self.grid = np.array([[None for x in range(shape[0])] for y in range(shape[1])])
         self.is_done = False
@@ -36,6 +35,7 @@ class GridWorld:
         self.carry_dict = {}
         self.tick_start_time = datetime.datetime.now()
         self.sleep_duration = tick_duration
+        self.visualizer = None
 
     def initialize(self):
         # We update the grid, which fills everything with added objects and agents
