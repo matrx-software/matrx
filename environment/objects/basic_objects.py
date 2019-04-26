@@ -1,6 +1,7 @@
 import numpy as np
 from environment.objects.helper_functions import *
 
+
 class EnvObject:
 
     def __init__(self, obj_id, obj_name, locations, properties, is_traversable=False):
@@ -14,7 +15,6 @@ class EnvObject:
         else:
             self.fills_multiple_locations = False
 
-
     def update_properties(self, grid_world):
         """
         Used to update some properties if needed. For example a 'status' property that changes over time or due to an
@@ -22,7 +22,6 @@ class EnvObject:
         class EnvObject.
         :return: The new properties"""
         pass
-
 
     def add_properties(self, propName, propVal):
         """
@@ -32,7 +31,6 @@ class EnvObject:
             raise Exception("Property already exists, update with update_properties instead")
         else:
             self.properties[propName] = propVal
-
 
     def get_properties(self):
         """
@@ -57,24 +55,23 @@ class Block(EnvObject):
     """ Block base object """
 
     def __init__(self, obj_id, obj_name, locations, properties):
-
         # set default properties of this object
         default_props = {"shape": 0, "carried": []}
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
-        defaults_for_customizable_props = {"grootte": 1, "colour": "#0876b8", "movable": True, "size": 0.5, "is_traversable": True}
+        defaults_for_customizable_props = {"grootte": 1, "colour": "#0876b8", "movable": True, "size": 0.5,
+                                           "is_traversable": True}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
-                            properties=properties, is_traversable=properties["is_traversable"])
+                         properties=properties, is_traversable=properties["is_traversable"])
 
 
 class Wall(EnvObject):
     """ Wall base object """
 
     def __init__(self, obj_id, obj_name, locations, properties):
-
         # set default properties of this object
         default_props = {"shape": 0, "size": 1, "movable": False, "carried": []}
         properties = set_default_properties(properties, default_props)
@@ -84,7 +81,7 @@ class Wall(EnvObject):
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
-                            properties=properties, is_traversable=False)
+                         properties=properties, is_traversable=False)
 
 
 class Area(EnvObject):
@@ -100,7 +97,8 @@ class Area(EnvObject):
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
-                            properties=properties, is_traversable=True)
+                         properties=properties, is_traversable=True)
+
 
 class Door(EnvObject):
     """ Door base object, can be used to define rooms """
