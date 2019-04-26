@@ -78,7 +78,7 @@ class GridWorld:
 
         return agent_id, agent_seed
 
-    def add_env_object(self, obj_name, location, obj_properties, is_traversable=False):
+    def add_env_object(self, obj_name, location, obj_properties, is_traversable):
         """ this function adds the objects """
         obj_id = obj_name
         env_object = None
@@ -90,7 +90,8 @@ class GridWorld:
 
         # otherwise, it is a custom object
         else:
-            env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties, is_traversable=is_traversable)
+            env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties,
+                                   is_traversable=is_traversable)
 
         # check if the object can be succesfully placed at that location
         self.validate_obj_placement(env_object)
@@ -115,7 +116,8 @@ class GridWorld:
 
         # two intraversable objects can't be at the same location
         if not env_object.is_traversable and len(intraversable_objs) > 0:
-            raise Exception(f"Invalid scenario. Could not place object {env_object.obj_id} in grid, location already occupied by intraversable object: {intraversable_objs}")
+            raise Exception(f"Invalid scenario. Could not place object {env_object.obj_id} in grid, location already "
+                            f"occupied by intraversable object {intraversable_objs} at location {obj_loc}")
 
 
 
