@@ -50,4 +50,12 @@ $(document).ready(function(){
         });
     });
 
+    /**
+     * Stop the GUI drawing if we have been disconnected
+     */
+    socket.on('disconnect', function() {
+        console.log('Got disconnected!');
+        disconnected = true;
+   });
+
 });

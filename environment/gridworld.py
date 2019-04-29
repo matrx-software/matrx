@@ -145,7 +145,9 @@ class GridWorld:
             if agent_obj.check_agent_busy(curr_tick=self.current_nr_ticks):
                 # only do the observe and orient of the OODA loop to update the GUI
                 filtered_agent_state = agent_obj.ooda_observe(state)
-                self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state)
+                self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state, params={"prev_location": agent_obj.prev_location})
+                # update the previous location of the agent, this needs to be done after saving the agent state
+                agent_obj.save_prev_location()
                 continue
 
             possible_actions = self.__get_possible_actions(agent_id=agent_id, action_set=agent_obj.action_set)
@@ -170,6 +172,8 @@ class GridWorld:
 
             # save what the agent observed to the visualizer
             self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state, params={"prev_location": agent_obj.prev_location})
+            # update the previous location of the agent, this needs to be done after saving the agent state
+            agent_obj.save_prev_location()
 
 
         # save the state of the god view in the visualizer

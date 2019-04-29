@@ -12,13 +12,13 @@ from environment.actions.door_actions import *
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 
 seed = 1
-time_step = 0.1  # Wait this in seconds between performing all actions
+time_step = 0.5  # Wait this in seconds between performing all actions
 grid_size = [15, 15]  # horizontal and vertical size of grid
 max_duration = -1  # number of time units the environment should run as a maximum
 
 # start locations of agents = thus 2 agents
 agent_start_locations = [[14, 14], [1, 1], [8, 8]]
-human_agent_start_locations = [[6, 6], [9, 9]]
+human_agent_start_locations = [] #[[6, 6], [9, 9]]
 obj_locations = [[1, 5], [6, 0], [9, 6], [6, 3],
                  [3, 5], [7, 8], [2, 6], [8, 3]]
 
@@ -187,5 +187,3 @@ for nr_human_agent in range(len(human_agent_start_locations)):
     human_agent.set_rnd_seed(human_agent_seed)
 
 grid_env.run()
-
-print()
