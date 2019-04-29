@@ -96,20 +96,22 @@ class Visualizer():
         """
 
         # reorder god state
-        self.god_state = self.__reorder_state_for_GUI(self.god_state)
+        # self.god_state = self.__reorder_state_for_GUI(self.god_state)
 
         # reorder agents state
-        for agent_id in self.agent_states:
-            self.agent_states[agent_id] = self.__reorder_state_for_GUI(self.agent_states[agent_id])
-
-        # reorder human states
-        for hu_ag_id in self.hu_ag_states:
-            self.hu_ag_states[hu_ag_id] = self.__reorder_state_for_GUI(self.hu_ag_states[hu_ag_id])
+        # for agent_id in self.agent_states:
+        #     self.agent_states[agent_id] = self.__reorder_state_for_GUI(self.agent_states[agent_id])
+        #
+        # # reorder human states
+        # for hu_ag_id in self.hu_ag_states:
+        #     self.hu_ag_states[hu_ag_id] = self.__reorder_state_for_GUI(self.hu_ag_states[hu_ag_id])
 
         self.tick = tick
 
         # send the update to the webserver
         self.__sendGUIupdate()
+
+
 
 
     def __sendGUIupdate(self):

@@ -12,8 +12,13 @@ var firstDraw = true;
 var bgTileColour = "#C2C2C2";
 var highestTickSoFar = 0;
 
-// keep track of the objects
-objects =
+var animatedObjects = {};
+var targetFPS = 60;
+// how quick is the animation of the movement, 1 = max duration between ticks,
+// 0.0001 is quickest possible animation
+var timePerMoveMultiplier = 1;
+var sleepPeriod = 0.0;
+
 
 window.onload = function()
 {
@@ -108,7 +113,7 @@ function updateGridSize(grid_size) {
 /**
  * called when a new tick is received by the agent
  */
-function tick(grid_size, state, curr_tick) {
+function doTick(grid_size, state, curr_tick) {
     // for the first time drawing the visualization, calculate the optimal
     // screen size based on the grid size
     if (firstDraw) {
@@ -120,19 +125,28 @@ function tick(grid_size, state, curr_tick) {
     // calc the ticks per second
     highestTickSoFar = curr_tick;
     calc_tps();
+    // reset tracked animated objects
+    animatedObjects = {};
+
+    sleepPeriod = (1.0 / targetFPS) * (fpsCount / tpsCount);
+
 
     // if we have less than 60 ticks per second
     if (ticksLastSecond < 60) {
+        console.log("starting animation loop, ticksLastSecond:", ticksLastSecond);
         // draw the grid recusively with animated movement
-        drawSim(grid_size, state, curr_tick, True);
+        drawSim(grid_size, state, curr_tick, true);
     }
     else {
-        drawSim(grid_size, state, curr_tick, False);
+        drawSim(grid_size, state, curr_tick, false);
     }
 }
 
 
-
+// sleep time expects milliseconds
+function sleep (time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
 
 /**
  * Draw the grid on screen
@@ -149,53 +163,108 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
     }
 
     calc_fps();
+    updateGridSize(grid_size); // save the number of cells in x and y direction of the map
+    drawBg(); // draw a default bg tile
 
-    // save the number of cells in x and y direction of the map
-    updateGridSize(grid_size);
+    // identify the objects we received
+    var obj_keys = Object.keys(state);
 
-    // draw a default bg tile
-    drawBg();
+    // how much time do we have to animate a movement
+    var timePerMove = ((1.0 / targetFPS) * (fpsCount / tpsCount)) * timePerMoveMultiplier;
+    console.log("Tps", tpsCount, " fps", fpsCount , " time per tick", timePerMove);
 
     // Draw the grid
-    // traverse along Y axis
-	for(var y = 0; y < grid_size[1]; ++y)
-	{
-        // traverse along X axis
-		for(var x = 0; x < grid_size[0]; ++x)
-		{
+    // loop through objects to draw
+    obj_keys.forEach(function(key) {
+        var obj = state[key];
 
-            // draw any objects on top
-            key = x + "_" + y;
-            if (key in state){
-                // console.log("Objects for key ", key, ":", state[key]);
+        // fetch location of object in pixel values
+        var x = obj['location'][0] * px_per_cell;
+        var y = obj['location'][1] * px_per_cell;
 
-                // loop through objects for this possition and draw them
-                for (var objKey in state[key]) {
-                    obj = state[key][objKey]
-                    // console.log('obj:', obj);
+        // check if we need to animate this movement
+        // if (obj["animate"]) {
+        if (animateMovement && key.includes("agent")) {
+            console.log("This is an agent", obj);
+            var pos = processMovement(key, obj["prev_location"], animatedObjects, timePerMove);
+            // round the location to round pixel values
+            x =  Math.round(pos[0]);
+            y =  Math.round(pos[1]);
+        }
 
-                    // get the object colour and size
-                    clr = obj['colour'];
-                    sz = obj['size'];
+        // get the object colour and size
+        clr = obj['colour'];
+        sz = obj['size'];
 
-                    // draw the object with the correct shape, size and colour
-                    if (obj['shape'] == 0) {
-                        drawRectangle(x*px_per_cell, y*px_per_cell, px_per_cell, px_per_cell, clr, sz)
-                    }
-                    else if (obj['shape'] == 1) {
-                        drawTriangle(x*px_per_cell, y*px_per_cell, px_per_cell, px_per_cell, clr, sz);
-                    }
-                }
-            }
-		}
-	}
+        // draw the object with the correct shape, size and colour
+        if (obj['shape'] == 0) {
+            drawRectangle(x, y, px_per_cell, px_per_cell, clr, sz)
+        }
+        else if (obj['shape'] == 1) {
+            drawTriangle(x, y, px_per_cell, px_per_cell, clr, sz);
+        }
+    });
+
 
     // Draw the FPS to the canvas as last so it's drawn on top
 	ctx.fillStyle = "#ff0000";
 	ctx.fillText("FPS: " + framesLastSecond, 10, 20);
 	ctx.fillText("TPS: " + ticksLastSecond, 65, 20);
 
+    if (animateMovement) {
+        // short sleep to get to desired number of fps in milliseconds
+        sleep((1.0 / targetFPS) * 1000.0);
+        // call the animation recusively for animating of movement
+        drawSim(grid_size, state, curr_tick, animateMovement)
+    }
 }
+
+
+/**
+ * Process the movement of an object if it needs to be animated
+ */
+function processMovement(key, prev_location, animatedObjects, timePerMove){
+    // add the object if this is our first iteration animating its movement
+    if (!(key in animatedObjects)) {
+        animatedObjects[key] = {"loc_from": prev_location, "loc_to": location, "position": location, "timeStarted": Date.now()};
+        return animatedObjects[key]["position"]
+    }
+
+    var obj = animatedObjects[key];
+
+    // check if we have completed animating the movement
+    if((Date.now() - obj["timeStarted"] >= timePerMove)) {
+        animatedObjects[key]["position"] = animatedObjects[key]["loc_to"];
+
+    // otherwise, we move the object a little to the target location
+    } else {
+        // calc and set the new coordinates for the object
+        animatedObjects[key]["position"][0] = calcNewAnimatedCoord(animatedObjects[key], 0);
+        animatedObjects[key]["position"][1] = calcNewAnimatedCoord(animatedObjects[key], 1);
+    }
+    return animatedObjects[key]["position"]
+}
+
+
+/**
+ * Calculate a new coordinate of the agent as it moves in an animated fashion
+ * to the goal state.
+ * @oaram obj = object for which to calculate the animated movement
+ * @param coord = which coordinate we are calculating (x or y).
+ */
+function calcNewAnimatedCoord(obj, coord) {
+    if(obj["loc_to"][coord] != obj["loc_from"][coord]) {
+        // calc how many blocks our target is
+        var numberOfCellsToMove = Math.abs(obj["loc_to"][coord] - obj["loc_from"][coord]);
+        // calc how much we have moved so far towards the goal location
+        var diff = ((numberOfCellsToMove * px_per_cell) / timePerMove) * (Date.now() - obj["timeStarted"]);
+        // calc how much will move now and what the new coordinate is
+        return (obj["loc_to"][coord] < obj["loc_from"][coord] ? 0 - diff : diff);
+    }
+    return obj["position"][coord]
+}
+
+
 
 /**
  * Draw a background with the default colour
