@@ -4,14 +4,10 @@
 
 
 # animated movement notes
-- prev_location property of agents needs to be available to other agents
-- users might want to control if movements are animated (teleport vs normal movement?)
 
-Solutions:   
-- add prev_location as official agent property which is not editable by users
-- do an extra loop over all agents to fetch all prev_locations, and save it in the state of all agents
-- save objects copy with prev_locations in visualizers
-- save objects with prev_locations in GUI
+Solution:
+For animating smooth movement of objects, the visualizer keeps track of object IDs (which move) and their location, such that
+it can animate movement from a previous location to the new passed location.
 
-Other todos:
-- fix for human agents as well 
+Additions:
+- add `animate_movement` property to objects and agents which can be toggled by user.

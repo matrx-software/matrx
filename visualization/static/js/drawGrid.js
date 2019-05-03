@@ -14,8 +14,9 @@ var firstDraw = true;
 var bgTileColour = "#C2C2C2";
 var highestTickSoFar = 0;
 
+var prevAnimatedObjects = {};
 var animatedObjects = {};
-var targetFPS = 4;
+var targetFPS = 60;
 // how long should the animation of the movement be, in percentage with respect to
 // the maximum number of time available between ticks 1 = max duration between ticks, 0.001 min (no animation)
 var animationDurationPerc = 1;
@@ -131,13 +132,14 @@ function doTick(grid_size, state, curr_tick) {
         firstDraw = false;
     }
 
-    console.log("\nNew tick", state);
+    // console.log("\nNew tick", state);
 
     // calc the ticks per second
     highestTickSoFar = curr_tick;
     lastTickSecond = Date.now();
     calc_tps();
-    // reset tracked animated objects
+    // the tracked objects from last iteration are moved to a seperate list
+    prevAnimatedObjects = animatedObjects;
     animatedObjects = {};
 
     // if we have less than X ticks per second (by default 60), animate the movement
@@ -163,14 +165,14 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
         return;
     }
 
-    console.log("\n Drawing grid");
+    // console.log("\n Drawing grid");
 
     // Check if we have gotten disconnected
-    checkDisconnected();
-    if (disconnected) {
-        console.log("Got disconnected, quit visualization");
-        return;
-    }
+    // checkDisconnected();
+    // if (disconnected) {
+    //     console.log("Got disconnected, quit visualization");
+    //     return;
+    // }
 
     calc_fps();
     updateGridSize(grid_size); // save the number of cells in x and y direction of the map
@@ -191,10 +193,9 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
         var animationDurationMs = animationDurationFrames * msPerFrame;
     }
 
-    console.log("Animated objects:", animatedObjects);
+    // console.log("Animated objects:", animatedObjects);
 
-    // Draw the grid
-    // loop through objects to draw
+    // Loop through objects to draw
     obj_keys.forEach(function(key) {
         var obj = state[key];
 
@@ -202,21 +203,31 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
         var x = obj['location'][0] * px_per_cell;
         var y = obj['location'][1] * px_per_cell;
 
-        if (key.includes("agent")) {
-            console.log("Agent object:", obj);
-        }
+        // if (key.includes("agent")) {
+        //     console.log("Agent object:", obj);
+        // }
 
-        // check if we need to animate this movement, which is the case if:
-        // animating is enabled, it is an agent, and it has to move from a previous location to a new different location
+        // keep track of objects which need to be animated
         // if (obj["animate"]) {
-        if (animateMovement && key.includes("agent") && "prev_location" in obj && obj["prev_location"] != obj['location']) {
-            console.log("This is a moving agent", obj);
-            // console.log("From ", obj["prev_location"][0], obj["prev_location"][1], "(",cellsToPxs(obj["prev_location"])[0], cellsToPxs(obj["prev_location"])[1], ") to", obj["location"][0], obj["location"][1], "(",cellsToPxs(obj["location"])[0], cellsToPxs(obj["location"])[1], ")");
-            var pos = processMovement(key, obj["prev_location"], obj['location'], animatedObjects, animationDurationMs);
-            // round the location to round pixel values
-            x =  Math.round(pos[0]);
-            y =  Math.round(pos[1]);
-            // console.log("Agent new coordinates:", x, y);
+        if (animateMovement && key.includes("agent")) {
+
+            // fetch the previous location of the object from last iteration
+            if ( !(key in animatedObjects) && key in prevAnimatedObjects) {
+                // console.log("Fetching", key, " from prevAnimatedObjects");
+                animatedObjects[key] = {"loc_from": prevAnimatedObjects[key]["loc_to"], "loc_to": obj['location'], "position": cellsToPxs(prevAnimatedObjects[key]["loc_to"]), "timeStarted": Date.now()};
+            }
+
+            // check if we need to animate this movement, which is the case if:
+            // it it is our first encounter with this object, or it moves to a new position
+            if ( !(key in animatedObjects && animatedObjects[key]['loc_from'] == obj['location']) ) {
+                // console.log("This is a moving agent", obj);
+                // console.log("From ", obj["prev_location"][0], obj["prev_location"][1], "(",cellsToPxs(obj["prev_location"])[0], cellsToPxs(obj["prev_location"])[1], ") to", obj["location"][0], obj["location"][1], "(",cellsToPxs(obj["location"])[0], cellsToPxs(obj["location"])[1], ")");
+                var pos = processMovement(key, obj['location'], animatedObjects, animationDurationMs);
+                // round the location to round pixel values
+                x =  Math.round(pos[0]);
+                y =  Math.round(pos[1]);
+                // console.log("Agent new coordinates:", x, y);
+            }
         }
 
         // get the object colour and size
@@ -258,10 +269,10 @@ function cellsToPxs(coords) {
  * Animate the movement from one cell to the target cell for an object, by covering
  * the distance in smaller steps
  */
-function processMovement(key, prevLocation, targetLocation, animatedObjects, timePerMove){
+function processMovement(key, targetLocation, animatedObjects, timePerMove){
     // add the object if this is our first iteration animating its movement
-    if (!(key in animatedObjects)) {
-        animatedObjects[key] = {"loc_from": prevLocation, "loc_to": targetLocation, "position": cellsToPxs(prevLocation), "timeStarted": Date.now()};
+    if ( !(key in prevAnimatedObjects) ) {
+        animatedObjects[key] = {"loc_from": targetLocation, "loc_to": targetLocation, "position": cellsToPxs(targetLocation), "timeStarted": Date.now()};
         // console.log("New agent, adding to array, new array", animatedObjects);
         return animatedObjects[key]["position"];
     }

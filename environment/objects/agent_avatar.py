@@ -36,17 +36,11 @@ class AgentAvatar(EnvObject):
         self.ooda_orient = ooda_orient
         self.type = type
         self.properties_agent_writable = properties_agent_writable
-        self.prev_location = agent_properties["location"] # used for visualization
 
         # defines an agent is blocked by an action which takes multiple timesteps
         self.blocked = False
         # is the last action performed by the agent, at what tick and how long it takes
         self.last_action = {"duration_in_ticks": 0, "tick": 0}
-
-
-
-    def save_prev_location(self):
-        self.prev_location = self.location
 
 
     def __check_properties_validity(self, id, props):

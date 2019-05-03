@@ -12,13 +12,13 @@ from environment.actions.door_actions import *
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 
 seed = 1
-time_step = 0.5  # Wait this in seconds between performing all actions
+time_step = 0.1  # Wait this in seconds between performing all actions
 grid_size = [15, 15]  # horizontal and vertical size of grid
 max_duration = -1  # number of time units the environment should run as a maximum
 
 # start locations of agents = thus 2 agents
 agent_start_locations = [[14, 14], [1, 1], [8, 8]]
-human_agent_start_locations = [] #[[6, 6], [9, 9]]
+human_agent_start_locations = [[6, 6], [9, 9]]
 obj_locations = [[1, 5], [6, 0], [9, 6], [6, 3],
                  [3, 5], [7, 8], [2, 6], [8, 3]]
 
@@ -113,7 +113,7 @@ for nr_agent in range(len(agent_start_locations)):
     speeds = [1, 3, 6]
     agent_properties = {"size": 1, "name": f"agent_{nr_agent}", "carrying": [],
             "location": agent_start_locations[nr_agent], "is_traversable": False,
-            "colour": "#900C3F", "shape": 1, "agent_speed_in_ticks": speeds[nr_agent]}
+            "colour": "#900C3F", "shape": 1, "agent_speed_in_ticks": 1}
     # specify which agent properties can be changed by the agent
     properties_agent_writable = ["colour", "shape"]
 

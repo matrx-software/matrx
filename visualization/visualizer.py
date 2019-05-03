@@ -77,14 +77,8 @@ class Visualizer():
         if type == "god":
             self.god_state = state
         elif type == "agent":
-            # add the previous location to the state as well
-            if params is not None and "prev_location" in params:
-                state[id]["prev_location"] = params["prev_location"]
             self.agent_states[id] = state
         elif type == "humanagent":
-            # add the previous location to the state as well
-            if params is not None and "prev_location" in params:
-                state[id]["prev_location"] = params["prev_location"]
             self.hu_ag_states[id] = state
 
 

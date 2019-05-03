@@ -43,7 +43,7 @@ $(document).ready(function(){
 
         // draw the grid again
         requestAnimationFrame(function() {
-            drawSim(grid_size, state, tick);
+            doTick(grid_size, state, tick);
         });
     });
 });

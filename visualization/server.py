@@ -13,7 +13,7 @@ app = Flask(__name__, template_folder='static/templates')
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
-debug = False
+# debug = True
 
 grid_sz = [4, 4]
 
