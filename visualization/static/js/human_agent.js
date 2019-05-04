@@ -1,3 +1,9 @@
+/**
+ * This is the file which handles the socketIO connection for the human agent view,
+ * requesting a redraw of the grid when a socketIO update has been received.
+ * Specific to the human agent, key inputs are also handled and sent back to the server.
+ */
+
 var doVisualUpdates = true;
 
 /**
@@ -69,27 +75,7 @@ $(document).ready(function(){
     function checkArrowKey(e) {
         e = e || window.event;
 
-        // filter for arrow keys (for now)
-        if (e.keyCode < 37 || e.keyCode > 40) {
-            return
-        }
-
-        // send an update for every arrow key pressed
-        if (e.keyCode == '38') {
-            // up arrow
-            socket.emit("userinput", {"action": "arrowkey:up", 'id': id});
-        }
-        else if (e.keyCode == '39') {
-           // right arrow
-           socket.emit("userinput", {"action": "arrowkey:right", 'id': id});
-        }
-        else if (e.keyCode == '40') {
-            // down arrow
-            socket.emit("userinput", {"action": "arrowkey:down", 'id': id});
-        }
-        else if (e.keyCode == '37') {
-           // left arrow
-           socket.emit("userinput", {"action": "arrowkey:left", 'id': id});
-        }
+        // send an update for every key pressed
+        socket.emit("userinput", {"key": e.key, 'id': id});
     }
 });

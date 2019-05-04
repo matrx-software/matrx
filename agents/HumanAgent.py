@@ -69,14 +69,18 @@ class HumanAgent(Agent):
         # first filter the state to only show things this particular agent can see
         state = self.ooda_observe(state)
 
+        # only keep userinput which is actually connected to an agent action
+        userinput = self.filter_userinputs(userinput)
+
         # if there was no userinput do nothing
-        if userinput is None:
+        if userinput is None or userinput == []:
             return state, self.agent_properties, None, {}
+
+        # take the last userinput (for now)
+        userinput = userinput[-1]
 
         # otherwise check which action is mapped to that key and return it
         return state, self.agent_properties, self.usrinp_action_map[userinput], {}
-
-
 
 
     def ooda_observe(self, state):
@@ -98,3 +102,14 @@ class HumanAgent(Agent):
         :return: A filtered state.
         """
         return state
+
+
+    def filter_userinputs(self, userinputs):
+        """
+        From the received userinput, only keep those which are actually Connected
+        to a specific agent action
+        """
+        if userinputs is None:
+            return []
+        possible_usrinpts = list(self.usrinp_action_map.keys())
+        return list(set(possible_usrinpts) & set(userinputs))

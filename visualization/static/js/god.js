@@ -1,4 +1,9 @@
-var doVisualUpdates = true;
+/**
+ * This is the file which handles the socketIO connection for the god view,
+ * requesting a redraw of the grid when a socketIO update has been received.
+ */
+
+ var doVisualUpdates = true;
 
 /**
  * Check if the current tab is in focus or not

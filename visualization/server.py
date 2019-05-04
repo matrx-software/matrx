@@ -5,15 +5,22 @@ import numpy as np
 import json
 import datetime
 
+
+'''
+This file holds the code for the Flask (Python) webserver, which listens to grid updates
+via a restful API, and forwards these to the specific viewpoint (god, agent, human-agent).
+'''
+
+
+
 # Using PyCharm:
 # runfile('visualization/server.py')
 
-# app = Flask(__name__)
 app = Flask(__name__, template_folder='static/templates')
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
-# debug = True
+debug = False
 
 grid_sz = [4, 4]
 
@@ -138,16 +145,18 @@ def handle_usr_inp(input):
         print('received userinput: %s' % input)
 
     id = input['id']
-    action = input['action']
+    keyPressed = input['key']
 
     # save the userinput action to the userinput dict of that human agent.
-    # As the agent can do only 1 action at a time remember only the latest
-    # userinput action of each human agent
     global userinput
     if id not in userinput:
-        userinput[id] = {"action": action}
-    else:
-        userinput[id]["action"] = action
+        userinput[id] = []
+    # don't add duplicate keypresses
+    if keyPressed not in userinput[id]:
+        userinput[id].append(keyPressed)
+
+    if debug:
+        print(f"Userinput:{userinput[id]}")
 
 
 

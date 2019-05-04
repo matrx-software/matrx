@@ -1,3 +1,8 @@
+/**
+ * This is a file which draws the grid with all objects, used for all views:
+ * Agent, human-agent and god view.
+ */
+
 var canvas = null;
 var ctx = null;
 var disconnected = false;
@@ -208,8 +213,8 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
         // }
 
         // keep track of objects which need to be animated
-        // if (obj["animate"]) {
-        if (animateMovement && key.includes("agent")) {
+        // if (key.includes("agent")
+        if (animateMovement && "animateMovementGUI" in obj) {
 
             // fetch the previous location of the object from last iteration
             if ( !(key in animatedObjects) && key in prevAnimatedObjects) {

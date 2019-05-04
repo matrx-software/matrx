@@ -2,6 +2,12 @@ import datetime
 import requests
 
 class Visualizer():
+    '''
+    The Visualizer class bridges the gap between the Gridworld simulation environment, and
+    the Flask webserver which does the visualization. This is done by keeping track
+    of the states of every agent, human-agent, and the complete (god) state for every
+    simulation iteration, and sending these to the Flask webserver via an API where they are visualized.
+    '''
 
     def __init__(self, grid_size):
         self.agent_states = {}
@@ -36,38 +42,12 @@ class Visualizer():
         if r.status_code != requests.codes.ok:
             print("Error in initializing GUI")
 
-    def __reorder_state_for_GUI(self, state):
-        """
-        Reorder the state such that it has the x,y coords as keys and can be JSON serialized
-        Old state order: { 'object_name' : {obj_properties}, 'object_name2' : {obj_properties}, ....}
-        New state order: { 'x1_y1') : [obj1, obj2, agent1], 'x2_y1' : [obj3, obj4, agent1], ...}
-        :param state: state of all visible objects for that entity
-        :return: state reordered
-        """
-        newState = {}
-        for obj in state:
-
-            # convert the [x,y] coords to a x_y notation so we can use it as a key which is
-            # also JSON serializable
-            strXYkey = str(state[obj]['location'][0]) + "_" + str(state[obj]['location'][1])
-
-            # create a new list with (x,y) as key if it does not exist yet in the newState dict
-            if strXYkey not in newState:
-                newState[strXYkey] = []
-
-            # add the object or agent to the list at the (x,y) location in the dict
-            newState[strXYkey].append( state[obj] )
-
-        return newState
-
 
     def reset(self):
         """ Reset all saved states of (human) agents etc """
-
         self.agent_states = {}
         self.hu_ag_states = {}
         self.god_state = {}
-
 
 
     def save_state(self, type, id, state, params=None):
@@ -88,20 +68,7 @@ class Visualizer():
         state of each to the Visualizer webserver which will update the
         visualizations.
         """
-
-        # reorder god state
-        # self.god_state = self.__reorder_state_for_GUI(self.god_state)
-
-        # reorder agents state
-        # for agent_id in self.agent_states:
-        #     self.agent_states[agent_id] = self.__reorder_state_for_GUI(self.agent_states[agent_id])
-        #
-        # # reorder human states
-        # for hu_ag_id in self.hu_ag_states:
-        #     self.hu_ag_states[hu_ag_id] = self.__reorder_state_for_GUI(self.hu_ag_states[hu_ag_id])
-
         self.tick = tick
-
         # send the update to the webserver
         self.__sendGUIupdate()
 
@@ -142,6 +109,8 @@ class Visualizer():
         # return None if there was no userinput
         if repl == {}:
             self.userinputs = {}
+        else:
+            print("User input received:", repl)
 
         # otherwise return the userinput
         self.userinputs = repl

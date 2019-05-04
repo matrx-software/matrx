@@ -12,7 +12,7 @@ from environment.actions.door_actions import *
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 
 seed = 1
-time_step = 0.1  # Wait this in seconds between performing all actions
+time_step = 0.2  # Wait this in seconds between performing all actions
 grid_size = [15, 15]  # horizontal and vertical size of grid
 max_duration = -1  # number of time units the environment should run as a maximum
 
@@ -42,7 +42,8 @@ for nr_obj in range(len(obj_locations)):
                   "colour": rng.choice(["#286625", "#678fd9", "#FF5733"]),
                   "size": float(rng.rand()),
                   "movable": bool(rng.choice([False, True])),
-                  "carried": []}
+                  "carried": [],
+                  "animateMovementGUI": True}
 
     if properties["colour"] == "#286625":
         is_traversable = False
@@ -66,7 +67,7 @@ for nr_obj in range(len(block_obj_locations)):
     obj_name = f"block_object_{nr_obj}"
     location = block_obj_locations[nr_obj]
 
-    properties = {"type": "Block"}
+    properties = {"type": "Block", "animateMovementGUI": True}
 
     grid_env.add_env_object(obj_name, location, properties)
 
@@ -113,7 +114,7 @@ for nr_agent in range(len(agent_start_locations)):
     speeds = [1, 3, 6]
     agent_properties = {"size": 1, "name": f"agent_{nr_agent}", "carrying": [],
             "location": agent_start_locations[nr_agent], "is_traversable": False,
-            "colour": "#900C3F", "shape": 1, "agent_speed_in_ticks": 1}
+            "colour": "#900C3F", "shape": 1, "agent_speed_in_ticks": 1, "animateMovementGUI": True}
     # specify which agent properties can be changed by the agent
     properties_agent_writable = ["colour", "shape"]
 
@@ -152,16 +153,16 @@ for nr_human_agent in range(len(human_agent_start_locations)):
         MoveWest.__name__
     ]
     usrinp_action_map = {
-        'arrowkey:up': MoveNorth.__name__,
-        'arrowkey:right': MoveEast.__name__,
-        'arrowkey:down': MoveSouth.__name__,
-        'arrowkey:left': MoveWest.__name__
+        'ArrowUp': MoveNorth.__name__,
+        'ArrowRight': MoveEast.__name__,
+        'ArrowDown': MoveSouth.__name__,
+        'ArrowLeft': MoveWest.__name__
     }
 
     # specify the agent properties
     hu_ag_properties = {"size": 1, "name": f"human_agent_{nr_human_agent}", "carrying": [],
             "location": human_agent_start_locations[nr_human_agent], "is_traversable": False,
-            "colour": "#fde500", "shape": 1, "agent_speed_in_ticks": 1}
+            "colour": "#fde500", "shape": 1, "agent_speed_in_ticks": 1, "animateMovementGUI": True}
     # specify which agent properties can be instantly changed by the agent without cost / action
     properties_human_agent_writable = ["colour", "shape"]
 
