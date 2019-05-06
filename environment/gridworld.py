@@ -184,6 +184,7 @@ class GridWorld:
             action_class_name = action[0]
             # Get optional kwargs
             action_kwargs = action[1]
+
             if action_kwargs is None:  # If kwargs is none, make an empty dict out of it
                 action_kwargs = {}
 
@@ -445,7 +446,7 @@ class GridWorld:
             else:
                 # If the action is not possible, send a failed ActionResult with the is_possible message if given,
                 # otherwise use the default one.
-                custom_not_possible_message = is_possible[1]
+                custom_not_possible_message = is_possible[1] #is_possible[1]
                 if custom_not_possible_message is not None:
                     result = ActionResult(custom_not_possible_message, succeeded=False)
                 else:

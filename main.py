@@ -19,7 +19,7 @@ max_duration = -1  # number of time units the environment should run as a maximu
 # start locations of agents = thus 2 agents
 agent_start_locations = [[14, 14], [1, 1], [8, 8]]
 human_agent_start_locations = [[6, 6], [9, 9]]
-obj_locations = [[1, 5], [6, 0], [9, 6], [6, 3],
+obj_locations = [[1, 5], [9, 6], [6, 3],
                  [3, 5], [7, 8], [2, 6], [8, 3]]
 
 wall_obj_locations = [[0,0], [1,0], [2,0], [3,0], [3,1], [3,2], [3,4], [2,4], [1,4], [0,4], [0,3], [0,2], [0,1]]
@@ -107,14 +107,15 @@ for nr_agent in range(len(agent_start_locations)):
         MoveNorthWest.__name__,
         GrabAction.__name__,
         DropAction.__name__,
-        OpenDoorAction.__name__
+        OpenDoorAction.__name__,
+        CloseDoorAction.__name__
     ]
 
     # specify the agent properties
     speeds = [1, 3, 6]
     agent_properties = {"size": 1, "name": f"agent_{nr_agent}", "carrying": [],
             "location": agent_start_locations[nr_agent], "is_traversable": False,
-            "colour": "#900C3F", "shape": 1, "agent_speed_in_ticks": 1, "animateMovementGUI": True}
+            "colour": "#900C3F", "shape": 1, "agent_speed_in_ticks": speeds[nr_agent], "animateMovementGUI": True}
     # specify which agent properties can be changed by the agent
     properties_agent_writable = ["colour", "shape"]
 
@@ -150,13 +151,21 @@ for nr_human_agent in range(len(human_agent_start_locations)):
         MoveNorth.__name__,
         MoveEast.__name__,
         MoveSouth.__name__,
-        MoveWest.__name__
+        MoveWest.__name__,
+        GrabAction.__name__,
+        DropAction.__name__,
+        OpenDoorAction.__name__,
+        CloseDoorAction.__name__
     ]
     usrinp_action_map = {
         'ArrowUp': MoveNorth.__name__,
         'ArrowRight': MoveEast.__name__,
         'ArrowDown': MoveSouth.__name__,
-        'ArrowLeft': MoveWest.__name__
+        'ArrowLeft': MoveWest.__name__,
+        'p': GrabAction.__name__,
+        'd': DropAction.__name__,
+        'o': OpenDoorAction.__name__,
+        'c': CloseDoorAction.__name__
     }
 
     # specify the agent properties

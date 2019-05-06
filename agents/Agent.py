@@ -218,7 +218,7 @@ class Agent:
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
                     np.array(state[object_id]['location']) - np.array(state[self.agent_properties["name"]]['location']))))
-                if dist <= grab_range:
+                if dist <= grab_range and state[object_id]["movable"]:
                     object_in_range.append(object_id)
 
             if object_in_range:
