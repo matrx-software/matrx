@@ -30,13 +30,18 @@ class ScenarioManager:
         # Get simulation settings
         grid_world = self._create_grid_world()
 
-        self._create_agents(grid_world)
+        agents = self._create_agents(grid_world)
 
         areas = self._create_areas(grid_world)
 
         objects = self._create_objects(grid_world)
 
         return None
+
+    def _fill_grid_world(self, grid_world, agents, areas, objects):
+        # Create all Agents
+        for agent_id_name, settings in agents.items():
+            self._create_agent(agent_id_name, settings, grid_world)
 
     def _create_grid_world(self):
         # If there is no simulation settings section, we warn the user
@@ -99,18 +104,18 @@ class ScenarioManager:
         for agent_id_name, settings in human_agents.items():
             self._create_human_agent(agent_id_name, settings, grid_world)
 
-        # Create all Agents
-        for agent_id_name, settings in agents.items():
-            self._create_agent(agent_id_name, settings, grid_world)
+        return agents
 
     def _create_areas(self, grid_world: GridWorld):
         # Obtain the areas section
         areas_settings = self.scenario_dict['areas']
 
+        areas = []
         for area_settings in areas_settings:
-            self._add_area(grid_world, area_settings)
+            area = self._get_area(area_settings)
+            areas.append(area)
 
-        print()
+        return areas
 
     def _create_objects(self, grid_world: GridWorld):
         pass
@@ -321,7 +326,7 @@ class ScenarioManager:
 
         return callable_class
 
-    def _add_area(self, grid_world, area_settings):
+    def _get_area(self, area_settings):
         # Append missing settings (if any)
         default_settings = self.defaults["area_defaults"]
         settings = self._add_missing_keys(area_settings, default_settings)  # add default settings if missing
@@ -339,8 +344,11 @@ class ScenarioManager:
         hull_coords, volume_coords = self._get_hull_and_volume_coords(ordered_corners)
 
         # Get area, wall and door objects
-        area_obj, wall_obj, door_obj = self._get_area_objects(volume_coords, hull_coords, doors, generate_walls,
-                                                              settings)
+        area_obj, wall_obj, door_obj = self._get_area_tiles(volume_coords, hull_coords, doors, generate_walls,
+                                                            settings)
+
+        # Area object consist out of a tuple; area_objects, wall_objects, door_objects
+        return (area_obj, wall_obj, door_obj)
 
     def _get_hull_and_volume_coords(self, corner_coords):
         # Get the polygon represented by the corner coordinates
@@ -386,7 +394,7 @@ class ScenarioManager:
 
         return hull_coords, volume_coords
 
-    def _get_area_objects(self, volume_coords, hull_coords, doors, generate_walls, settings):
+    def _get_area_tiles(self, volume_coords, hull_coords, doors, generate_walls, settings):
         area_objs = []
         area_nr = 0
         door_objs = []
@@ -409,7 +417,7 @@ class ScenarioManager:
 
         # Create all area objects
         for area_coord in volume_coords:
-            area_tile = self.get_area_tile(area_nr, area_name, area_coord, True, area_class, area_kwargs,
+            area_tile = self.get_area_tile(area_nr, area_name, area_coord, area_class, area_kwargs,
                                            settings['area_properties'], area_vis)
             area_nr += 1
             area_objs.append(area_tile)
