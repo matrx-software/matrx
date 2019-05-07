@@ -19,7 +19,7 @@ class Agent:
         :param grid_size: The size of the grid. The agent needs to send this along with other information to the
         webapp managing the Agent GUI
         """
-        self.action_set = action_set  # list of Action objects
+        self.action_set = action_set  # list of action names (strings)
         self.sense_capability = sense_capability
         self.agent_properties = {}
         self.rnd_gen = np.random.RandomState()

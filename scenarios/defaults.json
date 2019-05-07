@@ -73,6 +73,9 @@
   "area_defaults":
   {
     "name": "Area",
+    "area_class": "Area",
+    "area_kwargs": {},
+    "area_properties": {},
     "has_walls": false,
     "doors": [[]],
     "visualisation_properties":
