@@ -55,20 +55,23 @@
       "colour": "#fde500",
       "shape": 0
     },
-    "agent_properties_writable": ["colour", "shape"]
+    "agent_properties_writable": ["colour", "shape"],
+    "class_specific_kwargs": {}
   },
   "object_defaults":
   {
-      "name": "Object",
-      "object_class": "EnvObject",
-      "movable": false,
-      "additional_object_properties": {},
-      "visualisation_properties":
-      {
-          "colour": "#024f21",
-          "size": 1.0,
-          "shape": 0
-      }
+    "name": "Object",
+    "object_class": "EnvObject",
+    "movable": false,
+    "is_traversable": true,
+    "additional_object_properties": {},
+    "visualisation_properties":
+    {
+        "colour": "#024f21",
+        "size": 1.0,
+        "shape": 0
+    },
+    "class_specific_kwargs": {}
   },
   "area_defaults":
   {

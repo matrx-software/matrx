@@ -4,9 +4,9 @@ from environment.objects.helper_functions import *
 
 class EnvObject:
 
-    def __init__(self, obj_id, obj_name, locations, properties, is_traversable=False):
+    def __init__(self, obj_id, obj_name, location, properties, is_traversable):
         self.obj_id = obj_id
-        self.location = locations
+        self.location = location
         self.name = obj_name
         self.properties = properties
         self.carried_by_agent_id = None
@@ -55,24 +55,24 @@ class EnvObject:
 class Block(EnvObject):
     """ Block base object """
 
-    def __init__(self, obj_id, obj_name, locations, properties):
+    def __init__(self, obj_id, obj_name, location, properties, is_traversable=True):
         # set default properties of this object
         default_props = {"shape": 0, "carried": []}
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
         defaults_for_customizable_props = {"grootte": 1, "colour": "#0876b8", "movable": True, "size": 0.5,
-                                           "is_traversable": True}
+                                           "is_traversable": is_traversable}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
-        super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
+        super().__init__(obj_id=obj_id, obj_name=obj_name, location=location,
                          properties=properties, is_traversable=properties["is_traversable"])
 
 
 class Wall(EnvObject):
     """ Wall base object """
 
-    def __init__(self, obj_id, obj_name, locations, properties):
+    def __init__(self, obj_id, obj_name, location, properties, is_traversable=False):
         # set default properties of this object
         default_props = {"shape": 0, "size": 1, "movable": False, "carried": []}
         properties = set_default_properties(properties, default_props)
@@ -81,14 +81,14 @@ class Wall(EnvObject):
         defaults_for_customizable_props = {"grootte": 1, "colour": "#000000"}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
-        super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
-                         properties=properties, is_traversable=False)
+        super().__init__(obj_id=obj_id, obj_name=obj_name, location=location,
+                         properties=properties, is_traversable=is_traversable)
 
 
 class Area(EnvObject):
     """ Area base object, can be used to define rooms """
 
-    def __init__(self, obj_id, obj_name, locations, properties):
+    def __init__(self, obj_id, obj_name, location, properties, is_traversable=True):
         # set default properties of this object
         default_props = {"shape": 0, "size": 1, "movable": False, "carried": []}
         properties = set_default_properties(properties, default_props)
@@ -97,21 +97,21 @@ class Area(EnvObject):
         defaults_for_customizable_props = {"grootte": 1, "colour": "#fbf0c3"}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
-        super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
-                         properties=properties, is_traversable=True)
+        super().__init__(obj_id=obj_id, obj_name=obj_name, location=location,
+                         properties=properties, is_traversable=is_traversable)
 
 
 class Door(EnvObject):
     """ Door base object, can be used to define rooms """
 
-    def __init__(self, obj_id, obj_name, locations, properties):
+    def __init__(self, obj_id, obj_name, location, properties, is_traversable=False):
         # set default properties of this object
         default_props = {"shape": 0, "size": 1, "movable": False, "colour": "#5a5a5a", "carried": []}
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
-        defaults_for_customizable_props = {"grootte": 1, "door_open": False}
+        defaults_for_customizable_props = {"grootte": 1, "door_open": is_traversable}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
-        super().__init__(obj_id=obj_id, obj_name=obj_name, locations=locations,
+        super().__init__(obj_id=obj_id, obj_name=obj_name, location=location,
                          properties=properties, is_traversable=properties["door_open"])

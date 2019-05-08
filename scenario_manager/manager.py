@@ -30,18 +30,35 @@ class ScenarioManager:
         # Get simulation settings
         grid_world = self._create_grid_world()
 
-        agents = self._create_agents(grid_world)
+        agents, human_agents = self._create_agents()
 
-        areas = self._create_areas(grid_world)
+        areas = self._create_areas()
 
-        objects = self._create_objects(grid_world)
+        objects = self._create_objects()
 
-        return None
+        grid_world = self._fill_grid_world(grid_world, agents, human_agents, areas, objects)
 
-    def _fill_grid_world(self, grid_world, agents, areas, objects):
+        return grid_world
+
+    def _fill_grid_world(self, grid_world, agents, human_agents, areas, objects):
+
+        # Create all HumanAgents
+        for agent_id_name, settings in human_agents.items():
+            self._create_human_agent(agent_id_name, settings, grid_world)
+
         # Create all Agents
         for agent_id_name, settings in agents.items():
             self._create_agent(agent_id_name, settings, grid_world)
+
+        # Create all Areas
+        for (area_obj, wall_obj, door_obj) in areas:
+            self._create_area(area_obj, wall_obj, door_obj, grid_world)
+
+        # Create all objects
+        for env_obj in objects:
+            self._create_object(env_obj)
+
+        return grid_world
 
     def _create_grid_world(self):
         # If there is no simulation settings section, we warn the user
@@ -66,7 +83,7 @@ class ScenarioManager:
 
         return grid_world
 
-    def _create_agents(self, grid_world: GridWorld):
+    def _create_agents(self):
         # If there is no agent section, we warn the user
         if "agents" not in self.scenario_dict.keys():
             warn(f"You are creating a scenario from {self.scenario_file} that does not contain an 'agents' section.")
@@ -100,13 +117,9 @@ class ScenarioManager:
                     agent_id_nr += 1
                 agents[name] = settings
 
-        # Create all HumanAgents
-        for agent_id_name, settings in human_agents.items():
-            self._create_human_agent(agent_id_name, settings, grid_world)
+        return agents, human_agents
 
-        return agents
-
-    def _create_areas(self, grid_world: GridWorld):
+    def _create_areas(self):
         # Obtain the areas section
         areas_settings = self.scenario_dict['areas']
 
@@ -117,8 +130,15 @@ class ScenarioManager:
 
         return areas
 
-    def _create_objects(self, grid_world: GridWorld):
-        pass
+    def _create_objects(self):
+        all_object_settings = self.scenario_dict['objects']
+
+        env_objs = []
+        for obj_settings in all_object_settings:
+            env_object = self._create_env_object(obj_settings)
+            env_objs.append(env_object)
+
+        return env_objs
 
     def _load_defaults_json(self):
         root_path = Path(__file__).parents[1]
@@ -351,6 +371,10 @@ class ScenarioManager:
         return (area_obj, wall_obj, door_obj)
 
     def _get_hull_and_volume_coords(self, corner_coords):
+        # Check if there are any corners given
+        if len(corner_coords) <= 1:
+            raise Exception("Cannot create area; No or just one corner coordinate given.")
+
         # Get the polygon represented by the corner coordinates
         # TODO remove the dependency to Shapely
         polygon = Polygon(corner_coords)
@@ -360,7 +384,7 @@ class ScenarioManager:
         miny = int(miny)
         maxx = int(maxx)
         maxy = int(maxy)
-        print("poly.bounds:", polygon.bounds)
+
         volume_coords = []
         for x in range(minx, maxx + 1):
             for y in range(miny, maxy + 1):
@@ -381,16 +405,36 @@ class ScenarioManager:
             ydiff = y2 - y1
 
             # Find the line's equation, y = mx + b
-            if xdiff != 0:
+            strt = x1 + 1
+            nd = x2
+            if xdiff != 0 and ydiff != 0:
                 m = ydiff / xdiff
-            else:
-                m = 1
-            b = y1 - m * x1
+                b = y1 - m * x1
+            elif ydiff == 0:
+                m = 0
+                b = y2
+                strt = x1
+                nd = x2
+            elif xdiff == 0:
+                m = 0
+                b = x2
+                strt = y1
+                nd = y2
 
-            for xval in range(x1 + 1, x2):
-                yval = int(m * xval + b)
-                if int(yval) == yval:
-                    hull_coords.append((xval, yval))
+            temp_strt = min(strt, nd)
+            nd = max(nd, strt)
+            strt = temp_strt + 1
+            for val in range(strt, nd):
+                res = int(m * val + b)
+                if int(res) == res:
+                    if xdiff == 0:
+                        hull_coords.append((res, val))
+                    else:
+                        hull_coords.append((val, res))
+
+        # Add corners as well
+        for corner in corner_coords:
+            hull_coords.append(tuple(corner))
 
         return hull_coords, volume_coords
 
@@ -434,7 +478,7 @@ class ScenarioManager:
 
         # Else we add walls and potential doors and return those as well
         for hull_coord in hull_coords:
-            if hull_coord not in doors:
+            if list(hull_coord) not in doors or hull_coord in doors:  # check both for tuple and list form
                 wall_tile = self.get_area_tile(wall_nr, area_name, hull_coord, Wall, {}, {}, walls_vis)
                 wall_nr += 1
                 wall_objs.append(wall_tile)
@@ -450,6 +494,63 @@ class ScenarioManager:
 
         obj_properties = self._add_missing_keys(properties, vis_properties)
 
-        tile = callable_class(obj_id, area_name, locations=coord, properties=obj_properties, **kwargs)
+        tile = callable_class(obj_id, area_name, location=coord, properties=obj_properties, **kwargs)
 
         return tile
+
+    def _create_area(self, area_tiles, wall_tiles, door_objs, grid_world):
+        # Add area tiles
+        for tile in area_tiles:
+            grid_world.add_env_object(tile)
+
+        # Add wall tiles
+        for wall in wall_tiles:
+            grid_world.add_env_object(wall)
+
+        # Add doors
+        for door in door_objs:
+            grid_world.add_env_object(door)
+
+        return grid_world
+
+    def _create_object(self, env_obj):
+        pass
+
+    def _create_env_object(self, obj_settings):
+        # Append missing settings (if any)
+        default_settings = self.defaults["object_defaults"]
+        settings = self._add_missing_keys(obj_settings, default_settings)  # add default settings if missing
+
+        # Get name
+        name = settings['name']
+
+        # Create id
+        obj_id = name
+
+        # Get object class (if known in the testbed)
+        callable_class = self._get_class(settings['object_class'], EnvObject, obj_id)
+
+        # Get mandatory properties
+        location = settings['location']
+        is_movable = settings['movable']
+        is_traversable = settings['is_traversable']
+        additional_obj_properties = settings['additional_object_properties']
+        vis_properties = settings['visualisation_properties']
+
+        # Create an object properties dict
+        properties = {"is_movable": is_movable}
+        properties = self._add_missing_keys(properties, additional_obj_properties)  # add default settings if missing
+        properties = self._add_missing_keys(properties, vis_properties)  # add default settings if missing
+
+        # Get potential class specific arguments (kwargs)
+        kwargs = settings['class_specific_kwargs']
+
+        # Create the object
+        env_object = callable_class(obj_id=obj_id,
+                                    obj_name=name,
+                                    location=location,
+                                    properties=properties,
+                                    is_traversable=is_traversable,
+                                    **kwargs)
+
+        return env_object

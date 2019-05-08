@@ -49,7 +49,7 @@
     {
       "name": "Block 1",
       "object_class": "Door",
-      "location": [],
+      "location": [11, 18],
       "movable": false,
       "additional_object_properties":
       {

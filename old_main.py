@@ -51,7 +51,7 @@ for nr_obj in range(len(obj_locations)):
     else:
         is_traversable = True
 
-    grid_env.add_env_object(obj_name, location, properties, is_traversable)
+    grid_env.create_and_add_env_object(obj_name, location, properties, is_traversable)
 
 
 # initialize walls
@@ -61,7 +61,7 @@ for nr_obj in range(len(wall_obj_locations)):
 
     properties = {"object_class": "Wall"}
 
-    grid_env.add_env_object(obj_name, location, properties, is_traversable=False)
+    grid_env.create_and_add_env_object(obj_name, location, properties, is_traversable=False)
 
 # initialize blocks
 for nr_obj in range(len(block_obj_locations)):
@@ -70,7 +70,7 @@ for nr_obj in range(len(block_obj_locations)):
 
     properties = {"object_class": "Block"}
 
-    grid_env.add_env_object(obj_name, location, properties, is_traversable=False)
+    grid_env.create_and_add_env_object(obj_name, location, properties, is_traversable=False)
 
 # initialize areas
 for nr_obj in range(len(area_obj_locations)):
@@ -79,7 +79,7 @@ for nr_obj in range(len(area_obj_locations)):
 
     properties = {"object_class": "Area"}
 
-    grid_env.add_env_object(obj_name, location, properties, is_traversable=True)
+    grid_env.create_and_add_env_object(obj_name, location, properties, is_traversable=True)
 
 # initialize doors
 for nr_obj in range(len(door_obj_locations)):
@@ -88,7 +88,7 @@ for nr_obj in range(len(door_obj_locations)):
 
     properties = {"object_class": "Door"}
 
-    grid_env.add_env_object(obj_name, location, properties, is_traversable=False)
+    grid_env.create_and_add_env_object(obj_name, location, properties, is_traversable=False)
 
 
 

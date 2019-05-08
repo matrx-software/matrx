@@ -8,6 +8,7 @@ import sys
 
 import numpy as np
 
+from agents.HumanAgent import HumanAgent
 from environment.actions.move_actions import *
 from environment.objects.basic_objects import *
 from environment.objects.agent_avatar import AgentAvatar
@@ -20,7 +21,7 @@ class GridWorld:
     TIME_FOCUS_SIMULATION_DURATION = 'aim_for_accurate_global_tick_duration'
 
     def __init__(self, shape, tick_duration, simulation_goal=None, run_sail_api=True, run_visualisation_server=True,
-                 time_focus=TIME_FOCUS_TICK_DURATION, rnd_seed=1,):
+                 time_focus=TIME_FOCUS_TICK_DURATION, rnd_seed=1, ):
         self.tick_duration = tick_duration
         self.registered_agents = OrderedDict()
         self.environment_objects = OrderedDict()
@@ -83,27 +84,39 @@ class GridWorld:
 
         return agent_id, agent_seed
 
-    def add_env_object(self, obj_name, location, obj_properties, is_traversable):
+    def create_and_add_env_object(self, obj_name, location, obj_properties, is_traversable):
         """ this function adds the objects """
-        obj_id = obj_name
-        env_object = None
+
+        env_object = self.create_env_object(obj_name, location, obj_properties, is_traversable)
+
+        obj_id = self.add_env_object(env_object)
+
+        return obj_id
+
+    def create_env_object(self, name, location, properties, is_traversable):
+        obj_id = name
 
         # check if we need to add an existing object
-        if 'object_class' in obj_properties:
+        if 'object_class' in properties:
             # call the constructor for the defined object type
-            env_object = eval(obj_properties["object_class"])(obj_id, obj_name, locations=location,
-                                                              properties=obj_properties)
-
-        # otherwise, it is a custom object
-        else:
-            env_object = EnvObject(obj_id, obj_name, locations=location, properties=obj_properties,
+            env_object = eval(properties["object_class"])(obj_id, name, locations=location,
+                                                          properties=properties)
+        else:  # otherwise, it is a custom object
+            env_object = EnvObject(obj_id, name, location=location, properties=properties,
                                    is_traversable=is_traversable)
+
+        return env_object
+
+    def add_env_object(self, env_object: EnvObject):
+        """ this function adds the objects """
 
         # check if the object can be succesfully placed at that location
         self.validate_obj_placement(env_object)
 
-        self.environment_objects[obj_id] = env_object
-        return obj_id
+        # Assign id to environment sparse dictionary grid
+        self.environment_objects[env_object.obj_id] = env_object
+
+        return env_object.obj_id
 
     def validate_obj_placement(self, env_object):
         """
@@ -151,25 +164,25 @@ class GridWorld:
             if agent_obj.check_agent_busy(curr_tick=self.current_nr_ticks):
                 # only do the observe and orient of the OODA loop to update the GUI
                 filtered_agent_state = agent_obj.ooda_observe(state)
-                self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state)
+                self.visualizer.save_state(type=agent_obj.class_name_agent, id=agent_id, state=filtered_agent_state)
                 continue
 
             possible_actions = self.__get_possible_actions(agent_id=agent_id, action_set=agent_obj.action_set)
 
-            # perform the OODA loop and get an action back
-            if agent_obj.type == "agent":
-                filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
-                    state=state,
-                    agent_properties=agent_obj.get_properties(), possible_actions=possible_actions, agent_id=agent_id)
-
-            # For a humanagent any userinputs from the GUI for this humanagent are send along
-            elif agent_obj.type == "humanagent":
+            # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
+            if agent_obj.class_name_agent == HumanAgent.__name__:
                 usrinp = self.visualizer.userinputs[agent_id][
                     "action"] if agent_id in self.visualizer.userinputs else None
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
                     state=state,
                     agent_properties=agent_obj.get_properties(), possible_actions=possible_actions, agent_id=agent_id,
                     userinput=usrinp)
+            else:
+                # perform the OODA loop and get an action back
+                filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
+                    state=state,
+                    agent_properties=agent_obj.get_properties(), possible_actions=possible_actions,
+                    agent_id=agent_id)
 
             # store the action in the buffer
             action_buffer[agent_id] = (action_class_name, action_kwargs)
@@ -179,7 +192,7 @@ class GridWorld:
             agent_obj.set_agent_changed_properties(agent_properties)
 
             # save what the agent observed to the visualizer
-            self.visualizer.save_state(type=agent_obj.type, id=agent_id, state=filtered_agent_state)
+            self.visualizer.save_state(type=agent_obj.class_name_agent, id=agent_id, state=filtered_agent_state)
 
         # save the state of the god view in the visualizer
         self.visualizer.save_state(type="god", id="god", state=self.__get_complete_state())

@@ -20,11 +20,11 @@ class AgentAvatar(EnvObject):
         self.__check_properties_validity(agent_id, agent_properties)
 
         # create an Env obj from this agent
-        super().__init__(   obj_id=agent_id,
-                            obj_name=agent_properties["name"],
-                            locations=agent_properties["location"],
-                            properties=agent_properties,
-                            is_traversable=agent_properties["is_traversable"])
+        super().__init__(obj_id=agent_id,
+                         obj_name=agent_properties["name"],
+                         location=agent_properties["location"],
+                         properties=agent_properties,
+                         is_traversable=agent_properties["is_traversable"])
 
         # save the other
         self.sense_capability = sense_capability
