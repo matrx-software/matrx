@@ -50,8 +50,9 @@ def act_drop(grid_world, agent_id, obj_id):
 
     # Updating properties
     reg_ag.properties['carrying'].remove(obj_id)
-    env_obj.carried_by_agent_id = None
-    return True
+    env_obj.properties['carried'].remove(agent_id)
+
+    return DropActionResult(DropActionResult.RESULT_SUCCESS, True)
 
 
 def possible_drop(grid_world, agent_id, obj_id):

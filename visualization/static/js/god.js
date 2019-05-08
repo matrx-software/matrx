@@ -1,4 +1,9 @@
-var doVisualUpdates = true;
+/**
+ * This is the file which handles the socketIO connection for the god view,
+ * requesting a redraw of the grid when a socketIO update has been received.
+ */
+
+ var doVisualUpdates = true;
 
 /**
  * Check if the current tab is in focus or not
@@ -38,11 +43,12 @@ $(document).ready(function(){
         // unpack received data
         grid_size = data.params.grid_size;
         state = data.state;
+        tick = data.params.tick;
 
 
         // draw the grid again
         requestAnimationFrame(function() {
-            drawSim(grid_size, state);
+            doTick(grid_size, state, tick);
         });
     });
 });

@@ -29,11 +29,12 @@ class OpenDoorAction(Action):
         """
 
         # fetch options
-        door_range = 0 if 'door_range' not in kwargs else kwargs['door_range']
+        door_range = 1 if 'door_range' not in kwargs else kwargs['door_range']
         # object_id is required
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
         if object_id == None:
-            return False, OpenDoorActionResult.NO_OBJECT_SPECIFIED
+            result = OpenDoorActionResult(OpenDoorActionResult.NO_OBJECT_SPECIFIED, False)
+            return result
 
         # get obj
         obj = grid_world.environment_objects[object_id]
@@ -43,7 +44,8 @@ class OpenDoorAction(Action):
         obj.properties["colour"] = "#9c9c9c"
         obj.is_traversable = True
 
-        return True, OpenDoorActionResult.OPEN_RESULT_SUCCESS
+        result = CloseDoorActionResult(OpenDoorActionResult.RESULT_SUCCESS, True)
+        return result
 
 
     def is_possible(self, grid_world, agent_id, **kwargs):
@@ -59,14 +61,14 @@ class OpenDoorAction(Action):
         door_range = np.inf if 'door_range' not in kwargs else kwargs['door_range']
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
 
-        return is_possible_door_open_close(grid_world, agent_id, "open", object_id, door_range)
-
+        result = is_possible_door_open_close(grid_world, agent_id, OpenDoorActionResult, object_id, door_range)
+        return result.succeeded, result.result
 
 
 
 class OpenDoorActionResult(ActionResult):
 
-    OPEN_RESULT_SUCCESS = "Door was succesfully opened."
+    RESULT_SUCCESS = "Door was succesfully opened."
     ACTION_NOT_POSSIBLE = "The `is_possible(...)` method return False. Signalling that the action was not possible."
     UNKNOWN_ACTION = "The action is not known to the environment."
     NO_DOORS_IN_RANGE = "No door found in range"
@@ -113,7 +115,8 @@ class CloseDoorAction(Action):
         # object_id is required
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
         if object_id == None:
-            return False, CloseDoorActionResult.NO_OBJECT_SPECIFIED
+            result = CloseDoorActionResult(CloseDoorActionResult.NO_OBJECT_SPECIFIED, False)
+            return result
 
         # get obj
         obj = grid_world.environment_objects[object_id]
@@ -123,8 +126,8 @@ class CloseDoorAction(Action):
         obj.properties["colour"] = "#5a5a5a"
         obj.is_traversable = False
 
-        return True, CloseDoorActionResult.CLOSE_RESULT_SUCCESS
-
+        result = CloseDoorActionResult(CloseDoorActionResult.RESULT_SUCCESS, True)
+        return result
 
     def is_possible(self, grid_world, agent_id, **kwargs):
         """
@@ -139,13 +142,13 @@ class CloseDoorAction(Action):
         door_range = np.inf if 'door_range' not in kwargs else kwargs['door_range']
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
 
-        return is_possible_door_open_close(grid_world, agent_id, "close", object_id, door_range)
-
+        result = is_possible_door_open_close(grid_world, agent_id, CloseDoorActionResult, object_id, door_range)
+        return result.succeeded, result.result
 
 
 class CloseDoorActionResult(OpenDoorActionResult):
 
-    CLOSE_RESULT_SUCCESS = "Door was succesfully closed."
+    RESULT_SUCCESS = "Door was succesfully closed."
     NOT_A_DOOR = "Closedoor action could not be performed, as object isn't a door"
     RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
     DOOR_ALREADY_CLOSED = "Can't close door, door is already closed."
@@ -158,7 +161,7 @@ class CloseDoorActionResult(OpenDoorActionResult):
 
 
 
-def is_possible_door_open_close(grid_world, agent_id, open_close, object_id=None, door_range=np.inf):
+def is_possible_door_open_close(grid_world, agent_id, action_result, object_id=None, door_range=np.inf):
     """
     Same as is_possible, but this function uses the action_kwargs to get a more accurate prediction.
     Can be used both for checking if the door is already open or closed
@@ -174,39 +177,39 @@ def is_possible_door_open_close(grid_world, agent_id, open_close, object_id=None
     if object_id == None:
         # there is no Door in this complete scenario, so not possible
         if len(objects_in_range) is 0:
-            return False, OpenDoorActionResult.NO_DOORS_IN_RANGE
+            return action_result(action_result.NO_DOORS_IN_RANGE, False)
         # There is a door present, so it might be possible to perform this action
         else:
-            return True, None
+            return action_result(action_result.RESULT_SUCCESS, True)
 
     # check if it is an object
     if not object_id in grid_world.environment_objects.keys():
-        return False, OpenDoorActionResult.NOT_A_DOOR
+        return action_result(action_result.NOT_A_DOOR, False)
 
     # get the target object
     obj = grid_world.environment_objects[object_id]
 
     # check if the object is a door or not
     if not ("type" in obj.properties and obj.properties["type"] == "Door"):
-        return False, OpenDoorActionResult.NOT_A_DOOR
+        return action_result(action_result.NOT_A_DOOR, False)
 
     # Check if object is in range
     if object_id not in objects_in_range:
-        return False, OpenDoorActionResult.NOT_IN_RANGE
+        return action_result(action_result.NOT_IN_RANGE, False)
 
     # check if door is already open or closed
-    if open_close == "open" and obj.properties["door_open"]:
-        return False, OpenDoorActionResult.DOOR_ALREADY_OPEN
-    elif open_close == "close" and not obj.properties["door_open"]:
-        return False, CloseDoorActionResult.DOOR_ALREADY_CLOSED
+    if action_result == OpenDoorActionResult and obj.properties["door_open"]:
+        return action_result(action_result.DOOR_ALREADY_OPEN, False)
+    elif action_result == CloseDoorActionResult and not obj.properties["door_open"]:
+        return action_result(action_result.DOOR_ALREADY_CLOSED, False)
 
     # when closing, check that there are no objects in the door opening
-    if open_close == "close":
+    if action_result == CloseDoorActionResult:
         # get all objects at the location of the door
         objects_in_dooropening = grid_world.get_objects_in_range(obj.location, object_type="*", sense_range=0)
 
         # more than 1 object at that location (the door itself) means the door is blocked
         if len(objects_in_dooropening) > 1:
-            return False, CloseDoorActionResult.DOOR_BLOCKED
+            return action_result(action_result.DOOR_BLOCKED, False)
 
-    return True, None
+    return action_result(action_result.RESULT_SUCCESS, True)

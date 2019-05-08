@@ -5,10 +5,17 @@ import numpy as np
 import json
 import datetime
 
+
+'''
+This file holds the code for the Flask (Python) webserver, which listens to grid updates
+via a restful API, and forwards these to the specific viewpoint (god, agent, human-agent).
+'''
+
+
+
 # Using PyCharm:
 # runfile('visualization/server.py')
 
-# app = Flask(__name__)
 app = Flask(__name__, template_folder='static/templates')
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
@@ -29,9 +36,6 @@ def init_GUI():
 
     # pass testbed init to clients / GUIs
     data = request.json
-    # socketio.emit('init', data, namespace="/humanagent")
-    # socketio.emit('init', data, namespace="/agent")
-    # socketio.emit('init', data, namespace="/god")
 
     global grid_sz
     grid_sz = data["params"]["grid_size"]
@@ -55,22 +59,23 @@ def update_GUI():
     god = data["god"]
     agent_states = data["agent_states"]
     hu_ag_states = data["hu_ag_states"]
+    tick = data['tick']
 
     # send update to god
-    new_data = {'params': {"grid_size": grid_sz}, 'state': god}
+    new_data = {'params': {"grid_size": grid_sz, "tick": tick}, 'state': god}
     socketio.emit('update', new_data, namespace="/god")
 
 
     # send updates to agents
     for agent_id in agent_states:
-        new_data = {'params': {"grid_size": grid_sz}, 'state': agent_states[agent_id]}
+        new_data = {'params': {"grid_size": grid_sz, "tick": tick}, 'state': agent_states[agent_id]}
         room = f"/agent/{agent_id}"
         socketio.emit('update', new_data, room=room, namespace="/agent")
 
 
     # send updates to human agents
     for hu_ag_id in hu_ag_states:
-        new_data = {'params': {"grid_size": grid_sz}, 'state': hu_ag_states[hu_ag_id]}
+        new_data = {'params': {"grid_size": grid_sz, "tick": tick}, 'state': hu_ag_states[hu_ag_id]}
         room = f"/humanagent/{hu_ag_id}"
         socketio.emit('update', new_data, room=room, namespace="/humanagent")
 
@@ -86,24 +91,7 @@ def update_GUI():
 # Routes human agent
 ###############################################
 
-# update API of Python server / client / GUI
-# receives testbed update, passes it on to client / GUI
-# returns last userinput (if any)
-# @app.route('/update/human-agent/<id>', methods=['POST'])
-# def update_human_agent(id):
-#     # print("Human Agent update request with agent id:", id)
-#
-#     # pass testbed update to client / GUI
-#     data = request.json
-#     data["params"]["grid_size"] = grid_sz
-#     room = f"/humanagent/{id}"
-#     socketio.emit('update', data, room=room, namespace="/humanagent")
-#
-#     # send back user input to testbed
-#     return format_usr_inp(id)
-
-
-# route for agent, get the ID from the URL
+# route for human agent, get the ID from the URL
 @app.route('/human-agent/<id>')
 def human_agent_view(id):
     return render_template('human_agent.html', id=id)
@@ -112,23 +100,6 @@ def human_agent_view(id):
 ###############################################
 # Routes Agent
 ###############################################
-
-# update API of Python server / client / GUI
-# receives testbed update, passes it on to client / GUI
-# returns last userinput (if any)
-# @app.route('/update/agent/<id>', methods=['POST'])
-# def update_agent(id):
-#     # print("Agent update request with agent id:", id)
-#
-#     # pass testbed update to client / GUI of agent with specified ID
-#     data = request.json
-#     data["params"]["grid_size"] = grid_sz
-#     room = f"/agent/{id}"
-#     socketio.emit('update', data, room=room, namespace="/agent")
-#
-#     # send back user input to testbed
-#     return ""
-
 
 # route for agent, get the ID from the URL
 @app.route('/agent/<id>')
@@ -139,21 +110,6 @@ def agent_view(id):
 ###############################################
 # Routes God
 ###############################################
-
-# update API of Python server / client / GUI
-# receives testbed update, passes it on to client / GUI
-# returns last userinput (if any)
-# @app.route('/update/god', methods=['POST'])
-# def update_god():
-#
-#     # pass testbed update to client / GUI of Godview
-#     data = request.json
-#     # add grid size
-#     data["params"]["grid_size"] = grid_sz
-#     socketio.emit('update', data, namespace="/god")
-#
-#     return ""
-
 
 # route for agent, get the ID from the URL
 @app.route('/god')
@@ -182,40 +138,25 @@ def join(message):
 # can't be None, otherwise Flask flips out when returning it
 userinput = {}
 
-
-# # return the userinput from a specific agent by ID as a JSON obj
-# def format_usr_inp(id):
-#     global userinput
-#
-#     # check if there is any userinput for this agent
-#     if id not in userinput:
-#         return jsonify({})
-#
-#     # convert to a JSON object
-#     resp = jsonify(userinput[id])
-#
-#     # remove the userinput so it doesn't do the same action for infinity
-#     del userinput[id]
-#
-#     return resp
-
-
+# Fetch userinput messages sent from human agents
 @socketio.on('userinput', namespace="/humanagent")
 def handle_usr_inp(input):
     if debug:
         print('received userinput: %s' % input)
 
     id = input['id']
-    action = input['action']
+    keyPressed = input['key']
 
     # save the userinput action to the userinput dict of that human agent.
-    # As the agent can do only 1 action at a time remember only the latest
-    # userinput action of each human agent
     global userinput
     if id not in userinput:
-        userinput[id] = {"action": action}
-    else:
-        userinput[id]["action"] = action
+        userinput[id] = []
+    # don't add duplicate keypresses
+    if keyPressed not in userinput[id]:
+        userinput[id].append(keyPressed)
+
+    if debug:
+        print(f"Userinput:{userinput[id]}")
 
 
 

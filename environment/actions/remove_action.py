@@ -48,16 +48,16 @@ class RemoveObject(Action):
             if obj == object_id:  # if object is in that list
                 success = grid_world.remove_from_grid(object_id)  # remove it, success is whether GridWorld succeeded
                 if success:  # if we succeeded in removal return the appriopriate ActionResult
-                    return True, ObjectActionResult.OBJECT_REMOVED \
-                        .replace('object_id'.upper(), str(object_id))
+                    return ObjectActionResult(ObjectActionResult.OBJECT_REMOVED \
+                        .replace('object_id'.upper(), str(object_id)), True)
                 else:  # else we return a failure due to the GridWorld removal failed
-                    return False, ObjectActionResult.REMOVAL_FAILED \
-                        .replace('object_id'.upper(), str(object_id))
+                    return ObjectActionResult(ObjectActionResult.REMOVAL_FAILED \
+                        .replace('object_id'.upper(), str(object_id)), False)
 
         # If the object was not in range, or no objects were in range we return that the object id was not in range
-        return False, ObjectActionResult.OBJECT_ID_NOT_WITHIN_RANGE \
+        return ObjectActionResult(ObjectActionResult.OBJECT_ID_NOT_WITHIN_RANGE \
             .replace('remove_range'.upper(), str(remove_range)) \
-            .replace('object_id'.upper(), str(object_id))
+            .replace('object_id'.upper(), str(object_id)),False)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
         agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentAvatar)  # get ourselves

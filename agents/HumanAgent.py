@@ -4,6 +4,8 @@ import requests
 
 from agents.Agent import Agent
 
+from environment.actions.grab_action import GrabAction
+from environment.actions.door_actions import *
 
 class HumanAgent(Agent):
 
@@ -68,12 +70,71 @@ class HumanAgent(Agent):
         # first filter the state to only show things this particular agent can see
         state = self.ooda_observe(state)
 
+        # only keep userinput which is actually connected to an agent action
+        userinput = self.filter_userinputs(userinput)
+
+        action_kwargs = {}
+
         # if there was no userinput do nothing
-        if userinput is None:
+        if userinput is None or userinput == []:
             return state, self.agent_properties, None, {}
 
+        # take the last userinput (for now), and fetch the action associated with that key
+        userinput = userinput[-1]
+        action = self.usrinp_action_map[userinput]
+
+        # if the user chose a grab action, choose an object with a grab_range of 1
+        if action == GrabAction.__name__:
+            # Assign it to the arguments list
+            action_kwargs['grab_range'] = 0 # Set grab range
+            action_kwargs['max_objects'] = 3 # Set max amount of objects
+            action_kwargs['object_id'] = None
+
+            # Get all perceived objects
+            objects = list(state.keys())
+
+            # Remove all (human)agents
+            objects = [obj for obj in objects if 'agent' not in obj]
+
+            # find objects in range
+            object_in_range = []
+            for object_id in objects:
+                # Select range as just enough to grab that object
+                dist = int(np.ceil(np.linalg.norm(
+                    np.array(state[object_id]['location']) - np.array(state[self.agent_properties["name"]]['location']))))
+                if dist <= action_kwargs['grab_range'] and state[object_id]["movable"]:
+                    object_in_range.append(object_id)
+
+            # Select an object if there are any in range
+            if object_in_range:
+                object_id = self.rnd_gen.choice(object_in_range)
+                action_kwargs['object_id'] = object_id
+
+        # if the user chose to do a open or close door action, find a door to open/close within 1 block
+        elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:
+            action_kwargs['door_range'] = 1
+            action_kwargs['object_id'] = None
+
+            # Get all doors from the perceived objects
+            objects = list(state.keys())
+            doors = [obj for obj in objects if 'type' in state[obj] and state[obj]['type'] == "Door"]
+
+            # get all doors within range
+            doors_in_range = []
+            for object_id in doors:
+                # Select range as just enough to grab that object
+                dist = int(np.ceil(np.linalg.norm(
+                    np.array(state[object_id]['location']) - np.array(state[self.agent_properties["name"]]['location']))))
+                if dist <= action_kwargs['door_range']:
+                    doors_in_range.append(object_id)
+
+            # choose a random door within range
+            if len(doors_in_range) > 0:
+                action_kwargs['object_id'] = self.rnd_gen.choice(doors_in_range)
+
         # otherwise check which action is mapped to that key and return it
-        return state, self.agent_properties, self.usrinp_action_map[userinput], {}
+        return state, self.agent_properties, action, action_kwargs
+
 
     def ooda_observe(self, state):
         """
@@ -94,3 +155,14 @@ class HumanAgent(Agent):
         :return: A filtered state.
         """
         return state
+
+
+    def filter_userinputs(self, userinputs):
+        """
+        From the received userinput, only keep those which are actually Connected
+        to a specific agent action
+        """
+        if userinputs is None:
+            return []
+        possible_usrinpts = list(self.usrinp_action_map.keys())
+        return list(set(possible_usrinpts) & set(userinputs))

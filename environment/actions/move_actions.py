@@ -15,14 +15,13 @@ def act_move(grid_world, agent_id, dx, dy):
             if obj_carried in grid_world.environment_objects:
                 grid_world.environment_objects[obj_carried].location = new_loc
             else:
-                assert False, "Object no longer in grid_world.environment_objects, but still carried"
+                raise Exception("Object no longer in grid_world.environment_objects, but still carried.")
 
-    return True
+    return MoveActionResult(MoveActionResult.RESULT_SUCCESS, succeeded=True)
 
 
 def is_possible_movement(grid_world, agent_id, dx, dy):
-    result = possible_movement(grid_world, agent_id, dx, dy)
-    return result.succeeded, result.result
+    return possible_movement(grid_world, agent_id, dx, dy)
 
 
 def possible_movement(grid_world, agent_id, dx, dy):
@@ -90,7 +89,8 @@ class Move(Action):
         self.dy = 0
 
     def is_possible(self, grid_world, agent_id, **kwargs):
-        return is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+        result = is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+        return result.succeeded, result.result
 
     def mutate(self, grid_world, agent_id, **kwargs):
         return act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)

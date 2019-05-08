@@ -1,4 +1,5 @@
 from environment.objects.basic_objects import EnvObject
+from copy import copy
 
 
 class AgentAvatar(EnvObject):
@@ -67,8 +68,8 @@ class AgentAvatar(EnvObject):
         """
         check if the agent is done with executing the action
         """
-        self.blocked =  not( (curr_tick > self.last_action["tick"] + self.last_action["duration_in_ticks"]) and \
-                             (curr_tick > self.last_action["tick"] + self.properties["agent_speed_in_ticks"]) )
+        self.blocked =  not( (curr_tick >= self.last_action["tick"] + self.last_action["duration_in_ticks"]) and \
+                             (curr_tick >= self.last_action["tick"] + self.properties["agent_speed_in_ticks"]) )
         return self.blocked
 
 

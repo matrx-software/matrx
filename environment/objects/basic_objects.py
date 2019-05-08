@@ -11,10 +11,7 @@ class EnvObject:
         self.properties = properties
         self.carried_by_agent_id = None
         self.is_traversable = is_traversable
-        if len(np.array(self.location).shape) > 1 and np.array(self.location).shape[1] > 1:
-            self.fills_multiple_locations = True
-        else:
-            self.fills_multiple_locations = False
+
 
     def update_properties(self, grid_world):
         """
@@ -46,10 +43,6 @@ class EnvObject:
 
     def set_location(self, loc):
         self.location = loc
-        if len(np.array(self.location).shape) > 1 and np.array(self.location).shape[1] > 1:
-            self.fills_multiple_locations = True
-        else:
-            self.fills_multiple_locations = False
 
 
 class Block(EnvObject):
@@ -61,8 +54,7 @@ class Block(EnvObject):
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
-        defaults_for_customizable_props = {"grootte": 1, "colour": "#0876b8", "movable": True, "size": 0.5,
-                                           "is_traversable": is_traversable}
+        defaults_for_customizable_props = {"colour": "#0876b8", "movable": True, "size": 0.5, "is_traversable": True}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, location=location,
@@ -78,7 +70,7 @@ class Wall(EnvObject):
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
-        defaults_for_customizable_props = {"grootte": 1, "colour": "#000000"}
+        defaults_for_customizable_props = {"colour": "#000000"}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, location=location,
@@ -94,7 +86,7 @@ class Area(EnvObject):
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
-        defaults_for_customizable_props = {"grootte": 1, "colour": "#fbf0c3"}
+        defaults_for_customizable_props = {"colour": "#fbf0c3"}
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, location=location,

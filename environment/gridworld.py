@@ -198,7 +198,7 @@ class GridWorld:
         self.visualizer.save_state(type="god", id="god", state=self.__get_complete_state())
 
         # update the visualizations of all (human)agents and god
-        # self.visualizer.updateGUIs()
+        self.visualizer.updateGUIs(tick=self.current_nr_ticks)
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
         for agent_id, action in action_buffer.items():
@@ -206,6 +206,7 @@ class GridWorld:
             action_class_name = action[0]
             # Get optional kwargs
             action_kwargs = action[1]
+
             if action_kwargs is None:  # If kwargs is none, make an empty dict out of it
                 action_kwargs = {}
 
@@ -306,15 +307,10 @@ class GridWorld:
         # Remove object first from grid
         grid_obj = self.get_env_object(object_id)  # get the object
         loc = grid_obj.location  # its location
-        if grid_obj.fills_multiple_locations:  # check if it fills multiple locations in which case 'loc' is a list
-            for l in loc:
-                self.grid[l[1], l[0]].remove(grid_obj.obj_id)  # remove the object id from the list at that location
-                if len(self.grid[l[1], l[0]]) == 0:  # if the list is empty, just add None there
-                    self.grid[l[1], l[0]] = None
-        else:  # else 'loc' is just one location
-            self.grid[loc[1], loc[0]].remove(grid_obj.obj_id)  # remove the object id from the list at that location
-            if len(self.grid[loc[1], loc[0]]) == 0:  # if the list is empty, just add None there
-                self.grid[loc[1], loc[0]] = None
+
+        self.grid[loc[1], loc[0]].remove(grid_obj.obj_id)  # remove the object id from the list at that location
+        if len(self.grid[loc[1], loc[0]]) == 0:  # if the list is empty, just add None there
+            self.grid[loc[1], loc[0]] = None
 
         # Remove object from the list of registered agents or environmental objects
         # Check if it is an agent
@@ -346,18 +342,11 @@ class GridWorld:
 
     def add_to_grid(self, grid_obj):
         if isinstance(grid_obj, EnvObject):
-            if grid_obj.fills_multiple_locations:
-                for loc in grid_obj.location:
-                    if self.grid[loc[1], loc[0]] is not None:
-                        self.grid[loc[1], loc[0]].append(grid_obj.obj_id)
-                    else:
-                        self.grid[loc[1], loc[0]] = [grid_obj.obj_id]
+            loc = grid_obj.location
+            if self.grid[loc[1], loc[0]] is not None:
+                self.grid[loc[1], loc[0]].append(grid_obj.obj_id)
             else:
-                loc = grid_obj.location
-                if self.grid[loc[1], loc[0]] is not None:
-                    self.grid[loc[1], loc[0]].append(grid_obj.obj_id)
-                else:
-                    self.grid[loc[1], loc[0]] = [grid_obj.obj_id]
+                self.grid[loc[1], loc[0]] = [grid_obj.obj_id]
         else:
             loc = grid_obj.location
             if self.grid[loc[1], loc[0]] is not None:
@@ -458,6 +447,11 @@ class GridWorld:
     def __perform_action(self, agent_id, action_name, action_kwargs):
         if action_name is None:  # If action is None, we send an action result that no action was given (and succeeded)
             result = ActionResult(ActionResult.NO_ACTION_GIVEN, succeeded=True)
+
+        # action known, but agent not capable of performing it
+        elif action_name in self.all_actions.keys() and not action_name in self.registered_agents[agent_id].action_set:
+            result = ActionResult(ActionResult.AGENT_NOT_CAPABLE, succeeded=False)
+
         elif action_name in self.all_actions.keys():  # Check if action is known
             # Get action class
             action_class = self.all_actions[action_name]
@@ -477,13 +471,14 @@ class GridWorld:
             else:
                 # If the action is not possible, send a failed ActionResult with the is_possible message if given,
                 # otherwise use the default one.
-                custom_not_possible_message = is_possible[1]
+                custom_not_possible_message = is_possible[1] #is_possible[1]
                 if custom_not_possible_message is not None:
                     result = ActionResult(custom_not_possible_message, succeeded=False)
                 else:
                     result = ActionResult(ActionResult.ACTION_NOT_POSSIBLE, succeeded=False)
         else:  # If the action is not known
             result = ActionResult(ActionResult.UNKNOWN_ACTION, succeeded=False)
+
         # Get agent's send_result function
         set_action_result = self.registered_agents[agent_id].set_action_result_func
         # Send result of mutation to agent

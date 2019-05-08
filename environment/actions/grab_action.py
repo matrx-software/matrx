@@ -21,10 +21,10 @@ class GrabAction(Action):
         :param agent_id: The agent that performes the action
         :return:
         """
-        # Check if object_id is specified
-        object_id = None
-        grab_range = np.inf  # we do not know the intended range, so assume infinite
-        max_objects = np.inf
+        # Set default values check
+        object_id = None if 'object_id' not in kwargs else kwargs['object_id']
+        grab_range = np.inf if 'grab_range' not in kwargs else kwargs['grab_range']
+        max_objects = np.inf if 'max_objects' not in kwargs else kwargs['max_objects']
 
         return is_possible_grab(grid_world, agent_id=agent_id, object_id=object_id, grab_range=grab_range,
                                 max_objects=max_objects)
@@ -48,41 +48,26 @@ class GrabAction(Action):
         """
 
         # Additional check
-        if 'object_id' in kwargs:
-            object_id = kwargs['object_id']
-        else:
-            object_id = None
+        object_id = None if 'object_id' not in kwargs else kwargs['object_id']
+        grab_range = 0 if 'grab_range' not in kwargs else kwargs['grab_range']
+        max_objects = 1 if 'max_objects' not in kwargs else kwargs['max_objects']
 
-        if 'grab_range' in kwargs:
-            grab_range = kwargs['grab_range']
-        else:
-            grab_range = 0
+        # if possible:
+        object_id = kwargs['object_id']  # assign
 
-        if 'max_objects' in kwargs:
-            max_objects = kwargs['max_objects']
-        else:
-            max_objects = 1
+        # Loading properties
+        reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
+        env_obj = grid_world.environment_objects[object_id]  # Environment object
 
-        possible, reason = is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects)
+        # Updating properties
+        reg_ag.properties['carrying'].append(object_id)
+        env_obj.properties['carried'].append(agent_id)
 
-        if possible:
-            object_id = kwargs['object_id']  # assign
+        # Updating Location
+        env_obj.location = reg_ag.location
 
-            # Loading properties
-            reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
-            env_obj = grid_world.environment_objects[object_id]  # Environment object
+        return GrabActionResult(GrabActionResult.RESULT_SUCCESS, True)
 
-            # Updating properties
-            reg_ag.properties['carrying'].append(object_id)
-            env_obj.carried_by_agent_id = agent_id
-
-            # Updating Location
-            env_obj.location = reg_ag.location
-
-            # Moving the object with the Agent is done in Movement
-            return True, GrabActionResult.RESULT_SUCCESS
-        else:
-            return False, reason
 
 
 def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
@@ -133,7 +118,7 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
             return False, GrabActionResult.RESULT_OBJECT_UNMOVABLE
         else:
             # Success
-            return True, None
+            return True, GrabActionResult.RESULT_SUCCESS
     else:
         return False, GrabActionResult.RESULT_UNKNOWN_OBJECT_TYPE
 
