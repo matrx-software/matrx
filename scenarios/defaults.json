@@ -1,0 +1,92 @@
+{
+  "simulation_defaults" :
+  {
+    "random_seed" : 1,
+    "size" : [25, 25],
+    "step_duration" : 0.1,
+    "time_focus": "step",
+    "run_visualisation_server" : false,
+    "run_sail_api": false,
+    "simulation_goal": {
+      "goal_class": "LimitedTimeGoal",
+      "arguments":
+      {
+        "max_nr_ticks": -1
+      }
+    }
+  },
+  "agent_defaults":
+  {
+    "name": "Agent",
+    "agent_class": "Agent",
+    "agent_speed_in_ticks": 1,
+    "senses": [["*", "inf"]],
+    "is_traversable": true,
+    "possible_actions": ["*"],
+    "additional_agent_properties": {},
+    "visualisation_properties":
+    {
+      "size": 1.0,
+      "colour": "#900C3F",
+      "shape": 0
+    },
+    "agent_properties_writable": ["colour", "shape"],
+    "class_specific_kwargs": {},
+    "carrying": []
+  },
+  "human_agent_defaults":
+  {
+    "name": "Human Agent",
+    "agent_class": "HumanAgent",
+    "agent_speed_in_ticks": 1,
+    "senses": [["*", "inf"]],
+    "is_traversable": true,
+    "input_action_map":
+    {
+      "arrowkey:up": "MoveNorth",
+      "arrowkey:right": "MoveEast",
+      "arrowkey:down": "MoveSouth",
+      "arrowkey:left": "MoveWest"
+    },
+    "possible_actions": [],
+    "additional_agent_properties": {},
+    "visualisation_properties":
+    {
+      "size": 1.0,
+      "colour": "#fde500",
+      "shape": 0
+    },
+    "agent_properties_writable": ["colour", "shape"],
+    "class_specific_kwargs": {},
+    "carrying": []
+  },
+  "object_defaults":
+  {
+    "name": "Object",
+    "object_class": "EnvObject",
+    "movable": false,
+    "is_traversable": true,
+    "additional_object_properties": {},
+    "visualisation_properties":
+    {
+        "colour": "#024f21",
+        "size": 1.0,
+        "shape": 0
+    },
+    "class_specific_kwargs": {}
+  },
+  "area_defaults":
+  {
+    "name": "Area",
+    "area_class": "Area",
+    "area_kwargs": {},
+    "area_properties": {},
+    "has_walls": false,
+    "doors": [[]],
+    "visualisation_properties":
+    {
+      "walls": {"colour": "#000000"},
+      "area": {"colour": "#cccccc"}
+    }
+  }
+}
