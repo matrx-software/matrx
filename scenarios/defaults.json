@@ -31,7 +31,8 @@
       "shape": 0
     },
     "agent_properties_writable": ["colour", "shape"],
-    "class_specific_kwargs": {}
+    "class_specific_kwargs": {},
+    "carrying": []
   },
   "human_agent_defaults":
   {
@@ -56,7 +57,8 @@
       "shape": 0
     },
     "agent_properties_writable": ["colour", "shape"],
-    "class_specific_kwargs": {}
+    "class_specific_kwargs": {},
+    "carrying": []
   },
   "object_defaults":
   {

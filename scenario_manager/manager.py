@@ -190,8 +190,11 @@ class ScenarioManager:
 
             if isinstance(sense_range, str):  # if range is a string (e.g. "*") its infinite
                 sense_range = np.inf
-            if sense_class == "*":  # if the wildcard "*" is used, we set sense_class to None, denoting all classes
-                sense_class = None
+            if sense_class == "*":  # if the wildcard "*" is used, we add all classes and return
+                trans_senses = []  # empty so far, to prevent duplicates
+                for sense_class in potential_objects.values():
+                    trans_senses.append([sense_class, sense_range])
+                return SenseCapability(trans_senses)
 
             if sense_class in potential_objects.items():  # append the processed tuple to the new list of senses
                 trans_senses.append([sense_class, sense_range])
@@ -223,7 +226,7 @@ class ScenarioManager:
 
         # make sure that all key input actions are in 'all_actions'
         all_actions = settings['possible_actions']
-        all_actions.extend(settings["input_action_map"].keys())
+        all_actions.extend(settings["input_action_map"].values())
         all_actions = set(all_actions)
 
         # Create the sense capability
@@ -283,6 +286,7 @@ class ScenarioManager:
         agent_properties["shape"] = settings["visualisation_properties"]["shape"]
         agent_properties["is_traversable"] = settings["is_traversable"]
         agent_properties["agent_speed_in_ticks"] = settings["agent_speed_in_ticks"]
+        agent_properties['carrying'] = settings['carrying']
         agent_properties["name"] = agent_id
 
         # Get the properties the agent's brain can write to

@@ -440,7 +440,8 @@ class GridWorld:
                     possible_actions.append(action_type)
         # If no actions, we warn that this is the case
         if len(possible_actions) == 0:
-            warnings.warn(self.__warn("No possible actions for agent {agent_id}."))
+            warn_str = f"No possible actions for agent {agent_id}."
+            warnings.warn(self.__warn(warn_str))
 
         return possible_actions
 

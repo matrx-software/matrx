@@ -58,7 +58,7 @@ class Block(EnvObject):
         properties = set_default_for_customizable_properties(properties, defaults_for_customizable_props)
 
         super().__init__(obj_id=obj_id, obj_name=obj_name, location=location,
-                         properties=properties, is_traversable=properties["is_traversable"])
+                         properties=properties, is_traversable=is_traversable)
 
 
 class Wall(EnvObject):
