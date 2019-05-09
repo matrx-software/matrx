@@ -218,9 +218,9 @@ class ScenarioManager:
 
         return class_dict
 
-    def _create_human_agent(self, agent_id, settings, grid_world):
+    def _create_human_agent(self, agent_id, settings: dict, grid_world):
         # Check if settings contains the one mandatory setting that is not in defaults; start_location
-        if "start_location" not in settings.keys():
+        if "location" not in settings.keys():
             raise Exception(f"Cannot add the agent {agent_id}; the 'location' is missing in the scenario json "
                             f"file.")
 
@@ -236,19 +236,15 @@ class ScenarioManager:
         user_inputs_map = settings["input_action_map"]
 
         # Get agent properties, and add our mandatory properties to it as well (e.g., location, size, colour, etc.)
-        agent_properties = settings["additional_agent_properties"]
-        agent_properties["location"] = settings["start_location"]
-        agent_properties["size"] = settings["visualisation_properties"]["size"]
-        agent_properties["colour"] = settings["visualisation_properties"]["colour"]
-        agent_properties["shape"] = settings["visualisation_properties"]["shape"]
-        agent_properties["is_traversable"] = settings["is_traversable"]
-        agent_properties["agent_speed_in_ticks"] = settings["agent_speed_in_ticks"]
-        agent_properties["name"] = agent_id
+        agent_properties = {}
+        agent_properties = self._add_missing_keys(agent_properties, settings['visualisation_properties'])
+        settings.pop("visualisation_properties")
+        agent_properties = self._add_missing_keys(agent_properties, settings)
 
-        properties_agent_writable = settings["agent_properties_writable"]
+        # Create a HumanAgent object
         human_agent = HumanAgent(action_set=all_actions, sense_capability=sense_capability,
                                  usrinp_action_map=user_inputs_map, agent_properties=agent_properties,
-                                 properties_agent_writable=properties_agent_writable)
+                                 properties_agent_writable=agent_properties['customizable_properties'])
 
         # Register the agent to the grid world
         _, seed = grid_world.register_agent(agent_id=agent_id,
@@ -258,7 +254,7 @@ class ScenarioManager:
                                             ooda_observe=human_agent.ooda_observe,
                                             ooda_orient=human_agent.ooda_orient,
                                             agent_properties=agent_properties,
-                                            properties_agent_writable=properties_agent_writable,
+                                            properties_agent_writable=agent_properties['customizable_properties'],
                                             action_set=human_agent.action_set,
                                             class_name_agent=settings["agent_class"])
 
@@ -267,7 +263,7 @@ class ScenarioManager:
 
     def _create_agent(self, agent_id, settings, grid_world):
         # Check if settings contains the one mandatory setting that is not in defaults; start_location
-        if "start_location" not in settings.keys():
+        if "location" not in settings.keys():
             raise Exception(f"Cannot add the agent {agent_id}; the 'location' is missing in the scenario json "
                             f"file.")
 
@@ -278,16 +274,11 @@ class ScenarioManager:
         class_name = settings['agent_class']
         agent_class = self._get_class(class_name, Agent, id_name=agent_id)
 
-        # Ge the agents properties, and add our mandatory properties to it as well (e.g., location, size, colour, etc.)
-        agent_properties = settings["additional_agent_properties"]
-        agent_properties["location"] = settings["start_location"]
-        agent_properties["size"] = settings["visualisation_properties"]["size"]
-        agent_properties["colour"] = settings["visualisation_properties"]["colour"]
-        agent_properties["shape"] = settings["visualisation_properties"]["shape"]
-        agent_properties["is_traversable"] = settings["is_traversable"]
-        agent_properties["agent_speed_in_ticks"] = settings["agent_speed_in_ticks"]
-        agent_properties['carrying'] = settings['carrying']
-        agent_properties["name"] = agent_id
+        # Get agent properties, and add our mandatory properties to it as well (e.g., location, size, colour, etc.)
+        agent_properties = {}
+        agent_properties = self._add_missing_keys(agent_properties, settings['visualisation_properties'])
+        settings.pop("visualisation_properties")
+        agent_properties = self._add_missing_keys(agent_properties, settings)
 
         # Get the properties the agent's brain can write to
         properties_agent_writable = settings['agent_properties_writable']
@@ -353,7 +344,7 @@ class ScenarioManager:
     def _get_area(self, area_settings):
         # Append missing settings (if any)
         default_settings = self.defaults["area_defaults"]
-        settings = self._add_missing_keys(area_settings, default_settings)  # add default settings if missing
+        settings = self._add_missing_keys(area_settings, default_settings)
 
         # Boolean whether we should add wall objects on the edges
         generate_walls = settings['has_walls']
@@ -494,7 +485,7 @@ class ScenarioManager:
         return area_objs, wall_objs, door_objs
 
     def get_area_tile(self, nr, area_name, coord, callable_class, kwargs, properties, vis_properties):
-        obj_id = f"{area_name}_{callable_class}_{nr}"
+        obj_id = f"{area_name}_{callable_class.__name__}_{nr}"
 
         obj_properties = self._add_missing_keys(properties, vis_properties)
 

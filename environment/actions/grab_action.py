@@ -60,8 +60,8 @@ class GrabAction(Action):
         env_obj = grid_world.environment_objects[object_id]  # Environment object
 
         # Updating properties
-        reg_ag.properties['carrying'].append(object_id)
-        env_obj.properties['carried'].append(agent_id)
+        reg_ag.properties['carrying'].append(env_obj)
+        env_obj.properties['carried_by'].append(agent_id)
 
         # Updating Location
         env_obj.location = reg_ag.location
@@ -112,7 +112,7 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
     if object_id in grid_world.environment_objects.keys():
         env_obj = grid_world.environment_objects[object_id]  # Environment object
         # Check if the object is not carried by another agent
-        if env_obj.carried_by_agent_id is not None:
+        if len(env_obj.properties["carried_by"]) != 0:
             return False, GrabActionResult.RESULT_OBJECT_CARRIED.replace("{AGENT_ID}", env_obj.carried_by_agent_id)
         elif not env_obj.properties["movable"]:
             return False, GrabActionResult.RESULT_OBJECT_UNMOVABLE

@@ -107,3 +107,37 @@ class AgentAvatar(EnvObject):
             # update normal properties
             else:
                 self.properties = props[prop]
+
+    @property
+    def location(self):
+        """
+        We override the location pythonic property here so we can override its setter.
+        :return: The location tuple of the form; (x, y).
+        """
+        return tuple(self.__location)
+
+    @location.setter
+    def location(self, loc):
+        """
+        Overrides the setter of the location (pythonic) property so we can transfer also all carried objects with us
+        on any location change made anywhere.
+        :param loc:
+        :return:
+        """
+        # Set the location to our private location xy list
+        self.__location = loc
+
+        # Carrying action is done here
+        # First we check if we even have a 'carrying' property, as the future might hold an AgentAvatar who specifically
+        # removes this property. In that case we return.
+        if 'carrying' not in self.properties.keys():
+            return
+        # Next we retrieve whatever it is the agent avatar is carrying (if we have a 'carrying' property at all)
+        carried_objs = self.properties['carrying']
+        # If we carry nothing, we are done
+        if len(carried_objs) == 0:
+            return
+        # Otherwise we loop over all objects and adjust their location accordingly (since these are also EnvObjects,
+        # their setter for location gets called, in the case we are carrying an AgentAvatar this setter is called
+        for obj in carried_objs:
+            obj.location = loc  # this requires all objects in self.properties['carrying'] to be EnvObject

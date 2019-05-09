@@ -30,7 +30,7 @@
       "colour": "#900C3F",
       "shape": 0
     },
-    "agent_properties_writable": ["colour", "shape"],
+    "customizable_properties": ["colour", "shape"],
     "class_specific_kwargs": {},
     "carrying": []
   },
@@ -56,7 +56,7 @@
       "colour": "#fde500",
       "shape": 0
     },
-    "agent_properties_writable": ["colour", "shape"],
+    "customizable_properties": ["colour", "shape"],
     "class_specific_kwargs": {},
     "carrying": []
   },
@@ -73,7 +73,8 @@
         "size": 1.0,
         "shape": 0
     },
-    "class_specific_kwargs": {}
+    "class_specific_kwargs": {},
+    "carried_by": []
   },
   "area_defaults":
   {

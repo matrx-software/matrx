@@ -6,12 +6,13 @@ class EnvObject:
 
     def __init__(self, obj_id, obj_name, location, properties, is_traversable):
         self.obj_id = obj_id
-        self.location = location
         self.name = obj_name
         self.properties = properties
-        self.carried_by_agent_id = None
         self.is_traversable = is_traversable
 
+        # location should be set at the end (due to the dependency of its setter on the other attributes (e.g. in
+        # AgentAvatar)
+        self.location = location
 
     def update_properties(self, grid_world):
         """
@@ -41,8 +42,24 @@ class EnvObject:
         props['is_traversable'] = self.is_traversable
         return props
 
-    def set_location(self, loc):
-        self.location = loc
+    @property
+    def location(self):
+        """
+        The location of any object is a pythonic property, this allows us to do various checks on it. One of them is the
+        setter that is overridden in AgentAvatar to also transfer all carried objects with it.
+        :return: The current location as a tuple; (x, y)
+        """
+        return tuple(self.__location)
+
+    @location.setter
+    def location(self, loc):
+        """
+        The setter than can be overridden if a location change might also affect some other things inside the
+        AgentAvatar.
+        :param loc: The new location
+        :return: None
+        """
+        self.__location = loc
 
 
 class Block(EnvObject):
@@ -66,7 +83,7 @@ class Wall(EnvObject):
 
     def __init__(self, obj_id, obj_name, location, properties, is_traversable=False):
         # set default properties of this object
-        default_props = {"shape": 0, "size": 1, "movable": False, "carried": []}
+        default_props = {"shape": 0, "size": 1, "movable": False, "carried_by": []}
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
@@ -82,7 +99,7 @@ class Area(EnvObject):
 
     def __init__(self, obj_id, obj_name, location, properties, is_traversable=True):
         # set default properties of this object
-        default_props = {"shape": 0, "size": 1, "movable": False, "carried": []}
+        default_props = {"shape": 0, "size": 1, "movable": False, "carried_by": []}
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given
@@ -98,7 +115,7 @@ class Door(EnvObject):
 
     def __init__(self, obj_id, obj_name, location, properties, is_traversable=False):
         # set default properties of this object
-        default_props = {"shape": 0, "size": 1, "movable": False, "colour": "#5a5a5a", "carried": []}
+        default_props = {"shape": 0, "size": 1, "movable": False, "colour": "#5a5a5a", "carried_by": []}
         properties = set_default_properties(properties, default_props)
 
         # set default for customizable properties, if they are not given

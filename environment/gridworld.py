@@ -317,7 +317,7 @@ class GridWorld:
         if object_id in self.registered_agents.keys():
             # Check if the agent was carrying something, if so remove property from carried item
             for obj_id in self.registered_agents[object_id].properties['carrying']:
-                self.environment_objects[obj_id].properties['carried'].remove(object_id)
+                self.environment_objects[obj_id].properties['carried_by'].remove(object_id)
 
             # Remove agent
             success = self.registered_agents.pop(object_id,
@@ -326,7 +326,7 @@ class GridWorld:
         # Else, check if it is an object
         elif object_id in self.environment_objects.keys():
             # If the object was carried, remove this from the agent properties as well
-            for agent_id in self.environment_objects[object_id].properties['carried']:
+            for agent_id in self.environment_objects[object_id].properties['carried_by']:
                 self.registered_agents[agent_id].properties['carrying'].remove(object_id)
 
             # Remove object
@@ -507,7 +507,7 @@ class GridWorld:
             self.grid[loc[1], loc[0]] = [agent_id]
 
         # Update the Agent Avatar's location as well
-        self.registered_agents[agent_id].set_location(loc=loc)
+        self.registered_agents[agent_id].location = loc
 
     def __update_obj_location(self, obj_id):
         loc = self.environment_objects[obj_id].location
