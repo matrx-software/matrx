@@ -5,8 +5,8 @@ import numpy as np
 
 class RemoveObject(Action):
     """
-    An action that allows agent to remove EnvObjects (basically ALL objects) from the GridWorld permanently. This
-    includes other AgentAvatars.
+    An action that allows agent to remove EnvObjects (basically ALL objects except YOURSELF) from the GridWorld
+    permanently. This includes other AgentAvatars.
     """
 
     def __init__(self):
