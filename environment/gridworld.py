@@ -446,6 +446,12 @@ class GridWorld:
         return possible_actions
 
     def __perform_action(self, agent_id, action_name, action_kwargs):
+
+        # Check if the agent still exists (you would only get here if the agent is removed during this tick.
+        if agent_id not in self.registered_agents.keys():
+            result = ActionResult(ActionResult.AGENT_WAS_REMOVED.replace("{AGENT_ID}", agent_id), succeeded=False)
+            return result
+
         if action_name is None:  # If action is None, we send an action result that no action was given (and succeeded)
             result = ActionResult(ActionResult.NO_ACTION_GIVEN, succeeded=True)
 
