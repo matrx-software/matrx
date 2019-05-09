@@ -111,6 +111,22 @@ class AgentAvatar(EnvObject):
             else:
                 self.properties = props[prop]
 
+    def get_properties(self):
+        """
+        Overrides the get_properties of EnvObject with the purpose to translate all objects this agent avatar is
+        carrying to a dictionary and append it to its properties.
+        :return: A dictionary of properties describing this agent and its avatar.
+        """
+        props = super().get_properties()
+
+        # Go through all objects we are carrying, append their properties to a list and assign it to our properties
+        carrying_props_list = []
+        for obj in self.is_carrying:
+            carrying_props_list.append(obj.get_properties())
+        props['carrying'] = carrying_props_list
+
+        return props
+
     @property
     def location(self):
         """

@@ -47,12 +47,6 @@ class EnvObject:
         props['location'] = self.location
         props['is_traversable'] = self.is_traversable
 
-        if "carrying" in props.keys():
-            carrying_props_list = []
-            for obj in props["carrying"]:
-                carrying_props_list.append(obj.get_properties())
-            props['carrying'] = carrying_props_list
-
         return props
 
     @property
