@@ -27,6 +27,9 @@ class AgentAvatar(EnvObject):
                          properties=agent_properties,
                          is_traversable=agent_properties["is_traversable"])
 
+        # Set the variables that the grid world expect each agent avatar to have
+        self.is_carrying = []  # list of EnvObjects that this object carries
+
         # save the other
         self.sense_capability = sense_capability
         self.action_set = action_set

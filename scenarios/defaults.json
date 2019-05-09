@@ -31,8 +31,7 @@
       "shape": 0
     },
     "customizable_properties": ["colour", "shape"],
-    "class_specific_kwargs": {},
-    "carrying": []
+    "class_specific_kwargs": {}
   },
   "human_agent_defaults":
   {
@@ -57,8 +56,7 @@
       "shape": 0
     },
     "customizable_properties": ["colour", "shape"],
-    "class_specific_kwargs": {},
-    "carrying": []
+    "class_specific_kwargs": {}
   },
   "object_defaults":
   {
@@ -73,8 +71,7 @@
         "size": 1.0,
         "shape": 0
     },
-    "class_specific_kwargs": {},
-    "carried_by": []
+    "class_specific_kwargs": {}
   },
   "area_defaults":
   {

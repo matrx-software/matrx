@@ -8,7 +8,13 @@ class EnvObject:
         self.obj_id = obj_id
         self.name = obj_name
         self.properties = properties
-        self.is_traversable = is_traversable
+
+        # These are mandatory things the grid world expect each EnvObject to have
+        self.is_traversable = is_traversable  # whether agents can traverse over this object
+        self.carried_by = []  # a list of agent ids that denote who is carrying this object (if any)
+        self.vis_size = 1  # the size for the visualisation
+        self.vis_shape = 0  # the shape for the visualisation
+        self.vis_colour = "#000000"  # the colour for the visualisation
 
         # location should be set at the end (due to the dependency of its setter on the other attributes (e.g. in
         # AgentAvatar)
@@ -40,6 +46,13 @@ class EnvObject:
         props['name'] = self.name
         props['location'] = self.location
         props['is_traversable'] = self.is_traversable
+
+        if "carrying" in props.keys():
+            carrying_props_list = []
+            for obj in props["carrying"]:
+                carrying_props_list.append(obj.get_properties())
+            props['carrying'] = carrying_props_list
+
         return props
 
     @property

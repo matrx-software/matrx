@@ -4,7 +4,7 @@ import requests
 
 from agents.Agent import Agent
 
-from environment.actions.grab_action import GrabAction
+from environment.actions.object_actions import GrabAction
 from environment.actions.door_actions import *
 
 class HumanAgent(Agent):

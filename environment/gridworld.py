@@ -1,18 +1,14 @@
 import datetime
-import inspect
 import math
 import time
-from collections import OrderedDict
 import warnings
-import sys
-
-import numpy as np
+from collections import OrderedDict
 
 from agents.HumanAgent import HumanAgent
 from environment.actions.move_actions import *
-from environment.objects.basic_objects import *
+from environment.actions.object_actions import *
 from environment.objects.agent_avatar import AgentAvatar
-
+from environment.objects.basic_objects import *
 from visualization.visualizer import Visualizer
 
 
@@ -210,8 +206,8 @@ class GridWorld:
             if action_kwargs is None:  # If kwargs is none, make an empty dict out of it
                 action_kwargs = {}
 
-            # Actually perform the action (if possible)
-            result = self.__perform_action(agent_id, action_class_name, action_kwargs)
+            # Actually perform the action (if possible), also sets the result in the agent's brain
+            self.__perform_action(agent_id, action_class_name, action_kwargs)
 
             # Update the grid
             self.__update_grid()
@@ -383,9 +379,9 @@ class GridWorld:
         # create a state with all objects and agents
         state = {}
         for obj_id, obj in self.environment_objects.items():
-            state[obj.name] = obj.get_properties()
+            state[obj.obj_id] = obj.get_properties()
         for agent_id, agent in self.registered_agents.items():
-            state[agent.name] = agent.get_properties()
+            state[agent.obj_id] = agent.get_properties()
 
         return state
 

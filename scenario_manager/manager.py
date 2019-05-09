@@ -56,7 +56,7 @@ class ScenarioManager:
 
         # Create all objects
         for env_obj in objects:
-            self._create_object(env_obj)
+            self._create_object(env_obj, grid_world)
 
         return grid_world
 
@@ -135,7 +135,8 @@ class ScenarioManager:
 
         env_objs = []
         for obj_settings in all_object_settings:
-            env_object = self._create_env_object(obj_settings)
+            nr_objs = len(env_objs)
+            env_object = self._create_env_object(obj_settings, nr_objs)
             env_objs.append(env_object)
 
         return env_objs
@@ -508,10 +509,10 @@ class ScenarioManager:
 
         return grid_world
 
-    def _create_object(self, env_obj):
-        pass
+    def _create_object(self, env_obj: EnvObject, grid_world: GridWorld):
+        grid_world.add_env_object(env_obj)
 
-    def _create_env_object(self, obj_settings):
+    def _create_env_object(self, obj_settings, nr):
         # Append missing settings (if any)
         default_settings = self.defaults["object_defaults"]
         settings = self._add_missing_keys(obj_settings, default_settings)  # add default settings if missing
@@ -520,32 +521,26 @@ class ScenarioManager:
         name = settings['name']
 
         # Create id
-        obj_id = name
+        obj_id = f"{name}_{nr}"
 
         # Get object class (if known in the testbed)
         callable_class = self._get_class(settings['object_class'], EnvObject, obj_id)
 
-        # Get mandatory properties
-        location = settings['location']
-        is_movable = settings['movable']
-        is_traversable = settings['is_traversable']
-        additional_obj_properties = settings['additional_object_properties']
-        vis_properties = settings['visualisation_properties']
-
-        # Create an object properties dict
-        properties = {"is_movable": is_movable}
-        properties = self._add_missing_keys(properties, additional_obj_properties)  # add default settings if missing
-        properties = self._add_missing_keys(properties, vis_properties)  # add default settings if missing
-
         # Get potential class specific arguments (kwargs)
-        kwargs = settings['class_specific_kwargs']
+        kwargs = settings.pop('class_specific_kwargs')
+
+        # Create properties
+        properties = {}
+        vis_properties = settings.pop('visualisation_properties')
+        properties = self._add_missing_keys(properties, vis_properties)
+        properties = self._add_missing_keys(properties, settings)
 
         # Create the object
         env_object = callable_class(obj_id=obj_id,
                                     obj_name=name,
-                                    location=location,
+                                    location=properties['location'],
                                     properties=properties,
-                                    is_traversable=is_traversable,
+                                    is_traversable=properties['is_traversable'],
                                     **kwargs)
 
         return env_object

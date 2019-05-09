@@ -3,7 +3,7 @@
     {
         "random_seed" : 1,
         "size" : [25, 25],
-        "step_duration" : 0.1,
+        "step_duration" : 0.5,
         "time_focus": "step",
         "run_visualisation_server" : false,
         "run_sail_api": false,
@@ -19,7 +19,7 @@
     "agents" :
     [
         {
-            "name": "Human Agent",
+            "name": "Human_Agent",
             "location": [11, 21],
             "agent_class": "HumanAgent",
             "agent_speed_in_ticks": 2,
@@ -48,7 +48,8 @@
             "agent_class": "Agent",
             "agent_speed_in_ticks": 3,
             "senses": [["*", 5]],
-            "possible_actions": ["*"],
+            "possible_actions": ["MoveNorth", "MoveNorthEast", "MoveEast", "MoveSouthEast", "MoveSouth", "MoveSouthWest",
+                "MoveWest", "MoveNorthWest", "GrabAction", "DropAction", "OpenDoorAction", "CloseDoorAction"],
             "additional_agent_properties":
             {
                 "battery": 100.0
@@ -67,7 +68,8 @@
             "agent_class": "Agent",
             "agent_speed_in_ticks": 3,
             "senses": [["*", 5]],
-            "possible_actions": ["*"],
+            "possible_actions": ["MoveNorth", "MoveNorthEast", "MoveEast", "MoveSouthEast", "MoveSouth", "MoveSouthWest",
+                "MoveWest", "MoveNorthWest", "GrabAction", "DropAction", "OpenDoorAction", "CloseDoorAction"],
             "additional_agent_properties":
             {
                 "battery": 100.0
@@ -86,7 +88,8 @@
             "agent_class": "Agent",
             "agent_speed_in_ticks": 2,
             "senses": [["*", 8]],
-            "possible_actions": ["MoveNorth", "MoveEast", "MoveSouth", "MoveWest"],
+            "possible_actions": ["MoveNorth", "MoveNorthEast", "MoveEast", "MoveSouthEast", "MoveSouth", "MoveSouthWest",
+                "MoveWest", "MoveNorthWest"],
             "additional_agent_properties":
             {
                 "foo": "bar",
@@ -106,7 +109,8 @@
             "agent_class": "Agent",
             "agent_speed_in_ticks": 2,
             "senses": [["*", 8]],
-            "possible_actions": ["MoveNorth", "MoveEast", "MoveSouth", "MoveWest"],
+            "possible_actions": ["MoveNorth", "MoveNorthEast", "MoveEast", "MoveSouthEast", "MoveSouth", "MoveSouthWest",
+                "MoveWest", "MoveNorthWest"],
             "additional_agent_properties":
             {
                 "foo": "bar",
@@ -126,7 +130,8 @@
             "agent_class": "Agent",
             "agent_speed_in_ticks": 2,
             "senses": [["*", 8]],
-            "possible_actions": ["MoveNorth", "MoveEast", "MoveSouth", "MoveWest"],
+            "possible_actions": ["MoveNorth", "MoveNorthEast", "MoveEast", "MoveSouthEast", "MoveSouth", "MoveSouthWest",
+                "MoveWest", "MoveNorthWest"],
             "additional_agent_properties":
             {
                 "foo": "bar",
@@ -146,7 +151,8 @@
             "agent_class": "Agent",
             "agent_speed_in_ticks": 2,
             "senses": [["*", 8]],
-            "possible_actions": ["MoveNorth", "MoveEast", "MoveSouth", "MoveWest"],
+            "possible_actions": ["MoveNorth", "MoveNorthEast", "MoveEast", "MoveSouthEast", "MoveSouth", "MoveSouthWest",
+                "MoveWest", "MoveNorthWest"],
             "additional_agent_properties":
             {
                 "foo": "bar",
@@ -166,7 +172,8 @@
             "agent_class": "Agent",
             "agent_speed_in_ticks": 5,
             "senses": [["*", 3]],
-            "possible_actions": ["MoveNorth", "MoveEast", "MoveSouth", "MoveWest"],
+            "possible_actions": ["MoveNorth", "MoveNorthEast", "MoveEast", "MoveSouthEast", "MoveSouth", "MoveSouthWest",
+                "MoveWest", "MoveNorthWest"],
             "additional_agent_properties":
             {
                 "foo": "bar"
@@ -185,7 +192,8 @@
             "agent_class": "Agent",
             "agent_speed_in_ticks": 5,
             "senses": [["*", 3]],
-            "possible_actions": ["MoveNorth", "MoveEast", "MoveSouth", "MoveWest"],
+            "possible_actions": ["MoveNorth", "MoveNorthEast", "MoveEast", "MoveSouthEast", "MoveSouth", "MoveSouthWest",
+                "MoveWest", "MoveNorthWest"],
             "additional_agent_properties":
             {
                 "foo": "bar"
@@ -204,7 +212,8 @@
             "agent_class": "Agent",
             "agent_speed_in_ticks": 5,
             "senses": [["*", 3]],
-            "possible_actions": ["MoveNorth", "MoveEast", "MoveSouth", "MoveWest"],
+            "possible_actions": ["MoveNorth", "MoveNorthEast", "MoveEast", "MoveSouthEast", "MoveSouth", "MoveSouthWest",
+                "MoveWest", "MoveNorthWest"],
             "additional_agent_properties":
             {
 
@@ -223,7 +232,8 @@
             "agent_class": "Agent",
             "agent_speed_in_ticks": 5,
             "senses": [["*", 3]],
-            "possible_actions": ["MoveNorth", "MoveEast", "MoveSouth", "MoveWest"],
+            "possible_actions": ["MoveNorth", "MoveNorthEast", "MoveEast", "MoveSouthEast", "MoveSouth", "MoveSouthWest",
+                "MoveWest", "MoveNorthWest"],
             "additional_agent_properties":
             {
 
@@ -242,7 +252,8 @@
             "agent_class": "Agent",
             "agent_speed_in_ticks": 5,
             "senses": [["*", 3]],
-            "possible_actions": ["MoveNorth", "MoveEast", "MoveSouth", "MoveWest"],
+            "possible_actions": ["MoveNorth", "MoveNorthEast", "MoveEast", "MoveSouthEast", "MoveSouth", "MoveSouthWest",
+                "MoveWest", "MoveNorthWest"],
             "additional_agent_properties":
             {
 
@@ -284,18 +295,44 @@
     "objects":
     [
         {
-            "name": "Block 1",
-            "object_class": "Door",
-            "location": [],
-            "movable": false,
-            "additional_object_properties":
-            {
-                "foo": "bar"
-            }
+            "location": [10, 16],
+            "movable": true,
+            "is_traversable": false
         },
-      {
-        "location": [0,0],
-        "object_class": "Wall"
-      }
+        {
+            "location": [10, 14],
+            "movable": true,
+            "is_traversable": false
+        },
+        {
+            "location": [9, 15],
+            "movable": true,
+            "is_traversable": false
+        },
+        {
+            "location": [11, 15],
+            "movable": true,
+            "is_traversable": false
+        },
+        {
+            "location": [9, 16],
+            "movable": true,
+            "is_traversable": false
+        },
+        {
+            "location": [11, 16],
+            "movable": true,
+            "is_traversable": false
+        },
+        {
+            "location": [9, 14],
+            "movable": true,
+            "is_traversable": false
+        },
+        {
+            "location": [11, 14],
+            "movable": true,
+            "is_traversable": false
+        }
     ]
 }

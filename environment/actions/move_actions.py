@@ -8,7 +8,6 @@ def act_move(grid_world, agent_id, dx, dy):
     new_loc = [loc[0] + dx, loc[1] + dy]
     grid_world.registered_agents[agent_id].location = new_loc
 
-
     return MoveActionResult(MoveActionResult.RESULT_SUCCESS, succeeded=True)
 
 
