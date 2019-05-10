@@ -138,9 +138,9 @@ class GrabAction(Action):
         """
 
         # Additional check
-        object_id = None if 'object_id' not in kwargs else kwargs['object_id']
-        grab_range = 0 if 'grab_range' not in kwargs else kwargs['grab_range']
-        max_objects = 1 if 'max_objects' not in kwargs else kwargs['max_objects']
+        assert 'object_id' in kwargs.keys()
+        assert 'grab_range' in kwargs.keys()
+        assert 'max_objects' in kwargs.keys()
 
         # if possible:
         object_id = kwargs['object_id']  # assign
@@ -150,10 +150,16 @@ class GrabAction(Action):
         env_obj = grid_world.environment_objects[object_id]  # Environment object
 
         # Updating properties
-        reg_ag.is_carrying.append(env_obj)
+        reg_ag.is_carrying.append(env_obj)  # we add the entire object!
         env_obj.carried_by.append(agent_id)
 
-        # Updating Location
+        # Remove it from the grid world (it is now stored in the is_carrying list of the AgentAvatar
+        succeeded = grid_world.remove_from_grid(env_obj.obj_id)
+        if not succeeded:
+            return GrabActionResult(GrabActionResult.FAILED_TO_REMOVE_OBJECT_FROM_WORLD.replace("{OBJECT_ID}",
+                                                                                                env_obj.obj_id), False)
+
+        # Updating Location (done after removing from grid, or the grid will search the object on the wrong location)
         env_obj.location = reg_ag.location
 
         return GrabActionResult(GrabActionResult.RESULT_SUCCESS, True)
@@ -215,6 +221,7 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
 
 
 class GrabActionResult(ActionResult):
+    FAILED_TO_REMOVE_OBJECT_FROM_WORLD = 'Grab action failed; could not remove object with id {OBJECT_ID} from grid.'
     RESULT_SUCCESS = 'Grab action success'
     NOT_IN_RANGE = 'Object not in range'
     RESULT_AGENT = 'This is an agent, cannot be picked up'
@@ -273,13 +280,16 @@ class DropAction(Action):
 
 
 def act_drop(grid_world, agent_id, env_obj):
-    # Loading properties
+    # Get the agent
     reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
-    env_obj = grid_world.environment_objects[env_obj.obj_id]  # Environment object
 
     # Updating properties
     reg_ag.is_carrying.remove(env_obj)
     env_obj.carried_by.remove(agent_id)
+
+    # We return the object to the grid location we are standing at
+    env_obj.location = reg_ag.location
+    grid_world.add_env_object(env_obj)
 
     return DropActionResult(DropActionResult.RESULT_SUCCESS, True)
 
@@ -297,17 +307,14 @@ def possible_drop(grid_world, agent_id, obj_id):
     if not (obj_id in reg_ag.is_carrying):
         return False, DropActionResult.RESULT_NO_OBJECT
 
-    # No other object/agent is in that location, then drop is a success
-    if len(loc_obj_ids) == len(reg_ag.is_carrying) + 1:
+    # No other object/agent is in that location, then drop is a always a success
+    if len(loc_obj_ids) == 1:
         return True, DropActionResult.RESULT_SUCCESS
+
+    # If the object we want to drop is not traversable and because their are other objects
 
     # Go through all objects at the desired locations
     for loc_obj_id in loc_obj_ids:
-        # Check if loc_obj_id is the id of an agent
-        if loc_obj_id in grid_world.registered_agents.keys():
-            # If it is an agent at that location, dropping is not possible
-            return False, DropActionResult.RESULT_AGENT
-
         # Check if it is an object
         if loc_obj_id in grid_world.environment_objects.keys():
             return False, DropActionResult.RESULT_OBJECT

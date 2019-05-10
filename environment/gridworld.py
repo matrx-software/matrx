@@ -131,7 +131,7 @@ class GridWorld:
 
         # two intraversable objects can't be at the same location
         if not env_object.is_traversable and len(intraversable_objs) > 0:
-            raise Exception(f"Invalid scenario. Could not place object {env_object.obj_id} in grid, location already "
+            raise Exception(f"Invalid placement. Could not place object {env_object.obj_id} in grid, location already "
                             f"occupied by intraversable object {intraversable_objs} at location {obj_loc}")
 
     def step(self):
@@ -312,26 +312,27 @@ class GridWorld:
         # Check if it is an agent
         if object_id in self.registered_agents.keys():
             # Check if the agent was carrying something, if so remove property from carried item
-            for obj_id in self.registered_agents[object_id].properties['carrying']:
-                self.environment_objects[obj_id].properties['carried_by'].remove(object_id)
+            for obj_id in self.registered_agents[object_id].is_carrying:
+                self.environment_objects[obj_id].carried_by.remove(object_id)
 
             # Remove agent
             success = self.registered_agents.pop(object_id,
-                                                 default=False)  # if it is an agent, we get it otherwise False
+                                                 default=False)  # if it exists, we get it otherwise False
 
         # Else, check if it is an object
         elif object_id in self.environment_objects.keys():
             # If the object was carried, remove this from the agent properties as well
-            for agent_id in self.environment_objects[object_id].properties['carried_by']:
-                self.registered_agents[agent_id].properties['carrying'].remove(object_id)
+            for agent_id in self.environment_objects[object_id].carried_by:
+                obj = self.environment_objects[object_id]
+                self.registered_agents[agent_id].is_carrying.remove(obj)
 
             # Remove object
             success = self.environment_objects.pop(object_id,
-                                                   default=False)  # if it is an agent, we get it otherwise False
+                                                   default=False)  # if it exists, we get it otherwise False
         else:
             success = False  # Object type not specified
 
-        if success is not False:  # it was not an agent nor environment object, so success! Otherwise, success if False
+        if success is not False:  # if succes is not false, we successfully removed the object from the grid
             success = True
 
         return success
