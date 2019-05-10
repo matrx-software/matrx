@@ -11,8 +11,9 @@ from agents.HumanAgent import HumanAgent
 from agents.capabilities.capability import SenseCapability
 from environment.actions.action import Action
 from environment.gridworld import GridWorld
-from environment.objects.basic_objects import EnvObject, Area, Wall, Door
+from environment.objects.env_object import EnvObject, Area, Wall, Door
 from environment.sim_goals.sim_goal import SimulationGoal
+from scenario_manager.helper_functions import load_json, load_defaults, load_scenario
 
 
 class ScenarioManager:
@@ -20,12 +21,12 @@ class ScenarioManager:
     def __init__(self):
         self.scenario_file = None
         self.scenario_dict = None
-        self.defaults = self._load_defaults_json()
+        self.defaults = load_defaults()
 
     def create_scenario(self, scenario_file):
 
         # Get the full path to the scenario file
-        self.scenario_dict = self._load_scenario_json(scenario_file)
+        self.scenario_dict = load_scenario(scenario_file)
 
         # Get simulation settings
         grid_world = self._create_grid_world()
@@ -140,22 +141,6 @@ class ScenarioManager:
             env_objs.append(env_object)
 
         return env_objs
-
-    def _load_defaults_json(self):
-        root_path = Path(__file__).parents[1]
-        file_path = os.path.join(root_path, "scenarios", "defaults.json")
-        return self._load_json(file_path)
-
-    def _load_scenario_json(self, scenario_file):
-        self.scenario_file = scenario_file
-        root_path = Path(__file__).parents[1]
-        scenario_path = os.path.join(root_path, "scenarios", scenario_file)
-        return self._load_json(scenario_path)
-
-    def _load_json(self, file_path):
-        with open(file_path, "r") as read_file:
-            scenario_dict = json.load(read_file)
-        return scenario_dict
 
     def _add_missing_keys(self, settings: dict, defaults: dict):
         for k, v in defaults.items():

@@ -1,15 +1,20 @@
 import datetime
 import math
 import time
-import warnings
 from collections import OrderedDict
 
 from agents.HumanAgent import HumanAgent
-from environment.actions.move_actions import *
 from environment.actions.object_actions import *
 from environment.objects.agent_avatar import AgentAvatar
-from environment.objects.basic_objects import *
+from environment.objects.env_object import *
 from visualization.visualizer import Visualizer
+
+######
+# noinspection PyUnresolvedReferences
+from environment import *  # makes sure all Action and Object classes are loaded at runtime for reflection
+# noinspection PyUnresolvedReferences
+from agents import *  # makes sure all Agent classes are loaded at runtime for reflection
+######
 
 
 class GridWorld:
@@ -171,13 +176,13 @@ class GridWorld:
                     "action"] if agent_id in self.visualizer.userinputs else None
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
                     state=state,
-                    agent_properties=agent_obj.get_properties(), possible_actions=possible_actions, agent_id=agent_id,
+                    agent_properties=agent_obj.get_attributes(), possible_actions=possible_actions, agent_id=agent_id,
                     userinput=usrinp)
             else:
                 # perform the OODA loop and get an action back
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
                     state=state,
-                    agent_properties=agent_obj.get_properties(), possible_actions=possible_actions,
+                    agent_properties=agent_obj.get_attributes(), possible_actions=possible_actions,
                     agent_id=agent_id)
 
             # store the action in the buffer
@@ -214,7 +219,7 @@ class GridWorld:
 
         # Perform the update method of all objects
         for env_obj in self.environment_objects.values():
-            env_obj.update_properties(self)
+            env_obj.update_attributes(self)
 
         # Increment the number of tick we performed
         self.current_nr_ticks += 1
@@ -380,9 +385,9 @@ class GridWorld:
         # create a state with all objects and agents
         state = {}
         for obj_id, obj in self.environment_objects.items():
-            state[obj.obj_id] = obj.get_properties()
+            state[obj.obj_id] = obj.get_attributes()
         for agent_id, agent in self.registered_agents.items():
-            state[agent.obj_id] = agent.get_properties()
+            state[agent.obj_id] = agent.get_attributes()
 
         return state
 
@@ -407,7 +412,7 @@ class GridWorld:
         state = {}
         # Save all properties of the sensed objects in a state dictionary
         for env_obj in objs_in_range:
-            state[env_obj] = objs_in_range[env_obj].get_properties()
+            state[env_obj] = objs_in_range[env_obj].get_attributes()
 
         return state
 

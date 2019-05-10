@@ -1,11 +1,9 @@
-def set_default_properties(properties, default_values):
-    for val in default_values:
-        properties[val] = default_values[val]
-    return properties
+
+object_counter = 0
 
 
-def set_default_for_customizable_properties(properties, default_values):
-    for val in default_values:
-        if val not in properties:
-            properties[val] = default_values[val]
-    return properties
+def next_obj_id():
+    global object_counter
+    res = object_counter
+    object_counter += 1
+    return res
