@@ -274,6 +274,7 @@ class ScenarioManager:
         # Get the agent's brain class (defaults to Agent, a random behavior agent)
         class_name = settings['agent_class']
         agent_class = self._get_class(class_name, Agent, id_name=agent_id)
+        settings['agent_class'] = agent_class.__name__
 
         # Get agent properties, and add our mandatory properties to it as well (e.g., location, size, colour, etc.)
         agent_properties = {}
@@ -307,7 +308,7 @@ class ScenarioManager:
                                                          agent_properties=agent_properties,
                                                          properties_agent_writable=properties_agent_writable,
                                                          action_set=agent.action_set,
-                                                         class_name_agent=agent_class)
+                                                         class_name_agent=settings['agent_class'])
 
         # Set the random seed for this agent's brain with a seed generated from the master rng in grid world
         agent.set_rnd_seed(agent_seed)

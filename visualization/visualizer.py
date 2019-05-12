@@ -1,5 +1,6 @@
 import datetime
 import requests
+import sys
 
 class Visualizer():
     '''
@@ -30,7 +31,12 @@ class Visualizer():
         tick_start_time = datetime.datetime.now()
 
         # send an update of the agent state to the GUI via its API
-        r = requests.post(url, json=data)
+        try:
+            r = requests.post(url, json=data)
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            print(e)
+            print("Visualization server is unreachable")
+            sys.exit(1)
 
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time
@@ -40,7 +46,7 @@ class Visualizer():
 
         # check for errors in the response
         if r.status_code != requests.codes.ok:
-            print("Error in initializing GUI")
+            raise Exception("Error in initializing GUI")
 
 
     def reset(self):
@@ -56,9 +62,9 @@ class Visualizer():
         # add state for specific entity with ID to states dict
         if type == "god":
             self.god_state = state
-        elif type == "agent":
+        elif type == "Agent":
             self.agent_states[id] = state
-        elif type == "humanagent":
+        elif type == "HumanAgent":
             self.hu_ag_states[id] = state
 
 
@@ -87,8 +93,12 @@ class Visualizer():
         tick_start_time = datetime.datetime.now()
 
         # send an update of the agent state to the GUI via its API
-        r = requests.post(url, json=data)
-
+        try:
+            r = requests.post(url, json=data)
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            print(e)
+            print("Visualization server is unreachable")
+            sys.exit(1)
 
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time

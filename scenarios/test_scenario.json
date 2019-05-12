@@ -26,10 +26,14 @@
             "senses": [["*", 3]],
             "input_action_map":
             {
-                "arrowkey:up": "MoveNorth",
-                "arrowkey:right": "MoveEast",
-                "arrowkey:down": "MoveSouth",
-                "arrowkey:left": "MoveWest"
+                "ArrowUp": "MoveNorth",
+                "ArrowRight": "MoveEast",
+                "ArrowDown": "MoveSouth",
+                "ArrowLeft": "MoveWest",
+                "p": "GrabAction",
+                "d": "DropAction",
+                "o": "OpenDoorAction",
+                "c": "CloseDoorAction"
             },
             "additional_agent_properties":
             {

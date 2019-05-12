@@ -78,8 +78,6 @@ class GridWorld:
 
         self.registered_agents[agent_id] = agent_object
 
-        print(f"Registering agent with ID {agent_id}")
-
         return agent_id, agent_seed
 
     def create_and_add_env_object(self, obj_name, location, obj_properties, is_traversable):
