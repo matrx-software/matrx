@@ -78,6 +78,8 @@ class GridWorld:
 
         self.registered_agents[agent_id] = agent_object
 
+        print(f"Registering agent with ID {agent_id}")
+
         return agent_id, agent_seed
 
     def create_and_add_env_object(self, obj_name, location, obj_properties, is_traversable):
@@ -167,8 +169,7 @@ class GridWorld:
 
             # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
             if agent_obj.class_name_agent == HumanAgent.__name__:
-                usrinp = self.visualizer.userinputs[agent_id][
-                    "action"] if agent_id in self.visualizer.userinputs else None
+                usrinp = self.visualizer.userinputs[agent_id] if agent_id in self.visualizer.userinputs else None
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
                     state=state,
                     agent_properties=agent_obj.get_properties(), possible_actions=possible_actions, agent_id=agent_id,
