@@ -189,10 +189,6 @@ def is_possible_door_open_close(grid_world, agent_id, action_result, object_id=N
     # get the target object
     obj = grid_world.environment_objects[object_id]
 
-    # check if the object is a door or not
-    if not ("type" in obj.properties and obj.properties["type"] == "Door"):
-        return action_result(action_result.NOT_A_DOOR, False)
-
     # Check if object is in range
     if object_id not in objects_in_range:
         return action_result(action_result.NOT_IN_RANGE, False)
