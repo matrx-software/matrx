@@ -1,15 +1,23 @@
 import datetime
 import math
 import time
-import warnings
 from collections import OrderedDict
 
+from agents.Agent import Agent
 from agents.HumanAgent import HumanAgent
-from environment.actions.move_actions import *
+from agents.capabilities.capability import SenseCapability
 from environment.actions.object_actions import *
-from environment.objects.agent_avatar import AgentAvatar
-from environment.objects.basic_objects import *
+from environment.objects.env_object import *
 from visualization.visualizer import Visualizer
+
+######
+# noinspection PyUnresolvedReferences
+from environment import *  # makes sure all Action and Object classes are loaded at runtime for reflection
+# noinspection PyUnresolvedReferences
+from agents import *  # makes sure all Agent classes are loaded at runtime for reflection
+
+
+######
 
 
 class GridWorld:
@@ -52,56 +60,73 @@ class GridWorld:
         while not is_done:
             is_done, tick_duration = self.step()
 
-    def register_agent(self, agent_id, sense_capability, action_set, get_action_func,
-                       set_action_result_func, ooda_observe, ooda_orient, agent_properties,
-                       properties_agent_writable, class_name_agent, agent_type=AgentAvatar):
+    def register_agent(self, agent: Agent, agent_properties: dict, customizable_properties: list):
 
-        # Random seed for agent between 1 and 1000, might need to be adjusted still
-        agent_seed = self.rnd_gen.randint(1, 1000)
+        # Random seed for agent between 1 and 10000, might need to be adjusted still
+        agent_seed = self.rnd_gen.randint(1, 10000)
 
-        if not callable(get_action_func):
-            raise Exception("The given agent 'get_action_func' is not callable. Please provide this method.")
+        # Obtain the method callbacks from the agent we need for the avatar
+        action_set = agent.action_set
+        get_action = agent.get_action
+        set_action_result = agent.set_action_result
+        agent_observe = agent.ooda_observe
 
-        if agent_type == AgentAvatar:
-            agent_object = AgentAvatar(agent_id=agent_id,
-                                       sense_capability=sense_capability, action_set=action_set,
-                                       get_action_func=get_action_func, agent_properties=agent_properties,
-                                       set_action_result_func=set_action_result_func,
-                                       ooda_observe=ooda_observe, ooda_orient=ooda_orient,
-                                       properties_agent_writable=properties_agent_writable,
-                                       class_name_agent=class_name_agent)
+        # get sense capability
+        sense_capability = agent.sense_capability
+
+        # Obtain the class of the agent
+        callable_class = agent.__class__
+
+        # Obtain the mandatory properties of the agent
+        agent_name = agent_properties["name"]
+        is_traversable = agent_properties["is_traversable"]
+        agent_speed_in_ticks = agent_properties["agent_speed_in_ticks"]
+        visualize_size = agent_properties["visualize_size"]
+        visualize_shape = agent_properties["visualize_shape"]
+        visualize_colour = agent_properties["visualize_colour"]
+        location = agent_properties["location"]
+        team = agent_properties["team"]
+
+        # Check if the agent is a human agent
+        inh_path = get_inheritence_path(callable_class)
+        if 'HumanAgent' in inh_path:
+            is_human_agent = True
         else:
-            raise Exception(f"Agent of type {agent_type} is not known to the environment.")
+            is_human_agent = False
+
+        # Get all custom properties
+        custom_properties = agent.agent_properties
+
+        # Create the agent avatar
+        agent_object = AgentAvatar(location,
+                                   possible_actions=action_set, sense_capability=sense_capability,
+                                   class_callable=callable_class, callback_agent_get_action=get_action,
+                                   callback_agent_set_action_result=set_action_result,
+                                   callback_agent_observe=agent_observe, name=agent_name, is_human_agent=is_human_agent,
+                                   customizable_properties=customizable_properties, is_traversable=is_traversable,
+                                   team=team, agent_speed_in_ticks=agent_speed_in_ticks, visualize_size=visualize_size,
+                                   visualize_shape=visualize_shape, visualize_colour=visualize_colour,
+                                   **custom_properties)
+        # Get agent id
+        agent_id = agent_object.obj_id
 
         # check if the agent can be succesfully placed at that location
         self.validate_obj_placement(agent_object)
 
+        # Add agent to registered agents
         self.registered_agents[agent_id] = agent_object
 
+        # Get all properties from the agent avatar
+        avatar_props = agent_object.properties
+
+        # Add all avatar properties to the agents
+        for k, v in avatar_props.items():
+            agent.agent_properties[k] = v
+
+        # Set the keys the agent can edit for itself
+        agent.keys_of_agent_writable_props = customizable_properties
+
         return agent_id, agent_seed
-
-    def create_and_add_env_object(self, obj_name, location, obj_properties, is_traversable):
-        """ this function adds the objects """
-
-        env_object = self.create_env_object(obj_name, location, obj_properties, is_traversable)
-
-        obj_id = self.add_env_object(env_object)
-
-        return obj_id
-
-    def create_env_object(self, name, location, properties, is_traversable):
-        obj_id = name
-
-        # check if we need to add an existing object
-        if 'object_class' in properties:
-            # call the constructor for the defined object type
-            env_object = eval(properties["object_class"])(obj_id, name, locations=location,
-                                                          properties=properties)
-        else:  # otherwise, it is a custom object
-            env_object = EnvObject(obj_id, name, location=location, properties=properties,
-                                   is_traversable=is_traversable)
-
-        return env_object
 
     def add_env_object(self, env_object: EnvObject):
         """ this function adds the objects """
@@ -171,13 +196,13 @@ class GridWorld:
                     "action"] if agent_id in self.visualizer.userinputs else None
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
                     state=state,
-                    agent_properties=agent_obj.get_properties(), possible_actions=possible_actions, agent_id=agent_id,
+                    agent_properties=agent_obj.get_attributes(), possible_actions=possible_actions, agent_id=agent_id,
                     userinput=usrinp)
             else:
                 # perform the OODA loop and get an action back
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
                     state=state,
-                    agent_properties=agent_obj.get_properties(), possible_actions=possible_actions,
+                    agent_properties=agent_obj.get_attributes(), possible_actions=possible_actions,
                     agent_id=agent_id)
 
             # store the action in the buffer
@@ -214,7 +239,7 @@ class GridWorld:
 
         # Perform the update method of all objects
         for env_obj in self.environment_objects.values():
-            env_obj.update_properties(self)
+            env_obj.update_attributes(self)
 
         # Increment the number of tick we performed
         self.current_nr_ticks += 1
@@ -380,18 +405,11 @@ class GridWorld:
         # create a state with all objects and agents
         state = {}
         for obj_id, obj in self.environment_objects.items():
-            state[obj.obj_id] = obj.get_properties()
+            state[obj.obj_id] = obj.get_attributes()
         for agent_id, agent in self.registered_agents.items():
-            state[agent.obj_id] = agent.get_properties()
+            state[agent.obj_id] = agent.get_attributes()
 
         return state
-
-    def __sync_god_view_GUI(self):
-        # get all objects and agents on the grid
-        state = self.__get_complete_state()
-
-        # send the grid / god view state to the GUI web server for visualization
-        sendGUIupdate(state=state, type="god", verbose=False)
 
     def __get_agent_state(self, agent_obj):
         agent_loc = agent_obj.location
@@ -407,7 +425,7 @@ class GridWorld:
         state = {}
         # Save all properties of the sensed objects in a state dictionary
         for env_obj in objs_in_range:
-            state[env_obj] = objs_in_range[env_obj].get_properties()
+            state[env_obj] = objs_in_range[env_obj].get_attributes()
 
         return state
 
@@ -475,7 +493,7 @@ class GridWorld:
             else:
                 # If the action is not possible, send a failed ActionResult with the is_possible message if given,
                 # otherwise use the default one.
-                custom_not_possible_message = is_possible[1] #is_possible[1]
+                custom_not_possible_message = is_possible[1]  # is_possible[1]
                 if custom_not_possible_message is not None:
                     result = ActionResult(custom_not_possible_message, succeeded=False)
                 else:

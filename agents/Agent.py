@@ -4,9 +4,10 @@ from environment.actions.object_actions import RemoveObject
 from environment.actions.object_actions import GrabAction
 from environment.actions.door_actions import *
 
+
 class Agent:
 
-    def __init__(self, action_set, sense_capability, agent_properties, properties_agent_writable):
+    def __init__(self, action_set, name="Agent"):
         """
         Creates an Agent. All other agents should inherit from this class if you want smarter agents. This agent
         simply randomly selects an action from the possible actions it can do.
@@ -20,22 +21,19 @@ class Agent:
         webapp managing the Agent GUI
         """
         self.action_set = action_set  # list of action names (strings)
-        self.sense_capability = sense_capability
-        self.agent_properties = {}
-        self.rnd_gen = np.random.RandomState()
-        self.rnd_seed = None
-        self.previous_action = None
-        self.previous_action_result = None
 
-        # specifies the agent_properties
-        self.agent_properties = agent_properties
-        # specifies the keys of properties in self.agent_properties which can
-        # be changed by this Agent in this file. If it is not writable, it can only be
-        # updated through performing an action which updates that property (done by the environment).
-        # NOTE: Changing which properties are writable cannot be done during runtime! Only in
-        # the scenario manager
-        self.keys_of_agent_writable_props = properties_agent_writable
+        # Initialize past action and its result
+        self.previous_action = None  # previous action performed
+        self.previous_action_result = None  # previous action result
 
+        # Initialize things that will be filled in by the WorldFactory
+        # NOTE: Initializing cannot be done yourself! These will be overwritten by the WorldFactory.
+        self.agent_properties = {}  # dictionary of properties
+        self.rnd_gen = np.random.RandomState()  # this agent's random generator
+        self.rnd_seed = None  # the agent's random seed
+        self.agent_name = name  # the name of the agent
+        self.agent_properties = {}  # Specifies the agent's properties.
+        self.keys_of_agent_writable_props = []  # which properties can be overwritten by this agent (others are ignored)
 
     def get_action(self, state, agent_properties, possible_actions, agent_id):
         """
@@ -182,7 +180,8 @@ class Agent:
                 action_kwargs['object_id'] = object_id
                 # Select range as just enough to remove that object
                 remove_range = int(np.ceil(np.linalg.norm(
-                    np.array(state[object_id]['location'])-np.array(state[self.agent_properties["name"]]['location']))))
+                    np.array(state[object_id]['location']) - np.array(
+                        state[self.agent_properties["name"]]['location']))))
                 # Safety for if object and agent are in the same location
                 remove_range = max(remove_range, 0)
                 # Assign it to the arguments list
@@ -217,7 +216,8 @@ class Agent:
             for object_id in objects:
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
-                    np.array(state[object_id]['location']) - np.array(state[self.agent_properties["name"]]['location']))))
+                    np.array(state[object_id]['location']) - np.array(
+                        state[self.agent_properties["name"]]['location']))))
                 if dist <= grab_range and state[object_id]["movable"]:
                     object_in_range.append(object_id)
 
@@ -234,7 +234,7 @@ class Agent:
         # if we randomly chose to do a open or close door action, find a door to open/close
         elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:
 
-            action_kwargs['door_range'] = 1 #np.inf
+            action_kwargs['door_range'] = 1  # np.inf
             action_kwargs['object_id'] = None
 
             # Get all doors from the perceived objects
