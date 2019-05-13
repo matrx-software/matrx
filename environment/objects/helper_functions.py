@@ -7,3 +7,9 @@ def next_obj_id():
     res = object_counter
     object_counter += 1
     return res
+
+
+def get_inheritence_path(callable_class):
+    parents = callable_class.mro()
+    parents = [str(p) for p in parents]
+    return parents

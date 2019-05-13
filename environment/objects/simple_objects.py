@@ -1,4 +1,5 @@
 from environment.objects.env_object import EnvObject
+from scenario_manager.helper_functions import get_default_value
 
 
 class SquareBlock(EnvObject):
@@ -146,8 +147,9 @@ class Wall(EnvObject):
         :param location: The location of the wall.
         :param name: The name, default "Wall".
         """
-
-        super().__init__(name=name, location=location, visualize_colour=visualisation_colour)
+        is_traversable = False  # All walls are always not traversable
+        super().__init__(name=name, location=location, visualize_colour=visualisation_colour,
+                         is_traversable=is_traversable)
 
 
 class Area(EnvObject):
@@ -159,5 +161,6 @@ class Area(EnvObject):
         :param location: The location of the area.
         :param name: The name, default "Area".
         """
-
-        super().__init__(name=name, location=location, visualize_colour=visualisation_colour)
+        is_traversable = True  # Areas are always traversables
+        super().__init__(name=name, location=location, visualize_colour=visualisation_colour,
+                         is_traversable=is_traversable)

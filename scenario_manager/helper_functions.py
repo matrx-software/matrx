@@ -1,5 +1,6 @@
 import json
 import os
+from collections import Mapping, Callable
 from pathlib import Path
 
 
@@ -19,8 +20,8 @@ def get_default_value(class_name, property_name):
 def load_defaults():
     # Find the testbed's root path (searches through all the file's parents until the folder testbed is reached)
     root_path = None
-    for parent in Path(__file__).parents:
-        if "testbed" in parent:
+    for parent in reversed(list(Path(__file__).parents)):
+        if "testbed" in str(parent):
             root_path = parent
             break
 
@@ -33,8 +34,8 @@ def load_scenario(scenario_file):
 
     # Find the testbed's root path (searches through all the file's parents until the folder testbed is reached)
     root_path = None
-    for parent in Path(__file__).parents:
-        if "testbed" in parent:
+    for parent in reversed(list(Path(__file__).parents)):
+        if "testbed" in str(parent):
             root_path = parent
             break
 
@@ -46,3 +47,21 @@ def load_json(file_path):
     with open(file_path, "r") as read_file:
         json_dict = json.load(read_file)
     return json_dict
+
+
+def get_all_inherited_classes(super_type):
+    all_classes = {super_type}
+    work = [super_type]
+    while work:
+        parent = work.pop()
+        for child in parent.__subclasses__():
+            if child not in all_classes:
+                all_classes.add(child)
+                work.append(child)
+
+    # Create a dict out of it
+    class_dict = {}
+    for classes in all_classes:
+        class_dict[classes.__name__] = classes
+
+    return class_dict

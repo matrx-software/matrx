@@ -15,7 +15,7 @@
       }
     }
   },
-  "agent_defaults":
+  "Agent":
   {
     "name": "Agent",
     "agent_class": "Agent",
@@ -33,32 +33,7 @@
     "customizable_properties": ["colour", "shape"],
     "class_specific_kwargs": {}
   },
-  "human_agent_defaults":
-  {
-    "name": "Human Agent",
-    "agent_class": "HumanAgent",
-    "agent_speed_in_ticks": 1,
-    "senses": [["*", "inf"]],
-    "is_traversable": true,
-    "input_action_map":
-    {
-      "arrowkey:up": "MoveNorth",
-      "arrowkey:right": "MoveEast",
-      "arrowkey:down": "MoveSouth",
-      "arrowkey:left": "MoveWest"
-    },
-    "possible_actions": [],
-    "additional_agent_properties": {},
-    "visualisation_properties":
-    {
-      "size": 1.0,
-      "colour": "#fde500",
-      "shape": 0
-    },
-    "customizable_properties": ["colour", "shape"],
-    "class_specific_kwargs": {}
-  },
-  "object_defaults":
+  "EnvObject":
   {
     "name": "Object",
     "object_class": "EnvObject",
@@ -72,19 +47,5 @@
         "shape": 0
     },
     "class_specific_kwargs": {}
-  },
-  "area_defaults":
-  {
-    "name": "Area",
-    "area_class": "Area",
-    "area_kwargs": {},
-    "area_properties": {},
-    "has_walls": false,
-    "doors": [[]],
-    "visualisation_properties":
-    {
-      "walls": {"colour": "#000000"},
-      "area": {"colour": "#cccccc"}
-    }
   }
 }

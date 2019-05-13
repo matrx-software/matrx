@@ -1,7 +1,8 @@
 import numpy as np
 
 from environment.actions.action import Action, ActionResult
-from environment.objects.env_object import Door
+from environment.objects.simple_objects import Door
+
 
 class OpenDoorAction(Action):
     """

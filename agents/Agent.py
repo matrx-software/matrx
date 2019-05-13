@@ -4,9 +4,10 @@ from environment.actions.object_actions import RemoveObject
 from environment.actions.object_actions import GrabAction
 from environment.actions.door_actions import *
 
+
 class Agent:
 
-    def __init__(self, action_set, sense_capability, agent_properties, properties_agent_writable):
+    def __init__(self, action_set, sense_capability, agent_properties, properties_agent_writable, name="Agent"):
         """
         Creates an Agent. All other agents should inherit from this class if you want smarter agents. This agent
         simply randomly selects an action from the possible actions it can do.
@@ -26,6 +27,7 @@ class Agent:
         self.rnd_seed = None
         self.previous_action = None
         self.previous_action_result = None
+        self.agent_name = name
 
         # specifies the agent_properties
         self.agent_properties = agent_properties
@@ -35,7 +37,6 @@ class Agent:
         # NOTE: Changing which properties are writable cannot be done during runtime! Only in
         # the scenario manager
         self.keys_of_agent_writable_props = properties_agent_writable
-
 
     def get_action(self, state, agent_properties, possible_actions, agent_id):
         """
@@ -182,7 +183,8 @@ class Agent:
                 action_kwargs['object_id'] = object_id
                 # Select range as just enough to remove that object
                 remove_range = int(np.ceil(np.linalg.norm(
-                    np.array(state[object_id]['location'])-np.array(state[self.agent_properties["name"]]['location']))))
+                    np.array(state[object_id]['location']) - np.array(
+                        state[self.agent_properties["name"]]['location']))))
                 # Safety for if object and agent are in the same location
                 remove_range = max(remove_range, 0)
                 # Assign it to the arguments list
@@ -217,7 +219,8 @@ class Agent:
             for object_id in objects:
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
-                    np.array(state[object_id]['location']) - np.array(state[self.agent_properties["name"]]['location']))))
+                    np.array(state[object_id]['location']) - np.array(
+                        state[self.agent_properties["name"]]['location']))))
                 if dist <= grab_range and state[object_id]["movable"]:
                     object_in_range.append(object_id)
 
@@ -234,7 +237,7 @@ class Agent:
         # if we randomly chose to do a open or close door action, find a door to open/close
         elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:
 
-            action_kwargs['door_range'] = 1 #np.inf
+            action_kwargs['door_range'] = 1  # np.inf
             action_kwargs['object_id'] = None
 
             # Get all doors from the perceived objects

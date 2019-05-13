@@ -8,8 +8,9 @@ from scenario_manager.helper_functions import get_default_value
 class EnvObject:
 
     def __init__(self, location, name, customizable_properties=None,
-                 is_traversable=None, carried_by=None,
-                 visualize_size=None, visualize_shape=None, visualize_colour=None, **custom_properties):
+                 is_traversable=None, carried_by=None, class_callable=None,
+                 visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
+                 **custom_properties):
         """
         The basic class for all objects in the world. This includes the AgentAvatar. All objects that are added to the
         GridWorld should inherit this class.
@@ -54,6 +55,10 @@ class EnvObject:
         :param is_traversable: Boolean. Optional, default obtained from defaults.json. Signals whether other objects can
         be placed on top of this object.
         :param carried_by: List. Optional, default obtained from defaults.json. A list of who is carrying this object.
+        :param class_callable: Callable class. Optional, defaults to EnvObject. This is required to make a distinction
+        between what kind of object is actually seen or visualized. The last element is always the lowest level class,
+        whereas the first element is always EnvObject and everything in between are potential other classes in the
+        inheritance chain.
         :param visualize_size: Float. Optional, default obtained from defaults.json. A visualisation property used by
         the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualisation (e.g. a
         value of 0.5 is half of a square, object is in the center, a value of 2 is twice the square's size centered on
@@ -61,7 +66,9 @@ class EnvObject:
         :param visualize_shape: Int. Optional, default obtained from defaults.json. A visualisation property used by the
         Visualizer. Denotes the shape of the object in the visualisation.
         :param visualize_colour: Hexcode string. Optional, default obtained from defaults.json. A visualisation property
-        used by the Visualizer. Denotes the
+        used by the Visualizer. Denotes the colour of the object in visualisation.
+        :param visualize_depth: Integer. Optional, default obtained from defaults.json. A visualisation property that
+        is used by the Visualizer to draw objects in layers.
         :param **custom_properties: Optional. Any other keyword arguments. All these are treated as custom attributes.
         For example the property 'heat'=2.4 of an EnvObject representing a fire.
         """
@@ -76,15 +83,31 @@ class EnvObject:
         if customizable_properties is None:
             self.customizable_properties = []
 
+        # Set the class trace if not given (based on EnvObject). This is required to make a distinction between what
+        # kind of object is actually seen or visualized. The last element is always the lowest level class, whereas the
+        # first element is always EnvObject and everything in between are potential other classes in the inheritance
+        # chain.
+        if class_callable is None:
+            self.class_inheritance = get_inheritence_path(EnvObject)
+        else:
+            self.class_inheritance = get_inheritence_path(class_callable)
+
         # Set the mandatory properties to their default values based on the defaults.json if they are not given
-        if is_traversable is None:
+        self.is_traversable = is_traversable
+        if self.is_traversable is None:
             self.is_traversable = get_default_value(class_name="EnvObject", property_name="is_traversable")
-        if visualize_size is None:
+        self.visualize_size = visualize_size
+        if self.visualize_size is None:
             self.visualize_size = get_default_value(class_name="EnvObject", property_name="visualize_size")
-        if visualize_shape is None:
+        self.visualize_shape = visualize_shape
+        if self.visualize_shape is None:
             self.visualize_shape = get_default_value(class_name="EnvObject", property_name="visualize_shape")
-        if visualize_colour is None:
+        self.visualize_colour = visualize_colour
+        if self.visualize_colour is None:
             self.visualize_colour = get_default_value(class_name="EnvObject", property_name="visualize_colour")
+        self.visualize_depth = visualize_depth
+        if self.visualize_depth is None:
+            self.visualize_depth = get_default_value(class_name="EnvObject", property_name="visualize_depth")
 
         # Since carried_by cannot be defined beforehand (it contains the unique id's of objects that carry this object)
         # we set it to an empty list by default.
@@ -120,40 +143,40 @@ class EnvObject:
 
     def change_property(self, property_name, property_value):
         """
-        Changes the value of an existing (!) property, if it can be customized (as is present in the
-        customizable_properties list).
+        Changes the value of an existing (!) property.
         :param property_name: The name of the property.
         :param property_value:  The value of the property.
         :return: The new properties.
         """
-        # We can only change properties if they are customizable OR if this is called from the GridWorld (as the World
-        # is allowed the right to change anything it wants) or the EnvObject (as the object is allowed to change itself)
-        allowed_update = False
-        warning_str = ""
 
-        # We obtain the file name from which this method is called to check if it might be called from GridWorld.
-        # Error sensitive when the file name of where the GridWorld class is located changes!
-        caller_file = inspect.stack()[1].filename
-
-        # If it is in customizable_properties, it is fine
-        if property_name in self.customizable_properties:
-            allowed_update = True
-        # Then we check if the method is instead called from the GridWorld or EnvObject itself
-        # See the stack method; https://docs.python.org/3.5/library/inspect.html#the-interpreter-stack)
-        elif caller_file == "gridworld.py" or caller_file == "env_object.py" and allowed_update is False:
-            allowed_update = True
-        else:
-            warning_str = f"The property name {property_name} is not a customizable property and the change is " \
-                          f"called outside of the GridWorld or EnvObject class (namely from the file {caller_file})!"
-
-        # Then we change the value of the property if we are allowed to, otherwise we give a warning and don't change
-        # anything.
-        if allowed_update:
-            # We check if it is a custom property and if so change it simply in the dictionary
-            if property_name in self.custom_properties.keys():
-                self.customizable_properties[property_name] = property_value
-        else:
-            warnings.warn(warning_str)
+        # We check if it is a custom property and if so change it simply in the dictionary
+        if property_name in self.custom_properties.keys():
+            self.customizable_properties[property_name] = property_value
+        else:  # else we need to check if property_name is a mandatory class attribute that is also a property
+            if property_name == "is_traversable":
+                assert isinstance(property_value, bool)
+                self.is_traversable = property_value
+            elif property_name == "name":
+                assert isinstance(property_value, str)
+                self.obj_name = property_value
+            elif property_name == "location":
+                assert isinstance(property_value, list) or isinstance(property_value, tuple)
+                self.location = property_value
+            elif property_name == "class_inheritance":
+                assert isinstance(property_value, list)
+                self.class_inheritance = property_value
+            elif property_name == "visualize_size":
+                assert isinstance(property_value, int)
+                self.visualize_size = property_value
+            elif property_name == "visualize_colour":
+                assert isinstance(property_value, str)
+                self.visualize_colour = property_value
+            elif property_name == "visualize_shape":
+                assert isinstance(property_value, int)
+                self.visualize_shape = property_value
+            elif property_name == "visualize_depth":
+                assert isinstance(property_value, int)
+                self.visualize_depth = property_value
 
         return self.properties
 
@@ -202,12 +225,15 @@ class EnvObject:
 
         # Add all mandatory properties. Make sure that these are updated if one are added to the constructor!
         properties['name'] = self.obj_name
+        properties['object_id'] = self.obj_id  # we return id as well, but this should never ever be modified!
         properties['location'] = self.location
         properties['is_traversable'] = self.is_traversable
+        properties['class_inheritance'] = self.class_inheritance
         properties['visualisation'] = {
             "size": self.visualize_size,
             "shape": self.visualize_shape,
             "colour": self.visualize_colour,
+            "depth": self.visualize_depth
         }
 
         return properties
