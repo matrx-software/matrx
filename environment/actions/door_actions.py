@@ -1,7 +1,8 @@
 import numpy as np
 
 from environment.actions.action import Action, ActionResult
-from environment.objects.basic_objects import Door
+from environment.objects.simple_objects import Door
+
 
 class OpenDoorAction(Action):
     """
@@ -39,10 +40,8 @@ class OpenDoorAction(Action):
         # get obj
         obj = grid_world.environment_objects[object_id]
 
-        # set door to open, traversable, and change colour
-        obj.properties["door_open"] = True
-        obj.properties["colour"] = "#9c9c9c"
-        obj.is_traversable = True
+        # call the open door action in the object
+        obj.open_door()
 
         result = CloseDoorActionResult(OpenDoorActionResult.RESULT_SUCCESS, True)
         return result
@@ -121,10 +120,8 @@ class CloseDoorAction(Action):
         # get obj
         obj = grid_world.environment_objects[object_id]
 
-        # set door to closed, intraversable, and change colour
-        obj.properties["door_open"] = False
-        obj.properties["colour"] = "#5a5a5a"
-        obj.is_traversable = False
+        # call the close door action in the object
+        obj.close_door()
 
         result = CloseDoorActionResult(CloseDoorActionResult.RESULT_SUCCESS, True)
         return result

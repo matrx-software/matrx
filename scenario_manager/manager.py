@@ -11,8 +11,10 @@ from agents.HumanAgent import HumanAgent
 from agents.capabilities.capability import SenseCapability
 from environment.actions.action import Action
 from environment.gridworld import GridWorld
-from environment.objects.basic_objects import EnvObject, Area, Wall, Door
+from environment.objects.env_object import EnvObject
+from environment.objects.simple_objects import Area, Wall, Door
 from environment.sim_goals.sim_goal import SimulationGoal
+from scenario_manager.helper_functions import load_json, load_defaults, load_scenario, get_all_inherited_classes
 
 
 class ScenarioManager:
@@ -20,12 +22,12 @@ class ScenarioManager:
     def __init__(self):
         self.scenario_file = None
         self.scenario_dict = None
-        self.defaults = self._load_defaults_json()
+        self.defaults = load_defaults()
 
     def create_scenario(self, scenario_file):
 
         # Get the full path to the scenario file
-        self.scenario_dict = self._load_scenario_json(scenario_file)
+        self.scenario_dict = load_scenario(scenario_file)
 
         # Get simulation settings
         grid_world = self._create_grid_world()
@@ -141,22 +143,6 @@ class ScenarioManager:
 
         return env_objs
 
-    def _load_defaults_json(self):
-        root_path = Path(__file__).parents[1]
-        file_path = os.path.join(root_path, "scenarios", "defaults.json")
-        return self._load_json(file_path)
-
-    def _load_scenario_json(self, scenario_file):
-        self.scenario_file = scenario_file
-        root_path = Path(__file__).parents[1]
-        scenario_path = os.path.join(root_path, "scenarios", scenario_file)
-        return self._load_json(scenario_path)
-
-    def _load_json(self, file_path):
-        with open(file_path, "r") as read_file:
-            scenario_dict = json.load(read_file)
-        return scenario_dict
-
     def _add_missing_keys(self, settings: dict, defaults: dict):
         for k, v in defaults.items():
             if k not in settings.keys():
@@ -171,7 +157,7 @@ class ScenarioManager:
     def _runtime_object_creation(self, class_name, kwargs, super_type):
 
         # Search for all subclasses of super_type first in the entire code base
-        classes_dict = self._get_all_inherited_classes(super_type)
+        classes_dict = get_all_inherited_classes(super_type)
 
         # If the class is known, we call its constructor with the kwargs
         if class_name in classes_dict.keys():
@@ -181,7 +167,7 @@ class ScenarioManager:
 
     def _get_sense_capability(self, senses):
         # Get all potential EnvObject classes
-        potential_objects = self._get_all_inherited_classes(EnvObject)
+        potential_objects = get_all_inherited_classes(EnvObject)
 
         # Go through the list of (Type, range) tuples
         trans_senses = []
@@ -201,23 +187,6 @@ class ScenarioManager:
                 trans_senses.append([sense_class, sense_range])
 
         return SenseCapability(trans_senses)  # return a SenseCapability based on the processed senses list
-
-    def _get_all_inherited_classes(self, super_type) -> Mapping[str, Callable]:
-        all_classes = {super_type}
-        work = [super_type]
-        while work:
-            parent = work.pop()
-            for child in parent.__subclasses__():
-                if child not in all_classes:
-                    all_classes.add(child)
-                    work.append(child)
-
-        # Create a dict out of it
-        class_dict = {}
-        for classes in all_classes:
-            class_dict[classes.__name__] = classes
-
-        return class_dict
 
     def _create_human_agent(self, agent_id, settings: dict, grid_world):
         # Check if settings contains the one mandatory setting that is not in defaults; start_location
@@ -314,7 +283,7 @@ class ScenarioManager:
 
     def _get_action_list(self, agent_id, action_list):
         # Get list of all Action class types known in the project
-        all_actions = self._get_all_inherited_classes(Action).keys()
+        all_actions = get_all_inherited_classes(Action).keys()
 
         # Go through all actions, throw exception when there is one unknown in the project or if there is a wildcard '*'
         # present, we return all known actions.
@@ -329,7 +298,7 @@ class ScenarioManager:
 
     def _get_class(self, class_name, super_class, id_name=None):
         # Get all possible agent brain classes and check if the 'agent_class' is among them
-        all_classes = self._get_all_inherited_classes(super_class)
+        all_classes = get_all_inherited_classes(super_class)
         if class_name not in all_classes.keys():  # if class name is not known
             if id_name is not None:
                 raise Exception(f"Cannot add {id_name}; the class '{class_name}' is not among the classes"

@@ -77,7 +77,7 @@ class GridWorld:
         # Obtain the class of the agent
         callable_class = agent.__class__
 
-        # Obtain the mandatory properties of the agent
+        # Obtain the properties of the agent
         agent_name = agent_properties["name"]
         is_traversable = agent_properties["is_traversable"]
         agent_speed_in_ticks = agent_properties["agent_speed_in_ticks"]
