@@ -86,7 +86,7 @@ class HumanAgent(Agent):
         # if the user chose a grab action, choose an object with a grab_range of 1
         if action == GrabAction.__name__:
             # Assign it to the arguments list
-            action_kwargs['grab_range'] = 0 # Set grab range
+            action_kwargs['grab_range'] = 1# Set grab range
             action_kwargs['max_objects'] = 3 # Set max amount of objects
             action_kwargs['object_id'] = None
 
@@ -94,11 +94,14 @@ class HumanAgent(Agent):
             objects = list(state.keys())
 
             # Remove all (human)agents
+            objects.remove(self.agent_properties["name"])
             objects = [obj for obj in objects if 'agent' not in obj]
 
             # find objects in range
             object_in_range = []
             for object_id in objects:
+                if "movable" not in state[object_id]:
+                    continue
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
                     np.array(state[object_id]['location']) - np.array(state[self.agent_properties["name"]]['location']))))
@@ -117,7 +120,7 @@ class HumanAgent(Agent):
 
             # Get all doors from the perceived objects
             objects = list(state.keys())
-            doors = [obj for obj in objects if 'type' in state[obj] and state[obj]['type'] == "Door"]
+            doors = [obj for obj in objects if 'door_open' in state[obj]]
 
             # get all doors within range
             doors_in_range = []
