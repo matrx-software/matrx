@@ -7,8 +7,8 @@ from scenario_manager.helper_functions import get_default_value
 
 class EnvObject:
 
-    def __init__(self, location, name, customizable_properties=None,
-                 is_traversable=None, carried_by=None, class_callable=None,
+    def __init__(self, location, name, class_callable, customizable_properties=None,
+                 is_traversable=None, is_movable=None,
                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
                  **custom_properties):
         """
@@ -76,52 +76,53 @@ class EnvObject:
         # Set the object's name.
         self.obj_name = name
 
-        # Obtain a unique ID based on a global object counter
-        self.obj_id = f"{self.obj_name}_{next_obj_id()}"
+        # Obtain a unique ID based on a global object counter, if not already set as an attribute in a super class
+        if not hasattr(self, "obj_id"):
+            self.obj_id = f"{self.obj_name}_{next_obj_id()}"
 
-        # Make customizable_properties mutable if not given
+        # Make customizable_properties mutable if not given.
         if customizable_properties is None:
             self.customizable_properties = []
-
-        # Set the class trace if not given (based on EnvObject). This is required to make a distinction between what
-        # kind of object is actually seen or visualized. The last element is always the lowest level class, whereas the
-        # first element is always EnvObject and everything in between are potential other classes in the inheritance
-        # chain.
-        if class_callable is None:
-            self.class_inheritance = get_inheritence_path(EnvObject)
         else:
-            self.class_inheritance = get_inheritence_path(class_callable)
+            self.customizable_properties = customizable_properties
 
-        # Set the mandatory properties to their default values based on the defaults.json if they are not given
-        self.is_traversable = is_traversable
-        if self.is_traversable is None:
-            self.is_traversable = get_default_value(class_name="EnvObject", property_name="is_traversable")
-        self.visualize_size = visualize_size
-        if self.visualize_size is None:
-            self.visualize_size = get_default_value(class_name="EnvObject", property_name="visualize_size")
-        self.visualize_shape = visualize_shape
-        if self.visualize_shape is None:
-            self.visualize_shape = get_default_value(class_name="EnvObject", property_name="visualize_shape")
-        self.visualize_colour = visualize_colour
-        if self.visualize_colour is None:
-            self.visualize_colour = get_default_value(class_name="EnvObject", property_name="visualize_colour")
+        # Set the class trace based on the given callable class object. This is required to make a distinction between
+        # what kind of object is actually seen or visualized. The last element is always the lowest level class Object,
+        # with the second last element being EnvObject. Any elements before that are custom EnvObject class names.
+        self.class_inheritance = get_inheritence_path(class_callable)
+
+        # Load defaults if not given. We do this loading this low-level (instead of for example in the WorldFactory) for
+        # users to make it easier to build/extend their own WorldFactory and this way they do not have to deal with this
+        # It also helps if users want to create a GridWorld without using the WorldFactory.
+        if is_traversable is None:
+            is_traversable = get_default_value(class_name="EnvObject", property_name="is_traversable")
+        if visualize_size is None:
+            visualize_size = get_default_value(class_name="EnvObject", property_name="visualize_size")
+        if visualize_shape is None:
+            visualize_shape = get_default_value(class_name="EnvObject", property_name="visualize_shape")
+        if visualize_colour is None:
+            visualize_colour = get_default_value(class_name="EnvObject", property_name="visualize_colour")
+        if visualize_depth is None:
+            visualize_depth = get_default_value(class_name="EnvObject", property_name="visualize_depth")
+        if is_movable is None:
+            is_movable = get_default_value(class_name="EnvObject", property_name="is_movable")
+
+        # Set the mandatory properties
         self.visualize_depth = visualize_depth
-        if self.visualize_depth is None:
-            self.visualize_depth = get_default_value(class_name="EnvObject", property_name="visualize_depth")
+        self.visualize_colour = visualize_colour
+        self.visualize_shape = visualize_shape
+        self.visualize_size = visualize_size
+        self.is_traversable = is_traversable
+        self.is_movable = is_movable
 
         # Since carried_by cannot be defined beforehand (it contains the unique id's of objects that carry this object)
         # we set it to an empty list by default.
-        if carried_by is None:
-            self.carried_by = []
+        self.carried_by = []
 
         # Go through the custom properties that were given (if any) and set them to the custom_properties dictionary
         self.custom_properties = {}
-        for k, v in custom_properties:
+        for k, v in custom_properties.items():
             self.custom_properties[k] = v
-
-        # Check the location
-        assert isinstance(location, list)
-        assert len(location) == 2
 
         # location should be set at the end (due to the dependency of its setter on the other properties (e.g. in
         # AgentAvatar)
@@ -177,6 +178,9 @@ class EnvObject:
             elif property_name == "visualize_depth":
                 assert isinstance(property_value, int)
                 self.visualize_depth = property_value
+            elif property_name == "is_movable":
+                assert isinstance(property_value, bool)
+                self.is_movable = property_value
 
         return self.properties
 
@@ -207,6 +211,8 @@ class EnvObject:
         EnvObject (such as in the case of an AgentAvatar; all the objects its holding change their locations as well).
         :param loc: The new location
         """
+        assert isinstance(loc, list) or isinstance(loc, tuple)
+        assert len(loc) == 2
         self.__location = loc
 
     @property
@@ -225,8 +231,10 @@ class EnvObject:
 
         # Add all mandatory properties. Make sure that these are updated if one are added to the constructor!
         properties['name'] = self.obj_name
-        properties['object_id'] = self.obj_id  # we return id as well, but this should never ever be modified!
+        properties['obj_id'] = self.obj_id  # we return id as well, but this should never ever be modified!
         properties['location'] = self.location
+        properties['is_movable'] = self.is_movable
+        properties['carried_by'] = self.carried_by
         properties['is_traversable'] = self.is_traversable
         properties['class_inheritance'] = self.class_inheritance
         properties['visualisation'] = {

@@ -5,33 +5,26 @@ from collections import OrderedDict
 
 from agents.Agent import Agent
 from agents.HumanAgent import HumanAgent
-from agents.capabilities.capability import SenseCapability
 from environment.actions.object_actions import *
+from environment.helper_functions import get_all_classes
 from environment.objects.env_object import *
 from visualization.visualizer import Visualizer
 
-######
-# noinspection PyUnresolvedReferences
-from environment import *  # makes sure all Action and Object classes are loaded at runtime for reflection
-# noinspection PyUnresolvedReferences
-from agents import *  # makes sure all Agent classes are loaded at runtime for reflection
 
-
-######
+TIME_FOCUS_TICK_DURATION = 'aim_for_constant_tick_duration'
+TIME_FOCUS_SIMULATION_DURATION = 'aim_for_accurate_global_tick_duration'
 
 
 class GridWorld:
-    TIME_FOCUS_TICK_DURATION = 'aim_for_constant_tick_duration'
-    TIME_FOCUS_SIMULATION_DURATION = 'aim_for_accurate_global_tick_duration'
 
     def __init__(self, shape, tick_duration, simulation_goal=None, run_sail_api=True, run_visualisation_server=True,
-                 time_focus=TIME_FOCUS_TICK_DURATION, rnd_seed=1, ):
+                 time_focus=TIME_FOCUS_TICK_DURATION, rnd_seed=1):
         self.tick_duration = tick_duration
         self.registered_agents = OrderedDict()
         self.environment_objects = OrderedDict()
         self.current_nr_ticks = 0
         self.simulation_goal = simulation_goal
-        self.all_actions = self.__get_all_actions()
+        self.all_actions = get_all_classes(Action, omit_super_class=True)
         self.current_available_id = 0
         self.shape = shape
         self.run_sail_api = run_sail_api
@@ -60,75 +53,30 @@ class GridWorld:
         while not is_done:
             is_done, tick_duration = self.step()
 
-    def register_agent(self, agent: Agent, agent_properties: dict, customizable_properties: list):
+    def register_agent(self, agent: Agent, agent_avatar: AgentAvatar):
 
-        # Random seed for agent between 1 and 10000, might need to be adjusted still
-        agent_seed = self.rnd_gen.randint(1, 10000)
-
-        # Obtain the method callbacks from the agent we need for the avatar
-        action_set = agent.action_set
-        get_action = agent.get_action
-        set_action_result = agent.set_action_result
-        agent_observe = agent.ooda_observe
-
-        # get sense capability
-        sense_capability = agent.sense_capability
-
-        # Obtain the class of the agent
-        callable_class = agent.__class__
-
-        # Obtain the properties of the agent
-        agent_name = agent_properties["name"]
-        is_traversable = agent_properties["is_traversable"]
-        agent_speed_in_ticks = agent_properties["agent_speed_in_ticks"]
-        visualize_size = agent_properties["visualize_size"]
-        visualize_shape = agent_properties["visualize_shape"]
-        visualize_colour = agent_properties["visualize_colour"]
-        location = agent_properties["location"]
-        team = agent_properties["team"]
-
-        # Check if the agent is a human agent
-        inh_path = get_inheritence_path(callable_class)
-        if 'HumanAgent' in inh_path:
-            is_human_agent = True
-        else:
-            is_human_agent = False
-
-        # Get all custom properties
-        custom_properties = agent.agent_properties
-
-        # Create the agent avatar
-        agent_object = AgentAvatar(location,
-                                   possible_actions=action_set, sense_capability=sense_capability,
-                                   class_callable=callable_class, callback_agent_get_action=get_action,
-                                   callback_agent_set_action_result=set_action_result,
-                                   callback_agent_observe=agent_observe, name=agent_name, is_human_agent=is_human_agent,
-                                   customizable_properties=customizable_properties, is_traversable=is_traversable,
-                                   team=team, agent_speed_in_ticks=agent_speed_in_ticks, visualize_size=visualize_size,
-                                   visualize_shape=visualize_shape, visualize_colour=visualize_colour,
-                                   **custom_properties)
-        # Get agent id
-        agent_id = agent_object.obj_id
+        # Random seed for agent between 1 and 10000000, might need to be adjusted still
+        agent_seed = self.rnd_gen.randint(1, 10000000)
 
         # check if the agent can be succesfully placed at that location
-        self.validate_obj_placement(agent_object)
+        self.validate_obj_placement(agent_avatar)
 
         # Add agent to registered agents
-        self.registered_agents[agent_id] = agent_object
+        self.registered_agents[agent_avatar.obj_id] = agent_avatar
 
         # Get all properties from the agent avatar
-        avatar_props = agent_object.properties
+        avatar_props = agent_avatar.properties
 
-        # Add all avatar properties to the agents
-        for k, v in avatar_props.items():
-            agent.agent_properties[k] = v
+        agent.factory_initialise(agent_name=agent_avatar.obj_name,
+                                 action_set=agent_avatar.action_set,
+                                 sense_capability=agent_avatar.sense_capability,
+                                 agent_properties=avatar_props,
+                                 customizable_properties=agent_avatar.customizable_properties,
+                                 rnd_seed=agent_seed)
 
-        # Set the keys the agent can edit for itself
-        agent.keys_of_agent_writable_props = customizable_properties
+        return agent_avatar.obj_id
 
-        return agent_id, agent_seed
-
-    def add_env_object(self, env_object: EnvObject):
+    def register_env_object(self, env_object: EnvObject):
         """ this function adds the objects """
 
         # check if the object can be succesfully placed at that location
@@ -141,7 +89,7 @@ class GridWorld:
 
     def validate_obj_placement(self, env_object):
         """
-        Checks whether an object can be succesfully placed on the grid
+        Checks whether an object can be successfully placed on the grid
         """
         obj_loc = env_object.location
 
@@ -185,24 +133,25 @@ class GridWorld:
             if agent_obj.check_agent_busy(curr_tick=self.current_nr_ticks):
                 # only do the observe and orient of the OODA loop to update the GUI
                 filtered_agent_state = agent_obj.ooda_observe(state)
-                self.visualizer.save_state(type=agent_obj.class_name_agent, id=agent_id, state=filtered_agent_state)
+                self.visualizer.save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
+                                           state=filtered_agent_state)
                 continue
 
             possible_actions = self.__get_possible_actions(agent_id=agent_id, action_set=agent_obj.action_set)
 
             # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
-            if agent_obj.class_name_agent == HumanAgent.__name__:
+            if agent_obj.is_human_agent:
                 usrinp = self.visualizer.userinputs[agent_id][
                     "action"] if agent_id in self.visualizer.userinputs else None
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
                     state=state,
-                    agent_properties=agent_obj.get_attributes(), possible_actions=possible_actions, agent_id=agent_id,
+                    agent_properties=agent_obj.properties, possible_actions=possible_actions, agent_id=agent_id,
                     userinput=usrinp)
             else:
                 # perform the OODA loop and get an action back
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
                     state=state,
-                    agent_properties=agent_obj.get_attributes(), possible_actions=possible_actions,
+                    agent_properties=agent_obj.properties, possible_actions=possible_actions,
                     agent_id=agent_id)
 
             # store the action in the buffer
@@ -213,13 +162,14 @@ class GridWorld:
             agent_obj.set_agent_changed_properties(agent_properties)
 
             # save what the agent observed to the visualizer
-            self.visualizer.save_state(type=agent_obj.class_name_agent, id=agent_id, state=filtered_agent_state)
+            self.visualizer.save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
+                                       state=filtered_agent_state)
 
         # save the state of the god view in the visualizer
-        self.visualizer.save_state(type="god", id="god", state=self.__get_complete_state())
+        self.visualizer.save_state(inheritance_chain="god", id="god", state=self.__get_complete_state())
 
         # update the visualizations of all (human)agents and god
-        self.visualizer.updateGUIs(tick=self.current_nr_ticks)
+        self.visualizer.update_guis(tick=self.current_nr_ticks)
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
         for agent_id, action in action_buffer.items():
@@ -239,7 +189,7 @@ class GridWorld:
 
         # Perform the update method of all objects
         for env_obj in self.environment_objects.values():
-            env_obj.update_attributes(self)
+            env_obj.update_properties(self)
 
         # Increment the number of tick we performed
         self.current_nr_ticks += 1
@@ -251,8 +201,6 @@ class GridWorld:
         total_time = (tick_end_time - self.tick_start_time)
         self.sleep_duration = self.tick_duration * self.current_nr_ticks - total_time.total_seconds()
 
-        print(f"Tick took {self.curr_tick_duration} seconds")
-
         # Sleep for the remaining time of self.tick_duration
         self.__sleep()
 
@@ -260,6 +208,7 @@ class GridWorld:
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time_current_tick
         self.curr_tick_duration = tick_duration.total_seconds()
+        print(f"Tick {self.current_nr_ticks} took {self.curr_tick_duration} seconds")
 
         return self.is_done, self.curr_tick_duration
 
@@ -386,7 +335,8 @@ class GridWorld:
             time.sleep(self.sleep_duration)
         else:
             self.__warn(
-                f"The average tick took longer than the set tick duration of {self.tick_duration}. Programm is to heavy to run real time")
+                f"The average tick took longer than the set tick duration of {self.tick_duration}. "
+                f"Programm is to heavy to run real time")
 
     def __update_grid(self):
         self.grid = np.array([[None for x in range(self.shape[0])] for y in range(self.shape[1])])
@@ -405,9 +355,9 @@ class GridWorld:
         # create a state with all objects and agents
         state = {}
         for obj_id, obj in self.environment_objects.items():
-            state[obj.obj_id] = obj.get_attributes()
+            state[obj.obj_id] = obj.properties
         for agent_id, agent in self.registered_agents.items():
-            state[agent.obj_id] = agent.get_attributes()
+            state[agent.obj_id] = agent.properties
 
         return state
 
@@ -425,7 +375,7 @@ class GridWorld:
         state = {}
         # Save all properties of the sensed objects in a state dictionary
         for env_obj in objs_in_range:
-            state[env_obj] = objs_in_range[env_obj].get_attributes()
+            state[env_obj] = objs_in_range[env_obj].properties
 
         return state
 
@@ -533,19 +483,3 @@ class GridWorld:
 
     def __warn(self, warn_str):
         return f"[@{self.current_nr_ticks}] {warn_str}"
-
-    def __get_all_actions(self):
-        subclasses = set()
-        work = [Action]
-        while work:
-            parent = work.pop()
-            for child in parent.__subclasses__():
-                if child not in subclasses:
-                    subclasses.add(child)
-                    work.append(child)
-
-        act_dict = {}
-        for action_class in subclasses:
-            act_dict[action_class.__name__] = action_class
-
-        return act_dict

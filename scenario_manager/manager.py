@@ -11,10 +11,11 @@ from agents.HumanAgent import HumanAgent
 from agents.capabilities.capability import SenseCapability
 from environment.actions.action import Action
 from environment.gridworld import GridWorld
+from environment.helper_functions import get_all_classes
 from environment.objects.env_object import EnvObject
 from environment.objects.simple_objects import Area, Wall, Door
 from environment.sim_goals.sim_goal import SimulationGoal
-from scenario_manager.helper_functions import load_json, load_defaults, load_scenario, get_all_inherited_classes
+from scenario_manager.helper_functions import load_json, load_defaults, load_scenario
 
 
 class ScenarioManager:
@@ -157,7 +158,7 @@ class ScenarioManager:
     def _runtime_object_creation(self, class_name, kwargs, super_type):
 
         # Search for all subclasses of super_type first in the entire code base
-        classes_dict = get_all_inherited_classes(super_type)
+        classes_dict = get_all_classes(super_type)
 
         # If the class is known, we call its constructor with the kwargs
         if class_name in classes_dict.keys():
@@ -167,7 +168,7 @@ class ScenarioManager:
 
     def _get_sense_capability(self, senses):
         # Get all potential EnvObject classes
-        potential_objects = get_all_inherited_classes(EnvObject)
+        potential_objects = get_all_classes(EnvObject)
 
         # Go through the list of (Type, range) tuples
         trans_senses = []
@@ -283,7 +284,7 @@ class ScenarioManager:
 
     def _get_action_list(self, agent_id, action_list):
         # Get list of all Action class types known in the project
-        all_actions = get_all_inherited_classes(Action).keys()
+        all_actions = get_all_classes(Action).keys()
 
         # Go through all actions, throw exception when there is one unknown in the project or if there is a wildcard '*'
         # present, we return all known actions.
@@ -298,7 +299,7 @@ class ScenarioManager:
 
     def _get_class(self, class_name, super_class, id_name=None):
         # Get all possible agent brain classes and check if the 'agent_class' is among them
-        all_classes = get_all_inherited_classes(super_class)
+        all_classes = get_all_classes(super_class)
         if class_name not in all_classes.keys():  # if class name is not known
             if id_name is not None:
                 raise Exception(f"Cannot add {id_name}; the class '{class_name}' is not among the classes"
@@ -466,20 +467,20 @@ class ScenarioManager:
     def _create_area(self, area_tiles, wall_tiles, door_objs, grid_world):
         # Add area tiles
         for tile in area_tiles:
-            grid_world.add_env_object(tile)
+            grid_world.register_env_object(tile)
 
         # Add wall tiles
         for wall in wall_tiles:
-            grid_world.add_env_object(wall)
+            grid_world.register_env_object(wall)
 
         # Add doors
         for door in door_objs:
-            grid_world.add_env_object(door)
+            grid_world.register_env_object(door)
 
         return grid_world
 
     def _create_object(self, env_obj: EnvObject, grid_world: GridWorld):
-        grid_world.add_env_object(env_obj)
+        grid_world.register_env_object(env_obj)
 
     def _create_env_object(self, obj_settings, nr):
         # Append missing settings (if any)

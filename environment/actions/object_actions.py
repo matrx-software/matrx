@@ -211,7 +211,7 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
         if len(env_obj.carried_by) != 0:
             return False, GrabActionResult.RESULT_OBJECT_CARRIED.replace("{AGENT_ID}",
                                                                          str(env_obj.carried_by))
-        elif not env_obj.properties["movable"]:
+        elif not env_obj.properties["is_movable"]:
             return False, GrabActionResult.RESULT_OBJECT_UNMOVABLE
         else:
             # Success
@@ -289,7 +289,7 @@ def act_drop(grid_world, agent_id, env_obj):
 
     # We return the object to the grid location we are standing at
     env_obj.location = reg_ag.location
-    grid_world.add_env_object(env_obj)
+    grid_world.register_env_object(env_obj)
 
     return DropActionResult(DropActionResult.RESULT_SUCCESS, True)
 

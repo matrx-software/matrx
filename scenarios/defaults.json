@@ -15,37 +15,24 @@
       }
     }
   },
-  "Agent":
+  "AgentAvatar":
   {
-    "name": "Agent",
-    "agent_class": "Agent",
+    "is_traversable": false,
+    "is_movable": false,
     "agent_speed_in_ticks": 1,
-    "senses": [["*", "inf"]],
-    "is_traversable": true,
-    "possible_actions": ["*"],
-    "additional_agent_properties": {},
-    "visualisation_properties":
-    {
-      "size": 1.0,
-      "colour": "#900C3F",
-      "shape": 0
-    },
-    "customizable_properties": ["colour", "shape"],
-    "class_specific_kwargs": {}
+    "visualize_size": 1.0,
+    "visualize_shape": 1,
+    "visualize_colour": "#92f441",
+    "visualize_depth": 1,
+    "possible_actions": "*"
   },
   "EnvObject":
   {
-    "name": "Object",
-    "object_class": "EnvObject",
-    "movable": false,
-    "is_traversable": true,
-    "additional_object_properties": {},
-    "visualisation_properties":
-    {
-        "colour": "#024f21",
-        "size": 1.0,
-        "shape": 0
-    },
-    "class_specific_kwargs": {}
+    "is_traversable": false,
+    "is_movable": true,
+    "visualize_size": 1.0,
+    "visualize_shape": 0,
+    "visualize_colour": "#4286f4",
+    "visualize_depth": 0
   }
 }

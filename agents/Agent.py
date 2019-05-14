@@ -7,7 +7,7 @@ from environment.actions.door_actions import *
 
 class Agent:
 
-    def __init__(self, action_set, sense_capability, agent_properties, properties_agent_writable, name="Agent"):
+    def __init__(self):
         """
         Creates an Agent. All other agents should inherit from this class if you want smarter agents. This agent
         simply randomly selects an action from the possible actions it can do.
@@ -20,23 +20,58 @@ class Agent:
         :param grid_size: The size of the grid. The agent needs to send this along with other information to the
         webapp managing the Agent GUI
         """
-        self.action_set = action_set  # list of action names (strings)
-        self.sense_capability = sense_capability
-        self.agent_properties = {}
-        self.rnd_gen = np.random.RandomState()
-        self.rnd_seed = None
+
+        # Class variables for tracking the past action and its result
         self.previous_action = None
         self.previous_action_result = None
-        self.agent_name = name
 
-        # specifies the agent_properties
+        # Filled by the WorldFactory during self.initialise
+        self.agent_name = None
+        self.action_set = None  # list of action names (strings)
+        self.sense_capability = None
+        self.rng = None
+        self.rnd_seed = None
+        self.agent_properties = {}
+        self.keys_of_agent_writable_props = []
+
+    def factory_initialise(self, agent_name, action_set, sense_capability, agent_properties, customizable_properties,
+                           rnd_seed):
+        """
+        Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
+        properties. This also sets the random number generator with a seed generated based on the random seed of the
+        world that is generated.
+
+        Note; This method should NOT be overridden!
+
+        :param agent_name: The name of the agent.
+        :param action_set: The list of action names this agent is allowed to perform.
+        :param sense_capability: The SenseCapability of the agent denoting what it can see withing what range.
+        :param agent_properties: The dictionary of properties containing all mandatory and custom properties.
+        :param customizable_properties: A list of keys in agent_properties that this agent is allowed to change.
+        :param rnd_seed: The random seed used to set the random number generator self.rng
+        """
+
+        # The name of the agent with which it is also known in the world
+        self.agent_name = agent_name
+
+        # The names of the actions this agent is allowed to perform
+        self.action_set = action_set
+
+        # Setting the random seed and rng
+        self.rnd_seed = rnd_seed
+        self.set_rnd_seed(seed=rnd_seed)
+
+        # The SenseCapability of the agent; what it can see and within what range
+        self.sense_capability = sense_capability
+
+        # Contains the agent_properties
         self.agent_properties = agent_properties
-        # specifies the keys of properties in self.agent_properties which can
-        # be changed by this Agent in this file. If it is not writable, it can only be
-        # updated through performing an action which updates that property (done by the environment).
-        # NOTE: Changing which properties are writable cannot be done during runtime! Only in
-        # the scenario manager
-        self.keys_of_agent_writable_props = properties_agent_writable
+
+        # Specifies the keys of properties in self.agent_properties which can  be changed by this Agent in this file. If
+        # it is not writable, it can only be  updated through performing an action which updates that property (done by
+        # the environment).
+        # NOTE: Changing which properties are writable cannot be done during runtime! Only in  the scenario manager
+        self.keys_of_agent_writable_props = customizable_properties
 
     def get_action(self, state, agent_properties, possible_actions, agent_id):
         """
@@ -172,7 +207,7 @@ class Agent:
             # Get all perceived objects
             objects = list(state.keys())
             # Remove yourself from the object id list
-            objects.remove(self.agent_properties["name"])
+            objects.remove(self.agent_properties["obj_id"])
             # Remove all objects that have 'agent' in the name (so we do not remove those, though agents without agent
             # in their name can still be removed).
             objects = [obj for obj in objects if 'agent' not in obj]
@@ -184,7 +219,7 @@ class Agent:
                 # Select range as just enough to remove that object
                 remove_range = int(np.ceil(np.linalg.norm(
                     np.array(state[object_id]['location']) - np.array(
-                        state[self.agent_properties["name"]]['location']))))
+                        state[self.agent_properties["obj_id"]]['location']))))
                 # Safety for if object and agent are in the same location
                 remove_range = max(remove_range, 0)
                 # Assign it to the arguments list
@@ -209,7 +244,7 @@ class Agent:
             objects = list(state.keys())
 
             # Remove yourself from the object id list
-            objects.remove(self.agent_properties["name"])
+            objects.remove(self.agent_properties["obj_id"])
             # Remove all objects that have 'agent' in the name (so we do not remove those, though agents without agent
             # in their name can still be removed).
             objects = [obj for obj in objects if 'agent' not in obj]
@@ -220,8 +255,8 @@ class Agent:
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
                     np.array(state[object_id]['location']) - np.array(
-                        state[self.agent_properties["name"]]['location']))))
-                if dist <= grab_range and state[object_id]["movable"]:
+                        state[self.agent_properties["obj_id"]]['location']))))
+                if dist <= grab_range and state[object_id]["is_movable"]:
                     object_in_range.append(object_id)
 
             if object_in_range:
@@ -232,7 +267,6 @@ class Agent:
                 action_kwargs['object_id'] = object_id
             else:
                 action_kwargs['object_id'] = None
-
 
         # if we randomly chose to do a open or close door action, find a door to open/close
         elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:

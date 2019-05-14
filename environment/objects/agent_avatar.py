@@ -1,16 +1,16 @@
+from agents.capabilities.capability import SenseCapability
+from environment.actions.action import Action
+from environment.helper_functions import get_all_classes
 from environment.objects.env_object import EnvObject
-
-from scenario_manager.helper_functions import get_default_value
 
 
 class AgentAvatar(EnvObject):
 
     def __init__(self, location, possible_actions, sense_capability, class_callable,
                  callback_agent_get_action, callback_agent_set_action_result, callback_agent_observe,
-                 name="Agent", is_human_agent=False,
-                 customizable_properties=None,
-                 is_traversable=None, carried_by=None, team=None, agent_speed_in_ticks=None,
-                 visualize_size=None, visualize_shape=None, visualize_colour=None,
+                 visualize_size, visualize_shape, visualize_colour, visualize_depth,
+                 is_traversable, team, agent_speed_in_ticks, name, is_movable,
+                 is_human_agent, customizable_properties,
                  **custom_properties):
         """
         This class is a representation of an agent in the GridWorld.
@@ -67,6 +67,8 @@ class AgentAvatar(EnvObject):
         Visualizer. Denotes the shape of the object in the visualisation.
         :param visualize_colour: Hexcode string. Optional, default obtained from defaults.json. A visualisation property
         used by the Visualizer. Denotes the
+        :param visualize_depth: Integer. Optional, default obtained from defaults.json. A visualisation property that
+        is used by the Visualizer to draw objects in layers.
         :param **custom_properties: Optional. Any other keyword arguments. All these are treated as custom attributes.
         For example the property 'heat'=2.4 of an EnvObject representing a fire.
         """
@@ -79,31 +81,27 @@ class AgentAvatar(EnvObject):
         # The property that signals whether the agent this avatar represents is a human agent
         self.is_human_agent = is_human_agent
 
-        # Save the other attributes the GridWorld expects an AgentAvatar to have.
-        self.sense_capability = sense_capability
-        self.action_set = possible_actions
-        self.agent_speed_in_ticks = agent_speed_in_ticks
+        # Save the other attributes the GridWorld expects an AgentAvatar to have to access an Agent
         self.get_action_func = callback_agent_get_action
         self.set_action_result_func = callback_agent_set_action_result
         self.ooda_observe = callback_agent_observe
 
-        # Obtain any defaults from the defaults.json file if not set already
+        # Set all mandatory properties
+        self.agent_speed_in_ticks = agent_speed_in_ticks
         self.is_traversable = is_traversable
-        if self.is_traversable is None:
-            self.is_traversable = get_default_value(class_name="AgentAvatar", property_name="is_traversable")
-        self.visualize_size = visualize_size
-        if self.visualize_size is None:
-            self.visualize_size = get_default_value(class_name="AgentAvatar", property_name="visualize_size")
-        self.visualize_shape = visualize_shape
-        if self.visualize_shape is None:
-            self.visualize_shape = get_default_value(class_name="AgentAvatar", property_name="visualize_shape")
+        self.sense_capability = sense_capability
+        self.action_set = possible_actions
+        self.is_movable = is_movable
+
+        # Set visualization properties
+        self.visualize_depth = visualize_depth
         self.visualize_colour = visualize_colour
-        if self.visualize_colour is None:
-            self.visualize_colour = get_default_value(class_name="AgentAvatar", property_name="visualize_colour")
-        self.agent_speed_in_ticks = visualize_colour
-        if self.agent_speed_in_ticks is None:
-            self.agent_speed_in_ticks = get_default_value(class_name="AgentAvatar",
-                                                          property_name="agent_speed_in_ticks")
+        self.visualize_shape = visualize_shape
+        self.visualize_size = visualize_size
+
+        # Parse the action_set property if set to the wildcard "*" denoting all actions
+        if self.action_set == "*":
+            self.action_set = list(get_all_classes(Action, omit_super_class=True).keys())
 
         # Defines an agent is blocked by an action which takes multiple time steps. Is updated based on the speed with
         # which an agent can perform actions.
@@ -112,18 +110,20 @@ class AgentAvatar(EnvObject):
         # Denotes the last action performed by the agent, at what tick and how long it must take
         self.last_action = {"duration_in_ticks": 0, "tick": 0}
 
+        # We set a placeholder for the 'team' property so that it can be found in self.properties
+        self.team = ""
+
         # Call the super constructor (we do this here because then we have access to all of EnvObject, including a
         # unique id
         super().__init__(location, name, customizable_properties=customizable_properties, is_traversable=is_traversable,
                          class_callable=class_callable,
-                         carried_by=carried_by, visualize_size=visualize_size, visualize_shape=visualize_shape,
-                         visualize_colour=visualize_colour, possible_actions=possible_actions, team=team,
-                         objects_carrying={}, agent_speed_in_ticks=agent_speed_in_ticks,
+                         visualize_size=visualize_size, visualize_shape=visualize_shape,
+                         visualize_colour=visualize_colour,
                          **custom_properties)
 
         # If there was no team name given, the AgentAvatar (and as an extension its Agent) is part of its own team which
-        # is simply its object id. Since we already set the 'team' property we have to override it. We cannot do it
-        # before the super constructor because there the id is assigned.
+        # is simply its object id. For this we need to object id, which was made in the EnvObject constructor, that is
+        # why we call this AFTER calling that.
         if team is None:
             self.team = self.obj_id
         self.change_property("team", self.team)
@@ -169,6 +169,64 @@ class AgentAvatar(EnvObject):
             # update special properties
             self.change_property(prop, props[prop])
 
+
+    def change_property(self, property_name, property_value):
+        """
+        Changes the value of an existing (!) property.
+        :param property_name: The name of the property.
+        :param property_value:  The value of the property.
+        :return: The new properties.
+        """
+
+        # We check if it is a custom property and if so change it simply in the dictionary
+        if property_name in self.custom_properties.keys():
+            self.customizable_properties[property_name] = property_value
+        else:  # else we need to check if property_name is a mandatory class attribute that is also a property
+            if property_name == "is_traversable":
+                assert isinstance(property_value, bool)
+                self.is_traversable = property_value
+            elif property_name == "name":
+                assert isinstance(property_value, str)
+                self.obj_name = property_value
+            elif property_name == "location":
+                assert isinstance(property_value, list) or isinstance(property_value, tuple)
+                self.location = property_value
+            elif property_name == "class_inheritance":
+                assert isinstance(property_value, list)
+                self.class_inheritance = property_value
+            elif property_name == "visualize_size":
+                assert isinstance(property_value, int)
+                self.visualize_size = property_value
+            elif property_name == "visualize_colour":
+                assert isinstance(property_value, str)
+                self.visualize_colour = property_value
+            elif property_name == "visualize_shape":
+                assert isinstance(property_value, int)
+                self.visualize_shape = property_value
+            elif property_name == "visualize_depth":
+                assert isinstance(property_value, int)
+                self.visualize_depth = property_value
+            elif property_name == "team":
+                assert isinstance(property_value, str)
+                self.team = property_value
+            elif property_name == "agent_speed_in_ticks":
+                assert isinstance(property_value, int)
+                self.agent_speed_in_ticks = property_value
+            elif property_name == "sense_capability":
+                assert isinstance(property_value, SenseCapability)
+                self.sense_capability = property_value
+            elif property_name == "is_human_agent":
+                assert isinstance(property_value, bool)
+                self.is_human_agent = property_value
+            elif property_name == "action_set":
+                assert isinstance(property_value, list)
+                self.action_set = property_value
+            elif property_name == "is_movable":
+                assert isinstance(property_value, bool)
+                self.is_movable = property_value
+
+        return self.properties
+
     @property
     def location(self):
         """
@@ -185,6 +243,8 @@ class AgentAvatar(EnvObject):
         :param loc:
         :return:
         """
+        assert isinstance(loc, list) or isinstance(loc, tuple)
+        assert len(loc) == 2
         # Set the location to our private location xy list
         self.__location = loc
 
@@ -201,7 +261,7 @@ class AgentAvatar(EnvObject):
         # Otherwise we loop over all objects and adjust their location accordingly (since these are also EnvObjects,
         # their setter for location gets called, in the case we are carrying an AgentAvatar this setter is called
         for obj in carried_objs:
-            obj.location = loc  # this requires all objects in self.properties['carrying'] to be EnvObject
+            obj.location = loc  # this requires all objects in self.properties['carrying'] to be of type EnvObject
 
     @property
     def properties(self):
@@ -218,11 +278,19 @@ class AgentAvatar(EnvObject):
         properties = self.custom_properties.copy()
 
         # Add all mandatory properties. Make sure that these are updated if one are added to the constructor!
+        properties['team'] = self.team
         properties['name'] = self.obj_name
+        properties['obj_id'] = self.obj_id  # we return id as well, but this should never ever be modified!
         properties['location'] = self.location
+        properties['is_movable'] = self.is_movable
+        properties['action_set'] = self.action_set
+        properties['carried_by'] = self.carried_by
+        properties['is_human_agent'] = self.is_human_agent
         properties['is_traversable'] = self.is_traversable
         properties['class_inheritance'] = self.class_inheritance
+        properties['agent_speed_in_ticks'] = self.agent_speed_in_ticks
         properties['is_carrying'] = [obj.properties for obj in self.is_carrying]
+        properties['sense_capability'] = self.sense_capability.get_capabilities()
         properties['visualisation'] = {
             "size": self.visualize_size,
             "shape": self.visualize_shape,

@@ -1,6 +1,10 @@
 import datetime
 import requests
 
+from agents.Agent import Agent
+from agents.HumanAgent import HumanAgent
+
+
 class Visualizer():
     '''
     The Visualizer class bridges the gap between the Gridworld simulation environment, and
@@ -18,12 +22,11 @@ class Visualizer():
 
         self.__initGUI(grid_size=grid_size)
 
-
     def __initGUI(self, grid_size):
         """
         Send an initialization message to the GUI webserver, which sends the grid_size.
         """
-        data = {'params': {'grid_size': grid_size} }
+        data = {'params': {'grid_size': grid_size}}
 
         url = 'http://localhost:3000/init'
 
@@ -42,27 +45,26 @@ class Visualizer():
         if r.status_code != requests.codes.ok:
             print("Error in initializing GUI")
 
-
     def reset(self):
         """ Reset all saved states of (human) agents etc """
         self.agent_states = {}
         self.hu_ag_states = {}
         self.god_state = {}
 
-
-    def save_state(self, type, id, state, params=None):
+    def save_state(self, inheritance_chain, id, state, params=None):
         """ Save the filtered agent state which we will visualize later on """
 
         # add state for specific entity with ID to states dict
-        if type == "god":
+        if isinstance(inheritance_chain, list):
+            for c in inheritance_chain:
+                if c == Agent.__name__:
+                    self.agent_states[id] = state
+                elif c == HumanAgent.__name__:
+                    self.hu_ag_states[id] = state
+        else:
             self.god_state = state
-        elif type == "agent":
-            self.agent_states[id] = state
-        elif type == "humanagent":
-            self.hu_ag_states[id] = state
 
-
-    def updateGUIs(self, tick):
+    def update_guis(self, tick):
         """
         Update the (human)agent and god views, by sending the updated filtered
         state of each to the Visualizer webserver which will update the
@@ -70,25 +72,22 @@ class Visualizer():
         """
         self.tick = tick
         # send the update to the webserver
-        self.__sendGUIupdate()
+        self.__send_gui_update()
 
-
-
-
-    def __sendGUIupdate(self):
+    def __send_gui_update(self):
         """
         Send the states of all (human)agents and god to the webserver for updating of the GUI
         """
 
         # put data in a json array
-        data = {'god': self.god_state, 'agent_states': self.agent_states, 'hu_ag_states': self.hu_ag_states, 'tick': self.tick}
+        data = {'god': self.god_state, 'agent_states': self.agent_states, 'hu_ag_states': self.hu_ag_states,
+                'tick': self.tick}
         url = 'http://localhost:3000/update'
 
         tick_start_time = datetime.datetime.now()
 
         # send an update of the agent state to the GUI via its API
         r = requests.post(url, json=data)
-
 
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time

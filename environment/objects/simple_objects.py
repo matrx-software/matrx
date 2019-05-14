@@ -13,7 +13,8 @@ class SquareBlock(EnvObject):
         :param name: The name of the block, if not given it is simply "Block".
         """
 
-        super().__init__(name=name, location=location, is_traversable=False, visualize_shape=0)
+        super().__init__(name=name, location=location, is_traversable=False, visualize_shape=0,
+                         class_callable=SquareBlock)
 
 
 class Battery(EnvObject):
@@ -47,7 +48,8 @@ class Battery(EnvObject):
                          customizable_properties=["current_energy_level"],  # the current energy level can be changed
                          visualize_colour="#32b432",
                          energy_decay=self.energy_decay,
-                         current_energy_level=self.current_energy_level)
+                         current_energy_level=self.current_energy_level,
+                         class_callable=Battery)
 
     def update_properties(self, grid_world):
         """
@@ -107,7 +109,7 @@ class Door(EnvObject):
         is_traversable = self.is_open
 
         super().__init__(location=location, name=name, is_traversable=is_traversable, visualize_colour=current_color,
-                         is_open=self.is_open)
+                         is_open=self.is_open, class_callable=Door)
 
     def open_door(self):
         """
@@ -149,7 +151,7 @@ class Wall(EnvObject):
         """
         is_traversable = False  # All walls are always not traversable
         super().__init__(name=name, location=location, visualize_colour=visualisation_colour,
-                         is_traversable=is_traversable)
+                         is_traversable=is_traversable, class_callable=Wall)
 
 
 class Area(EnvObject):
@@ -163,4 +165,4 @@ class Area(EnvObject):
         """
         is_traversable = True  # Areas are always traversables
         super().__init__(name=name, location=location, visualize_colour=visualisation_colour,
-                         is_traversable=is_traversable)
+                         is_traversable=is_traversable, class_callable=Area)

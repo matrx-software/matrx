@@ -11,5 +11,5 @@ def next_obj_id():
 
 def get_inheritence_path(callable_class):
     parents = callable_class.mro()
-    parents = [str(p) for p in parents]
+    parents = [str(p.__name__) for p in parents]
     return parents
