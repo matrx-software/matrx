@@ -501,7 +501,7 @@ class WorldFactory:
 
 class RandomProperty:
 
-    def __init__(self, property_name, values, distribution=None):
+    def __init__(self, property_name, values, distribution=None, allow_duplicates=True):
 
         # If distribution is None, its uniform (equal probability to all values)
         if distribution is None:
@@ -518,9 +518,10 @@ class RandomProperty:
         self.name = property_name
         self.values = values
         self.distribution = distribution
+        self.allow_duplicates = allow_duplicates
 
-    def get_property(self, rng: RandomState, size=None, allow_duplicates=True):
-        return rng.choice(self.values, p=self.distribution, size=size, replace=allow_duplicates)
+    def get_property(self, rng: RandomState, size=None):
+        return rng.choice(self.values, p=self.distribution, size=size, replace=self.allow_duplicates)
 
 
 class RandomLocation:
