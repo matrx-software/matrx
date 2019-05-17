@@ -17,7 +17,7 @@ TIME_FOCUS_SIMULATION_DURATION = 'aim_for_accurate_global_tick_duration'
 
 class GridWorld:
 
-    def __init__(self, shape, tick_duration, simulation_goal=None, run_sail_api=True, run_visualisation_server=True,
+    def __init__(self, shape, tick_duration, simulation_goal=None, run_sail_api=True, run_visualization_server=True,
                  time_focus=TIME_FOCUS_TICK_DURATION, rnd_seed=1):
         self.tick_duration = tick_duration
         self.registered_agents = OrderedDict()
@@ -28,7 +28,7 @@ class GridWorld:
         self.current_available_id = 0
         self.shape = shape
         self.run_sail_api = run_sail_api
-        self.run_visualisation_server = run_visualisation_server
+        self.run_visualization_server = run_visualization_server
         self.time_focus = time_focus
         self.grid = np.array([[None for x in range(shape[0])] for y in range(shape[1])])
         self.is_done = False

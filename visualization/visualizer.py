@@ -77,11 +77,10 @@ class Visualizer():
         # loop through all objects in the state
         for objID, obj in state.items():
             # fetch the visualization depth
-            # TODO: replace with real visualize depth property
-            # visDepth = state[obj]['visualize_depth']
-            visDepth = 1
-            if "Agent" in objID:
-                visDepth = 10
+            visDepth = state[objID]["visualization"]['depth']
+
+            if "sense_capability" in obj:
+                obj["sense_capability"] = str(obj["sense_capability"])
 
             # save the object in the new_state dict at its visualization_depth
             if visDepth not in new_state:

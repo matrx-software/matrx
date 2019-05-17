@@ -30,7 +30,7 @@ class AgentAvatar(EnvObject):
         create agents that can only perform a couple of the available actions.
         :param sense_capability: The SenseCapability object.
         :param class_callable: The Agent class; in other words, the class of the agent's brain. This is stored here so
-        that the Visualizer (which visualises an agent based on this avatar object) and agents knows what kind of agent
+        that the Visualizer (which visualizes an agent based on this avatar object) and agents knows what kind of agent
         it is. Allows you to visualize certain agent types in a certain way.
 
         :param callback_agent_get_action: The callback function as defined by the Agent instance of which this is an
@@ -41,7 +41,7 @@ class AgentAvatar(EnvObject):
         action went.
         :param callback_agent_observe: Similar to callback_agent_get_action, is used by GridWorld to obtain the
         processed state dictionary of the Agent. As the GridWorld does not know exactly what the Agent is allowed to
-        see or not, the 'observe' preprocesses the given state further. But to accurately visualise what the agent sees
+        see or not, the 'observe' preprocesses the given state further. But to accurately visualize what the agent sees
         we have to obtain that pre-processed state, which is done through this callback.
 
         :param name: String Defaults to "Agent". The name of the agent, does not need to be unique.
@@ -59,15 +59,15 @@ class AgentAvatar(EnvObject):
         which the agent can perform actions. For example, a speed of 5 would mean that it can perform an action every 5
         steps of the simulation.
 
-        :param visualize_size: Float. Optional, default obtained from defaults.json. A visualisation property used by
-        the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualisation (e.g. a
+        :param visualize_size: Float. Optional, default obtained from defaults.json. A visualization property used by
+        the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualization (e.g. a
         value of 0.5 is half of a square, object is in the center, a value of 2 is twice the square's size centered on
         its location.)
-        :param visualize_shape: Int. Optional, default obtained from defaults.json. A visualisation property used by the
-        Visualizer. Denotes the shape of the object in the visualisation.
-        :param visualize_colour: Hexcode string. Optional, default obtained from defaults.json. A visualisation property
+        :param visualize_shape: Int. Optional, default obtained from defaults.json. A visualization property used by the
+        Visualizer. Denotes the shape of the object in the visualization.
+        :param visualize_colour: Hexcode string. Optional, default obtained from defaults.json. A visualization property
         used by the Visualizer. Denotes the
-        :param visualize_depth: Integer. Optional, default obtained from defaults.json. A visualisation property that
+        :param visualize_depth: Integer. Optional, default obtained from defaults.json. A visualization property that
         is used by the Visualizer to draw objects in layers.
         :param **custom_properties: Optional. Any other keyword arguments. All these are treated as custom attributes.
         For example the property 'heat'=2.4 of an EnvObject representing a fire.
@@ -267,7 +267,7 @@ class AgentAvatar(EnvObject):
     def properties(self):
         """
         Returns the custom properties of this object, but also any mandatory properties such as location, name,
-        is_traversable and all visualisation properties (those are in their own dictionary under 'visualisation').
+        is_traversable and all visualization properties (those are in their own dictionary under 'visualization').
 
         In the case we return the properties of a class that inherits from EnvObject, we check if that class has
 
@@ -291,7 +291,7 @@ class AgentAvatar(EnvObject):
         properties['agent_speed_in_ticks'] = self.agent_speed_in_ticks
         properties['is_carrying'] = [obj.properties for obj in self.is_carrying]
         properties['sense_capability'] = self.sense_capability.get_capabilities()
-        properties['visualisation'] = {
+        properties['visualization'] = {
             "size": self.visualize_size,
             "shape": self.visualize_shape,
             "colour": self.visualize_colour,
@@ -306,4 +306,3 @@ class AgentAvatar(EnvObject):
         Here to protect the 'properties' variable. It does not do anything and should not do anything!
         """
         pass
-

@@ -46,7 +46,7 @@ import visualization
 class WorldFactory:
 
     def __init__(self, shape, tick_duration, random_seed=1, simulation_goal=None, run_sail_api=True,
-                 run_visualisation_server=True, time_focus=TIME_FOCUS_TICK_DURATION):
+                 run_visualization_server=True, time_focus=TIME_FOCUS_TICK_DURATION):
         # Set our random number generator
         self.rng = np.random.RandomState(random_seed)
         # Set our settings place holders
@@ -57,7 +57,7 @@ class WorldFactory:
                                                         tick_duration=tick_duration,
                                                         simulation_goal=simulation_goal,
                                                         run_sail_api=run_sail_api,
-                                                        run_visualisation_server=run_visualisation_server,
+                                                        run_visualization_server=run_visualization_server,
                                                         time_focus=time_focus)
         # Keep track of the number of worlds we created
         self.worlds_created = 0
@@ -84,7 +84,7 @@ class WorldFactory:
         return world
 
     def __set_world_settings(self, shape, tick_duration, simulation_goal=None, run_sail_api=True,
-                             run_visualisation_server=True, time_focus=TIME_FOCUS_TICK_DURATION, rnd_seed=None):
+                             run_visualization_server=True, time_focus=TIME_FOCUS_TICK_DURATION, rnd_seed=None):
 
         if rnd_seed is None:
             rnd_seed = self.rng.randint(0, 1000000)
@@ -93,7 +93,7 @@ class WorldFactory:
                           "tick_duration": tick_duration,
                           "simulation_goal": simulation_goal,
                           "run_sail_api": run_sail_api,
-                          "run_visualisation_server": run_visualisation_server,
+                          "run_visualization_server": run_visualization_server,
                           "time_focus": time_focus,
                           "rnd_seed": rnd_seed}
 

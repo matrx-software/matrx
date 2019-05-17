@@ -44,7 +44,7 @@ class Battery(EnvObject):
         self.energy_decay = energy_decay
         super().__init__(name=name, location=location,
                          visualize_shape=0,  # a battery is always square
-                         visualize_size=0.25,  # a battery is always 1/4th of a grid square of the visualisation
+                         visualize_size=0.25,  # a battery is always 1/4th of a grid square of the visualization
                          customizable_properties=["current_energy_level"],  # the current energy level can be changed
                          visualize_colour="#32b432",
                          energy_decay=self.energy_decay,
@@ -53,7 +53,7 @@ class Battery(EnvObject):
 
     def update_properties(self, grid_world):
         """
-        Updates the current energy level, changes the property accordingly, and also change the visualisation color.
+        Updates the current energy level, changes the property accordingly, and also change the visualization color.
         :param grid_world: The state of the world. Not used.
         :return: The new properties
         """
@@ -87,7 +87,7 @@ class Door(EnvObject):
         property accordingly.
 
         It also has two colors which the
-        door visualisation changes into when open or closed.
+        door visualization changes into when open or closed.
 
         :param location: Location of door.
         :param name: Name of object, defaults to "Door"
@@ -142,7 +142,7 @@ class Door(EnvObject):
 
 class Wall(EnvObject):
 
-    def __init__(self, location, name="Wall", visualisation_colour="#000000"):
+    def __init__(self, location, name="Wall", visualization_colour="#000000"):
         """
         A simple Wall object. Is not traversable, the colour can be set but has otherwise the default EnvObject property
         values.
@@ -150,13 +150,13 @@ class Wall(EnvObject):
         :param name: The name, default "Wall".
         """
         is_traversable = False  # All walls are always not traversable
-        super().__init__(name=name, location=location, visualize_colour=visualisation_colour,
+        super().__init__(name=name, location=location, visualize_colour=visualization_colour,
                          is_traversable=is_traversable, class_callable=Wall)
 
 
 class Area(EnvObject):
 
-    def __init__(self, location, name="Area", visualisation_colour="#8ca58c"):
+    def __init__(self, location, name="Area", visualization_colour="#8ca58c"):
         """
         A simple Area object. Is always traversable, the colour can be set but has otherwise the default EnvObject
         property values. Can be used to define different areas in the GridWorld.
@@ -164,5 +164,5 @@ class Area(EnvObject):
         :param name: The name, default "Area".
         """
         is_traversable = True  # Areas are always traversables
-        super().__init__(name=name, location=location, visualize_colour=visualisation_colour,
+        super().__init__(name=name, location=location, visualize_colour=visualization_colour,
                          is_traversable=is_traversable, class_callable=Area)

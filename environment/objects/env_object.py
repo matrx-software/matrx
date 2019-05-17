@@ -27,7 +27,7 @@ class EnvObject:
 
         A few properties are mandatory for the GridWorld, some Actions and the Visualizer to function. These are
         keyword arguments (e.g. is_traversable). If these are not set, they are obtained from the defaults.json file.
-        
+
         This class specific allows you to create any object you desire that only differs in the properties it holds. For
         example both a simple block or complex object such as a 'fire' can be modeled with this class. They only differ
         in their mandatory and custom properties (a block is simply a colored square, whereas a 'fire' has potentially
@@ -59,15 +59,15 @@ class EnvObject:
         between what kind of object is actually seen or visualized. The last element is always the lowest level class,
         whereas the first element is always EnvObject and everything in between are potential other classes in the
         inheritance chain.
-        :param visualize_size: Float. Optional, default obtained from defaults.json. A visualisation property used by
-        the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualisation (e.g. a
+        :param visualize_size: Float. Optional, default obtained from defaults.json. A visualization property used by
+        the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualization (e.g. a
         value of 0.5 is half of a square, object is in the center, a value of 2 is twice the square's size centered on
         its location.)
-        :param visualize_shape: Int. Optional, default obtained from defaults.json. A visualisation property used by the
-        Visualizer. Denotes the shape of the object in the visualisation.
-        :param visualize_colour: Hexcode string. Optional, default obtained from defaults.json. A visualisation property
-        used by the Visualizer. Denotes the colour of the object in visualisation.
-        :param visualize_depth: Integer. Optional, default obtained from defaults.json. A visualisation property that
+        :param visualize_shape: Int. Optional, default obtained from defaults.json. A visualization property used by the
+        Visualizer. Denotes the shape of the object in the visualization.
+        :param visualize_colour: Hexcode string. Optional, default obtained from defaults.json. A visualization property
+        used by the Visualizer. Denotes the colour of the object in visualization.
+        :param visualize_depth: Integer. Optional, default obtained from defaults.json. A visualization property that
         is used by the Visualizer to draw objects in layers.
         :param **custom_properties: Optional. Any other keyword arguments. All these are treated as custom attributes.
         For example the property 'heat'=2.4 of an EnvObject representing a fire.
@@ -219,7 +219,7 @@ class EnvObject:
     def properties(self):
         """
         Returns the custom properties of this object, but also any mandatory properties such as location, name,
-        is_traversable and all visualisation properties (those are in their own dictionary under 'visualisation').
+        is_traversable and all visualization properties (those are in their own dictionary under 'visualization').
 
         In the case we return the properties of a class that inherits from EnvObject, we check if that class has
 
@@ -237,7 +237,7 @@ class EnvObject:
         properties['carried_by'] = self.carried_by
         properties['is_traversable'] = self.is_traversable
         properties['class_inheritance'] = self.class_inheritance
-        properties['visualisation'] = {
+        properties['visualization'] = {
             "size": self.visualize_size,
             "shape": self.visualize_shape,
             "colour": self.visualize_colour,

@@ -189,7 +189,9 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
     var obj_keys = Object.keys(state);
 
     // calculate a number of necessary variables for timing the movement animation
-    if( animateMovement) {
+    // if(animateMovement) { // Todo: if required add an property per object which
+    // determines if movement should be animated or not?
+    if( true ) {
         // how many milliseconds should 1 frame take
         var msPerFrame = (1.0 / targetFPS) * 1000;
 
@@ -222,21 +224,21 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
             // }
 
             // keep track of objects which need to be animated
-            // if (key.includes("agent")
-            if (animateMovement && "animateMovementGUI" in obj) {
+            // if (animateMovement && "animateMovementGUI" in obj) {}
+            if (true) {
 
                 // fetch the previous location of the object from last iteration
-                if ( !(key in animatedObjects) && key in prevAnimatedObjects) {
-                    // console.log("Fetching", key, " from prevAnimatedObjects");
-                    animatedObjects[key] = {"loc_from": prevAnimatedObjects[key]["loc_to"], "loc_to": obj['location'], "position": cellsToPxs(prevAnimatedObjects[key]["loc_to"]), "timeStarted": Date.now()};
+                if ( !(objID in animatedObjects) && objID in prevAnimatedObjects) {
+                    // console.log("Fetching", objID, " from prevAnimatedObjects");
+                    animatedObjects[objID] = {"loc_from": prevAnimatedObjects[objID]["loc_to"], "loc_to": obj['location'], "position": cellsToPxs(prevAnimatedObjects[objID]["loc_to"]), "timeStarted": Date.now()};
                 }
 
                 // check if we need to animate this movement, which is the case if:
                 // it it is our first encounter with this object, or it moves to a new position
-                if ( !(key in animatedObjects && animatedObjects[key]['loc_from'] == obj['location']) ) {
+                if ( !(objID in animatedObjects && animatedObjects[objID]['loc_from'] == obj['location']) ) {
                     // console.log("This is a moving agent", obj);
                     // console.log("From ", obj["prev_location"][0], obj["prev_location"][1], "(",cellsToPxs(obj["prev_location"])[0], cellsToPxs(obj["prev_location"])[1], ") to", obj["location"][0], obj["location"][1], "(",cellsToPxs(obj["location"])[0], cellsToPxs(obj["location"])[1], ")");
-                    var pos = processMovement(key, obj['location'], animatedObjects, animationDurationMs);
+                    var pos = processMovement(objID, obj['location'], animatedObjects, animationDurationMs);
                     // round the location to round pixel values
                     x =  Math.round(pos[0]);
                     y =  Math.round(pos[1]);
@@ -245,14 +247,14 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
             }
 
             // get the object colour and size
-            clr = obj['colour'];
-            sz = obj['size'];
+            clr = obj['visualization']['colour'];
+            sz = obj['visualization']['size'];
 
             // draw the object with the correct shape, size and colour
-            if (obj['shape'] == 0) {
+            if (obj['visualization']['shape'] == 0) {
                 drawRectangle(x, y, px_per_cell, px_per_cell, clr, sz)
             }
-            else if (obj['shape'] == 1) {
+            else if (obj['visualization']['shape'] == 1) {
                 drawTriangle(x, y, px_per_cell, px_per_cell, clr, sz);
             }
 

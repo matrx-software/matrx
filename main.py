@@ -1,4 +1,4 @@
-from scenarios import test_scenario, hat_case, blanket_search_case
+from scenarios import test_scenario, hat_case, blanket_search_case, test_is_poss_scenario
 
 if __name__ == "__main__":
 
