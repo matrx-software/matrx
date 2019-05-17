@@ -72,7 +72,6 @@ def update_GUI():
         room = f"/agent/{agent_id}"
         socketio.emit('update', new_data, room=room, namespace="/agent")
 
-
     # send updates to human agents
     for hu_ag_id in hu_ag_states:
         new_data = {'params': {"grid_size": grid_sz, "tick": tick}, 'state': hu_ag_states[hu_ag_id]}
