@@ -181,7 +181,7 @@ class WorldFactory:
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
         if custom_properties is None:
-            custom_properties = [None for _ in range(len(agents))]
+            custom_properties = [{} for _ in range(len(agents))]
         elif isinstance(custom_properties, dict):
             custom_properties = [custom_properties for _ in range(len(agents))]
 
@@ -276,7 +276,7 @@ class WorldFactory:
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
         if names is None:
-            names = [None for _ in range(len(locations))]
+            names = [{} for _ in range(len(locations))]
         elif isinstance(custom_properties, str):
             names = [custom_properties for _ in range(len(locations))]
 
@@ -315,8 +315,13 @@ class WorldFactory:
         elif isinstance(visualize_colours, str):
             visualize_colours = [visualize_colours for _ in range(len(locations))]
 
+        if visualize_depths is None:
+            visualize_depths = [None for _ in range(len(locations))]
+        elif isinstance(visualize_depths, str):
+            visualize_depths = [visualize_depths for _ in range(len(locations))]
+
         # Loop through all agents and add them
-        for idx in range(locations):
+        for idx in range(len(locations)):
             self.add_env_object(self, locations[idx], names[idx], callable_class=callable_classes[idx],
                                 customizable_properties=customizable_properties[idx],
                                 is_traversable=is_traversable[idx],

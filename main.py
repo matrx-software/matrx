@@ -11,6 +11,15 @@ if __name__ == "__main__":
     agent = Agent()
     factory.add_agent(location=[1, 0], agent=agent)
 
+    agents = [Agent() for _ in range(3)]
+    locs = [[1, 1], [2, 2], [3, 3]]
+    factory.add_multiple_agents(agents=agents, locations=locs)
+
+    factory.add_multiple_objects([[4, 4], [5, 5], [6, 6]])
+
     world = factory.get_world()
+
+    for world in factory.worlds():
+        world.run()
 
     world.run()
