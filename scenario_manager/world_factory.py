@@ -79,7 +79,9 @@ class WorldFactory:
 
     def get_world(self):
         self.worlds_created += 1
-        return self.__create_world()
+        world = self.__create_world()
+        self.__reset_random()
+        return world
 
     def __set_world_settings(self, shape, tick_duration, simulation_goal=None, run_sail_api=True,
                              run_visualisation_server=True, time_focus=TIME_FOCUS_TICK_DURATION, rnd_seed=None):
@@ -238,10 +240,12 @@ class WorldFactory:
                            visualize_colour=visualize_colours[idx],
                            **custom_properties[idx])
 
-    def add_env_object(self, location, name, callable_class=EnvObject, customizable_properties=None,
+    def add_env_object(self, location, name, callable_class=None, customizable_properties=None,
                        is_traversable=None,
                        visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
                        **custom_properties):
+        if callable_class is None:
+            callable_class = EnvObject
 
         # Check if location and agent are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
@@ -276,7 +280,7 @@ class WorldFactory:
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
         if names is None:
-            names = [{} for _ in range(len(locations))]
+            names = [None for _ in range(len(locations))]
         elif isinstance(custom_properties, str):
             names = [custom_properties for _ in range(len(locations))]
 
@@ -286,7 +290,7 @@ class WorldFactory:
             callable_classes = [callable_classes for _ in range(len(locations))]
 
         if custom_properties is None:
-            custom_properties = [None for _ in range(len(locations))]
+            custom_properties = [{} for _ in range(len(locations))]
         elif isinstance(custom_properties, dict):
             custom_properties = [custom_properties for _ in range(len(locations))]
 
@@ -322,7 +326,7 @@ class WorldFactory:
 
         # Loop through all agents and add them
         for idx in range(len(locations)):
-            self.add_env_object(self, locations[idx], names[idx], callable_class=callable_classes[idx],
+            self.add_env_object(location=locations[idx], name=names[idx], callable_class=callable_classes[idx],
                                 customizable_properties=customizable_properties[idx],
                                 is_traversable=is_traversable[idx],
                                 visualize_size=visualize_sizes[idx], visualize_shape=visualize_shapes[idx],
@@ -503,6 +507,11 @@ class WorldFactory:
 
         return args
 
+    def __reset_random(self):
+        # TODO resets all RandomProperty and RandomLocation, is called after creating a world so all duplicates can be
+        # TODO selected again.
+        pass
+
 
 class RandomProperty:
 
@@ -524,9 +533,19 @@ class RandomProperty:
         self.values = values
         self.distribution = distribution
         self.allow_duplicates = allow_duplicates
+        self.selected_values = set()
 
     def get_property(self, rng: RandomState, size=None):
-        return rng.choice(self.values, p=self.distribution, size=size, replace=self.allow_duplicates)
+        vals = self.values.copy()
+        if not self.allow_duplicates:
+            for it in self.selected_values:
+                vals.remove(it)
+        choice = rng.choice(vals, p=self.distribution, size=size, replace=self.allow_duplicates)
+        self.selected_values.add(choice)
+        return choice
+
+    def reset(self):
+        self.selected_values = set()
 
 
 class RandomLocation:
@@ -535,5 +554,9 @@ class RandomLocation:
         self.area_corners = area_corners
 
     def get_location(self, rng):
+        # TODO
+        pass
+
+    def reset(self):
         # TODO
         pass
