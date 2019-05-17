@@ -3,6 +3,7 @@ import requests
 
 from agents.Agent import Agent
 from agents.HumanAgent import HumanAgent
+from collections import OrderedDict
 
 
 class Visualizer():
@@ -58,11 +59,40 @@ class Visualizer():
         if isinstance(inheritance_chain, list):
             for c in inheritance_chain:
                 if c == Agent.__name__:
-                    self.agent_states[id] = state
+                    self.agent_states[id] = self.__reorder_state_for_GUI(state)
                 elif c == HumanAgent.__name__:
-                    self.hu_ag_states[id] = state
+                    self.hu_ag_states[id] = self.__reorder_state_for_GUI(state)
         else:
-            self.god_state = state
+            self.god_state = self.__reorder_state_for_GUI(state)
+
+
+    def __reorder_state_for_GUI(self, state):
+        """
+        Convert the state, which is a dictionary of objects with object ID as key,
+        into a new dictionary with as key the visualization depth, and as value
+        the objects which are to be displayed at that depth
+        """
+        new_state = OrderedDict()
+
+        # loop through all objects in the state
+        for objID, obj in state.items():
+            # fetch the visualization depth
+            # TODO: replace with real visualize depth property
+            # visDepth = state[obj]['visualize_depth']
+            visDepth = 1
+            if "Agent" in objID:
+                visDepth = 10
+
+            # save the object in the new_state dict at its visualization_depth
+            if visDepth not in new_state:
+                new_state[visDepth] = {}
+
+            # add the object or agent to the list at the (x,y) location in the dict
+            # TODO: only save visualization properties + location
+            # state[obj][location] & state[obj][visualization_properties]
+            new_state[visDepth][objID] = obj
+
+        return new_state
 
     def update_guis(self, tick):
         """
