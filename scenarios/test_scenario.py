@@ -1,4 +1,5 @@
 from agents.Agent import Agent
+from agents.HumanAgent import HumanAgent
 from scenario_manager.world_factory import RandomProperty, WorldFactory
 
 
@@ -17,6 +18,9 @@ def create_factory():
     agents = [Agent() for _ in range(3)]
     locs = [[1, 1], [2, 2], [3, 3]]
     factory.add_multiple_agents(agents=agents, locations=locs)
+
+    # hu_agent = HumanAgent()
+    # factory.add_human_agent(location=[4,1], agent=hu_agent)
 
     factory.add_multiple_objects([[4, 4], [5, 5], [6, 6]])
 

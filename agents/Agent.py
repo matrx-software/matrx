@@ -204,6 +204,8 @@ class Agent:
         action_kwargs = {}
 
         if action == RemoveObject.__name__:
+            action_kwargs['object_id'] = None
+            
             # Get all perceived objects
             objects = list(state.keys())
             # Remove yourself from the object id list

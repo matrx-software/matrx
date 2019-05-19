@@ -39,6 +39,8 @@ $(document).ready(function(){
      * receive an update from the python server
      */
     socket.on('update', function(data){
+        console.log("Received an update from the server:", data);
+
         if (!doVisualUpdates) {
             console.log("Chrome in background, skipping");
             return;

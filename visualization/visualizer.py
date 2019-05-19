@@ -1,5 +1,7 @@
 import datetime
 import requests
+import numpy as np
+import copy
 
 from agents.Agent import Agent
 from agents.HumanAgent import HumanAgent
@@ -22,6 +24,7 @@ class Visualizer():
         self.userinputs = {}
 
         self.__initGUI(grid_size=grid_size)
+
 
     def __initGUI(self, grid_size):
         """
@@ -46,24 +49,50 @@ class Visualizer():
         if r.status_code != requests.codes.ok:
             print("Error in initializing GUI")
 
+
     def reset(self):
         """ Reset all saved states of (human) agents etc """
         self.agent_states = {}
         self.hu_ag_states = {}
         self.god_state = {}
 
+
     def save_state(self, inheritance_chain, id, state, params=None):
         """ Save the filtered agent state which we will visualize later on """
+
+        # prepare the state for the GUI
+        GUIstate = self.__reorder_state_for_GUI(state)
+        GUIstate = self.__filter_state(GUIstate)
 
         # add state for specific entity with ID to states dict
         if isinstance(inheritance_chain, list):
             for c in inheritance_chain:
                 if c == Agent.__name__:
-                    self.agent_states[id] = self.__reorder_state_for_GUI(state)
+                    self.agent_states[id] = GUIstate
                 elif c == HumanAgent.__name__:
-                    self.hu_ag_states[id] = self.__reorder_state_for_GUI(state)
+                    self.hu_ag_states[id] = GUIstate
         else:
-            self.god_state = self.__reorder_state_for_GUI(state)
+            self.god_state = GUIstate
+
+
+    def __filter_state(self, state):
+        """
+        Filter values from the state dictionary which cannot be converted to json,
+        such as np.inf
+        """
+        # loop through the dictionary
+        for key, value in state.items():
+            # check subdict
+            if type(value) == dict:
+                state[key] = self.__filter_state(value)
+
+            # otherwise check the value
+            else:
+                # numpy inf is not recognized as an integer in javascript, so replace it with -1
+                if value == np.inf:
+                    state[key] = -1
+
+        return state
 
 
     def __reorder_state_for_GUI(self, state):
@@ -87,11 +116,10 @@ class Visualizer():
                 new_state[visDepth] = {}
 
             # add the object or agent to the list at the (x,y) location in the dict
-            # TODO: only save visualization properties + location
-            # state[obj][location] & state[obj][visualization_properties]
             new_state[visDepth][objID] = obj
 
         return new_state
+
 
     def update_guis(self, tick):
         """
@@ -102,6 +130,7 @@ class Visualizer():
         self.tick = tick
         # send the update to the webserver
         self.__send_gui_update()
+
 
     def __send_gui_update(self):
         """
