@@ -13,7 +13,7 @@ def create_factory():
     factory.add_env_object(location=[3,3], is_movable=False, is_traversable=True, visualize_shape=0, visualize_colour="#000000", name="overlaying_block", visualize_depth=3)
 
     agent = Agent()
-    factory.add_agent(location=[1, 0], agent=agent)
+    factory.add_agent(location=[1, 0], agent=agent, visualize_depth=5)
 
     agents = [Agent() for _ in range(3)]
     locs = [[1, 1], [2, 2], [3, 3]]

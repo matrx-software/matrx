@@ -5,7 +5,6 @@ import copy
 
 from agents.Agent import Agent
 from agents.HumanAgent import HumanAgent
-from collections import OrderedDict
 
 
 class Visualizer():
@@ -101,7 +100,7 @@ class Visualizer():
         into a new dictionary with as key the visualization depth, and as value
         the objects which are to be displayed at that depth
         """
-        new_state = OrderedDict()
+        new_state = {}
 
         # loop through all objects in the state
         for objID, obj in state.items():
@@ -118,7 +117,12 @@ class Visualizer():
             # add the object or agent to the list at the (x,y) location in the dict
             new_state[visDepth][objID] = obj
 
-        return new_state
+        # sort dict on depth
+        sorted_state = {}
+        for depth in sorted(new_state.keys()):
+            sorted_state[depth]= new_state[depth]
+
+        return sorted_state
 
 
     def update_guis(self, tick):
