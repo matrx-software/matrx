@@ -178,7 +178,7 @@ class WorldFactory:
                             sense_capabilities=None, customizable_properties=None,
                             is_traversable=None, agent_speeds_in_ticks=None,
                             teams=None, visualize_sizes=None, visualize_shapes=None,
-                            visualize_colours=None):
+                            visualize_colours=None, visualize_depths=None):
 
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
@@ -227,6 +227,11 @@ class WorldFactory:
         elif isinstance(visualize_colours, str):
             visualize_colours = [visualize_colours for _ in range(len(agents))]
 
+        if visualize_depths is None:
+            visualize_depths = [None for _ in range(len(agents))]
+        elif isinstance(visualize_depths, int):
+            visualize_depths = [visualize_depths for _ in range(len(agents))]
+
         # Loop through all agents and add them
         for idx, agent in enumerate(agents):
             self.add_agent(locations[idx], agent,
@@ -238,6 +243,7 @@ class WorldFactory:
                            visualize_size=visualize_sizes[idx],
                            visualize_shape=visualize_shapes[idx],
                            visualize_colour=visualize_colours[idx],
+                           visualize_depth=visualize_depths[idx],
                            **custom_properties[idx])
 
     def add_env_object(self, location, name, callable_class=None, customizable_properties=None,

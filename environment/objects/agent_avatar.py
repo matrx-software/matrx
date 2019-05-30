@@ -118,7 +118,7 @@ class AgentAvatar(EnvObject):
         super().__init__(location, name, customizable_properties=customizable_properties, is_traversable=is_traversable,
                          class_callable=class_callable,
                          visualize_size=visualize_size, visualize_shape=visualize_shape,
-                         visualize_colour=visualize_colour,
+                         visualize_colour=visualize_colour, visualize_depth=visualize_depth,
                          **custom_properties)
 
         # If there was no team name given, the AgentAvatar (and as an extension its Agent) is part of its own team which
