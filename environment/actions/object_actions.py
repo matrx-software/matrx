@@ -311,7 +311,8 @@ def possible_drop(grid_world, agent_id, obj_id):
     if len(loc_obj_ids) == 1:
         return True, DropActionResult.RESULT_SUCCESS
 
-    # If the object we want to drop is not traversable and because their are other objects
+    # If the object we want to drop is not traversable and because there are other objects
+
 
     # Go through all objects at the desired locations
     for loc_obj_id in loc_obj_ids:

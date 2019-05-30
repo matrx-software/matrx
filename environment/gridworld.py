@@ -53,7 +53,9 @@ class GridWorld:
         while not is_done:
             is_done, tick_duration = self.step()
 
-    def register_agent(self, agent: Agent, agent_avatar: AgentAvatar):
+
+    def register_agent(self, agent, agent_avatar: AgentAvatar):
+        """ Register human agents and agents to the gridworld environment """
 
         # Random seed for agent between 1 and 10000000, might need to be adjusted still
         agent_seed = self.rnd_gen.randint(1, 10000000)
@@ -63,6 +65,8 @@ class GridWorld:
 
         # Add agent to registered agents
         self.registered_agents[agent_avatar.obj_id] = agent_avatar
+
+        print("Created agent with id", agent_avatar.obj_id)
 
         # Get all properties from the agent avatar
         avatar_props = agent_avatar.properties
@@ -75,6 +79,8 @@ class GridWorld:
                                  rnd_seed=agent_seed)
 
         return agent_avatar.obj_id
+
+
 
     def register_env_object(self, env_object: EnvObject):
         """ this function adds the objects """
@@ -141,8 +147,8 @@ class GridWorld:
 
             # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
             if agent_obj.is_human_agent:
-                usrinp = self.visualizer.userinputs[agent_id][
-                    "action"] if agent_id in self.visualizer.userinputs else None
+                usrinp = self.visualizer.userinputs[agent_id] if \
+                                agent_id in self.visualizer.userinputs else None
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
                     state=state,
                     agent_properties=agent_obj.properties, possible_actions=possible_actions, agent_id=agent_id,

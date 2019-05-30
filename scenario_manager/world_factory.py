@@ -9,6 +9,7 @@ import numpy as np
 from numpy.random.mtrand import RandomState
 
 from agents.Agent import Agent
+from agents.HumanAgent import HumanAgent
 from agents.capabilities.capability import SenseCapability
 from environment.gridworld import TIME_FOCUS_TICK_DURATION, GridWorld
 from environment.objects.agent_avatar import AgentAvatar
@@ -339,14 +340,77 @@ class WorldFactory:
                                 visualize_colour=visualize_colours[idx], visualize_depth=visualize_depths[idx],
                                 **custom_properties[idx])
 
-    def add_human_agent(self, agent, name):
-        # Check if the agent is of HumanAgent, if so; use the add_agent method
+
+
+
+    def add_human_agent(self, location, agent, name="HumanAgent", customizable_properties=None, sense_capability=None,
+                  is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None, is_movable=None,
+                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
+                  usrinp_action_map={}, **custom_properties):
+
+        # Check if location and agent are of correct type
+        assert isinstance(location, list) or isinstance(location, tuple)
+        assert isinstance(agent, HumanAgent)
+
+        # Load the defaults for any variable that is not defined
+        # Obtain any defaults from the defaults.json file if not set already.
+        if is_traversable is None:
+            is_traversable = get_default_value(class_name="AgentAvatar", property_name="is_traversable")
+        if visualize_size is None:
+            visualize_size = get_default_value(class_name="AgentAvatar", property_name="visualize_size")
+        if visualize_shape is None:
+            visualize_shape = get_default_value(class_name="AgentAvatar", property_name="visualize_shape")
+        if visualize_colour is None:
+            visualize_colour = get_default_value(class_name="AgentAvatar", property_name="visualize_colour")
+        if visualize_depth is None:
+            visualize_depth = get_default_value(class_name="AgentAvatar", property_name="visualize_depth")
+        if agent_speed_in_ticks is None:
+            agent_speed_in_ticks = get_default_value(class_name="AgentAvatar", property_name="agent_speed_in_ticks")
+        if possible_actions is None:
+            possible_actions = get_default_value(class_name="AgentAvatar", property_name="possible_actions")
+        if is_movable is None:
+            is_movable = get_default_value(class_name="AgentAvatar", property_name="is_movable")
+
+        # set the user input action mapping in the agent object
+        agent.usrinp_action_map = usrinp_action_map
+
+        # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
+        # objects with infinite range).
+        if custom_properties is None:
+            custom_properties = {}
+        if sense_capability is None:
+            sense_capability = self.create_sense_capability([], [])  # Create sense capability that perceives all
+        if customizable_properties is None:
+            customizable_properties = []
+
+        # Check if the agent is of HumanAgent, if not; use the add_agent method
         inh_path = get_inheritence_path(agent.__class__)
         if 'HumanAgent' not in inh_path:
             Exception(f"You are adding an agent that does not inherit from HumanAgent with the name {name}. Use "
                       f"factory.add_agent to add autonomous agents.")
-        # TODO
-        pass
+
+        # Define a settings dictionary with all we need to register and add an agent to the GridWorld
+        hu_ag_setting = {"agent": agent,
+                         "custom_properties": custom_properties,
+                         "customizable_properties": customizable_properties,
+                         "sense_capability": sense_capability,
+                         "mandatory_properties": {
+                             "name": name,
+                             "is_movable": is_movable,
+                             "is_traversable": is_traversable,
+                             "possible_actions": possible_actions,
+                             "is_human_agent": True,
+                             "agent_speed_in_ticks": agent_speed_in_ticks,
+                             "visualize_size": visualize_size,
+                             "visualize_shape": visualize_shape,
+                             "visualize_colour": visualize_colour,
+                             "visualize_depth": visualize_depth,
+                             "location": location,
+                             "team": team}
+                         }
+
+        self.agent_settings.append(hu_ag_setting)
+
 
     def add_area(self, area_corners, name, colour=None):
         # TODO

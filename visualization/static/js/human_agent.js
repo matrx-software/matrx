@@ -44,7 +44,7 @@ $(document).ready(function(){
             console.log("Chrome in background, skipping");
             return;
         }
-
+        
         // unpack received data
         grid_size = data.params.grid_size;
         state = data.state;

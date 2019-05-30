@@ -77,7 +77,7 @@ def update_GUI():
     for hu_ag_id in hu_ag_states:
         new_data = {'params': {"grid_size": grid_sz, "tick": tick}, 'state': hu_ag_states[hu_ag_id]}
         room = f"/humanagent/{hu_ag_id.lower()}"
-        print(f"Sending to human agent {hu_ag_id} {room}")
+        # print(f"Sending to human agent {hu_ag_id} {room}")
         socketio.emit('update', new_data, room=room, namespace="/humanagent")
 
 
@@ -126,8 +126,8 @@ def god_view():
 @socketio.on('join', namespace='/agent')
 @socketio.on('join', namespace='/humanagent')
 def join(message):
-    join_room(message['room'])
-    print("Added client to room:", message["room"])
+    join_room(message['room'].lower())
+    print("Added client to room:", message["room"].lower())
 
 
 

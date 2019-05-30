@@ -170,7 +170,7 @@ class Visualizer():
         # return None if there was no userinput
         if repl == {}:
             self.userinputs = {}
-        else:
+        elif self.verbose:
             print("User input received:", repl)
 
         # otherwise return the userinput

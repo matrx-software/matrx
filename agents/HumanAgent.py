@@ -6,41 +6,39 @@ from agents.Agent import Agent
 
 from environment.actions.object_actions import GrabAction
 from environment.actions.door_actions import *
+from environment.objects.simple_objects import Door
 
 class HumanAgent(Agent):
 
-    def __init__(self, action_set, sense_capability, usrinp_action_map, agent_properties,
-                 properties_agent_writable):
+    def __init__(self):
         """
         Creates an Human Agent which is an agent that can be controlled by a human.
+        """
+        # create an Agent object
+        super().__init__()
 
-        :param name: The name of the agent.
-        :param strt_location: The initial location of the agent.
-        :param action_set: The actions the agent can perform. A list of strings, with each string a class name of an
-        existing action in the package Actions.
-        :param sense_capability: A SenseCapability object; it states which object types the agent can perceive within
-        what range.
-        :param usrinp_action_map: maps userinputs (e.g. arrow key up) to a specific action
-        :param agent_properties: the properties of this agent, including location etc.
-        :param properties_agent_writable: which of the agent_properties can be changed by this agent
+
+    def factory_initialise(self, agent_name, action_set, sense_capability, agent_properties, customizable_properties,
+                           rnd_seed):
+        """
+        Called by the WorldFactory to initialise this human agent with all required properties in addition with any custom
+        properties. This also sets the random number generator with a seed generated based on the random seed of the
+        world that is generated.
+
+        Note; This method should NOT be overridden!
+
+        :param agent_name: The name of the human agent.
+        :param action_set: The list of action names this agent is allowed to perform.
+        :param sense_capability: The SenseCapability of the agent denoting what it can see withing what range.
+        :param agent_properties: The dictionary of properties containing all mandatory and custom properties.
+        :param customizable_properties: A list of keys in agent_properties that this agent is allowed to change.
+        :param rnd_seed: The random seed used to set the random number generator self.rng
         """
 
-        super().__init__(action_set=action_set,
-                         sense_capability=sense_capability,
-                         agent_properties=agent_properties,
-                         properties_agent_writable=properties_agent_writable)
+        super().factory_initialise(agent_name, action_set, sense_capability, agent_properties,
+                customizable_properties, rnd_seed)
 
-        # specifies the agent_properties
-        self.agent_properties = agent_properties
-        # specifies the keys of properties in self.agent_properties which can
-        # be changed by this Agent in this file. If it is not writable, it can only be
-        # updated through performing an action which updates that property (done by the environment).
-        # NOTE: Changing which properties are writable cannot be done during runtime! Only in
-        # the scenario manager
-        self.keys_of_agent_writable_props = properties_agent_writable
 
-        # a list which maps user inputs to actions, defined in the scenario manager
-        self.usrinp_action_map = usrinp_action_map
 
     def get_action(self, state, agent_properties, possible_actions, agent_id, userinput):
         """
@@ -83,6 +81,9 @@ class HumanAgent(Agent):
         userinput = userinput[-1]
         action = self.usrinp_action_map[userinput]
 
+        print(f"User input: '{userinput}', performing action {action}")
+
+
         # if the user chose a grab action, choose an object with a grab_range of 1
         if action == GrabAction.__name__:
             # Assign it to the arguments list
@@ -93,9 +94,16 @@ class HumanAgent(Agent):
             # Get all perceived objects
             objects = list(state.keys())
 
+            # print(self.agent_properties)
+            #
+            #
+            # print(objects)
+            #
+            # print(state)
+
             # Remove all (human)agents
-            objects.remove(self.agent_properties["name"])
-            objects = [obj for obj in objects if 'agent' not in obj]
+            objects.remove(self.agent_properties["obj_id"])
+            objects = [obj for obj in objects if 'is_human_agent' not in state[obj]]
 
             # find objects in range
             object_in_range = []
@@ -113,6 +121,8 @@ class HumanAgent(Agent):
                 object_id = self.rnd_gen.choice(object_in_range)
                 action_kwargs['object_id'] = object_id
 
+            print("Selected object id:", action_kwargs['object_id'])
+
         # if the user chose to do a open or close door action, find a door to open/close within 1 block
         elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:
             action_kwargs['door_range'] = 1
@@ -120,7 +130,7 @@ class HumanAgent(Agent):
 
             # Get all doors from the perceived objects
             objects = list(state.keys())
-            doors = [obj for obj in objects if 'door_open' in state[obj]]
+            doors = [obj for obj in objects if 'class_callable' in state[obj] and state[obj]['class_callable'] == "Door"]
 
             # get all doors within range
             doors_in_range = []
