@@ -248,7 +248,7 @@ class WorldFactory:
                            **custom_properties[idx])
 
     def add_env_object(self, location, name, callable_class=None, customizable_properties=None,
-                       is_traversable=None,
+                       is_traversable=None, is_movable=None,
                        visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
                        **custom_properties):
         if callable_class is None:
@@ -258,6 +258,11 @@ class WorldFactory:
         assert isinstance(location, list) or isinstance(location, tuple)
         assert isinstance(callable_class, Callable)
 
+
+        # Load default parameters if not passed
+        if is_movable is None:
+            is_movable = get_default_value(class_name="EnvObject", property_name="is_movable")
+
         # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
         # objects with infinite range).
         if custom_properties is None:
@@ -266,7 +271,7 @@ class WorldFactory:
             customizable_properties = []
 
         # Define a settings dictionary with all we need to register and add an agent to the GridWorld
-        agent_setting = {"callable_class": callable_class,
+        object_setting = {"callable_class": callable_class,
                          "custom_properties": custom_properties,
                          "customizable_properties": customizable_properties,
                          "mandatory_properties": {
@@ -276,13 +281,15 @@ class WorldFactory:
                              "visualize_shape": visualize_shape,
                              "visualize_colour": visualize_colour,
                              "visualize_depth": visualize_depth,
+                             "is_movable": is_movable,
                              "location": location}
                          }
-        self.object_settings.append(agent_setting)
+        self.object_settings.append(object_setting)
 
     def add_multiple_objects(self, locations, names=None, callable_classes=None, custom_properties=None,
                              customizable_properties=None, is_traversable=None, visualize_sizes=None,
-                             visualize_shapes=None, visualize_colours=None, visualize_depths=None):
+                             visualize_shapes=None, visualize_colours=None, visualize_depths=None,
+                             is_movable=None):
 
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
@@ -290,6 +297,11 @@ class WorldFactory:
             names = [None for _ in range(len(locations))]
         elif isinstance(custom_properties, str):
             names = [custom_properties for _ in range(len(locations))]
+
+        if is_movable is None:
+            is_movable = [None for _ in range(len(locations))]
+        elif isinstance(is_movable, bool):
+            is_movable = [is_movable for _ in range(len(locations))]
 
         if callable_classes is None:
             callable_classes = [EnvObject for _ in range(len(locations))]
@@ -335,7 +347,7 @@ class WorldFactory:
         for idx in range(len(locations)):
             self.add_env_object(location=locations[idx], name=names[idx], callable_class=callable_classes[idx],
                                 customizable_properties=customizable_properties[idx],
-                                is_traversable=is_traversable[idx],
+                                is_traversable=is_traversable[idx], is_movable=is_movable[idx],
                                 visualize_size=visualize_sizes[idx], visualize_shape=visualize_shapes[idx],
                                 visualize_colour=visualize_colours[idx], visualize_depth=visualize_depths[idx],
                                 **custom_properties[idx])

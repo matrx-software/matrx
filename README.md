@@ -9,5 +9,5 @@ For documentation see the wiki at [https://ci.tno.nl/gitlab/SAIL-framework/testb
 
 Changelog:
 - Fixed humanagent with worldfactory and humanagent
+- added circle visualization shape (visualize_shape=2)
 - Updated actions and property names on wiki
-- 
