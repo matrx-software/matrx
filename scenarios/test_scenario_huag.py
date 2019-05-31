@@ -7,7 +7,7 @@ from environment.actions.object_actions import *
 
 
 def create_factory():
-    factory = WorldFactory(random_seed=1, shape=[10, 10], tick_duration=0.5)
+    factory = WorldFactory(random_seed=1, shape=[10, 10], tick_duration=0.2)
 
     random_prop = RandomProperty(property_name="random_prop", values=["One", "Two"], distribution=[3, 1])
     factory.add_env_object(location=[0, 0], name="Wall 1", random_prop=random_prop)
@@ -22,8 +22,8 @@ def create_factory():
         'd': MoveEast.__name__,
         's': MoveSouth.__name__,
         'a': MoveWest.__name__,
-        'p': GrabAction.__name__,
-        'd': DropAction.__name__
+        'g': GrabAction.__name__,
+        'p': DropAction.__name__
     }
 
     hu_ag = HumanAgent()
@@ -31,6 +31,6 @@ def create_factory():
                 visualize_colour="#e9b92b", usrinp_action_map=usrinp_action_map)
 
 
-    factory.add_multiple_objects([[4, 4], [5, 5], [6, 6]])
+    factory.add_multiple_objects(locations=[[4, 4], [5, 5], [6, 6]])
 
     return factory

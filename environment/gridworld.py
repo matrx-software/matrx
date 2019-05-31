@@ -279,7 +279,13 @@ class GridWorld:
 
         return False
 
-    def remove_from_grid(self, object_id):
+    def remove_from_grid(self, object_id, remove_from_carrier=True):
+        """
+        Remove an object from the grid
+        :param object_id: ID of the object to remove
+        :param remove_from_carrier: whether to also remove from agents which carry the
+        object or not.
+        """
         # Remove object first from grid
         grid_obj = self.get_env_object(object_id)  # get the object
         loc = grid_obj.location  # its location
@@ -301,10 +307,12 @@ class GridWorld:
 
         # Else, check if it is an object
         elif object_id in self.environment_objects.keys():
-            # If the object was carried, remove this from the agent properties as well
-            for agent_id in self.environment_objects[object_id].carried_by:
-                obj = self.environment_objects[object_id]
-                self.registered_agents[agent_id].is_carrying.remove(obj)
+            # remove from any agents carrying this object if asked for
+            if remove_from_carrier:
+                # If the object was carried, remove this from the agent properties as well
+                for agent_id in self.environment_objects[object_id].carried_by:
+                    obj = self.environment_objects[object_id]
+                    self.registered_agents[agent_id].is_carrying.remove(obj)
 
             # Remove object
             success = self.environment_objects.pop(object_id,

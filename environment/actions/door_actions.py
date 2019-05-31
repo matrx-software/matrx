@@ -34,8 +34,7 @@ class OpenDoorAction(Action):
         # object_id is required
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
         if object_id == None:
-            result = OpenDoorActionResult(OpenDoorActionResult.NO_OBJECT_SPECIFIED, False)
-            return result
+            return OpenDoorActionResult(OpenDoorActionResult.NO_OBJECT_SPECIFIED, False)
 
         # get obj
         obj = grid_world.environment_objects[object_id]
@@ -43,8 +42,7 @@ class OpenDoorAction(Action):
         # call the open door action in the object
         obj.open_door()
 
-        result = CloseDoorActionResult(OpenDoorActionResult.RESULT_SUCCESS, True)
-        return result
+        return CloseDoorActionResult(OpenDoorActionResult.RESULT_SUCCESS, True)
 
 
     def is_possible(self, grid_world, agent_id, **kwargs):

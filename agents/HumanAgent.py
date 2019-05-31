@@ -4,7 +4,7 @@ import requests
 
 from agents.Agent import Agent
 
-from environment.actions.object_actions import GrabAction
+from environment.actions.object_actions import GrabAction, DropAction
 from environment.actions.door_actions import *
 from environment.objects.simple_objects import Door
 
@@ -81,9 +81,6 @@ class HumanAgent(Agent):
         userinput = userinput[-1]
         action = self.usrinp_action_map[userinput]
 
-        print(f"User input: '{userinput}', performing action {action}")
-
-
         # if the user chose a grab action, choose an object with a grab_range of 1
         if action == GrabAction.__name__:
             # Assign it to the arguments list
@@ -94,13 +91,6 @@ class HumanAgent(Agent):
             # Get all perceived objects
             objects = list(state.keys())
 
-            # print(self.agent_properties)
-            #
-            #
-            # print(objects)
-            #
-            # print(state)
-
             # Remove all (human)agents
             objects.remove(self.agent_properties["obj_id"])
             objects = [obj for obj in objects if 'is_human_agent' not in state[obj]]
@@ -108,12 +98,12 @@ class HumanAgent(Agent):
             # find objects in range
             object_in_range = []
             for object_id in objects:
-                if "movable" not in state[object_id]:
+                if "is_movable" not in state[object_id]:
                     continue
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
-                    np.array(state[object_id]['location']) - np.array(state[self.agent_properties["name"]]['location']))))
-                if dist <= action_kwargs['grab_range'] and state[object_id]["movable"]:
+                    np.array(state[object_id]['location']) - np.array(state[self.agent_properties["obj_id"]]['location']))))
+                if dist <= action_kwargs['grab_range'] and state[object_id]["is_movable"]:
                     object_in_range.append(object_id)
 
             # Select an object if there are any in range
@@ -121,7 +111,9 @@ class HumanAgent(Agent):
                 object_id = self.rnd_gen.choice(object_in_range)
                 action_kwargs['object_id'] = object_id
 
-            print("Selected object id:", action_kwargs['object_id'])
+        # if the user chose a grab action, choose an object with a grab_range of 1
+        if action == DropAction.__name__:
+            action_kwargs['drop_range'] = 1
 
         # if the user chose to do a open or close door action, find a door to open/close within 1 block
         elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:
@@ -137,7 +129,7 @@ class HumanAgent(Agent):
             for object_id in doors:
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
-                    np.array(state[object_id]['location']) - np.array(state[self.agent_properties["name"]]['location']))))
+                    np.array(state[object_id]['location']) - np.array(state[self.agent_properties["obj_id"]]['location']))))
                 if dist <= action_kwargs['door_range']:
                     doors_in_range.append(object_id)
 
