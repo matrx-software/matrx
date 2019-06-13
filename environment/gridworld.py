@@ -147,8 +147,8 @@ class GridWorld:
 
             # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
             if agent_obj.is_human_agent:
-                usrinp = self.visualizer.userinputs[agent_id] if \
-                                agent_id in self.visualizer.userinputs else None
+                usrinp = self.visualizer.userinputs[agent_id.lower()] if \
+                                agent_id.lower() in self.visualizer.userinputs else None
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
                     state=state,
                     agent_properties=agent_obj.properties, possible_actions=possible_actions, agent_id=agent_id,
