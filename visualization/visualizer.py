@@ -20,7 +20,7 @@ class Visualizer():
         self.agent_states = {}
         self.hu_ag_states = {}
         self.god_state = {}
-        self.verbose = True
+        self.verbose = False
         self.userinputs = {}
 
         self.__initGUI(grid_size=grid_size)
