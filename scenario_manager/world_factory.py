@@ -41,6 +41,8 @@ import environment.actions.move_actions
 import scenario_manager
 # noinspection PyUnresolvedReferences
 import visualization
+
+
 ######
 
 
@@ -258,7 +260,6 @@ class WorldFactory:
         assert isinstance(location, list) or isinstance(location, tuple)
         assert isinstance(callable_class, Callable)
 
-
         # Load default parameters if not passed
         if is_movable is None:
             is_movable = get_default_value(class_name="EnvObject", property_name="is_movable")
@@ -272,18 +273,18 @@ class WorldFactory:
 
         # Define a settings dictionary with all we need to register and add an agent to the GridWorld
         object_setting = {"callable_class": callable_class,
-                         "custom_properties": custom_properties,
-                         "customizable_properties": customizable_properties,
-                         "mandatory_properties": {
-                             "name": name,
-                             "is_traversable": is_traversable,
-                             "visualize_size": visualize_size,
-                             "visualize_shape": visualize_shape,
-                             "visualize_colour": visualize_colour,
-                             "visualize_depth": visualize_depth,
-                             "is_movable": is_movable,
-                             "location": location}
-                         }
+                          "custom_properties": custom_properties,
+                          "customizable_properties": customizable_properties,
+                          "mandatory_properties": {
+                              "name": name,
+                              "is_traversable": is_traversable,
+                              "visualize_size": visualize_size,
+                              "visualize_shape": visualize_shape,
+                              "visualize_colour": visualize_colour,
+                              "visualize_depth": visualize_depth,
+                              "is_movable": is_movable,
+                              "location": location}
+                          }
         self.object_settings.append(object_setting)
 
     def add_multiple_objects(self, locations, names=None, callable_classes=None, custom_properties=None,
@@ -352,13 +353,11 @@ class WorldFactory:
                                 visualize_colour=visualize_colours[idx], visualize_depth=visualize_depths[idx],
                                 **custom_properties[idx])
 
-
-
-
     def add_human_agent(self, location, agent, name="HumanAgent", customizable_properties=None, sense_capability=None,
-                  is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None, is_movable=None,
-                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                  usrinp_action_map={}, **custom_properties):
+                        is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None,
+                        is_movable=None,
+                        visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
+                        usrinp_action_map={}, **custom_properties):
 
         # Check if location and agent are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
@@ -422,7 +421,6 @@ class WorldFactory:
                          }
 
         self.agent_settings.append(hu_ag_setting)
-
 
     def add_area(self, area_corners, name, colour=None):
         # TODO
