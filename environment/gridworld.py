@@ -59,7 +59,9 @@ class GridWorld:
         while not is_done:
             is_done, tick_duration = self.step()
 
-    def register_agent(self, agent: Agent, agent_avatar: AgentAvatar):
+
+    def register_agent(self, agent, agent_avatar: AgentAvatar):
+        """ Register human agents and agents to the gridworld environment """
 
         # Random seed for agent between 1 and 10000000, might need to be adjusted still
         agent_seed = self.rnd_gen.randint(1, 1000000)
@@ -70,16 +72,28 @@ class GridWorld:
         # Add agent to registered agents
         self.registered_agents[agent_avatar.obj_id] = agent_avatar
 
+        print("Created agent with id", agent_avatar.obj_id)
+
         # Get all properties from the agent avatar
         avatar_props = agent_avatar.properties
 
-        agent.factory_initialise(agent_name=agent_avatar.obj_name,
-                                 agent_id=agent_avatar.obj_id,
-                                 action_set=agent_avatar.action_set,
-                                 sense_capability=agent_avatar.sense_capability,
-                                 agent_properties=avatar_props,
-                                 customizable_properties=agent_avatar.customizable_properties,
-                                 rnd_seed=agent_seed)
+        if agent_avatar.is_human_agent is False:
+            agent.factory_initialise(agent_name=agent_avatar.obj_name,
+                                     agent_id=agent_avatar.obj_id,
+                                     action_set=agent_avatar.action_set,
+                                     sense_capability=agent_avatar.sense_capability,
+                                     agent_properties=avatar_props,
+                                     customizable_properties=agent_avatar.customizable_properties,
+                                     rnd_seed=agent_seed)
+        else:  # if the agent is a human agent, we also assign its user input action map
+            agent.factory_initialise(agent_name=agent_avatar.obj_name,
+                                     agent_id=agent_avatar.obj_id,
+                                     action_set=agent_avatar.action_set,
+                                     sense_capability=agent_avatar.sense_capability,
+                                     agent_properties=avatar_props,
+                                     customizable_properties=agent_avatar.customizable_properties,
+                                     rnd_seed=agent_seed,
+                                     usrinp_action_map=agent_avatar.properties["usrinp_action_map"])
 
         return agent_avatar.obj_id
 
@@ -148,8 +162,8 @@ class GridWorld:
 
             # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
             if agent_obj.is_human_agent:
-                usrinp = self.visualizer.userinputs[agent_id][
-                    "action"] if agent_id in self.visualizer.userinputs else None
+                usrinp = self.visualizer.userinputs[agent_id.lower()] if \
+                                agent_id.lower() in self.visualizer.userinputs else None
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
                     state=state,
                     agent_properties=agent_obj.properties, possible_actions=possible_actions, agent_id=agent_id,
@@ -299,7 +313,13 @@ class GridWorld:
 
         return False
 
-    def remove_from_grid(self, object_id):
+    def remove_from_grid(self, object_id, remove_from_carrier=True):
+        """
+        Remove an object from the grid
+        :param object_id: ID of the object to remove
+        :param remove_from_carrier: whether to also remove from agents which carry the
+        object or not.
+        """
         # Remove object first from grid
         grid_obj = self.get_env_object(object_id)  # get the object
         loc = grid_obj.location  # its location
@@ -321,10 +341,12 @@ class GridWorld:
 
         # Else, check if it is an object
         elif object_id in self.environment_objects.keys():
-            # If the object was carried, remove this from the agent properties as well
-            for agent_id in self.environment_objects[object_id].carried_by:
-                obj = self.environment_objects[object_id]
-                self.registered_agents[agent_id].is_carrying.remove(obj)
+            # remove from any agents carrying this object if asked for
+            if remove_from_carrier:
+                # If the object was carried, remove this from the agent properties as well
+                for agent_id in self.environment_objects[object_id].carried_by:
+                    obj = self.environment_objects[object_id]
+                    self.registered_agents[agent_id].is_carrying.remove(obj)
 
             # Remove object
             success = self.environment_objects.pop(object_id,

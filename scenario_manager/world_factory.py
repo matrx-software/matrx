@@ -10,6 +10,7 @@ from numpy.random.mtrand import RandomState
 
 from agents.agent import Agent
 from agents.capabilities.capability import SenseCapability
+from agents.human_agent import HumanAgent
 from environment.gridworld import TIME_FOCUS_TICK_DURATION, GridWorld
 from environment.objects.agent_avatar import AgentAvatar
 from environment.objects.env_object import EnvObject
@@ -181,7 +182,7 @@ class WorldFactory:
                             sense_capabilities=None, customizable_properties=None,
                             is_traversable=None, agent_speeds_in_ticks=None,
                             teams=None, visualize_sizes=None, visualize_shapes=None,
-                            visualize_colours=None):
+                            visualize_colours=None, visualize_depths=None):
 
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
@@ -230,6 +231,11 @@ class WorldFactory:
         elif isinstance(visualize_colours, str):
             visualize_colours = [visualize_colours for _ in range(len(agents))]
 
+        if visualize_depths is None:
+            visualize_depths = [None for _ in range(len(agents))]
+        elif isinstance(visualize_depths, int):
+            visualize_depths = [visualize_depths for _ in range(len(agents))]
+
         # Loop through all agents and add them
         for idx, agent in enumerate(agents):
             self.add_agent(locations[idx], agent,
@@ -241,6 +247,7 @@ class WorldFactory:
                            visualize_size=visualize_sizes[idx],
                            visualize_shape=visualize_shapes[idx],
                            visualize_colour=visualize_colours[idx],
+                           visualize_depth=visualize_depths[idx],
                            **custom_properties[idx])
 
     def add_agent_prospect(self, location, agent, probability, name="Agent", customizable_properties=None,
@@ -260,7 +267,7 @@ class WorldFactory:
         self.agent_settings[-1]['probability'] = probability
 
     def add_env_object(self, location, name, callable_class=None, customizable_properties=None,
-                       is_traversable=None,
+                       is_traversable=None, is_movable=None,
                        visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
                        **custom_properties):
         if callable_class is None:
@@ -313,7 +320,8 @@ class WorldFactory:
 
     def add_multiple_objects(self, locations, names=None, callable_classes=None, custom_properties=None,
                              customizable_properties=None, is_traversable=None, visualize_sizes=None,
-                             visualize_shapes=None, visualize_colours=None, visualize_depths=None):
+                             visualize_shapes=None, visualize_colours=None, visualize_depths=None,
+                             is_movable=None):
 
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
@@ -321,6 +329,11 @@ class WorldFactory:
             names = [None for _ in range(len(locations))]
         elif isinstance(custom_properties, str):
             names = [custom_properties for _ in range(len(locations))]
+
+        if is_movable is None:
+            is_movable = [None for _ in range(len(locations))]
+        elif isinstance(is_movable, bool):
+            is_movable = [is_movable for _ in range(len(locations))]
 
         if callable_classes is None:
             callable_classes = [EnvObject for _ in range(len(locations))]
@@ -366,7 +379,7 @@ class WorldFactory:
         for idx in range(len(locations)):
             self.add_env_object(location=locations[idx], name=names[idx], callable_class=callable_classes[idx],
                                 customizable_properties=customizable_properties[idx],
-                                is_traversable=is_traversable[idx],
+                                is_traversable=is_traversable[idx], is_movable=is_movable[idx],
                                 visualize_size=visualize_sizes[idx], visualize_shape=visualize_shapes[idx],
                                 visualize_colour=visualize_colours[idx], visualize_depth=visualize_depths[idx],
                                 **custom_properties[idx])
@@ -375,7 +388,7 @@ class WorldFactory:
                         is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None,
                         is_movable=None,
                         visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                        usrinp_action_map={}, **custom_properties):
+                        usrinp_action_map=None, **custom_properties):
 
         # Check if location and agent are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
@@ -400,9 +413,6 @@ class WorldFactory:
         if is_movable is None:
             is_movable = get_default_value(class_name="AgentAvatar", property_name="is_movable")
 
-        # set the user input action mapping in the agent object
-        agent.usrinp_action_map = usrinp_action_map
-
         # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
         # objects with infinite range).
         if custom_properties is None:
@@ -417,6 +427,9 @@ class WorldFactory:
         if 'HumanAgent' not in inh_path:
             Exception(f"You are adding an agent that does not inherit from HumanAgent with the name {name}. Use "
                       f"factory.add_agent to add autonomous agents.")
+
+        # Append the user input map to the custom properties
+        custom_properties["usrinp_action_map"] = usrinp_action_map
 
         # Define a settings dictionary with all we need to register and add an agent to the GridWorld
         hu_ag_setting = {"agent": agent,
@@ -566,7 +579,7 @@ class WorldFactory:
                 warnings.warn(f"The following properties are not used in the creation of environment object of type "
                               f"{callable_class.__name__} with name {mandatory_props['name']}; {not_used}")
 
-        args = self.__parse_args(args)
+        args = self.__instantiate_random_properties(args)
         env_object = callable_class(**args)
 
         return env_object
@@ -588,8 +601,7 @@ class WorldFactory:
         customizable_props = settings['customizable_properties']
         mandatory_props = settings['mandatory_properties']
 
-        args = {'location': mandatory_props['location'],
-                'possible_actions': mandatory_props['possible_actions'],
+        args = {**mandatory_props,
                 'sense_capability': sense_capability,
                 'class_callable': agent.__class__,
                 'callback_agent_get_action': agent.get_action,
@@ -597,27 +609,17 @@ class WorldFactory:
                 'callback_agent_observe': agent.ooda_observe,
                 'callback_agent_get_messages': agent.get_messages,
                 'callback_agent_set_messages': agent.set_messages,
-                'visualize_size': mandatory_props['visualize_size'],
-                'visualize_shape': mandatory_props['visualize_shape'],
-                'visualize_colour': mandatory_props['visualize_colour'],
-                'visualize_depth': mandatory_props['visualize_depth'],
-                'is_traversable': mandatory_props['is_traversable'],
-                'is_movable': mandatory_props['is_movable'],
-                'team': mandatory_props['team'],
-                'agent_speed_in_ticks': mandatory_props['agent_speed_in_ticks'],
-                'name': mandatory_props['name'],
-                'is_human_agent': mandatory_props['is_human_agent'],
                 'customizable_properties': customizable_props,
                 **custom_props}
 
         # Parse arguments and create the AgentAvatar
-        args = self.__parse_args(args)
+        args = self.__instantiate_random_properties(args)
         avatar = AgentAvatar(**args)
 
         # We return the agent and avatar (as we will complete the initialisation of the agent when we register it)
         return agent, avatar
 
-    def __parse_args(self, args):
+    def __instantiate_random_properties(self, args):
         # Checks if all given arguments in the dictionary are not None, and if they are of RandomProperty or
         # RandomLocation, their (random) value is retrieved.
         for k, v in args.items():
@@ -649,7 +651,7 @@ class RandomProperty:
         # Check that the distribution is complete
         assert len(distribution) == len(values)
 
-        # Assign name, values and distribution
+        # Assign values and distribution
         self.values = values
         self.distribution = distribution
         self.allow_duplicates = allow_duplicates

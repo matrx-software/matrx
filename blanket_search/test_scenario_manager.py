@@ -2,7 +2,7 @@ import numpy as np
 from agents.agent import Agent
 from environment.scenariomanager import scenario_manager
 from blanket_search.waypointnavigator import WaypointNavigator
-from environment.actions.search_action import *
+from blanket_search.search_action import *
 from environment.actions.move_actions import *
 from environment.actions.object_actions import RemoveObject
 from agents.capabilities.capability import SenseCapability

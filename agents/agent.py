@@ -50,6 +50,7 @@ class Agent:
         Note; This method should NOT be overridden!
 
         :param agent_name: The name of the agent.
+        :param agent_id: The unique ID given by the world to this agent's avatar. So the agent knows what body is his.
         :param action_set: The list of action names this agent is allowed to perform.
         :param sense_capability: The SenseCapability of the agent denoting what it can see withing what range.
         :param agent_properties: The dictionary of properties containing all mandatory and custom properties.
@@ -105,7 +106,7 @@ class Agent:
         self.agent_properties = agent_properties
         filtered_state = self.ooda_observe(state)
         filtered_state = self.ooda_orient(filtered_state)
-        action, action_kwargs = self.ooda_decide(None, filtered_state, possible_actions)
+        action, action_kwargs = self.ooda_decide(filtered_state, possible_actions)
         action = self.ooda_act(action)
 
         return filtered_state, self.agent_properties, action, action_kwargs
@@ -226,7 +227,7 @@ class Agent:
         """
         return state
 
-    def ooda_decide(self, previous_observations, current_observations, possible_actions):
+    def ooda_decide(self, state, possible_actions):
         """
         All our agent work through the OODA-loop paradigm; first you observe, then you orient/pre-process, followed by
         a decision process of an action after which we act upon the action.
@@ -254,7 +255,7 @@ class Agent:
 
         # Send a message to a random agent
         agents = []
-        for obj_id, obj in current_observations.items():
+        for obj_id, obj in state.items():
             classes = obj['class_inheritance']
             if Agent.__name__ in classes:  # the object is an agent to which we can send our message
                 agents.append(obj)
@@ -273,30 +274,30 @@ class Agent:
 
         if action == RemoveObject.__name__:
             action_kwargs['object_id'] = None
-            
-            # Get all perceived objects
-            objects = list(current_observations.keys())
-            # Remove yourself from the object id list
-            objects.remove(self.agent_properties["obj_id"])
-            # Remove all objects that have 'agent' in the name (so we do not remove those, though agents without agent
-            # in their name can still be removed).
-            objects = [obj for obj in objects if 'agent' not in obj]
-            # Choose a random object id (safety for when it is empty)
-            if objects:
-                object_id = self.rnd_gen.choice(objects)
-                # Assign it
-                action_kwargs['object_id'] = object_id
-                # Select range as just enough to remove that object
-                remove_range = int(np.ceil(np.linalg.norm(
-                    np.array(current_observations[object_id]['location']) - np.array(
-                        current_observations[self.agent_properties["obj_id"]]['location']))))
-                # Safety for if object and agent are in the same location
-                remove_range = max(remove_range, 0)
-                # Assign it to the arguments list
-                action_kwargs['remove_range'] = remove_range
-            else:
-                action_kwargs['object_id'] = None
-                action_kwargs['remove_range'] = 0
+            #
+            # # Get all perceived objects
+            # objects = list(state.keys())
+            # # Remove yourself from the object id list
+            # objects.remove(self.agent_properties["obj_id"])
+            # # Remove all objects that have 'agent' in the name (so we do not remove those, though agents without agent
+            # # in their name can still be removed).
+            # objects = [obj for obj in objects if 'agent' not in obj]
+            # # Choose a random object id (safety for when it is empty)
+            # if objects:
+            #     object_id = self.rnd_gen.choice(objects)
+            #     # Assign it
+            #     action_kwargs['object_id'] = object_id
+            #     # Select range as just enough to remove that object
+            #     remove_range = int(np.ceil(np.linalg.norm(
+            #         np.array(state[object_id]['location']) - np.array(
+            #             state[self.agent_properties["obj_id"]]['location']))))
+            #     # Safety for if object and agent are in the same location
+            #     remove_range = max(remove_range, 0)
+            #     # Assign it to the arguments list
+            #     action_kwargs['remove_range'] = remove_range
+            # else:
+            #     action_kwargs['object_id'] = None
+            #     action_kwargs['remove_range'] = 0
 
         # if the agent randomly chose a grab action, choose a random object to pickup
         elif action == GrabAction.__name__:
@@ -311,7 +312,7 @@ class Agent:
             action_kwargs['max_objects'] = max_objects
 
             # Get all perceived objects
-            objects = list(current_observations.keys())
+            objects = list(state.keys())
 
             # Remove yourself from the object id list
             objects.remove(self.agent_properties["obj_id"])
@@ -324,9 +325,9 @@ class Agent:
             for object_id in objects:
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
-                    np.array(current_observations[object_id]['location']) - np.array(
-                        current_observations[self.agent_properties["obj_id"]]['location']))))
-                if dist <= grab_range and current_observations[object_id]["is_movable"]:
+                    np.array(state[object_id]['location']) - np.array(
+                        state[self.agent_properties["obj_id"]]['location']))))
+                if dist <= grab_range and state[object_id]["is_movable"]:
                     object_in_range.append(object_id)
 
             if object_in_range:
@@ -345,8 +346,8 @@ class Agent:
             action_kwargs['object_id'] = None
 
             # Get all doors from the perceived objects
-            objects = list(current_observations.keys())
-            doors = [obj for obj in objects if 'type' in current_observations[obj] and current_observations[obj]['type'] == "Door"]
+            objects = list(state.keys())
+            doors = [obj for obj in objects if 'type' in state[obj] and state[obj]['type'] == "Door"]
 
             # choose a random door
             if len(doors) > 0:

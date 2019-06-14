@@ -1,8 +1,9 @@
 import numpy as np
+import collections, math
 
 from environment.actions.action import Action, ActionResult
 from environment.objects.agent_avatar import AgentAvatar
-
+import copy
 
 class RemoveObject(Action):
     """
@@ -150,11 +151,11 @@ class GrabAction(Action):
         env_obj = grid_world.environment_objects[object_id]  # Environment object
 
         # Updating properties
-        reg_ag.is_carrying.append(env_obj)  # we add the entire object!
         env_obj.carried_by.append(agent_id)
+        reg_ag.is_carrying.append(env_obj)  # we add the entire object!
 
         # Remove it from the grid world (it is now stored in the is_carrying list of the AgentAvatar
-        succeeded = grid_world.remove_from_grid(env_obj.obj_id)
+        succeeded = grid_world.remove_from_grid(object_id=env_obj.obj_id, remove_from_carrier=False)
         if not succeeded:
             return GrabActionResult(GrabActionResult.FAILED_TO_REMOVE_OBJECT_FROM_WORLD.replace("{OBJECT_ID}",
                                                                                                 env_obj.obj_id), False)
@@ -169,6 +170,9 @@ class GrabAction(Action):
 def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
     reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
     loc_agent = reg_ag.location  # Agent location
+
+    if object_id is None:
+        return False, GrabActionResult.RESULT_NO_OBJECT
 
     # Already carries an object
     if len(reg_ag.is_carrying) >= max_objects:
@@ -245,6 +249,8 @@ class DropAction(Action):
     def is_possible(self, grid_world, agent_id, **kwargs):
         reg_ag = grid_world.registered_agents[agent_id]
 
+        drop_range = 1 if not 'drop_range' in kwargs else kwargs['drop_range']
+
         # If no object id is given, the last item is dropped
         if 'object_id' in kwargs:
             obj_id = kwargs['object_id']
@@ -253,12 +259,14 @@ class DropAction(Action):
         else:
             return False, DropActionResult.RESULT_NO_OBJECT
 
-        return possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id)
+        return possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id, drop_range=drop_range)
+
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
         This function drops one of the items carried by the agent.
-        It drops the item at the current location of the agent.
+        It tries to drop the object within the specified drop_range around the agent,
+        trying to drop it as close to the agent as possible
 
         :param grid_world: pointer to current GridWorld
         :param agent_id: agent that acts
@@ -268,33 +276,124 @@ class DropAction(Action):
         """
         reg_ag = grid_world.registered_agents[agent_id]
 
+        # fetch range from kwargs
+        drop_range = 1 if not 'drop_range' in kwargs else kwargs['drop_range']
+
         # If no object id is given, the last item is dropped
         if 'object_id' in kwargs:
             env_obj = kwargs['object_id']
         elif len(reg_ag.is_carrying) > 0:
             env_obj = reg_ag.is_carrying[-1]
         else:
-            return False
+            return DropActionResult(DropActionResult.RESULT_NO_OBJECT_CARRIED, False)
 
-        return act_drop(grid_world, agent_id=agent_id, env_obj=env_obj)
+        # check that it is even possible to drop this object somewhere
+        if not env_obj.is_traversable and not reg_ag.is_traversable and drop_range == 0:
+            raise Exception(f"Intraversable agent {reg_ag.obj_id} can only drop the intraversable object {env_obj.obj_id} at its own location (drop_range = 0), but this is impossible. Enlarge the drop_range for the DropAction to atleast 1")
+
+        # check if we can drop it at our current location
+        curr_loc_drop_poss = is_drop_poss(grid_world, env_obj, reg_ag.location)
+        # drop it on the agent location if possible
+        if curr_loc_drop_poss:
+            return act_drop(grid_world, agent=reg_ag, env_obj=env_obj, drop_loc=reg_ag.location)
+
+        # if the agent location was the only within range, return a negative action result
+        elif not curr_loc_drop_poss and drop_range == 0:
+            return DropActionResult(DropActionResult.RESULT_OBJECT, False)
+
+        # Try finding other drop locations from close to further away around the agent
+        drop_loc = find_drop_loc(grid_world, reg_ag, env_obj, drop_range, reg_ag.location)
+
+        # If we didn't find a valid drop location within range, return a negative action result
+        if not drop_loc:
+            return DropActionResult(DropActionResult.RESULT_OBJECT, False)
+
+        return act_drop(grid_world, agent=reg_ag, env_obj=env_obj, drop_loc=drop_loc)
 
 
-def act_drop(grid_world, agent_id, env_obj):
-    # Get the agent
-    reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
+def act_drop(grid_world, agent, env_obj, drop_loc):
+    """ Drop the object """
 
     # Updating properties
-    reg_ag.is_carrying.remove(env_obj)
-    env_obj.carried_by.remove(agent_id)
+    agent.is_carrying.remove(env_obj)
+    env_obj.carried_by.remove(agent.obj_id)
 
     # We return the object to the grid location we are standing at
-    env_obj.location = reg_ag.location
+    env_obj.location = drop_loc
     grid_world.register_env_object(env_obj)
 
     return DropActionResult(DropActionResult.RESULT_SUCCESS, True)
 
 
-def possible_drop(grid_world, agent_id, obj_id):
+def find_drop_loc(grid_world, agent, env_obj, drop_range, start_loc):
+    """
+    Do a breadth first search starting from the agent's location to find
+    the closest valid drop location.
+
+    :param grid_world: The grid_world object
+    :param reg_ag: the agent object of the agent who wants to drop the object
+    :param env_obj: the object to be dropped
+    :param drop_range: the range from our current location for which we can drop
+    the object
+    :return: False if no valid drop location can be found, otherwise the [x,y]
+    coords of the closest drop location
+    """
+    queue = collections.deque([[start_loc]])
+    seen = set([start_loc])
+
+    width = grid_world.shape[0]
+    height = grid_world.shape[1]
+
+    while queue:
+        path = queue.popleft()
+        x, y = path[-1]
+
+        # check if we are still within drop_range
+        if get_distance([x,y], start_loc) > drop_range:
+            return False
+
+        # check if we can drop at this location
+        if is_drop_poss(grid_world, env_obj, [x,y]):
+            return [x,y]
+
+        # queue unseen neighbouring tiles
+        for x2, y2 in ((x+1,y), (x-1,y), (x,y+1), (x,y-1)):
+            if 0 <= x2 < width and 0 <= y2 < height and (x2, y2) not in seen:
+                queue.append(path + [(x2, y2)])
+                seen.add((x2, y2))
+    return False
+
+
+def get_distance(coord1, coord2):
+    """ Get distance between two x,y coordinates """
+    dist = [(a - b) ** 2 for a, b in zip(coord1, coord2)]
+    dist = math.sqrt(sum(dist))
+    return dist
+
+
+def is_drop_poss(grid_world, env_obj, dropLocation):
+    """
+    Check if the object can be dropped at a specific location by checking if
+    there are any intraversable objects at that location, and if the object to
+    be dropped is intraversable
+    """
+
+    # Count the intraversable objects at the current location if we would drop the
+    # object here
+    objs_at_loc = grid_world.get_objects_in_range(dropLocation, object_type="*", sense_range=0)
+    in_trav_objs_count = 1 if not env_obj.is_traversable else 0
+    in_trav_objs_count += len([obj for obj in objs_at_loc if not objs_at_loc[obj].is_traversable])
+
+    # check if we would have an in_traversable object and other objects in
+    # the same location (which is impossible)
+    if in_trav_objs_count >= 1 and (len(objs_at_loc) + 1) >= 2:
+        return False
+    else:
+        return True
+
+
+
+def possible_drop(grid_world, agent_id, obj_id, drop_range):
     reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
     loc_agent = reg_ag.location
     loc_obj_ids = grid_world.grid[loc_agent[1], loc_agent[0]]
@@ -328,8 +427,9 @@ class DropActionResult(ActionResult):
     RESULT_NO_OBJECT = 'The item is not carried'
     RESULT_NONE_GIVEN = "'None' used as input id"
     RESULT_AGENT = 'Cannot drop item on an agent'
-    RESULT_OBJECT = 'Cannot drop item on another object'
+    RESULT_OBJECT = 'Cannot drop item on another intraversable object'
     RESULT_UNKNOWN_OBJECT_TYPE = 'Cannot drop item on an unknown object'
+    RESULT_NO_OBJECT_CARRIED = 'Cannot drop object when none carried'
 
     def __init__(self, result, succeeded, obj_id=None):
         super().__init__(result, succeeded)

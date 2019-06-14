@@ -7,37 +7,59 @@ from agents.agent import Agent
 from environment.actions.object_actions import GrabAction
 from environment.actions.door_actions import *
 
+
 class HumanAgent(Agent):
 
-    def __init__(self, action_set, sense_capability, usrinp_action_map, agent_properties,
-                 properties_agent_writable):
+    def __init__(self):
         """
         Creates an Human Agent which is an agent that can be controlled by a human.
-
-        :param name: The name of the agent.
-        :param strt_location: The initial location of the agent.
-        :param action_set: The actions the agent can perform. A list of strings, with each string a class name of an
-        existing action in the package Actions.
-        :param sense_capability: A SenseCapability object; it states which object types the agent can perceive within
-        what range.
-        :param usrinp_action_map: maps userinputs (e.g. arrow key up) to a specific action
-        :param agent_properties: the properties of this agent, including location etc.
-        :param properties_agent_writable: which of the agent_properties can be changed by this agent
         """
 
-        super().__init__(action_set=action_set,
-                         sense_capability=sense_capability,
-                         agent_properties=agent_properties,
-                         properties_agent_writable=properties_agent_writable)
+        super().__init__()
 
-        # specifies the agent_properties
+    def factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
+                           customizable_properties, rnd_seed, usrinp_action_map={}):
+        """
+        Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
+        properties. This also sets the random number generator with a seed generated based on the random seed of the
+        world that is generated.
+
+        Note; This method should NOT be overridden!
+
+        :param agent_name: The name of the agent.
+        :param agent_id: The unique ID given by the world to this agent's avatar. So the agent knows what body is his.
+        :param action_set: The list of action names this agent is allowed to perform.
+        :param sense_capability: The SenseCapability of the agent denoting what it can see withing what range.
+        :param agent_properties: The dictionary of properties containing all mandatory and custom properties.
+        :param customizable_properties: A list of keys in agent_properties that this agent is allowed to change.
+        :param rnd_seed: The random seed used to set the random number generator self.rng
+        :param usrinp_action_map: maps userinputs (e.g. arrow key up) to a specific action
+        """
+
+        # The name of the agent with which it is also known in the world
+        self.agent_name = agent_name
+
+        # The id of the agent
+        self.agent_id = agent_id
+
+        # The names of the actions this agent is allowed to perform
+        self.action_set = action_set
+
+        # Setting the random seed and rng
+        self.rnd_seed = rnd_seed
+        self.set_rnd_seed(seed=rnd_seed)
+
+        # The SenseCapability of the agent; what it can see and within what range
+        self.sense_capability = sense_capability
+
+        # Contains the agent_properties
         self.agent_properties = agent_properties
-        # specifies the keys of properties in self.agent_properties which can
-        # be changed by this Agent in this file. If it is not writable, it can only be
-        # updated through performing an action which updates that property (done by the environment).
-        # NOTE: Changing which properties are writable cannot be done during runtime! Only in
-        # the scenario manager
-        self.keys_of_agent_writable_props = properties_agent_writable
+
+        # Specifies the keys of properties in self.agent_properties which can  be changed by this Agent in this file. If
+        # it is not writable, it can only be  updated through performing an action which updates that property (done by
+        # the environment).
+        # NOTE: Changing which properties are writable cannot be done during runtime! Only in  the scenario manager
+        self.keys_of_agent_writable_props = customizable_properties
 
         # a list which maps user inputs to actions, defined in the scenario manager
         self.usrinp_action_map = usrinp_action_map
@@ -86,8 +108,8 @@ class HumanAgent(Agent):
         # if the user chose a grab action, choose an object with a grab_range of 1
         if action == GrabAction.__name__:
             # Assign it to the arguments list
-            action_kwargs['grab_range'] = 1# Set grab range
-            action_kwargs['max_objects'] = 3 # Set max amount of objects
+            action_kwargs['grab_range'] = 1  # Set grab range
+            action_kwargs['max_objects'] = 3  # Set max amount of objects
             action_kwargs['object_id'] = None
 
             # Get all perceived objects
@@ -104,7 +126,8 @@ class HumanAgent(Agent):
                     continue
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
-                    np.array(state[object_id]['location']) - np.array(state[self.agent_properties["name"]]['location']))))
+                    np.array(state[object_id]['location']) - np.array(
+                        state[self.agent_properties["name"]]['location']))))
                 if dist <= action_kwargs['grab_range'] and state[object_id]["movable"]:
                     object_in_range.append(object_id)
 
@@ -127,7 +150,8 @@ class HumanAgent(Agent):
             for object_id in doors:
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
-                    np.array(state[object_id]['location']) - np.array(state[self.agent_properties["name"]]['location']))))
+                    np.array(state[object_id]['location']) - np.array(
+                        state[self.agent_properties["name"]]['location']))))
                 if dist <= action_kwargs['door_range']:
                     doors_in_range.append(object_id)
 
@@ -137,7 +161,6 @@ class HumanAgent(Agent):
 
         # otherwise check which action is mapped to that key and return it
         return state, self.agent_properties, action, action_kwargs
-
 
     def ooda_observe(self, state):
         """
@@ -158,7 +181,6 @@ class HumanAgent(Agent):
         :return: A filtered state.
         """
         return state
-
 
     def filter_userinputs(self, userinputs):
         """

@@ -260,7 +260,6 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
             else if (obj['visualization']['shape'] == 2) {
                 drawCircle(x, y, px_per_cell, px_per_cell, clr, sz);
             }
-
         })
     });
 
@@ -378,6 +377,36 @@ function drawRectangle(x, y, tileW, tileH, clr, size) {
     ctx.fillRect( top_left_x, top_left_y, w, h);
 }
 
+/**
+ * Draw a circle on screen
+ *
+ * @param {int} x: x location of tile (top left)
+ * @param {int} y: y location of tile (top left)
+ * @param {int} tileW: width of normal tile
+ * @param {int} tileH: height of normal tile
+ * @param {str} clr: colour to be used to fill the figure
+ * @param {float} size: size ratio (0-1) of this tile compared to a full tile
+ */
+function drawCircle(x, y, tileW, tileH, clr, size) {
+    // coords of top left corner
+    top_x = x + 0.5 * tileW;
+    top_y = y + 0.5 * tileH;
+
+    // width and height of rectangle
+    w = size * tileW;
+    h = size * tileH;
+
+    // draw the rectangle
+    // ctx.fillRect( top_left_x, top_left_y, w, h);
+    ctx.beginPath();
+    ctx.arc(top_x, top_y, w * 0.5, 0, 2 * Math.PI);
+    ctx.closePath();
+
+    // fill the shape with colour
+    ctx.fillStyle = clr;
+    ctx.fill();
+}
+
 
 /**
  * Draw a triangle on screen
@@ -408,36 +437,6 @@ function drawTriangle(x, y, tileW, tileH, clr, size) {
     ctx.lineTo(bt_leftX, bt_leftY); // bottom left
     ctx.lineTo(bt_rightX, bt_rightY); // bottom right
     ctx.closePath();
-
-    // fill the shape with colour
-    ctx.fillStyle = clr;
-    ctx.fill();
-}
-
-/**
- * Draw a triangle on screen
- *
- * @param {int} x: x location of tile (top left)
- * @param {int} y: y location of tile (top left)
- * @param {int} tileW: width of normal tile
- * @param {int} tileH: height of normal tile
- * @param {str} clr: colour to be used to fill the figure
- * @param {float} size: size ratio (0-1) of this tile compared to a full tile
- */
-function drawCircle(x, y, tileW, tileH, clr, size) {
-    // calc the coordinates of the center of the circle
-    centerX = x + 0.5 * tileW;
-    centerY = y + 0.5 * tileH;
-
-    // calc the size of the circle
-    circle_size = tileW * size / 2;
-
-    // draw circle point by point
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, circle_size, 0, 2 * Math.PI);
-    ctx.stroke();
-    ctx.closePath();
-    ctx.fill();
 
     // fill the shape with colour
     ctx.fillStyle = clr;

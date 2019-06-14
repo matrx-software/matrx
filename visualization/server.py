@@ -3,7 +3,7 @@ from flask_socketio import SocketIO, join_room, emit
 from time import sleep, time
 import numpy as np
 import json
-import datetime 
+import datetime
 
 
 '''
@@ -23,6 +23,9 @@ socketio = SocketIO(app)
 debug = False
 
 grid_sz = [4, 4]
+
+# can't be None, otherwise Flask flips out when returning it
+userinput = {}
 
 # When you want to emit from a regular route you have to use socketio.emit(),
 # only socket handlers have the socketio context necessary to call the plain emit().
@@ -77,15 +80,14 @@ def update_GUI():
     for hu_ag_id in hu_ag_states:
         new_data = {'params': {"grid_size": grid_sz, "tick": tick}, 'state': hu_ag_states[hu_ag_id]}
         room = f"/humanagent/{hu_ag_id.lower()}"
-        print(f"Sending to human agent {hu_ag_id} {room}")
+        # print(f"Sending to human agent {hu_ag_id} {room}")
         socketio.emit('update', new_data, room=room, namespace="/humanagent")
 
 
     # return user inputs
     global userinput
-    userinput = {}
     resp = jsonify(userinput)
-    
+    userinput = {}
     return resp
 
 
@@ -127,8 +129,8 @@ def god_view():
 @socketio.on('join', namespace='/agent')
 @socketio.on('join', namespace='/humanagent')
 def join(message):
-    join_room(message['room'])
-    print("Added client to room:", message["room"])
+    join_room(message['room'].lower())
+    print("Added client to room:", message["room"].lower())
 
 
 
@@ -136,9 +138,6 @@ def join(message):
 ###############################################
 # User input handling for human agent
 ###############################################
-
-# can't be None, otherwise Flask flips out when returning it
-userinput = {}
 
 # Fetch userinput messages sent from human agents
 @socketio.on('userinput', namespace="/humanagent")

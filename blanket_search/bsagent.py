@@ -11,7 +11,7 @@ from environment.actions.object_actions import *
 
 
 class BSAgent(Agent):
-    AGENT_PROPERTIES_JSON = "blanket_search/scenarios/bs_agent_properties.json"
+    AGENT_PROPERTIES_JSON = "scenarios/bs_agent_properties.json"
     bs_action_set = [
         MoveNorth.__name__,
         MoveNorthEast.__name__,
@@ -107,7 +107,7 @@ class BSAgent(Agent):
         """
         return state
 
-    def ooda_decide(self, previous_observations, current_observations, possible_actions):
+    def ooda_decide(self, current_observations, possible_actions):
         """
         For now, choose a random action from all possible actions
         In our implementation, we determine the action for each agent in the Plan class
@@ -152,7 +152,7 @@ class BSAgent(Agent):
 
                 print ("deciding")
                 
-                self.basicreasoner.update_todos(previous_observations, current_observations)
+                self.basicreasoner.update_todos(None, current_observations)
                 self.current_goal = self.basicreasoner.request_current_goal()
                 print("Current goal: " + str(self.current_goal))
                 

@@ -20,7 +20,7 @@ class Visualizer():
         self.agent_states = {}
         self.hu_ag_states = {}
         self.god_state = {}
-        self.verbose = False
+        self.verbose = True
         self.userinputs = {}
 
         self.__initGUI(grid_size=grid_size)
@@ -101,7 +101,7 @@ class Visualizer():
         into a new dictionary with as key the visualization depth, and as value
         the objects which are to be displayed at that depth
         """
-        new_state = OrderedDict()
+        new_state = {}
 
         # loop through all objects in the state
         for objID, obj in state.items():
@@ -122,6 +122,7 @@ class Visualizer():
         sorted_state = {}
         for depth in sorted(new_state.keys()):
             sorted_state[depth]= new_state[depth]
+
         return sorted_state
 
 
@@ -170,7 +171,7 @@ class Visualizer():
         # return None if there was no userinput
         if repl == {}:
             self.userinputs = {}
-        else:
+        elif self.verbose:
             print("User input received:", repl)
 
         # otherwise return the userinput
