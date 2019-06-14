@@ -3,8 +3,7 @@ import math
 import time
 from collections import OrderedDict
 
-from agents.Agent import Agent
-from agents.HumanAgent import HumanAgent
+from agents.agent import Agent
 from environment.actions.object_actions import *
 from environment.helper_functions import get_all_classes
 from environment.objects.env_object import *
@@ -39,13 +38,20 @@ class GridWorld:
         self.tick_start_time = datetime.datetime.now()
         self.sleep_duration = tick_duration
         self.visualizer = None
+        self.is_initialized = False
+        self.message_buffer = {} # dictionary of messages that need to be send to agents, with receiver ids as keys
 
     def initialize(self):
-        # We update the grid, which fills everything with added objects and agents
-        self.__update_grid()
+        # Only initialize when we did not already do so
+        if not self.is_initialized:
+            # We update the grid, which fills everything with added objects and agents
+            self.__update_grid()
 
-        # Initialize the visualizer
-        self.visualizer = Visualizer(self.shape)
+            # Initialize the visualizer
+            self.visualizer = Visualizer(self.shape)
+
+            # Visualize already
+            self.__initial_visualisation()
 
     def run(self):
         self.initialize()
@@ -53,12 +59,10 @@ class GridWorld:
         while not is_done:
             is_done, tick_duration = self.step()
 
-
-    def register_agent(self, agent, agent_avatar: AgentAvatar):
-        """ Register human agents and agents to the gridworld environment """
+    def register_agent(self, agent: Agent, agent_avatar: AgentAvatar):
 
         # Random seed for agent between 1 and 10000000, might need to be adjusted still
-        agent_seed = self.rnd_gen.randint(1, 10000000)
+        agent_seed = self.rnd_gen.randint(1, 1000000)
 
         # check if the agent can be succesfully placed at that location
         self.validate_obj_placement(agent_avatar)
@@ -66,12 +70,11 @@ class GridWorld:
         # Add agent to registered agents
         self.registered_agents[agent_avatar.obj_id] = agent_avatar
 
-        print("Created agent with id", agent_avatar.obj_id)
-
         # Get all properties from the agent avatar
         avatar_props = agent_avatar.properties
 
         agent.factory_initialise(agent_name=agent_avatar.obj_name,
+                                 agent_id=agent_avatar.obj_id,
                                  action_set=agent_avatar.action_set,
                                  sense_capability=agent_avatar.sense_capability,
                                  agent_properties=avatar_props,
@@ -79,8 +82,6 @@ class GridWorld:
                                  rnd_seed=agent_seed)
 
         return agent_avatar.obj_id
-
-
 
     def register_env_object(self, env_object: EnvObject):
         """ this function adds the objects """
@@ -147,8 +148,8 @@ class GridWorld:
 
             # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
             if agent_obj.is_human_agent:
-                usrinp = self.visualizer.userinputs[agent_id.lower()] if \
-                                agent_id.lower() in self.visualizer.userinputs else None
+                usrinp = self.visualizer.userinputs[agent_id][
+                    "action"] if agent_id in self.visualizer.userinputs else None
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
                     state=state,
                     agent_properties=agent_obj.properties, possible_actions=possible_actions, agent_id=agent_id,
@@ -159,6 +160,16 @@ class GridWorld:
                     state=state,
                     agent_properties=agent_obj.properties, possible_actions=possible_actions,
                     agent_id=agent_id)
+
+            # Obtain all communication messages if the agent has something to say to others
+            agent_messages = agent_obj.get_messages_func()
+            if len(agent_messages) > 0:  # there are messages
+                # go through all messages
+                for mssg in agent_messages:
+                    if mssg['to_id'] not in self.message_buffer.keys():  # first message for this receiver
+                        self.message_buffer[mssg['to_id']] = [mssg]
+                    else:
+                        self.message_buffer[mssg['to_id']].append(mssg)
 
             # store the action in the buffer
             action_buffer[agent_id] = (action_class_name, action_kwargs)
@@ -192,6 +203,15 @@ class GridWorld:
 
             # Update the grid
             self.__update_grid()
+
+        # Send all messages between agents
+        for receiver_id, messages in self.message_buffer.items():
+            # check if the receiver exists
+            if receiver_id in self.registered_agents.keys():
+                # Call the callback method that sets the messages
+                self.registered_agents[receiver_id].set_messages_func(messages)
+        # Clean the message buffer so we don't send the same messages next tick
+        self.message_buffer = {}
 
         # Perform the update method of all objects
         for env_obj in self.environment_objects.values():
@@ -279,13 +299,7 @@ class GridWorld:
 
         return False
 
-    def remove_from_grid(self, object_id, remove_from_carrier=True):
-        """
-        Remove an object from the grid
-        :param object_id: ID of the object to remove
-        :param remove_from_carrier: whether to also remove from agents which carry the
-        object or not.
-        """
+    def remove_from_grid(self, object_id):
         # Remove object first from grid
         grid_obj = self.get_env_object(object_id)  # get the object
         loc = grid_obj.location  # its location
@@ -307,12 +321,10 @@ class GridWorld:
 
         # Else, check if it is an object
         elif object_id in self.environment_objects.keys():
-            # remove from any agents carrying this object if asked for
-            if remove_from_carrier:
-                # If the object was carried, remove this from the agent properties as well
-                for agent_id in self.environment_objects[object_id].carried_by:
-                    obj = self.environment_objects[object_id]
-                    self.registered_agents[agent_id].is_carrying.remove(obj)
+            # If the object was carried, remove this from the agent properties as well
+            for agent_id in self.environment_objects[object_id].carried_by:
+                obj = self.environment_objects[object_id]
+                self.registered_agents[agent_id].is_carrying.remove(obj)
 
             # Remove object
             success = self.environment_objects.pop(object_id,
@@ -426,7 +438,7 @@ class GridWorld:
 
     def __perform_action(self, agent_id, action_name, action_kwargs):
 
-        # Check if the agent still exists (you would only get here if the agent is removed during this tick.
+        # Check if the agent still exists (you would only get here if the agent is removed during this tick).
         if agent_id not in self.registered_agents.keys():
             result = ActionResult(ActionResult.AGENT_WAS_REMOVED.replace("{AGENT_ID}", agent_id), succeeded=False)
             return result
@@ -497,3 +509,20 @@ class GridWorld:
 
     def __warn(self, warn_str):
         return f"[@{self.current_nr_ticks}] {warn_str}"
+
+    def __initial_visualisation(self):
+        # Loop through all agents, apply their observe to get their state for the gui
+        for agent_id, agent_obj in self.registered_agents.items():
+            # Get the state
+            state = self.__get_agent_state(agent_obj)
+            # only do the observe and orient of the OODA loop to update the GUI
+            filtered_agent_state = agent_obj.ooda_observe(state)
+            # Save the state
+            self.visualizer.save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
+                                       state=filtered_agent_state)
+
+        # save the state of the god view in the visualizer
+        self.visualizer.save_state(inheritance_chain="god", id="god", state=self.__get_complete_state())
+
+        # update the visualizations of all (human)agents and god
+        self.visualizer.update_guis(tick=self.current_nr_ticks)

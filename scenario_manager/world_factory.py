@@ -8,8 +8,7 @@ from typing import Callable
 import numpy as np
 from numpy.random.mtrand import RandomState
 
-from agents.Agent import Agent
-from agents.HumanAgent import HumanAgent
+from agents.agent import Agent
 from agents.capabilities.capability import SenseCapability
 from environment.gridworld import TIME_FOCUS_TICK_DURATION, GridWorld
 from environment.objects.agent_avatar import AgentAvatar
@@ -41,6 +40,8 @@ import environment.actions.move_actions
 import scenario_manager
 # noinspection PyUnresolvedReferences
 import visualization
+
+
 ######
 
 
@@ -75,8 +76,9 @@ class WorldFactory:
 
         warnings.showwarning = _warning
 
-    def worlds(self):
-        yield self.get_world()
+    def worlds(self, nr_of_worlds=10):
+        while self.worlds_created < nr_of_worlds:
+            yield self.get_world()
 
     def get_world(self):
         self.worlds_created += 1
@@ -179,7 +181,7 @@ class WorldFactory:
                             sense_capabilities=None, customizable_properties=None,
                             is_traversable=None, agent_speeds_in_ticks=None,
                             teams=None, visualize_sizes=None, visualize_shapes=None,
-                            visualize_colours=None, visualize_depths=None):
+                            visualize_colours=None):
 
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
@@ -228,11 +230,6 @@ class WorldFactory:
         elif isinstance(visualize_colours, str):
             visualize_colours = [visualize_colours for _ in range(len(agents))]
 
-        if visualize_depths is None:
-            visualize_depths = [None for _ in range(len(agents))]
-        elif isinstance(visualize_depths, int):
-            visualize_depths = [visualize_depths for _ in range(len(agents))]
-
         # Loop through all agents and add them
         for idx, agent in enumerate(agents):
             self.add_agent(locations[idx], agent,
@@ -244,11 +241,26 @@ class WorldFactory:
                            visualize_size=visualize_sizes[idx],
                            visualize_shape=visualize_shapes[idx],
                            visualize_colour=visualize_colours[idx],
-                           visualize_depth=visualize_depths[idx],
                            **custom_properties[idx])
 
+    def add_agent_prospect(self, location, agent, probability, name="Agent", customizable_properties=None,
+                           sense_capability=None,
+                           is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None,
+                           is_movable=None,
+                           visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
+                           **custom_properties):
+
+        # Add agent as normal
+        self.add_agent(location, agent, name, customizable_properties, sense_capability,
+                       is_traversable, team, agent_speed_in_ticks, possible_actions, is_movable,
+                       visualize_size, visualize_shape, visualize_colour, visualize_depth,
+                       **custom_properties)
+
+        # Get the last settings (which we just added) and add the probability
+        self.agent_settings[-1]['probability'] = probability
+
     def add_env_object(self, location, name, callable_class=None, customizable_properties=None,
-                       is_traversable=None, is_movable=None,
+                       is_traversable=None,
                        visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
                        **custom_properties):
         if callable_class is None:
@@ -258,11 +270,6 @@ class WorldFactory:
         assert isinstance(location, list) or isinstance(location, tuple)
         assert isinstance(callable_class, Callable)
 
-
-        # Load default parameters if not passed
-        if is_movable is None:
-            is_movable = get_default_value(class_name="EnvObject", property_name="is_movable")
-
         # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
         # objects with infinite range).
         if custom_properties is None:
@@ -271,7 +278,7 @@ class WorldFactory:
             customizable_properties = []
 
         # Define a settings dictionary with all we need to register and add an agent to the GridWorld
-        object_setting = {"callable_class": callable_class,
+        agent_setting = {"callable_class": callable_class,
                          "custom_properties": custom_properties,
                          "customizable_properties": customizable_properties,
                          "mandatory_properties": {
@@ -281,15 +288,26 @@ class WorldFactory:
                              "visualize_shape": visualize_shape,
                              "visualize_colour": visualize_colour,
                              "visualize_depth": visualize_depth,
-                             "is_movable": is_movable,
                              "location": location}
                          }
-        self.object_settings.append(object_setting)
+        self.object_settings.append(agent_setting)
+
+    def add_env_object_prospect(self, location, name, probability, callable_class=None, customizable_properties=None,
+                                is_traversable=None,
+                                visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
+                                **custom_properties):
+        # Add object as normal
+        self.add_env_object(location, name, callable_class, customizable_properties,
+                            is_traversable,
+                            visualize_size, visualize_shape, visualize_colour, visualize_depth,
+                            **custom_properties)
+
+        # Get the last settings (which we just added) and add the probability
+        self.object_settings[-1]['probability'] = probability
 
     def add_multiple_objects(self, locations, names=None, callable_classes=None, custom_properties=None,
                              customizable_properties=None, is_traversable=None, visualize_sizes=None,
-                             visualize_shapes=None, visualize_colours=None, visualize_depths=None,
-                             is_movable=None):
+                             visualize_shapes=None, visualize_colours=None, visualize_depths=None):
 
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
@@ -297,11 +315,6 @@ class WorldFactory:
             names = [None for _ in range(len(locations))]
         elif isinstance(custom_properties, str):
             names = [custom_properties for _ in range(len(locations))]
-
-        if is_movable is None:
-            is_movable = [None for _ in range(len(locations))]
-        elif isinstance(is_movable, bool):
-            is_movable = [is_movable for _ in range(len(locations))]
 
         if callable_classes is None:
             callable_classes = [EnvObject for _ in range(len(locations))]
@@ -347,82 +360,19 @@ class WorldFactory:
         for idx in range(len(locations)):
             self.add_env_object(location=locations[idx], name=names[idx], callable_class=callable_classes[idx],
                                 customizable_properties=customizable_properties[idx],
-                                is_traversable=is_traversable[idx], is_movable=is_movable[idx],
+                                is_traversable=is_traversable[idx],
                                 visualize_size=visualize_sizes[idx], visualize_shape=visualize_shapes[idx],
                                 visualize_colour=visualize_colours[idx], visualize_depth=visualize_depths[idx],
                                 **custom_properties[idx])
 
-
-
-
-    def add_human_agent(self, location, agent, name="HumanAgent", customizable_properties=None, sense_capability=None,
-                  is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None, is_movable=None,
-                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                  usrinp_action_map={}, **custom_properties):
-
-        # Check if location and agent are of correct type
-        assert isinstance(location, list) or isinstance(location, tuple)
-        assert isinstance(agent, HumanAgent)
-
-        # Load the defaults for any variable that is not defined
-        # Obtain any defaults from the defaults.json file if not set already.
-        if is_traversable is None:
-            is_traversable = get_default_value(class_name="AgentAvatar", property_name="is_traversable")
-        if visualize_size is None:
-            visualize_size = get_default_value(class_name="AgentAvatar", property_name="visualize_size")
-        if visualize_shape is None:
-            visualize_shape = get_default_value(class_name="AgentAvatar", property_name="visualize_shape")
-        if visualize_colour is None:
-            visualize_colour = get_default_value(class_name="AgentAvatar", property_name="visualize_colour")
-        if visualize_depth is None:
-            visualize_depth = get_default_value(class_name="AgentAvatar", property_name="visualize_depth")
-        if agent_speed_in_ticks is None:
-            agent_speed_in_ticks = get_default_value(class_name="AgentAvatar", property_name="agent_speed_in_ticks")
-        if possible_actions is None:
-            possible_actions = get_default_value(class_name="AgentAvatar", property_name="possible_actions")
-        if is_movable is None:
-            is_movable = get_default_value(class_name="AgentAvatar", property_name="is_movable")
-
-        # set the user input action mapping in the agent object
-        agent.usrinp_action_map = usrinp_action_map
-
-        # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
-        # objects with infinite range).
-        if custom_properties is None:
-            custom_properties = {}
-        if sense_capability is None:
-            sense_capability = self.create_sense_capability([], [])  # Create sense capability that perceives all
-        if customizable_properties is None:
-            customizable_properties = []
-
-        # Check if the agent is of HumanAgent, if not; use the add_agent method
+    def add_human_agent(self, agent, name):
+        # Check if the agent is of HumanAgent, if so; use the add_agent method
         inh_path = get_inheritence_path(agent.__class__)
         if 'HumanAgent' not in inh_path:
             Exception(f"You are adding an agent that does not inherit from HumanAgent with the name {name}. Use "
                       f"factory.add_agent to add autonomous agents.")
-
-        # Define a settings dictionary with all we need to register and add an agent to the GridWorld
-        hu_ag_setting = {"agent": agent,
-                         "custom_properties": custom_properties,
-                         "customizable_properties": customizable_properties,
-                         "sense_capability": sense_capability,
-                         "mandatory_properties": {
-                             "name": name,
-                             "is_movable": is_movable,
-                             "is_traversable": is_traversable,
-                             "possible_actions": possible_actions,
-                             "is_human_agent": True,
-                             "agent_speed_in_ticks": agent_speed_in_ticks,
-                             "visualize_size": visualize_size,
-                             "visualize_shape": visualize_shape,
-                             "visualize_colour": visualize_colour,
-                             "visualize_depth": visualize_depth,
-                             "location": location,
-                             "team": team}
-                         }
-
-        self.agent_settings.append(hu_ag_setting)
-
+        # TODO
+        pass
 
     def add_area(self, area_corners, name, colour=None):
         # TODO
@@ -465,13 +415,15 @@ class WorldFactory:
         objs = []
         for obj_settings in self.object_settings:
             env_object = self.__create_env_object(obj_settings)
-            objs.append(env_object)
+            if env_object is not None:
+                objs.append(env_object)
 
         # Then create all agents
         avatars = []
         for agent_settings in self.agent_settings:
             agent, agent_avatar = self.__create_agent_avatar(agent_settings)
-            avatars.append((agent, agent_avatar))
+            if agent_avatar is not None:
+                avatars.append((agent, agent_avatar))
 
         # Register all objects (including checks)
         for env_object in objs:
@@ -490,6 +442,15 @@ class WorldFactory:
         return world
 
     def __create_env_object(self, settings):
+
+        # First we check if this settings represent a probabilistic object, because then we expect settings to contain
+        # a probability setting.
+        if 'probability' in settings.keys():
+            prob = settings['probability']
+            p = self.rng.rand()
+            if p > prob:
+                return None
+
         callable_class = settings['callable_class']
         custom_props = settings['custom_properties']
         customizable_props = settings['customizable_properties']
@@ -545,7 +506,17 @@ class WorldFactory:
         return env_object
 
     def __create_agent_avatar(self, settings):
+
         agent = settings['agent']
+
+        # First we check if this settings represent a probabilistic object, because then we expect settings to contain
+        # a probability setting.
+        if 'probability' in settings.keys():
+            prob = settings['probability']
+            p = self.rng.rand()
+            if p > prob:
+                return agent, None
+
         sense_capability = settings['sense_capability']
         custom_props = settings['custom_properties']
         customizable_props = settings['customizable_properties']
@@ -558,6 +529,8 @@ class WorldFactory:
                 'callback_agent_get_action': agent.get_action,
                 'callback_agent_set_action_result': agent.set_action_result,
                 'callback_agent_observe': agent.ooda_observe,
+                'callback_agent_get_messages': agent.get_messages,
+                'callback_agent_set_messages': agent.set_messages,
                 'visualize_size': mandatory_props['visualize_size'],
                 'visualize_shape': mandatory_props['visualize_shape'],
                 'visualize_colour': mandatory_props['visualize_colour'],
@@ -597,7 +570,7 @@ class WorldFactory:
 
 class RandomProperty:
 
-    def __init__(self, property_name, values, distribution=None, allow_duplicates=True):
+    def __init__(self, values, distribution=None, allow_duplicates=True):
 
         # If distribution is None, its uniform (equal probability to all values)
         if distribution is None:
@@ -611,7 +584,6 @@ class RandomProperty:
         assert len(distribution) == len(values)
 
         # Assign name, values and distribution
-        self.name = property_name
         self.values = values
         self.distribution = distribution
         self.allow_duplicates = allow_duplicates

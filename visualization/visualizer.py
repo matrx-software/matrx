@@ -3,8 +3,9 @@ import requests
 import numpy as np
 import copy
 
-from agents.Agent import Agent
-from agents.HumanAgent import HumanAgent
+from agents.agent import Agent
+from agents.humanagent import HumanAgent
+from collections import OrderedDict
 
 
 class Visualizer():
@@ -100,7 +101,7 @@ class Visualizer():
         into a new dictionary with as key the visualization depth, and as value
         the objects which are to be displayed at that depth
         """
-        new_state = {}
+        new_state = OrderedDict()
 
         # loop through all objects in the state
         for objID, obj in state.items():
@@ -121,7 +122,6 @@ class Visualizer():
         sorted_state = {}
         for depth in sorted(new_state.keys()):
             sorted_state[depth]= new_state[depth]
-
         return sorted_state
 
 
@@ -170,7 +170,7 @@ class Visualizer():
         # return None if there was no userinput
         if repl == {}:
             self.userinputs = {}
-        elif self.verbose:
+        else:
             print("User input received:", repl)
 
         # otherwise return the userinput

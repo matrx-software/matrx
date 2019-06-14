@@ -64,7 +64,7 @@ class EnvObject:
         value of 0.5 is half of a square, object is in the center, a value of 2 is twice the square's size centered on
         its location.)
         :param visualize_shape: Int. Optional, default obtained from defaults.json. A visualization property used by the
-        Visualizer. Denotes the shape of the object in the visualization.
+        Visualizer. Denotes the shape of the object in the visualization. 0=Rectangle, 1=Triangle, 2=Circle
         :param visualize_colour: Hexcode string. Optional, default obtained from defaults.json. A visualization property
         used by the Visualizer. Denotes the colour of the object in visualization.
         :param visualize_depth: Integer. Optional, default obtained from defaults.json. A visualization property that

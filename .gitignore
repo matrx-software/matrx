@@ -1,3 +1,11 @@
 .idea/
-__pycache__/
+old/
+agents/__pycache__/
+agents/capabilities/__pycache__/
+environment/__pycache__/
+environment/actions/__pycache__/
+environment/objects/__pycache__/
+environment/sim_goals/__pycache__/
 *.pyc
+*.stackdump
+__pycache__/

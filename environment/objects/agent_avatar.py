@@ -8,6 +8,7 @@ class AgentAvatar(EnvObject):
 
     def __init__(self, location, possible_actions, sense_capability, class_callable,
                  callback_agent_get_action, callback_agent_set_action_result, callback_agent_observe,
+                 callback_agent_get_messages, callback_agent_set_messages,
                  visualize_size, visualize_shape, visualize_colour, visualize_depth,
                  is_traversable, team, agent_speed_in_ticks, name, is_movable,
                  is_human_agent, customizable_properties,
@@ -43,6 +44,11 @@ class AgentAvatar(EnvObject):
         processed state dictionary of the Agent. As the GridWorld does not know exactly what the Agent is allowed to
         see or not, the 'observe' preprocesses the given state further. But to accurately visualize what the agent sees
         we have to obtain that pre-processed state, which is done through this callback.
+
+        :param callback_agent_get_messages: A callback function that allows the GridWorld to obtain the agent's messages
+        that need to be send to different agents.
+        :param callback_agent_set_messages: A callback function that allows the GridWorld to set any message send by
+        some agent to a list of received messages in an agent.
 
         :param name: String Defaults to "Agent". The name of the agent, does not need to be unique.
         :param is_human_agent: Boolean. Defaults to False. Boolean to signal that the agent represented by this avatar
@@ -85,6 +91,8 @@ class AgentAvatar(EnvObject):
         self.get_action_func = callback_agent_get_action
         self.set_action_result_func = callback_agent_set_action_result
         self.ooda_observe = callback_agent_observe
+        self.get_messages_func = callback_agent_get_messages
+        self.set_messages_func = callback_agent_set_messages
 
         # Set all mandatory properties
         self.agent_speed_in_ticks = agent_speed_in_ticks
@@ -127,6 +135,7 @@ class AgentAvatar(EnvObject):
         if team is None:
             self.team = self.obj_id
         self.change_property("team", self.team)
+
 
     def set_agent_busy(self, curr_tick, action_duration):
         """

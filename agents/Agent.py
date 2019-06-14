@@ -25,17 +25,23 @@ class Agent:
         self.previous_action = None
         self.previous_action_result = None
 
+        # A list of messages that may be filled by this agent, which is retrieved by the GridWorld and send towards the
+        # appropriate agents.
+        self.messages_to_send = []
+        self.received_messages = []
+
         # Filled by the WorldFactory during self.initialise
+        self.agent_id = None
         self.agent_name = None
         self.action_set = None  # list of action names (strings)
         self.sense_capability = None
-        self.rng = None
+        self.rnd_gen = None
         self.rnd_seed = None
         self.agent_properties = {}
         self.keys_of_agent_writable_props = []
 
-    def factory_initialise(self, agent_name, action_set, sense_capability, agent_properties, customizable_properties,
-                           rnd_seed):
+    def factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
+                           customizable_properties, rnd_seed):
         """
         Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
         properties. This also sets the random number generator with a seed generated based on the random seed of the
@@ -53,6 +59,9 @@ class Agent:
 
         # The name of the agent with which it is also known in the world
         self.agent_name = agent_name
+
+        # The id of the agent
+        self.agent_id = agent_id
 
         # The names of the actions this agent is allowed to perform
         self.action_set = action_set
@@ -77,6 +86,9 @@ class Agent:
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
         for this agent to select an action.
+
+        Note; This method should NOT be overridden!
+
         :param state: A state description containing all properties of EnvObject that are within a certain range as
         defined by self.sense_capability. It is a list of properties in a dictionary
         :param agent_properties: The properties of the agent, which might have been changed by the
@@ -91,10 +103,9 @@ class Agent:
         # Process any properties of this agent which were updated in the environment as a result of
         # actions
         self.agent_properties = agent_properties
-
         filtered_state = self.ooda_observe(state)
-        state = self.ooda_orient(state)
-        action, action_kwargs = self.ooda_decide(state, possible_actions)
+        filtered_state = self.ooda_orient(filtered_state)
+        action, action_kwargs = self.ooda_decide(None, filtered_state, possible_actions)
         action = self.ooda_act(action)
 
         return filtered_state, self.agent_properties, action, action_kwargs
@@ -105,6 +116,9 @@ class Agent:
         action this agent decided upon. Note, that the result is given AFTER the action is performed (if possible).
         Hence it is named the self.previous_action_result, as we can read its contents when we should decide on our
         NEXT action after the action whose result this is.
+
+        Note; This method should NOT be overridden!
+
         :param action_result: An object that inherits from ActionResult, containing a boolean whether the action
         succeeded and a string denoting the reason why it failed (if it did so).
         :return:
@@ -117,9 +131,6 @@ class Agent:
         will receive when the observe this agent. Also, these are the properties that will be used to visualize the
         agent.
 
-        By default we add the agent's name to the properties. The grid world is responsible for adding the location to
-        it and any other default properties for the AgentAvatar class (the representation of the agent in the grid
-        world).
 
         :return: A dictionary of properties, generally with strings as key and native types as values though is not
         required at all.
@@ -130,13 +141,57 @@ class Agent:
     def set_rnd_seed(self, seed):
         """
         The function that seeds this agent's random seed.
-        Currently; the grid world returns a seed for this agent and we need to set it 'manually' in our scenario script.
-        In the future this will be done for us by the ScenarioManager.
+
+        Note; This method should NOT be overridden!
+
         :param seed: The random seed this agent needs to be seeded with.
         :return:
         """
         self.rnd_seed = seed
         self.rnd_gen = np.random.RandomState(self.rnd_seed)
+
+    def get_messages(self):
+        """
+        This method is called by the GridWorld.
+
+        Retrieves all message objects the agent has made in a tick, and returns those to the GridWorld for sending.
+        It then removes all these messages!
+
+        Note; This method should NOT be overridden!
+
+        :return: A list of message objects with a generic content, the sender (this agent's id) and optionally a
+        receiver. If a receiver is not set, the message content is send to all agents including this agent.
+        """
+        # Loop through all Message objects and create a dict out of each and append them to a list
+        messages = []
+        for mssg_obj in self.messages_to_send:
+            messages.append(
+                {'from_id': mssg_obj.from_id,
+                 'to_id': mssg_obj.to_id,
+                 'content': mssg_obj.content}
+            )
+        # Remove all messages that need to be send, as we have send them now
+        self.messages_to_send = []
+
+        return messages
+
+    def set_messages(self, messages):
+        """
+        This method is called by the GridWorld.
+        It sets all messages intended for this agent to a list that it can access and read.
+
+        Note; This method should NOT be overridden!
+
+        :param messages: A list of dictionaries that contain a 'from_id', 'to_id' and 'content.
+        """
+        # We empty all received messages as this is from the previous tick
+        self.received_messages = []
+        # Loop through all messages and create a Message object out of the dictionaries.
+        for mssg in messages:
+            message_object = Message(from_id=mssg['from_id'], to_id=mssg['to_id'], content=mssg['content'])
+
+            # Add the message object to the received messages
+            self.received_messages.append(message_object)
 
     def ooda_observe(self, state):
         """
@@ -171,7 +226,7 @@ class Agent:
         """
         return state
 
-    def ooda_decide(self, state, possible_actions):
+    def ooda_decide(self, previous_observations, current_observations, possible_actions):
         """
         All our agent work through the OODA-loop paradigm; first you observe, then you orient/pre-process, followed by
         a decision process of an action after which we act upon the action.
@@ -196,6 +251,19 @@ class Agent:
         to know which keyword arguments it requires. For example if you want to remove an object, you should provide
         it object ID with a specific key (e.g. 'object_id' = some_object_id_agent_should_remove).
         """
+
+        # Send a message to a random agent
+        agents = []
+        for obj_id, obj in current_observations.items():
+            classes = obj['class_inheritance']
+            if Agent.__name__ in classes:  # the object is an agent to which we can send our message
+                agents.append(obj)
+        selected_agent = self.rnd_gen.choice(agents)
+        message_content = f"Hello, my name is {self.agent_name}"
+        message = Message(content=message_content, from_id=self.agent_id, to_id=selected_agent['obj_id'])
+        self.messages_to_send.append(message)
+
+        # Select a random action
         if possible_actions:
             action = self.rnd_gen.choice(possible_actions)
         else:
@@ -205,30 +273,30 @@ class Agent:
 
         if action == RemoveObject.__name__:
             action_kwargs['object_id'] = None
-            #
-            # # Get all perceived objects
-            # objects = list(state.keys())
-            # # Remove yourself from the object id list
-            # objects.remove(self.agent_properties["obj_id"])
-            # # Remove all objects that have 'agent' in the name (so we do not remove those, though agents without agent
-            # # in their name can still be removed).
-            # objects = [obj for obj in objects if 'agent' not in obj]
-            # # Choose a random object id (safety for when it is empty)
-            # if objects:
-            #     object_id = self.rnd_gen.choice(objects)
-            #     # Assign it
-            #     action_kwargs['object_id'] = object_id
-            #     # Select range as just enough to remove that object
-            #     remove_range = int(np.ceil(np.linalg.norm(
-            #         np.array(state[object_id]['location']) - np.array(
-            #             state[self.agent_properties["obj_id"]]['location']))))
-            #     # Safety for if object and agent are in the same location
-            #     remove_range = max(remove_range, 0)
-            #     # Assign it to the arguments list
-            #     action_kwargs['remove_range'] = remove_range
-            # else:
-            #     action_kwargs['object_id'] = None
-            #     action_kwargs['remove_range'] = 0
+            
+            # Get all perceived objects
+            objects = list(current_observations.keys())
+            # Remove yourself from the object id list
+            objects.remove(self.agent_properties["obj_id"])
+            # Remove all objects that have 'agent' in the name (so we do not remove those, though agents without agent
+            # in their name can still be removed).
+            objects = [obj for obj in objects if 'agent' not in obj]
+            # Choose a random object id (safety for when it is empty)
+            if objects:
+                object_id = self.rnd_gen.choice(objects)
+                # Assign it
+                action_kwargs['object_id'] = object_id
+                # Select range as just enough to remove that object
+                remove_range = int(np.ceil(np.linalg.norm(
+                    np.array(current_observations[object_id]['location']) - np.array(
+                        current_observations[self.agent_properties["obj_id"]]['location']))))
+                # Safety for if object and agent are in the same location
+                remove_range = max(remove_range, 0)
+                # Assign it to the arguments list
+                action_kwargs['remove_range'] = remove_range
+            else:
+                action_kwargs['object_id'] = None
+                action_kwargs['remove_range'] = 0
 
         # if the agent randomly chose a grab action, choose a random object to pickup
         elif action == GrabAction.__name__:
@@ -243,7 +311,7 @@ class Agent:
             action_kwargs['max_objects'] = max_objects
 
             # Get all perceived objects
-            objects = list(state.keys())
+            objects = list(current_observations.keys())
 
             # Remove yourself from the object id list
             objects.remove(self.agent_properties["obj_id"])
@@ -256,9 +324,9 @@ class Agent:
             for object_id in objects:
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
-                    np.array(state[object_id]['location']) - np.array(
-                        state[self.agent_properties["obj_id"]]['location']))))
-                if dist <= grab_range and state[object_id]["is_movable"]:
+                    np.array(current_observations[object_id]['location']) - np.array(
+                        current_observations[self.agent_properties["obj_id"]]['location']))))
+                if dist <= grab_range and current_observations[object_id]["is_movable"]:
                     object_in_range.append(object_id)
 
             if object_in_range:
@@ -277,8 +345,8 @@ class Agent:
             action_kwargs['object_id'] = None
 
             # Get all doors from the perceived objects
-            objects = list(state.keys())
-            doors = [obj for obj in objects if 'type' in state[obj] and state[obj]['type'] == "Door"]
+            objects = list(current_observations.keys())
+            doors = [obj for obj in objects if 'type' in current_observations[obj] and current_observations[obj]['type'] == "Door"]
 
             # choose a random door
             if len(doors) > 0:
@@ -300,3 +368,16 @@ class Agent:
         """
         self.previous_action = action
         return action
+
+
+class Message:
+    """
+    A simple object representing a communication message. An agent can create such a Message object by stating the
+    content, its own id as the sender and (optinal) a receiver. If a receiver is not given it is a message to all
+    agents, including the sender.
+    """
+
+    def __init__(self, content, from_id, to_id=None):
+        self.content = content  # content can be anything; a string, a dictionary, or even a custom object
+        self.from_id = from_id  # the agent id who creates this message
+        self.to_id = to_id  # the agent id who is the sender, when None it means all agents, including the sende

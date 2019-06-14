@@ -34,7 +34,8 @@ class OpenDoorAction(Action):
         # object_id is required
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
         if object_id == None:
-            return OpenDoorActionResult(OpenDoorActionResult.NO_OBJECT_SPECIFIED, False)
+            result = OpenDoorActionResult(OpenDoorActionResult.NO_OBJECT_SPECIFIED, False)
+            return result
 
         # get obj
         obj = grid_world.environment_objects[object_id]
@@ -42,7 +43,8 @@ class OpenDoorAction(Action):
         # call the open door action in the object
         obj.open_door()
 
-        return CloseDoorActionResult(OpenDoorActionResult.RESULT_SUCCESS, True)
+        result = CloseDoorActionResult(OpenDoorActionResult.RESULT_SUCCESS, True)
+        return result
 
 
     def is_possible(self, grid_world, agent_id, **kwargs):
@@ -58,7 +60,7 @@ class OpenDoorAction(Action):
         door_range = np.inf if 'door_range' not in kwargs else kwargs['door_range']
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
 
-        result = is_possible_is_open_close(grid_world, agent_id, OpenDoorActionResult, object_id, door_range)
+        result = is_possible_door_open_close(grid_world, agent_id, OpenDoorActionResult, object_id, door_range)
         return result.succeeded, result.result
 
 
@@ -137,7 +139,7 @@ class CloseDoorAction(Action):
         door_range = np.inf if 'door_range' not in kwargs else kwargs['door_range']
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
 
-        result = is_possible_is_open_close(grid_world, agent_id, CloseDoorActionResult, object_id, door_range)
+        result = is_possible_door_open_close(grid_world, agent_id, CloseDoorActionResult, object_id, door_range)
         return result.succeeded, result.result
 
 
@@ -156,7 +158,7 @@ class CloseDoorActionResult(OpenDoorActionResult):
 
 
 
-def is_possible_is_open_close(grid_world, agent_id, action_result, object_id=None, door_range=np.inf):
+def is_possible_door_open_close(grid_world, agent_id, action_result, object_id=None, door_range=np.inf):
     """
     Same as is_possible, but this function uses the action_kwargs to get a more accurate prediction.
     Can be used both for checking if the door is already open or closed
@@ -189,9 +191,9 @@ def is_possible_is_open_close(grid_world, agent_id, action_result, object_id=Non
         return action_result(action_result.NOT_IN_RANGE, False)
 
     # check if door is already open or closed
-    if action_result == OpenDoorActionResult and obj.properties["is_open"]:
+    if action_result == OpenDoorActionResult and obj.properties["door_open"]:
         return action_result(action_result.DOOR_ALREADY_OPEN, False)
-    elif action_result == CloseDoorActionResult and not obj.properties["is_open"]:
+    elif action_result == CloseDoorActionResult and not obj.properties["door_open"]:
         return action_result(action_result.DOOR_ALREADY_CLOSED, False)
 
     # when closing, check that there are no objects in the door opening
