@@ -1,4 +1,4 @@
-from agents.Agent import Agent
+from agents.agent import Agent
 from scenario_manager.world_factory import RandomProperty, WorldFactory
 
 

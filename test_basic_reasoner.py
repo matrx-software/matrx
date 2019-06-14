@@ -1,5 +1,5 @@
-from scenario_manager.scenarios.bstaskmodel import BS_TaskModel
-from modules.basicreasoner import BasicReasoner
+from blanket_search.scenarios.bstaskmodel import BS_TaskModel
+from blanket_search.modules.basicreasoner import BasicReasoner
 # from environment.objects.basic_objects import AgentObject
 
 # initialize a task and mental model with potential tasks, potential

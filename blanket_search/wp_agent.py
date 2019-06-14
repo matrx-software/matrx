@@ -1,5 +1,5 @@
 from agents.agent import Agent
-from agents.waypointnavigator import WaypointNavigator
+from blanket_search.waypointnavigator import WaypointNavigator
 
 
 class WPAgent(Agent):

@@ -1,5 +1,5 @@
-from modules.goal import Goal
-from modules.translator import GoalTranslator
+from blanket_search.modules.goal import Goal
+from blanket_search.modules.translator import GoalTranslator
 
 
 class BasicReasoner:

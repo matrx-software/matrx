@@ -1,7 +1,6 @@
 from scenario_manager.world_factory import WorldFactory, RandomProperty
-from agents.agent import Agent
-from agents.bsagent import BSAgent
-from environment.objects.simple_objects import C4I, SeWaCo, Mobiliteit, Energy, Brand, Gewonde, Lekkage, Waypoint
+from blanket_search.bsagent import BSAgent
+from blanket_search.bs_objects import C4I, SeWaCo, Mobiliteit, Energy, Brand, Gewonde, Lekkage, Waypoint
 
 
 def create_factory(seed=None):

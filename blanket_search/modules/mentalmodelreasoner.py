@@ -1,5 +1,5 @@
-from modules.mentalmodel import MentalModel
-from modules.goal import Goal
+from blanket_search.modules.mentalmodel import MentalModel
+from blanket_search.modules.goal import Goal
 
 
 class MentalModelReasoner:

@@ -1,6 +1,5 @@
-from environment.actions.move_actions import Move
 from environment.actions.object_actions import RemoveObject
-from modules.TaskModel import TaskModel
+from blanket_search.modules.TaskModel import TaskModel
 
 
 class BS_TaskModel:

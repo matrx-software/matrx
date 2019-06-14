@@ -1,18 +1,17 @@
-import numpy as np
 import json
 
 from agents.capabilities.capability import SenseCapability
 from agents.agent import Agent
-from agents.waypointnavigator import WaypointNavigator
-from modules.basicreasoner import BasicReasoner
-from scenario_manager.scenarios.bstaskmodel import BS_TaskModel
+from blanket_search.bs_objects import *
+from blanket_search.waypointnavigator import WaypointNavigator
+from blanket_search.modules.basicreasoner import BasicReasoner
+from blanket_search.scenarios.bstaskmodel import BS_TaskModel
 from environment.actions.move_actions import *
 from environment.actions.object_actions import *
-from environment.objects.simple_objects import *
 
 
 class BSAgent(Agent):
-    AGENT_PROPERTIES_JSON = "scenario_manager/scenarios/bs_agent_properties.json"
+    AGENT_PROPERTIES_JSON = "blanket_search/scenarios/bs_agent_properties.json"
     bs_action_set = [
         MoveNorth.__name__,
         MoveNorthEast.__name__,

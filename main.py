@@ -1,6 +1,4 @@
-import scenario_manager.scenarios.scenario1 as scenario1
-from scenario_manager.scenarios import test_scenario
-from scenario_manager.scenarios import blanket_search_case
+import blanket_search.scenarios.scenario1 as scenario1
 
 if __name__ == "__main__":
 

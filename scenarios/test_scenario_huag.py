@@ -1,5 +1,5 @@
-from agents.Agent import Agent
-from agents.HumanAgent import HumanAgent
+from agents.agent import Agent
+from agents.human_agent import HumanAgent
 from scenario_manager.world_factory import RandomProperty, WorldFactory
 from environment.actions.move_actions import *
 from environment.actions.object_actions import *

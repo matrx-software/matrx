@@ -1,7 +1,5 @@
 from agents.agent import Agent
-from agents.bsagent import BSAgent
-from agents.capabilities.capability import SenseCapability
-from environment.objects.env_object import EnvObject
+from blanket_search.bsagent import BSAgent
 from scenario_manager.world_factory import WorldFactory, RandomProperty
 
 

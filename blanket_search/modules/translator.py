@@ -1,8 +1,5 @@
-from environment.actions.object_actions import RemoveObject
-from modules.TaskModel import TaskModel
-from modules.goal import Goal
-from environment.objects.env_object import EnvObject
-import numpy as np
+from blanket_search.modules.TaskModel import TaskModel
+from blanket_search.modules.goal import Goal
 
 
 class GoalTranslator:

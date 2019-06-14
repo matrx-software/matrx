@@ -4,7 +4,7 @@ import numpy as np
 import copy
 
 from agents.agent import Agent
-from agents.humanagent import HumanAgent
+from agents.human_agent import HumanAgent
 from collections import OrderedDict
 
 
