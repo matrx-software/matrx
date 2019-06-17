@@ -9,8 +9,8 @@ from environment.actions.object_actions import *
 def create_factory():
     factory = WorldFactory(random_seed=1, shape=[10, 10], tick_duration=0.2)
 
-    random_prop = RandomProperty(property_name="random_prop", values=["One", "Two"], distribution=[3, 1])
-    factory.add_env_object(location=[0, 0], name="Wall 1", random_prop=random_prop)
+    # random_prop = RandomProperty(property_name="random_prop", values=["One", "Two"], distribution=[3, 1])
+    # factory.add_env_object(location=[0, 0], name="Wall 1", random_prop=random_prop)
 
     agent = Agent()
     factory.add_agent(location=[1, 0], agent=agent, visualize_depth=5)
