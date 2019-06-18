@@ -7,7 +7,7 @@ def create_factory():
     factory = WorldFactory(random_seed=1, shape=[10, 10], tick_duration=0.5)
 
     # TODO set random properties and distributions
-    random_prop = RandomProperty(property_name="incident", values=["Geen", "Dit", "Of", "Dat"],
+    random_prop = RandomProperty(values=["Geen", "Dit", "Of", "Dat"],
                                  distribution=[0.5, 0.1, 0.15, 0.25])
     factory.add_env_object(location=[0, 0], name="Wall 1", random_prop=random_prop)
 
