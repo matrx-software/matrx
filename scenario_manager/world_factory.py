@@ -454,9 +454,9 @@ class WorldFactory:
     def add_area(self, top_left_location, width, height, name, customizable_properties=None, visualize_colour=None,
                  **custom_properties):
         # Check if width and height are large enough to make an actual room (with content)
-        if width <= 1 or height <= 1:
+        if width < 1 or height < 1:
             raise Exception(f"While adding area {name}; The width {width} and/or height {height} should both be larger"
-                            f" than 1.")
+                            f" than 0.")
 
         # Get all locations in the rectangle
         locs = []
