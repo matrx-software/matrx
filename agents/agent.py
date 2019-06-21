@@ -107,8 +107,9 @@ class Agent:
         filtered_state = self.ooda_observe(state)
         filtered_state = self.ooda_orient(filtered_state)
         action, action_kwargs = self.ooda_decide(filtered_state, possible_actions)
-        action = self.ooda_act(action)
+        action, action_kwargs = self.ooda_act(action, action_kwargs)
 
+        self.previous_action = action
         return filtered_state, self.agent_properties, action, action_kwargs
 
     def set_action_result(self, action_result):
@@ -356,7 +357,7 @@ class Agent:
 
         return action, action_kwargs
 
-    def ooda_act(self, action):
+    def ooda_act(self, action, action_args):
         """
         All our agent work through the OODA-loop paradigm; first you observe, then you orient/pre-process, followed by
         a decision process of an action after which we act upon the action.
@@ -366,10 +367,11 @@ class Agent:
 
         :param action: The decided action that may have additional consequences that are not performed by and in the
         grid world.
+        :param action_args: The arguments for the selected action.
         :return: The decided action.
         """
-        self.previous_action = action
-        return action
+        print(action)
+        return action, action_args
 
 
 class Message:

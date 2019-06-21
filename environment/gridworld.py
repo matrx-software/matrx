@@ -449,6 +449,10 @@ class GridWorld:
             warn_str = f"No possible actions for agent {agent_id}."
             warnings.warn(self.__warn(warn_str))
 
+        # Sort alphabeticcelly, since the order was determined by the order of a dictionary we fix it now such that any
+        # random selection (e.g. through 'choice') makes sense.
+        possible_actions.sort()
+
         return possible_actions
 
     def __perform_action(self, agent_id, action_name, action_kwargs):
