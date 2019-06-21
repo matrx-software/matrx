@@ -189,7 +189,7 @@ class AgentAvatar(EnvObject):
 
         # We check if it is a custom property and if so change it simply in the dictionary
         if property_name in self.custom_properties.keys():
-            self.customizable_properties[property_name] = property_value
+            self.custom_properties[property_name] = property_value
         else:  # else we need to check if property_name is a mandatory class attribute that is also a property
             if property_name == "is_traversable":
                 assert isinstance(property_value, bool)
