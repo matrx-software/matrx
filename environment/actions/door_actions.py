@@ -8,6 +8,7 @@ class OpenDoorAction(Action):
     """
     Action to open a Door
     """
+
     def __init__(self, name=None, duration_in_ticks=1):
         """
         :param name: The name of the action.
@@ -16,7 +17,6 @@ class OpenDoorAction(Action):
         if name is None:
             name = OpenDoorAction.__name__
         super().__init__(name, 3)
-
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
@@ -43,9 +43,8 @@ class OpenDoorAction(Action):
         # call the open door action in the object
         obj.open_door()
 
-        result = CloseDoorActionResult(OpenDoorActionResult.RESULT_SUCCESS, True)
+        result = OpenDoorActionResult(OpenDoorActionResult.RESULT_SUCCESS, True)
         return result
-
 
     def is_possible(self, grid_world, agent_id, **kwargs):
         """
@@ -64,30 +63,11 @@ class OpenDoorAction(Action):
         return result.succeeded, result.result
 
 
-
-class OpenDoorActionResult(ActionResult):
-
-    RESULT_SUCCESS = "Door was succesfully opened."
-    ACTION_NOT_POSSIBLE = "The `is_possible(...)` method return False. Signalling that the action was not possible."
-    UNKNOWN_ACTION = "The action is not known to the environment."
-    NO_DOORS_IN_RANGE = "No door found in range"
-    NOT_IN_RANGE = "Specified door is not within range."
-    NO_ACTION_GIVEN = "There was no action given to perform, automatic succeed."
-    NOT_A_DOOR = "Opendoor action could not be performed, as object isn't a door"
-    RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
-    DOOR_ALREADY_OPEN = "Can't open door, door is already open"
-    NO_OBJECT_SPECIFIED = "No object_id of a door specified to open."
-
-    def __init__(self, result, succeeded):
-        self.result = result
-        self.succeeded = succeeded
-
-
-
 class CloseDoorAction(Action):
     """
     Action to open a Door
     """
+
     def __init__(self, name=None, duration_in_ticks=1):
         """
         :param name: The name of the action.
@@ -96,7 +76,6 @@ class CloseDoorAction(Action):
         if name is None:
             name = CloseDoorAction.__name__
         super().__init__(name, 3)
-
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
@@ -143,19 +122,29 @@ class CloseDoorAction(Action):
         return result.succeeded, result.result
 
 
-class CloseDoorActionResult(OpenDoorActionResult):
-
+class CloseDoorActionResult(ActionResult):
     RESULT_SUCCESS = "Door was succesfully closed."
-    NOT_A_DOOR = "Closedoor action could not be performed, as object isn't a door"
+    NOT_A_DOOR = "CloseDoor action could not be performed, as object isn't a door"
     RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
     DOOR_ALREADY_CLOSED = "Can't close door, door is already closed."
     DOOR_BLOCKED = "Can't close door, object or agent is blocking the door opening."
     NO_OBJECT_SPECIFIED = "No object_id of a door specified to close."
 
     def __init__(self, result, succeeded):
-        self.result = result
-        self.succeeded = succeeded
+        super().__init__(result, succeeded)
 
+
+class OpenDoorActionResult(ActionResult):
+    RESULT_SUCCESS = "Door was successfully opened."
+    NO_DOORS_IN_RANGE = "No door found in range"
+    NOT_IN_RANGE = "Specified door is not within range."
+    NOT_A_DOOR = "OpenDoor action could not be performed, as object isn't a door"
+    RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
+    DOOR_ALREADY_OPEN = "Can't open door, door is already open"
+    NO_OBJECT_SPECIFIED = "No object_id of a door specified to open."
+
+    def __init__(self, result, succeeded):
+        super().__init__(result, succeeded)
 
 
 def is_possible_door_open_close(grid_world, agent_id, action_result, object_id=None, door_range=np.inf):
@@ -169,26 +158,25 @@ def is_possible_door_open_close(grid_world, agent_id, action_result, object_id=N
     # check if there is a Door object in the scenario
     objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type=Door, sense_range=door_range)
 
-    # We don't get a specific target door passed, so check if the action would
-    # be possible in principle
-    if object_id == None:
-        # there is no Door in this complete scenario, so not possible
-        if len(objects_in_range) is 0:
-            return action_result(action_result.NO_DOORS_IN_RANGE, False)
-        # There is a door present, so it might be possible to perform this action
-        else:
-            return action_result(action_result.RESULT_SUCCESS, True)
+    # there is no Door in range, so not possible to open any door
+    if len(objects_in_range) is 0:
+        return action_result(action_result.NO_DOORS_IN_RANGE, False)
 
-    # check if it is an object
-    if not object_id in grid_world.environment_objects.keys():
+    # if we did not get a specific door to open, we simply return success as it is possible to open an arbitrary door
+    # as there is atleast one door in range.
+    if object_id is None:
+        return action_result(action_result.RESULT_SUCCESS, True)
+
+    # check if the given object_id even exists
+    if object_id not in grid_world.environment_objects.keys():
         return action_result(action_result.NOT_A_DOOR, False)
+
+    # check if the given object_id is an actual door in range
+    if object_id not in objects_in_range.keys():
+        return action_result(action_result.NOT_IN_RANGE, False)
 
     # get the target object
     obj = grid_world.environment_objects[object_id]
-
-    # Check if object is in range
-    if object_id not in objects_in_range:
-        return action_result(action_result.NOT_IN_RANGE, False)
 
     # check if door is already open or closed
     if action_result == OpenDoorActionResult and obj.properties["door_open"]:
@@ -199,10 +187,10 @@ def is_possible_door_open_close(grid_world, agent_id, action_result, object_id=N
     # when closing, check that there are no objects in the door opening
     if action_result == CloseDoorActionResult:
         # get all objects at the location of the door
-        objects_in_dooropening = grid_world.get_objects_in_range(obj.location, object_type="*", sense_range=0)
+        objects_in_door_opening = grid_world.get_objects_in_range(obj.location, object_type="*", sense_range=0)
 
-        # more than 1 object at that location (the door itself) means the door is blocked
-        if len(objects_in_dooropening) > 1:
+        # more than 1 object at that location (besides the door itself) means the door is blocked
+        if len(objects_in_door_opening) > 1:
             return action_result(action_result.DOOR_BLOCKED, False)
 
     return action_result(action_result.RESULT_SUCCESS, True)
