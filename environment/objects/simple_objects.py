@@ -19,7 +19,7 @@ class SquareBlock(EnvObject):
 
 class Door(EnvObject):
 
-    def __init__(self, location, is_open, name="Door", open_colour="#646464", closed_colour="#191919"):
+    def __init__(self, location, is_open, name="Door", open_colour="#006400", closed_colour="#640000"):
         """
         Door base object, can be used to define rooms. An example of an object that is and ordinary EnvObject but has
         a method on which two Actions depend; OpenDoorAction and CloseDoorAction. This method alters the is_traversable
@@ -104,4 +104,4 @@ class AreaTile(EnvObject):
         """
         is_traversable = True  # Areas are always traversables
         super().__init__(name=name, location=location, visualize_colour=visualize_colour,
-                         is_traversable=is_traversable, class_callable=AreaTile)
+                         is_traversable=is_traversable, class_callable=AreaTile, visualize_depth=0)

@@ -59,36 +59,39 @@ def _get_line_coords(p1, p2):
     x2 = int(p2[0])
     y1 = int(p1[1])
     y2 = int(p2[1])
-    xdiff = x2 - x1
-    ydiff = y2 - y1
 
-    # Find the line's equation, y = mx + b
-    strt = x1 + 1
-    nd = x2
-    if xdiff != 0 and ydiff != 0:
-        m = ydiff / xdiff
-        b = y1 - m * x1
-    elif ydiff == 0:
-        m = 0
-        b = y2
-        strt = x1
-        nd = x2
-    elif xdiff == 0:
-        m = 0
-        b = x2
-        strt = y1
-        nd = y2
+    is_steep = abs(y2 - y1) > abs(x2 - x1)
+    if is_steep:
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
 
-    temp_strt = min(strt, nd)
-    nd = max(nd, strt)
-    strt = temp_strt + 1
-    for val in range(strt, nd):
-        res = int(m * val + b)
-        if int(res) == res:
-            if xdiff == 0:
-                line_coords.append((res, val))
-            else:
-                line_coords.append((val, res))
+    rev = False
+    if x1 > x2:
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+        rev = True
+
+    deltax = x2 - x1
+    deltay = abs(y2 - y1)
+    error = int(deltax / 2)
+    y = y1
+
+    if y1 < y2:
+        ystep = 1
+    else:
+        ystep = -1
+    for x in range(x1, x2 + 1):
+        if is_steep:
+            line_coords.append((y, x))
+        else:
+            line_coords.append((x, y))
+        error -= deltay
+        if error < 0:
+            y += ystep
+            error += deltax
+    # Reverse the list if the coordinates were reversed
+    if rev:
+        line_coords.reverse()
 
     return line_coords
 
@@ -96,7 +99,7 @@ def _get_line_coords(p1, p2):
 def _get_hull_and_volume_coords(corner_coords):
         # Check if there are any corners given
         if len(corner_coords) <= 1:
-            raise Exception("Cannot create area; No or just one corner coordinate given.")
+            raise Exception(f"Cannot create area; {len(corner_coords)} corner coordinates given, requires at least 2.")
 
         # Get the polygon represented by the corner coordinates
         # TODO remove the dependency to Shapely
