@@ -347,7 +347,8 @@ class Agent:
 
             # Get all doors from the perceived objects
             objects = list(state.keys())
-            doors = [obj for obj in objects if 'type' in state[obj] and state[obj]['type'] == "Door"]
+            doors = [obj for obj in objects
+                     if 'class_inheritance' in state[obj] and state[obj]['class_inheritance'][0] == "Door"]
 
             # choose a random door
             if len(doors) > 0:

@@ -124,6 +124,8 @@ class CloseDoorAction(Action):
 
 class CloseDoorActionResult(ActionResult):
     RESULT_SUCCESS = "Door was succesfully closed."
+    NO_DOORS_IN_RANGE = "No door found in range"
+    NOT_IN_RANGE = "Specified door is not within range."
     NOT_A_DOOR = "CloseDoor action could not be performed, as object isn't a door"
     RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
     DOOR_ALREADY_CLOSED = "Can't close door, door is already closed."
@@ -141,6 +143,7 @@ class OpenDoorActionResult(ActionResult):
     NOT_A_DOOR = "OpenDoor action could not be performed, as object isn't a door"
     RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
     DOOR_ALREADY_OPEN = "Can't open door, door is already open"
+    DOOR_BLOCKED = "Can't close door, object or agent is blocking the door opening."
     NO_OBJECT_SPECIFIED = "No object_id of a door specified to open."
 
     def __init__(self, result, succeeded):
@@ -179,9 +182,9 @@ def is_possible_door_open_close(grid_world, agent_id, action_result, object_id=N
     obj = grid_world.environment_objects[object_id]
 
     # check if door is already open or closed
-    if action_result == OpenDoorActionResult and obj.properties["door_open"]:
+    if action_result == OpenDoorActionResult and obj.properties["is_open"]:
         return action_result(action_result.DOOR_ALREADY_OPEN, False)
-    elif action_result == CloseDoorActionResult and not obj.properties["door_open"]:
+    elif action_result == CloseDoorActionResult and not obj.properties["is_open"]:
         return action_result(action_result.DOOR_ALREADY_CLOSED, False)
 
     # when closing, check that there are no objects in the door opening
