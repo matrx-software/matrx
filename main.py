@@ -1,11 +1,12 @@
-from scenarios import test_scenario_huag, hat_case, blanket_search_case
+from blanket_search.scenarios import scenario1
+from scenarios import test_scenario_huag, hat_case
 
 if __name__ == "__main__":
 
     # By creating scripts that return a factory, we can define infinite number of use cases and select them (in the
     # future) through a UI.
-    # factory = test_scenario_huag.create_factory()
-    factory = blanket_search_case.create_factory()
+    factory = test_scenario_huag.create_factory()
+    factory = scenario1.create_factory()
     # factory = hat_case.create_factory()
 
     for world in factory.worlds():

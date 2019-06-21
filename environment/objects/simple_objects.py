@@ -93,15 +93,15 @@ class Wall(EnvObject):
                          is_traversable=is_traversable, class_callable=Wall)
 
 
-class Area(EnvObject):
+class AreaTile(EnvObject):
 
-    def __init__(self, location, name="Area", visualize_colour="#8ca58c"):
+    def __init__(self, location, name="AreaTile", visualize_colour="#8ca58c"):
         """
-        A simple Area object. Is always traversable, the colour can be set but has otherwise the default EnvObject
+        A simple AreaTile object. Is always traversable, the colour can be set but has otherwise the default EnvObject
         property values. Can be used to define different areas in the GridWorld.
         :param location: The location of the area.
-        :param name: The name, default "Area".
+        :param name: The name, default "AreaTile".
         """
         is_traversable = True  # Areas are always traversables
         super().__init__(name=name, location=location, visualize_colour=visualize_colour,
-                         is_traversable=is_traversable, class_callable=Area)
+                         is_traversable=is_traversable, class_callable=AreaTile)
