@@ -145,7 +145,7 @@ def handle_usr_inp(input):
     if debug:
         print('received userinput: %s' % input)
 
-    id = input['id']
+    id = input['id'].lower()
     keyPressed = input['key']
 
     # save the userinput action to the userinput dict of that human agent.
