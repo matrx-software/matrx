@@ -555,14 +555,15 @@ class WorldFactory:
             defaults = argspecs.defaults  # defaults (if any) of the last n elements in args
 
             # Now assign the default values to kwargs dictionary
-            args = OrderedDict({arg: None for arg in reversed(args[1:])})
-            for idx, default in enumerate(reversed(defaults)):
-                k = list(args.keys())[idx]
-                args[k] = default
+            args = OrderedDict({arg: "not_set" for arg in reversed(args[1:])})
+            if defaults is not None:
+                for idx, default in enumerate(reversed(defaults)):
+                    k = list(args.keys())[idx]
+                    args[k] = default
 
             # Check if all arguments are present (fails if a required argument without a default value is not given)
             for arg, default in args.items():
-                if arg not in custom_props.keys() and arg not in mandatory_props.keys() and default is None:
+                if arg not in custom_props.keys() and arg not in mandatory_props.keys() and default == "not_set":
                     raise Exception(f"Cannot create environment object of type {callable_class.__name__} with name "
                                     f"{mandatory_props['name']}, as its constructor requires the argument named {arg} "
                                     f"which is not given as a property.")
