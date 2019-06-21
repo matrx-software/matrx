@@ -23,7 +23,7 @@
     "visualize_size": 1.0,
     "visualize_colour": "#92f441",
     "visualize_shape": 1,
-    "visualize_depth": 1,
+    "visualize_depth": 100,
     "possible_actions": "*"
   },
   "EnvObject":
