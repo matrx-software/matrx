@@ -80,7 +80,7 @@ class ActionResult:
 
     AGENT_WAS_REMOVED = "Agent {AGENT_ID} was removed during this tick, cannot perform anymore actions."
     ACTION_SUCCEEDED = "The action succeeded."
-    ACTION_NOT_POSSIBLE = "The `is_possible(...)` method return False. Signalling that the action was not possible."
+    ACTION_NOT_POSSIBLE = "The `is_possible(...)` method returned False. Signalling that the action was not possible."
     AGENT_NOT_CAPABLE = "The action could not be performed, as the agent is not capable of performing this action."
     UNKNOWN_ACTION = "The action is not known to the environment."
     NO_ACTION_GIVEN = "There was no action given to perform, automatic succeed."

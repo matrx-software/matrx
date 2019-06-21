@@ -5,6 +5,7 @@ from environment.actions.action import Action, ActionResult
 from environment.objects.agent_avatar import AgentAvatar
 import copy
 
+
 class RemoveObject(Action):
     """
     An action that allows agent to remove EnvObjects (basically ALL objects except YOURSELF) from the GridWorld
@@ -51,15 +52,15 @@ class RemoveObject(Action):
                 success = grid_world.remove_from_grid(object_id)  # remove it, success is whether GridWorld succeeded
                 if success:  # if we succeeded in removal return the appriopriate ActionResult
                     return ObjectActionResult(ObjectActionResult.OBJECT_REMOVED \
-                        .replace('object_id'.upper(), str(object_id)), True)
+                                              .replace('object_id'.upper(), str(object_id)), True)
                 else:  # else we return a failure due to the GridWorld removal failed
                     return ObjectActionResult(ObjectActionResult.REMOVAL_FAILED \
-                        .replace('object_id'.upper(), str(object_id)), False)
+                                              .replace('object_id'.upper(), str(object_id)), False)
 
         # If the object was not in range, or no objects were in range we return that the object id was not in range
         return ObjectActionResult(ObjectActionResult.OBJECT_ID_NOT_WITHIN_RANGE \
-            .replace('remove_range'.upper(), str(remove_range)) \
-            .replace('object_id'.upper(), str(object_id)),False)
+                                  .replace('remove_range'.upper(), str(remove_range)) \
+                                  .replace('object_id'.upper(), str(object_id)), False)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
         agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentAvatar)  # get ourselves
@@ -74,12 +75,12 @@ class RemoveObject(Action):
         objects_in_range.pop(agent_avatar.obj_id)
 
         if len(objects_in_range) == 0:  # if there are no objects in infinite range besides ourselves, we return fail
-            return False, ObjectActionResult.NO_OBJECTS_IN_RANGE \
-                .replace('remove_range'.upper(), str(remove_range))
+            return False, ObjectActionResult(ObjectActionResult.NO_OBJECTS_IN_RANGE \
+                                             .replace('remove_range'.upper(), str(remove_range)), False)
 
         # otherwise some instance of RemoveObject is possible, although we do not know yet IF the intended removal is
         # possible.
-        return True, None
+        return True, ObjectActionResult(ObjectActionResult.ACTION_SUCCEEDED, True)
 
 
 class ObjectActionResult(ActionResult):
@@ -98,6 +99,7 @@ class GrabAction(Action):
     excludes other AgentAvatars. Grabbing automatically is followed by carrying of the object.
     Carrying is implemented in movement actions.
     """
+
     def __init__(self, name=None):
         if name is None:
             name = GrabAction.__name__
@@ -166,17 +168,16 @@ class GrabAction(Action):
         return GrabActionResult(GrabActionResult.RESULT_SUCCESS, True)
 
 
-
 def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
     reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
     loc_agent = reg_ag.location  # Agent location
 
     if object_id is None:
-        return False, GrabActionResult.RESULT_NO_OBJECT
+        return False, GrabActionResult(GrabActionResult.RESULT_NO_OBJECT, False)
 
     # Already carries an object
     if len(reg_ag.is_carrying) >= max_objects:
-        return False, GrabActionResult.RESULT_CARRIES_OBJECT
+        return False, GrabActionResult(GrabActionResult.RESULT_CARRIES_OBJECT, False)
 
     # Go through all objects at the desired locations
     objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type="*", sense_range=grab_range)
@@ -197,31 +198,32 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
         if objects_in_range:
             object_id = grid_world.rnd_gen.choice(list(objects_in_range.keys()))
         else:
-            return False, GrabActionResult.NOT_IN_RANGE
+            return False, GrabActionResult(GrabActionResult.NOT_IN_RANGE, False)
 
     # Check if object is in range
     if object_id not in objects_in_range:
-        return False, GrabActionResult.NOT_IN_RANGE
+        return False, GrabActionResult(GrabActionResult.NOT_IN_RANGE, False)
 
     # Check if object_id is the id of an agent
     if object_id in grid_world.registered_agents.keys():
         # If it is an agent at that location, grabbing is not possible
-        return False, GrabActionResult.RESULT_AGENT
+        return False, GrabActionResult(GrabActionResult.RESULT_AGENT, False)
 
     # Check if it is an object
     if object_id in grid_world.environment_objects.keys():
         env_obj = grid_world.environment_objects[object_id]  # Environment object
         # Check if the object is not carried by another agent
         if len(env_obj.carried_by) != 0:
-            return False, GrabActionResult.RESULT_OBJECT_CARRIED.replace("{AGENT_ID}",
-                                                                         str(env_obj.carried_by))
+            return False, GrabActionResult(GrabActionResult.RESULT_OBJECT_CARRIED.replace("{AGENT_ID}",
+                                                                                          str(env_obj.carried_by)),
+                                           False)
         elif not env_obj.properties["is_movable"]:
-            return False, GrabActionResult.RESULT_OBJECT_UNMOVABLE
+            return False, GrabActionResult(GrabActionResult.RESULT_OBJECT_UNMOVABLE, False)
         else:
             # Success
-            return True, GrabActionResult.RESULT_SUCCESS
+            return True, GrabActionResult(GrabActionResult.RESULT_SUCCESS, False)
     else:
-        return False, GrabActionResult.RESULT_UNKNOWN_OBJECT_TYPE
+        return False, GrabActionResult(GrabActionResult.RESULT_UNKNOWN_OBJECT_TYPE, False)
 
 
 class GrabActionResult(ActionResult):
@@ -237,7 +239,6 @@ class GrabActionResult(ActionResult):
 
     def __init__(self, result, succeeded):
         super().__init__(result, succeeded)
-
 
 
 class DropAction(Action):
@@ -257,10 +258,9 @@ class DropAction(Action):
         elif len(reg_ag.is_carrying) > 0:
             obj_id = reg_ag.is_carrying[-1]
         else:
-            return False, DropActionResult.RESULT_NO_OBJECT
+            return False, DropActionResult(DropActionResult.RESULT_NO_OBJECT, False)
 
         return possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id, drop_range=drop_range)
-
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
@@ -289,7 +289,8 @@ class DropAction(Action):
 
         # check that it is even possible to drop this object somewhere
         if not env_obj.is_traversable and not reg_ag.is_traversable and drop_range == 0:
-            raise Exception(f"Intraversable agent {reg_ag.obj_id} can only drop the intraversable object {env_obj.obj_id} at its own location (drop_range = 0), but this is impossible. Enlarge the drop_range for the DropAction to atleast 1")
+            raise Exception(
+                f"Intraversable agent {reg_ag.obj_id} can only drop the intraversable object {env_obj.obj_id} at its own location (drop_range = 0), but this is impossible. Enlarge the drop_range for the DropAction to atleast 1")
 
         # check if we can drop it at our current location
         curr_loc_drop_poss = is_drop_poss(grid_world, env_obj, reg_ag.location)
@@ -349,15 +350,15 @@ def find_drop_loc(grid_world, agent, env_obj, drop_range, start_loc):
         x, y = path[-1]
 
         # check if we are still within drop_range
-        if get_distance([x,y], start_loc) > drop_range:
+        if get_distance([x, y], start_loc) > drop_range:
             return False
 
         # check if we can drop at this location
-        if is_drop_poss(grid_world, env_obj, [x,y]):
-            return [x,y]
+        if is_drop_poss(grid_world, env_obj, [x, y]):
+            return [x, y]
 
         # queue unseen neighbouring tiles
-        for x2, y2 in ((x+1,y), (x-1,y), (x,y+1), (x,y-1)):
+        for x2, y2 in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
             if 0 <= x2 < width and 0 <= y2 < height and (x2, y2) not in seen:
                 queue.append(path + [(x2, y2)])
                 seen.add((x2, y2))
@@ -392,7 +393,6 @@ def is_drop_poss(grid_world, env_obj, dropLocation):
         return True
 
 
-
 def possible_drop(grid_world, agent_id, obj_id, drop_range):
     reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
     loc_agent = reg_ag.location
@@ -400,15 +400,15 @@ def possible_drop(grid_world, agent_id, obj_id, drop_range):
 
     # No object given
     if not obj_id:
-        return False, DropActionResult.RESULT_NONE_GIVEN
+        return False, DropActionResult(DropActionResult.RESULT_NONE_GIVEN, False)
 
     # No object with that name
     if not (obj_id in reg_ag.is_carrying):
-        return False, DropActionResult.RESULT_NO_OBJECT
+        return False, DropActionResult(DropActionResult.RESULT_NO_OBJECT, False)
 
     # No other object/agent is in that location, then drop is a always a success
     if len(loc_obj_ids) == 1:
-        return True, DropActionResult.RESULT_SUCCESS
+        return True, DropActionResult(DropActionResult.RESULT_SUCCESS, True)
 
     # If the object we want to drop is not traversable and because their are other objects
 
@@ -416,10 +416,10 @@ def possible_drop(grid_world, agent_id, obj_id, drop_range):
     for loc_obj_id in loc_obj_ids:
         # Check if it is an object
         if loc_obj_id in grid_world.environment_objects.keys():
-            return False, DropActionResult.RESULT_OBJECT
+            return False, DropActionResult(DropActionResult.RESULT_OBJECT, False)
         else:
             # We have checked for agent and object, unknown what to do
-            return False, DropActionResult.RESULT_UNKNOWN_OBJECT_TYPE
+            return False, DropActionResult(DropActionResult.RESULT_UNKNOWN_OBJECT_TYPE, False)
 
 
 class DropActionResult(ActionResult):
