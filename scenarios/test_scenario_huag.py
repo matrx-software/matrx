@@ -30,7 +30,7 @@ def create_factory():
 
     factory.add_line(start=(4, 6), end=(4, 6), name="Line")
 
-    factory.add_room(top_left_location=(0, 0), width=4, height=7, name="room 1", door_locations=[(3, 1)],
+    factory.add_room(top_left_location=(0, 0), width=3, height=3, name="room 1", door_locations=[(2, 1), (1, 2)],
                      area_visualize_colour="#af4848", doors_open=False)
 
     return factory
