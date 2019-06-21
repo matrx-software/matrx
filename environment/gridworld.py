@@ -12,7 +12,7 @@ from visualization.visualizer import Visualizer
 
 class GridWorld:
 
-    def __init__(self, shape, tick_duration, simulation_goal=None, run_sail_api=True, run_visualization_server=True,
+    def __init__(self, shape, tick_duration, simulation_goal, run_sail_api=True, run_visualization_server=True,
                  rnd_seed=1):
         self.tick_duration = tick_duration
         self.registered_agents = OrderedDict()

@@ -16,6 +16,7 @@ from environment.objects.agent_avatar import AgentAvatar
 from environment.objects.env_object import EnvObject
 from environment.objects.helper_functions import get_inheritence_path
 from environment.objects.simple_objects import Wall, Door, AreaTile
+from environment.sim_goals.sim_goal import LimitedTimeGoal
 from scenario_manager.helper_functions import get_default_value, _get_line_coords
 
 ######
@@ -49,13 +50,29 @@ import visualization
 
 class WorldFactory:
 
-    def __init__(self, shape, tick_duration, random_seed=1, simulation_goal=None, run_sail_api=True,
+    def __init__(self, shape, tick_duration, random_seed=1, simulation_goal=1000, run_sail_api=True,
                  run_visualization_server=True):
+        """
+        Create a WorldFactory who stores how you want the world to look like, and from which you can obtain infinite
+        instantions of that world.
+        :param shape: The grid size, (width, height)
+        :param tick_duration: The duration of a tick in seconds.
+        :param random_seed: The master random seed from which all other seeds are obtains
+        :param simulation_goal: The goal that denotes when the simulation ended. Can be a SimulationGoal, a list of
+         SimulationGoal, or an integer denoting the number of ticks the simulation runs.
+        :param run_sail_api: Boolean if the SAIL api server should be started (not yet implemented)
+        :param run_visualization_server: Boolean if the Visualisation server should be started (not yet implemented)
+        """
         # Set our random number generator
         self.rng = np.random.RandomState(random_seed)
         # Set our settings place holders
         self.agent_settings = []
         self.object_settings = []
+
+        # If simulation goal is an integer, we create a LimitedTimeGoal with that number of ticks
+        if isinstance(simulation_goal, int):
+            simulation_goal = LimitedTimeGoal(max_nr_ticks=simulation_goal)
+
         # Set our world settings
         self.world_settings = self.__set_world_settings(shape=shape,
                                                         tick_duration=tick_duration,
@@ -87,7 +104,7 @@ class WorldFactory:
         self.__reset_random()
         return world
 
-    def __set_world_settings(self, shape, tick_duration, simulation_goal=None, run_sail_api=True,
+    def __set_world_settings(self, shape, tick_duration, simulation_goal, run_sail_api=True,
                              run_visualization_server=True, rnd_seed=None):
 
         if rnd_seed is None:
