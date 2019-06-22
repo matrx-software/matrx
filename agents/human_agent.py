@@ -116,19 +116,18 @@ class HumanAgent(Agent):
             objects = list(state.keys())
 
             # Remove all (human)agents
-            objects.remove(self.agent_properties["name"])
-            objects = [obj for obj in objects if 'agent' not in obj]
+            objects = [obj for obj in objects if 'agent' not in obj.lower()]
 
             # find objects in range
             object_in_range = []
             for object_id in objects:
-                if "movable" not in state[object_id]:
+                if "is_movable" not in state[object_id]:
                     continue
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
                     np.array(state[object_id]['location']) - np.array(
-                        state[self.agent_properties["name"]]['location']))))
-                if dist <= action_kwargs['grab_range'] and state[object_id]["movable"]:
+                        state[agent_id]['location']))))
+                if dist <= action_kwargs['grab_range'] and state[object_id]["is_movable"]:
                     object_in_range.append(object_id)
 
             # Select an object if there are any in range

@@ -1,5 +1,5 @@
 from blanket_search.scenarios import scenario1
-from scenarios import test_scenario_huag, hat_case
+from scenarios import test_scenario_huag, hat_case, test_drop_action
 
 if __name__ == "__main__":
 

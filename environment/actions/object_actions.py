@@ -3,6 +3,7 @@ import collections, math
 
 from environment.actions.action import Action, ActionResult
 from environment.objects.agent_avatar import AgentAvatar
+from environment.objects.simple_objects import AreaTile
 import copy
 
 
@@ -183,10 +184,6 @@ def is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
     objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type="*", sense_range=grab_range)
     objects_in_range.pop(agent_id)
 
-    # Removing objects in range that the agent already carries
-    for obj in reg_ag.is_carrying:
-        objects_in_range.pop(obj.obj_id)
-
     # Set random object in range
     if not object_id:
         # Remove all non objects from the list
@@ -247,6 +244,7 @@ class DropAction(Action):
             name = DropAction.__name__
         super().__init__(name)
 
+
     def is_possible(self, grid_world, agent_id, **kwargs):
         reg_ag = grid_world.registered_agents[agent_id]
 
@@ -261,6 +259,7 @@ class DropAction(Action):
             return False, DropActionResult(DropActionResult.RESULT_NO_OBJECT, False)
 
         return possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id, drop_range=drop_range)
+
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
@@ -294,6 +293,7 @@ class DropAction(Action):
 
         # check if we can drop it at our current location
         curr_loc_drop_poss = is_drop_poss(grid_world, env_obj, reg_ag.location)
+
         # drop it on the agent location if possible
         if curr_loc_drop_poss:
             return act_drop(grid_world, agent=reg_ag, env_obj=env_obj, drop_loc=reg_ag.location)
@@ -377,11 +377,20 @@ def is_drop_poss(grid_world, env_obj, dropLocation):
     Check if the object can be dropped at a specific location by checking if
     there are any intraversable objects at that location, and if the object to
     be dropped is intraversable
+    :param grid_world: The grid_world object
+    :param env_obj: the object to be dropped
+    :param dropLocation: location to check if it is possible to drop the env_obj there
     """
 
     # Count the intraversable objects at the current location if we would drop the
     # object here
     objs_at_loc = grid_world.get_objects_in_range(dropLocation, object_type="*", sense_range=0)
+
+    # Remove area objects from the list
+    for i in range(len(objs_at_loc),0):
+        if isinstance(objs_at_loc[i], AreaTile):
+            del objs_at_loc[i]
+
     in_trav_objs_count = 1 if not env_obj.is_traversable else 0
     in_trav_objs_count += len([obj for obj in objs_at_loc if not objs_at_loc[obj].is_traversable])
 
@@ -406,20 +415,12 @@ def possible_drop(grid_world, agent_id, obj_id, drop_range):
     if not (obj_id in reg_ag.is_carrying):
         return False, DropActionResult(DropActionResult.RESULT_NO_OBJECT, False)
 
-    # No other object/agent is in that location, then drop is a always a success
     if len(loc_obj_ids) == 1:
         return True, DropActionResult(DropActionResult.RESULT_SUCCESS, True)
 
-    # If the object we want to drop is not traversable and because their are other objects
+    # TODO: incorporate is_possible check from DropAction.mutate is_possible here
 
-    # Go through all objects at the desired locations
-    for loc_obj_id in loc_obj_ids:
-        # Check if it is an object
-        if loc_obj_id in grid_world.environment_objects.keys():
-            return False, DropActionResult(DropActionResult.RESULT_OBJECT, False)
-        else:
-            # We have checked for agent and object, unknown what to do
-            return False, DropActionResult(DropActionResult.RESULT_UNKNOWN_OBJECT_TYPE, False)
+    return True, DropActionResult(DropActionResult.RESULT_SUCCESS, True)
 
 
 class DropActionResult(ActionResult):
