@@ -34,7 +34,10 @@ def create_factory():
     factory.add_env_object(location=[8, 1], name="Wall 2", is_traversable=True)
 
     # area
-    factory.add_env_object(location=[8,0], name="area1", callable_class=AreaTile, visualize_depth=5, is_movable=False)
+    factory.add_env_object(location=[8,0], name="area1", callable_class=AreaTile, is_movable=False)
+
+    # fog test
+    factory.add_env_object(location=[9,0], name="fog", callable_class=FogTile, visualize_opacity=0.5, visualize_depth=101)
 
 
 

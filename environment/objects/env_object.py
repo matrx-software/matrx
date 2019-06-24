@@ -10,7 +10,7 @@ class EnvObject:
     def __init__(self, location, name, class_callable, customizable_properties=None,
                  is_traversable=None, is_movable=None,
                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                 **custom_properties):
+                 visualize_opacity=None, **custom_properties):
         """
         The basic class for all objects in the world. This includes the AgentAvatar. All objects that are added to the
         GridWorld should inherit this class.
@@ -69,6 +69,7 @@ class EnvObject:
         used by the Visualizer. Denotes the colour of the object in visualization.
         :param visualize_depth: Integer. Optional, default obtained from defaults.json. A visualization property that
         is used by the Visualizer to draw objects in layers.
+        :param visualize_opacity: Integer. Opacity of the object. From 0.0 to 1.0.
         :param **custom_properties: Optional. Any other keyword arguments. All these are treated as custom attributes.
         For example the property 'heat'=2.4 of an EnvObject representing a fire.
         """
@@ -79,7 +80,7 @@ class EnvObject:
         # Obtain a unique ID based on a global object counter, if not already set as an attribute in a super class
         if not hasattr(self, "obj_id"):
             self.obj_id = f"{self.obj_name}_{next_obj_id()}"
-            
+
         # Make customizable_properties mutable if not given.
         if customizable_properties is None:
             self.customizable_properties = []
@@ -102,6 +103,8 @@ class EnvObject:
             visualize_shape = get_default_value(class_name="EnvObject", property_name="visualize_shape")
         if visualize_colour is None:
             visualize_colour = get_default_value(class_name="EnvObject", property_name="visualize_colour")
+        if visualize_opacity is None:
+            visualize_opacity = get_default_value(class_name="EnvObject", property_name="visualize_opacity")
         if visualize_depth is None:
             visualize_depth = get_default_value(class_name="EnvObject", property_name="visualize_depth")
         if is_movable is None:
@@ -110,6 +113,7 @@ class EnvObject:
         # Set the mandatory properties
         self.visualize_depth = visualize_depth
         self.visualize_colour = visualize_colour
+        self.visualize_opacity = visualize_opacity
         self.visualize_shape = visualize_shape
         self.visualize_size = visualize_size
         self.is_traversable = is_traversable
@@ -172,6 +176,9 @@ class EnvObject:
             elif property_name == "visualize_colour":
                 assert isinstance(property_value, str)
                 self.visualize_colour = property_value
+            elif property_name == "visualize_opacity":
+                assert isinstance(property_value, int)
+                self.visualize_opacity = property_value
             elif property_name == "visualize_shape":
                 assert isinstance(property_value, int)
                 self.visualize_shape = property_value
@@ -241,7 +248,8 @@ class EnvObject:
             "size": self.visualize_size,
             "shape": self.visualize_shape,
             "colour": self.visualize_colour,
-            "depth": self.visualize_depth
+            "depth": self.visualize_depth,
+            "opacity": self.visualize_opacity
         }
 
         return properties

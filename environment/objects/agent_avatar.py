@@ -9,7 +9,7 @@ class AgentAvatar(EnvObject):
     def __init__(self, location, possible_actions, sense_capability, class_callable,
                  callback_agent_get_action, callback_agent_set_action_result, callback_agent_observe,
                  callback_agent_get_messages, callback_agent_set_messages,
-                 visualize_size, visualize_shape, visualize_colour, visualize_depth,
+                 visualize_size, visualize_shape, visualize_colour, visualize_depth, visualize_opacity,
                  is_traversable, team, agent_speed_in_ticks, name, is_movable,
                  is_human_agent, customizable_properties,
                  **custom_properties):
@@ -75,6 +75,7 @@ class AgentAvatar(EnvObject):
         used by the Visualizer. Denotes the
         :param visualize_depth: Integer. Optional, default obtained from defaults.json. A visualization property that
         is used by the Visualizer to draw objects in layers.
+        :param visualize_opacity: Integer. Opacity of object. Between 0.0 and 1.0.
         :param **custom_properties: Optional. Any other keyword arguments. All these are treated as custom attributes.
         For example the property 'heat'=2.4 of an EnvObject representing a fire.
         """
@@ -106,6 +107,7 @@ class AgentAvatar(EnvObject):
         self.visualize_colour = visualize_colour
         self.visualize_shape = visualize_shape
         self.visualize_size = visualize_size
+        self.visualize_opacity = visualize_opacity
 
         # Parse the action_set property if set to the wildcard "*" denoting all actions
         if self.action_set == "*":
@@ -126,7 +128,7 @@ class AgentAvatar(EnvObject):
         super().__init__(location, name, customizable_properties=customizable_properties, is_traversable=is_traversable,
                          class_callable=class_callable,
                          visualize_size=visualize_size, visualize_shape=visualize_shape,
-                         visualize_colour=visualize_colour, visualize_depth=visualize_depth,
+                         visualize_colour=visualize_colour, visualize_depth=visualize_depth, visualize_opacity=visualize_opacity,
                          **custom_properties)
 
         # If there was no team name given, the AgentAvatar (and as an extension its Agent) is part of its own team which
@@ -209,6 +211,9 @@ class AgentAvatar(EnvObject):
             elif property_name == "visualize_colour":
                 assert isinstance(property_value, str)
                 self.visualize_colour = property_value
+            elif property_name == "visualize_opacity":
+                assert isinstance(property_value, int)
+                self.visualize_opacity = property_value
             elif property_name == "visualize_shape":
                 assert isinstance(property_value, int)
                 self.visualize_shape = property_value
@@ -304,7 +309,8 @@ class AgentAvatar(EnvObject):
             "size": self.visualize_size,
             "shape": self.visualize_shape,
             "colour": self.visualize_colour,
-            "depth": self.visualize_depth
+            "depth": self.visualize_depth,
+            "opacity": self.visualize_opacity
         }
 
         return properties

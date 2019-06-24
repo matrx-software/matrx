@@ -123,7 +123,7 @@ class WorldFactory:
 
     def add_agent(self, location, agent, name="Agent", customizable_properties=None, sense_capability=None,
                   is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None, is_movable=None,
-                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
+                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None, visualize_opacity=None,
                   **custom_properties):
 
         # Check if location and agent are of correct type
@@ -140,6 +140,8 @@ class WorldFactory:
             visualize_shape = get_default_value(class_name="AgentAvatar", property_name="visualize_shape")
         if visualize_colour is None:
             visualize_colour = get_default_value(class_name="AgentAvatar", property_name="visualize_colour")
+        if visualize_opacity is None:
+            visualize_opacity = get_default_value(class_name="AgentAvatar", property_name="visualize_opacity")
         if visualize_depth is None:
             visualize_depth = get_default_value(class_name="AgentAvatar", property_name="visualize_depth")
         if agent_speed_in_ticks is None:
@@ -179,6 +181,7 @@ class WorldFactory:
                              "visualize_size": visualize_size,
                              "visualize_shape": visualize_shape,
                              "visualize_colour": visualize_colour,
+                             "visualize_opacity": visualize_opacity,
                              "visualize_depth": visualize_depth,
                              "location": location,
                              "team": team}
@@ -188,19 +191,19 @@ class WorldFactory:
 
     def add_team(self, agents, locations, team_name, custom_properties=None, sense_capability=None,
                  customizable_properties=None, is_traversable=None, agent_speed_in_ticks=None,
-                 visualize_size=None, visualize_shape=None, visualize_colour=None):
+                 visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_opacity=None):
 
         self.add_multiple_agents(agents, locations, custom_properties=custom_properties,
                                  sense_capabilities=sense_capability, customizable_properties=customizable_properties,
                                  is_traversable=is_traversable, agent_speeds_in_ticks=agent_speed_in_ticks,
                                  teams=team_name, visualize_sizes=visualize_size, visualize_shapes=visualize_shape,
-                                 visualize_colours=visualize_colour)
+                                 visualize_colours=visualize_colour, visualize_opacity=visualize_opacity)
 
     def add_multiple_agents(self, agents, locations, custom_properties=None,
                             sense_capabilities=None, customizable_properties=None,
                             is_traversable=None, agent_speeds_in_ticks=None,
                             teams=None, visualize_sizes=None, visualize_shapes=None,
-                            visualize_colours=None, visualize_depths=None):
+                            visualize_colours=None, visualize_opacities=None, visualize_depths=None):
 
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
@@ -249,6 +252,11 @@ class WorldFactory:
         elif isinstance(visualize_colours, str):
             visualize_colours = [visualize_colours for _ in range(len(agents))]
 
+        if visualize_opacities is None:
+            visualize_opacities = [None for _ in range(len(agents))]
+        elif isinstance(visualize_opacities, int):
+            visualize_opacities = [visualize_opacities for _ in range(len(agents))]
+
         if visualize_depths is None:
             visualize_depths = [None for _ in range(len(agents))]
         elif isinstance(visualize_depths, int):
@@ -266,20 +274,21 @@ class WorldFactory:
                            visualize_shape=visualize_shapes[idx],
                            visualize_colour=visualize_colours[idx],
                            visualize_depth=visualize_depths[idx],
+                           visualize_opacity=visualize_opacities[idx],
                            **custom_properties[idx])
 
     def add_agent_prospect(self, location, agent, probability, name="Agent", customizable_properties=None,
                            sense_capability=None,
                            is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None,
                            is_movable=None,
-                           visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                           **custom_properties):
+                           visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_opacity=None,
+                           visualize_depth=None, **custom_properties):
 
         # Add agent as normal
         self.add_agent(location, agent, name, customizable_properties, sense_capability,
                        is_traversable, team, agent_speed_in_ticks, possible_actions, is_movable,
                        visualize_size, visualize_shape, visualize_colour, visualize_depth,
-                       **custom_properties)
+                       visualize_opacity, **custom_properties)
 
         # Get the last settings (which we just added) and add the probability
         self.agent_settings[-1]['probability'] = probability
@@ -287,7 +296,7 @@ class WorldFactory:
     def add_env_object(self, location, name, callable_class=None, customizable_properties=None,
                        is_traversable=None, is_movable=None,
                        visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                       **custom_properties):
+                       visualize_opacity=None, **custom_properties):
         if callable_class is None:
             callable_class = EnvObject
 
@@ -317,6 +326,7 @@ class WorldFactory:
                               "visualize_shape": visualize_shape,
                               "visualize_colour": visualize_colour,
                               "visualize_depth": visualize_depth,
+                              "visualize_opacity": visualize_opacity,
                               "is_movable": is_movable,
                               "location": location}
                           }
@@ -325,12 +335,12 @@ class WorldFactory:
     def add_env_object_prospect(self, location, name, probability, callable_class=None, customizable_properties=None,
                                 is_traversable=None,
                                 visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                                **custom_properties):
+                                visualize_opacity=None, **custom_properties):
         # Add object as normal
         self.add_env_object(location, name, callable_class, customizable_properties,
                             is_traversable,
                             visualize_size, visualize_shape, visualize_colour, visualize_depth,
-                            **custom_properties)
+                            visualize_opacity, **custom_properties)
 
         # Get the last settings (which we just added) and add the probability
         self.object_settings[-1]['probability'] = probability
@@ -338,7 +348,7 @@ class WorldFactory:
     def add_multiple_objects(self, locations, names=None, callable_classes=None, custom_properties=None,
                              customizable_properties=None, is_traversable=None, visualize_sizes=None,
                              visualize_shapes=None, visualize_colours=None, visualize_depths=None,
-                             is_movable=None):
+                             visualize_opacities=None, is_movable=None):
 
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
@@ -387,6 +397,11 @@ class WorldFactory:
         elif isinstance(visualize_colours, str):
             visualize_colours = [visualize_colours for _ in range(len(locations))]
 
+        if visualize_opacities is None:
+            visualize_opacities = [None for _ in range(len(locations))]
+        elif isinstance(visualize_opacities, int):
+            visualize_opacities = [visualize_opacities for _ in range(len(locations))]
+
         if visualize_depths is None:
             visualize_depths = [None for _ in range(len(locations))]
         elif isinstance(visualize_depths, str):
@@ -399,13 +414,13 @@ class WorldFactory:
                                 is_traversable=is_traversable[idx], is_movable=is_movable[idx],
                                 visualize_size=visualize_sizes[idx], visualize_shape=visualize_shapes[idx],
                                 visualize_colour=visualize_colours[idx], visualize_depth=visualize_depths[idx],
-                                **custom_properties[idx])
+                                visualize_opacity=visualize_opacities[idx], **custom_properties[idx])
 
     def add_human_agent(self, location, agent, name="HumanAgent", customizable_properties=None, sense_capability=None,
                         is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None,
                         is_movable=None,
                         visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                        usrinp_action_map=None, **custom_properties):
+                        visualize_opacity=None, usrinp_action_map=None, **custom_properties):
 
         # Check if location and agent are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
@@ -421,6 +436,8 @@ class WorldFactory:
             visualize_shape = get_default_value(class_name="AgentAvatar", property_name="visualize_shape")
         if visualize_colour is None:
             visualize_colour = get_default_value(class_name="AgentAvatar", property_name="visualize_colour")
+        if visualize_opacity is None:
+            visualize_opacity = get_default_value(class_name="AgentAvatar", property_name="visualize_opacity")
         if visualize_depth is None:
             visualize_depth = get_default_value(class_name="AgentAvatar", property_name="visualize_depth")
         if agent_speed_in_ticks is None:
@@ -463,6 +480,7 @@ class WorldFactory:
                              "visualize_size": visualize_size,
                              "visualize_shape": visualize_shape,
                              "visualize_colour": visualize_colour,
+                             "visualize_opacity": visualize_opacity,
                              "visualize_depth": visualize_depth,
                              "location": location,
                              "team": team}
@@ -471,7 +489,7 @@ class WorldFactory:
         self.agent_settings.append(hu_ag_setting)
 
     def add_area(self, top_left_location, width, height, name, customizable_properties=None, visualize_colour=None,
-                 **custom_properties):
+                 visualize_opacity=None, **custom_properties):
         # Check if width and height are large enough to make an actual room (with content)
         if width < 1 or height < 1:
             raise Exception(f"While adding area {name}; The width {width} and/or height {height} should both be larger"
@@ -491,12 +509,12 @@ class WorldFactory:
         # Add all area objects
         self.add_multiple_objects(locations=locs, callable_classes=AreaTile,
                                   customizable_properties=customizable_properties, visualize_colours=visualize_colour,
-                                  **custom_properties)
+                                  visualize_opacities=visualize_opacity, **custom_properties)
 
     def add_line(self, start, end, name, callable_class=None, customizable_properties=None,
                  is_traversable=None, is_movable=None,
                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                 **custom_properties):
+                 visualize_opacity=None, **custom_properties):
 
         # Get the coordinates on the given line
         line_coords = _get_line_coords(start, end)
@@ -509,13 +527,13 @@ class WorldFactory:
                                   custom_properties=custom_properties, customizable_properties=customizable_properties,
                                   is_traversable=is_traversable, visualize_sizes=visualize_size,
                                   visualize_shapes=visualize_shape, visualize_colours=visualize_colour,
-                                  visualize_depths=visualize_depth, is_movable=is_movable)
+                                  visualize_opacities=visualize_opacity, visualize_depths=visualize_depth, is_movable=is_movable)
 
     def add_room(self, top_left_location, width, height, name, door_locations=None, with_area_tiles=False,
                  doors_open=False,
                  wall_custom_properties=None, wall_customizable_properties=None,
                  area_custom_properties=None, area_customizable_properties=None,
-                 area_visualize_colour=None):
+                 area_visualize_colour=None, area_visualize_opacity=None):
 
         # Check if width and height are large enough to make an actual room (with content)
         if width <= 2 or height <= 2:
@@ -526,7 +544,8 @@ class WorldFactory:
         if with_area_tiles is False and (
                 area_custom_properties is not None or
                 area_customizable_properties is not None or
-                area_visualize_colour is not None):
+                area_visualize_colour is not None or
+                area_visualize_opacity is not None):
             warnings.warn(f"While adding room {name}: The boolean with_area_tiles is set to {with_area_tiles} while "
                           f"also providing specific area statements. Treating with_area_tiles as True.")
             with_area_tiles = True
@@ -584,8 +603,8 @@ class WorldFactory:
                 area_custom_properties = {}
 
             self.add_area(top_left_location=area_top_left, width=area_width, height=area_height, name=f"{name}_area",
-                          visualize_colour=area_visualize_colour, customizable_properties=area_customizable_properties,
-                          **area_custom_properties)
+                          visualize_colour=area_visualize_colour, visualize_opacity=area_visualize_opacity,
+                          customizable_properties=area_customizable_properties, **area_custom_properties)
 
     def create_sense_capability(self, objects_to_perceive, range_to_perceive_them_in):
         # Check if range and objects are the same length
@@ -667,6 +686,7 @@ class WorldFactory:
                     'visualize_size': mandatory_props['visualize_size'],
                     'visualize_shape': mandatory_props['visualize_shape'],
                     'visualize_colour': mandatory_props['visualize_colour'],
+                    'visualize_opacity': mandatory_props['visualize_opacity'],
                     'visualize_depth': mandatory_props['visualize_depth'],
                     **custom_props}
 

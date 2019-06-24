@@ -22,6 +22,7 @@
     "agent_speed_in_ticks": 1,
     "visualize_size": 1.0,
     "visualize_colour": "#92f441",
+    "visualize_opacity": 1.0,
     "visualize_shape": 1,
     "visualize_depth": 100,
     "possible_actions": "*"
@@ -33,6 +34,7 @@
     "visualize_size": 1.0,
     "visualize_shape": 0,
     "visualize_colour": "#4286f4",
-    "visualize_depth": 99
+    "visualize_opacity": 1.0,
+    "visualize_depth": 80
   }
 }
