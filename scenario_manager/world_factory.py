@@ -480,7 +480,7 @@ class WorldFactory:
         min_x = top_left_location[0]
         max_x = top_left_location[0] + width
         min_y = top_left_location[1]
-        max_y = top_left_location[0] + height
+        max_y = top_left_location[1] + height
 
         for x in range(min_x, max_x):
             for y in range(min_y, max_y):
