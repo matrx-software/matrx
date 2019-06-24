@@ -15,7 +15,7 @@ from environment.gridworld import GridWorld
 from environment.objects.agent_avatar import AgentAvatar
 from environment.objects.env_object import EnvObject
 from environment.objects.helper_functions import get_inheritence_path
-from environment.objects.simple_objects import Wall, Door, AreaTile
+from environment.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
 from environment.sim_goals.sim_goal import LimitedTimeGoal
 from scenario_manager.helper_functions import get_default_value, _get_line_coords
 
@@ -496,6 +496,42 @@ class WorldFactory:
                             f" than 0.")
 
         # Get all locations in the rectangle
+        locs = self.__list_area_locs(top_left_location, width, height)
+
+        # Add all area objects
+        self.add_multiple_objects(locations=locs, callable_classes=AreaTile,
+                                  customizable_properties=customizable_properties, visualize_colours=visualize_colour,
+                                  visualize_opacities=visualize_opacity, **custom_properties)
+
+
+    def add_smoke_area(self, top_left_location, width, height, name, visualize_colour=None,
+                 avg_visualize_opacity=0.5, visualize_depth=None, **custom_properties):
+        # Check if width and height are large enough to make an actual room (with content)
+        if width < 1 or height < 1:
+            raise Exception(f"While adding area {name}; The width {width} and/or height {height} should both be larger"
+                            f" than 0.")
+
+        # Get all locations in the rectangle
+        locs = self.__list_area_locs(top_left_location, width, height)
+
+        # get the opacities from a normal distribution for the smoke opacities
+        opacities = np.random.normal(loc=avg_visualize_opacity, scale=0.4, size=len(locs))
+        # make sure it is between 0.0 and 1.0
+        opacities = np.clip(opacities, a_min=0.0, a_max=1.0)
+
+        # create smokeTiles for every location in the smokey / foggy area
+        for i, loc in enumerate(locs):
+            self.add_env_object(location=loc, name=name, callable_class=SmokeTile, visualize_colour=visualize_colour, visualize_opacity=opacities[i], visualize_depth=visualize_depth)
+
+
+
+    def __list_area_locs(self, top_left_location, width, height):
+        """
+        Provided an area with the top_left_location, width and height,
+        generate a list containing all coordinates in that area
+        """
+
+        # Get all locations in the rectangle
         locs = []
         min_x = top_left_location[0]
         max_x = top_left_location[0] + width
@@ -506,10 +542,8 @@ class WorldFactory:
             for y in range(min_y, max_y):
                 locs.append((x, y))
 
-        # Add all area objects
-        self.add_multiple_objects(locations=locs, callable_classes=AreaTile,
-                                  customizable_properties=customizable_properties, visualize_colours=visualize_colour,
-                                  visualize_opacities=visualize_opacity, **custom_properties)
+        return locs
+
 
     def add_line(self, start, end, name, callable_class=None, customizable_properties=None,
                  is_traversable=None, is_movable=None,

@@ -95,7 +95,7 @@ class Wall(EnvObject):
 
 class AreaTile(EnvObject):
 
-    def __init__(self, location, name="AreaTile", visualize_colour="#8ca58c"):
+    def __init__(self, location, name="AreaTile", visualize_colour="#8ca58c", visualize_depth=None, visualize_opacity=1.0):
         """
         A simple AreaTile object. Is always traversable, not movable, the colour can be set but has otherwise the default EnvObject
         property values. Can be used to define different areas in the GridWorld.
@@ -103,24 +103,22 @@ class AreaTile(EnvObject):
         :param name: The name, default "AreaTile".
         :param visualize_colour: hex colour code for tile
         """
-
-        is_traversable = True  # Areas are always traversables
         super().__init__(name=name, location=location, visualize_colour=visualize_colour,
-                         is_traversable=is_traversable, is_movable=False, class_callable=AreaTile, visualize_depth=0)
+                         is_traversable=True, is_movable=False, class_callable=AreaTile,
+                         visualize_depth=visualize_depth, visualize_opacity=visualize_opacity)
 
 
-class FogTile(EnvObject):
-    def __init__(self, location, name="FogTile", visualize_colour="#b7b7b7", visualize_opacity=0.5, visualize_depth=99):
+class SmokeTile(AreaTile):
+    def __init__(self, location, name="SmokeTile", visualize_colour="#b7b7b7", visualize_opacity=0.8, visualize_depth=101):
         """
-        An object representing one tile of fog. Is always traversable, not movable,
+        An object representing one tile of smoke. Is always traversable, not movable,
         and square shaped. Can be transparent.
         :param location: The location of the area.
-        :param name: The name, default "FogTile".
+        :param name: The name, default "SmokeTile".
         :param visualize_colour: hex colour code for tile. default is grey.
-        :param visualize_opacity: Opacity of the object. By default 0.5
-        :param visualize_depth: depth of visualization. By default 99: just below agent but above other objects
+        :param visualize_opacity: Opacity of the object. By default 0.8
+        :param visualize_depth: depth of visualization. By default 101: just above agent and other objects
         """
-
+        visualize_depth = 101 if visualize_depth is None else visualize_depth
         super().__init__(name=name, location=location, visualize_colour=visualize_colour,
-                        visualize_shape=0, visualize_opacity=visualize_opacity, is_traversable=True,
-                        is_movable=False, class_callable=FogTile, visualize_depth=visualize_depth)
+                        visualize_opacity=visualize_opacity, visualize_depth=visualize_depth)

@@ -387,9 +387,9 @@ def is_drop_poss(grid_world, env_obj, dropLocation):
     objs_at_loc = grid_world.get_objects_in_range(dropLocation, object_type="*", sense_range=0)
 
     # Remove area objects from the list
-    for i in range(len(objs_at_loc),0):
-        if isinstance(objs_at_loc[i], AreaTile):
-            del objs_at_loc[i]
+    for key in list(objs_at_loc.keys()):
+        if AreaTile.__name__ in objs_at_loc[key].class_inheritance:
+            objs_at_loc.pop(key)
 
     in_trav_objs_count = 1 if not env_obj.is_traversable else 0
     in_trav_objs_count += len([obj for obj in objs_at_loc if not objs_at_loc[obj].is_traversable])

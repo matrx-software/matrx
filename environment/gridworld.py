@@ -7,6 +7,7 @@ from agents.agent import Agent
 from environment.actions.object_actions import *
 from environment.helper_functions import get_all_classes
 from environment.objects.env_object import *
+from environment.objects.simple_objects import AreaTile
 from visualization.visualizer import Visualizer
 
 
@@ -112,6 +113,11 @@ class GridWorld:
 
         # get the objects at the target object location
         objs_at_loc = self.get_objects_in_range(obj_loc, "*", 0)
+
+        # filter out areaTiles, which don't count
+        for key in list(objs_at_loc.keys()):
+            if AreaTile.__name__ in objs_at_loc[key].class_inheritance:
+                objs_at_loc.pop(key)
 
         # check how many of these objects are intraversable
         intraversable_objs = []
