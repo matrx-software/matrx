@@ -16,21 +16,21 @@ class Visualizer():
     simulation iteration, and sending these to the Flask webserver via an API where they are visualized.
     '''
 
-    def __init__(self, grid_size):
+    def __init__(self, grid_size, vis_bg_clr):
         self.agent_states = {}
         self.hu_ag_states = {}
         self.god_state = {}
         self.verbose = False
         self.userinputs = {}
 
-        self.__initGUI(grid_size=grid_size)
+        self.__initGUI(grid_size=grid_size, vis_bg_clr=vis_bg_clr)
 
 
-    def __initGUI(self, grid_size):
+    def __initGUI(self, grid_size, vis_bg_clr):
         """
         Send an initialization message to the GUI webserver, which sends the grid_size.
         """
-        data = {'params': {'grid_size': grid_size}}
+        data = {'params': {'grid_size': grid_size, 'vis_bg_clr': vis_bg_clr}}
 
         url = 'http://localhost:3000/init'
 

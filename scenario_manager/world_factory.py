@@ -51,7 +51,7 @@ import visualization
 class WorldFactory:
 
     def __init__(self, shape, tick_duration, random_seed=1, simulation_goal=1000, run_sail_api=True,
-                 run_visualization_server=True):
+                 run_visualization_server=True, visualization_bg_clr="#C2C2C2"):
         """
         Create a WorldFactory who stores how you want the world to look like, and from which you can obtain infinite
         instantions of that world.
@@ -78,7 +78,8 @@ class WorldFactory:
                                                         tick_duration=tick_duration,
                                                         simulation_goal=simulation_goal,
                                                         run_sail_api=run_sail_api,
-                                                        run_visualization_server=run_visualization_server)
+                                                        run_visualization_server=run_visualization_server,
+                                                        visualization_bg_clr=visualization_bg_clr)
         # Keep track of the number of worlds we created
         self.worlds_created = 0
 
@@ -105,7 +106,7 @@ class WorldFactory:
         return world
 
     def __set_world_settings(self, shape, tick_duration, simulation_goal, run_sail_api=True,
-                             run_visualization_server=True, rnd_seed=None):
+                             run_visualization_server=True, rnd_seed=None, visualization_bg_clr="#C2C2C2"):
 
         if rnd_seed is None:
             rnd_seed = self.rng.randint(0, 1000000)
@@ -115,7 +116,8 @@ class WorldFactory:
                           "simulation_goal": simulation_goal,
                           "run_sail_api": run_sail_api,
                           "run_visualization_server": run_visualization_server,
-                          "rnd_seed": rnd_seed}
+                          "rnd_seed": rnd_seed,
+                          "visualization_bg_clr": visualization_bg_clr}
 
         return world_settings
 

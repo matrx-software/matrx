@@ -22,7 +22,9 @@ socketio = SocketIO(app)
 
 debug = False
 
+# overwritten by settings from simulator
 grid_sz = [4, 4]
+vis_bg_clr = "#C2C2C2"
 
 # can't be None, otherwise Flask flips out when returning it
 userinput = {}
@@ -40,10 +42,11 @@ def init_GUI():
     # pass testbed init to clients / GUIs
     data = request.json
 
-    global grid_sz
+    global grid_sz, vis_bg_clr
     grid_sz = data["params"]["grid_size"]
+    vis_bg_clr = data["params"]["vis_bg_clr"]
 
-    print("Testbed GUI intialization received. Grid size:", grid_sz)
+    print("Testbed GUI intialization received. Grid size:", grid_sz , " Visualization BG colour:", vis_bg_clr)
 
     return ""
 
@@ -65,20 +68,20 @@ def update_GUI():
     tick = data['tick']
 
     # send update to god
-    new_data = {'params': {"grid_size": grid_sz, "tick": tick}, 'state': god}
+    new_data = {'params': {"grid_size": grid_sz, "tick": tick, "vis_bg_clr": vis_bg_clr}, 'state': god}
     socketio.emit('update', new_data, namespace="/god")
 
 
     # send updates to agents
     for agent_id in agent_states:
-        new_data = {'params': {"grid_size": grid_sz, "tick": tick}, 'state': agent_states[agent_id]}
+        new_data = {'params': {"grid_size": grid_sz, "tick": tick, "vis_bg_clr": vis_bg_clr}, 'state': agent_states[agent_id]}
         room = f"/agent/{agent_id.lower()}"
         # print(f"Sending to agent {agent_id} {room}")
         socketio.emit('update', new_data, room=room, namespace="/agent")
 
     # send updates to human agents
     for hu_ag_id in hu_ag_states:
-        new_data = {'params': {"grid_size": grid_sz, "tick": tick}, 'state': hu_ag_states[hu_ag_id]}
+        new_data = {'params': {"grid_size": grid_sz, "tick": tick, "vis_bg_clr": vis_bg_clr}, 'state': hu_ag_states[hu_ag_id]}
         room = f"/humanagent/{hu_ag_id.lower()}"
         # print(f"Sending to human agent {hu_ag_id} {room}")
         socketio.emit('update', new_data, room=room, namespace="/humanagent")

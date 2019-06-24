@@ -13,7 +13,7 @@ from visualization.visualizer import Visualizer
 class GridWorld:
 
     def __init__(self, shape, tick_duration, simulation_goal, run_sail_api=True, run_visualization_server=True,
-                 rnd_seed=1):
+                 rnd_seed=1, visualization_bg_clr="#C2C2C2"):
         self.tick_duration = tick_duration
         self.registered_agents = OrderedDict()
         self.environment_objects = OrderedDict()
@@ -35,6 +35,7 @@ class GridWorld:
         self.visualizer = None
         self.is_initialized = False
         self.message_buffer = {} # dictionary of messages that need to be send to agents, with receiver ids as keys
+        self.visualization_bg_clr = visualization_bg_clr
 
     def initialize(self):
         # Only initialize when we did not already do so
@@ -43,7 +44,7 @@ class GridWorld:
             self.__update_grid()
 
             # Initialize the visualizer
-            self.visualizer = Visualizer(self.shape)
+            self.visualizer = Visualizer(self.shape, self.visualization_bg_clr)
 
             # Visualize already
             self.__initial_visualisation()

@@ -128,7 +128,7 @@ function updateGridSize(grid_size) {
 /**
  * called when a new tick is received by the agent
  */
-function doTick(grid_size, state, curr_tick) {
+function doTick(grid_size, state, curr_tick, vis_bg_clr) {
     // for the first time drawing the visualization, calculate the optimal
     // screen size based on the grid size
     if (firstDraw) {
@@ -146,6 +146,7 @@ function doTick(grid_size, state, curr_tick) {
     // the tracked objects from last iteration are moved to a seperate list
     prevAnimatedObjects = animatedObjects;
     animatedObjects = {};
+    bgTileColour = vis_bg_clr;
 
     // console.log("Received state:", state);
 

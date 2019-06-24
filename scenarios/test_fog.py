@@ -7,13 +7,13 @@ from environment.objects.simple_objects import *
 
 
 def create_factory():
-    factory = WorldFactory(random_seed=1, shape=[10, 10], tick_duration=0.2, simulation_goal=5000)
+    factory = WorldFactory(random_seed=1, shape=[10, 10], tick_duration=0.2, simulation_goal=5000, visualization_bg_clr="#6d1010")
 
     # random_prop = RandomProperty(values=["One", "Two"], distribution=[3, 1])
     # factory.add_env_object(location=[0, 0], name="Wall 1", random_prop=random_prop)
 
-    # agent = Agent()
-    # factory.add_agent(location=[1, 1], agent=agent, visualize_depth=5)
+    agent = Agent()
+    factory.add_agent(location=[1, 1], agent=agent, visualize_depth=5)
 
     # usr input action map for human agent
     usrinp_action_map = {
