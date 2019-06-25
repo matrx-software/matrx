@@ -4,3 +4,5 @@ Flask-SocketIO>=3.3.2
 numpy>=1.15.4
 requests>=2.21.0
 shapely>=1.6.4
+noise>=1.2.2
+colour>=0.1.5

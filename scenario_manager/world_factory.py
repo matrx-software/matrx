@@ -4,6 +4,7 @@ import sys
 import warnings
 from collections import OrderedDict
 from typing import Callable
+from noise import snoise2
 
 import numpy as np
 from numpy.random.mtrand import RandomState
@@ -505,23 +506,34 @@ class WorldFactory:
 
 
     def add_smoke_area(self, top_left_location, width, height, name, visualize_colour=None,
-                 avg_visualize_opacity=0.5, visualize_depth=None, **custom_properties):
+                 smoke_thickness_multiplier=1.0, visualize_depth=None, **custom_properties):
         # Check if width and height are large enough to make an actual room (with content)
         if width < 1 or height < 1:
             raise Exception(f"While adding area {name}; The width {width} and/or height {height} should both be larger"
                             f" than 0.")
 
+        # See https://www.redblobgames.com/maps/terrain-from-noise/#elevation
+        octaves = 8 # small noiseyness
+        freq = 5 # large noiseyness
+
         # Get all locations in the rectangle
-        locs = self.__list_area_locs(top_left_location, width, height)
+        min_x = top_left_location[0]
+        max_x = top_left_location[0] + width
+        min_y = top_left_location[1]
+        max_y = top_left_location[1] + height
 
-        # get the opacities from a normal distribution for the smoke opacities
-        opacities = np.random.normal(loc=avg_visualize_opacity, scale=0.4, size=len(locs))
-        # make sure it is between 0.0 and 1.0
-        opacities = np.clip(opacities, a_min=0.0, a_max=1.0)
+        for x in range(min_x, max_x):
+            for y in range(min_y, max_y):
+                # get noise point
+                noise = snoise2(x / freq, y / freq, octaves)
 
-        # create smokeTiles for every location in the smokey / foggy area
-        for i, loc in enumerate(locs):
-            self.add_env_object(location=loc, name=name, callable_class=SmokeTile, visualize_colour=visualize_colour, visualize_opacity=opacities[i], visualize_depth=visualize_depth)
+                # convert from [-1,1] range to [0,1] range, and flip
+                opacity = 1 - ((noise + 1.0) / 2.0)
+                opacity = np.clip(opacity * smoke_thickness_multiplier, 0, 1)
+
+                # add the smokeTile
+                self.add_env_object(location=[x,y], name=name, callable_class=SmokeTile, visualize_colour=visualize_colour, visualize_opacity=opacity, visualize_depth=visualize_depth)
+
 
 
 

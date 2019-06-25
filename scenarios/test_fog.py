@@ -37,9 +37,7 @@ def create_factory():
     factory.add_env_object(location=[8,0], name="area1", callable_class=AreaTile, is_movable=False)
 
     # fog test
-    # factory.add_env_object(location=[9,0], name="fog", callable_class=SmokeTile, visualize_opacity=0.8, visualize_depth=101)
-
-    factory.add_smoke_area(top_left_location=[3,1], name="fog", width=6, height=8, avg_visualize_opacity=0.7, visualize_depth=101)
+    factory.add_smoke_area(top_left_location=[3,1], name="fog", width=6, height=8, smoke_thickness_multiplier=1.5, visualize_depth=101)
 
     factory.add_line(start=(4, 4), end=(6, 9), name="Line", is_movable=True)
     factory.add_room(top_left_location=(0, 0), width=3, height=3, name="room 1", door_locations=[(2, 1), (1, 2)],
