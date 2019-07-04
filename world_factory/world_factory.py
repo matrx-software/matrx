@@ -795,9 +795,9 @@ class WorldFactory:
                 'class_callable': agent.__class__,
                 'callback_agent_get_action': agent.get_action,
                 'callback_agent_set_action_result': agent.set_action_result,
-                'callback_agent_observe': agent.ooda_observe,
+                'callback_agent_observe': agent.filter_observations,
                 'callback_agent_get_messages': agent.get_messages,
-                'callback_agent_set_messages': agent.set_messages,
+                'callback_agent_set_messages': agent._set_messages,
                 'customizable_properties': customizable_props,
                 **custom_props}
 

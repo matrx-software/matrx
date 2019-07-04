@@ -1,8 +1,6 @@
-import numpy as np
-
-from environment.actions.object_actions import RemoveObject
-from environment.actions.object_actions import GrabAction
 from environment.actions.door_actions import *
+from environment.actions.object_actions import GrabAction
+from environment.actions.object_actions import RemoveObject
 
 
 class Agent:
@@ -11,14 +9,6 @@ class Agent:
         """
         Creates an Agent. All other agents should inherit from this class if you want smarter agents. This agent
         simply randomly selects an action from the possible actions it can do.
-        :param action_set: The actions the agent can perform. A list of strings, with each string a class name of an
-        existing action in the package Actions.
-        :param sense_capability: A SenseCapability object; it states which object types the agent can perceive within
-        what range.
-        :param agent_properties: the properties of this agent, including location etc.
-        :param properties_agent_writable: which of the agent_properties can be changed by this agent
-        :param grid_size: The size of the grid. The agent needs to send this along with other information to the
-        webapp managing the Agent GUI
         """
 
         # Class variables for tracking the past action and its result
@@ -104,11 +94,8 @@ class Agent:
         # Process any properties of this agent which were updated in the environment as a result of
         # actions
         self.agent_properties = agent_properties
-        filtered_state = self.ooda_observe(state)
-        filtered_state = self.ooda_orient(filtered_state)
-        action, action_kwargs = self.ooda_decide(filtered_state, possible_actions)
-        action, action_kwargs = self.ooda_act(action, action_kwargs)
-
+        filtered_state = self.filter_observations(state)
+        action, action_kwargs = self.decide_on_action(filtered_state, possible_actions)
         self.previous_action = action
         return filtered_state, self.agent_properties, action, action_kwargs
 
@@ -177,7 +164,7 @@ class Agent:
 
         return messages
 
-    def set_messages(self, messages):
+    def _set_messages(self, messages):
         """
         This method is called by the GridWorld.
         It sets all messages intended for this agent to a list that it can access and read.
@@ -195,17 +182,14 @@ class Agent:
             # Add the message object to the received messages
             self.received_messages.append(message_object)
 
-    def ooda_observe(self, state):
+    def filter_observations(self, state):
         """
-        All our agent work through the OODA-loop paradigm; first you observe, then you orient/pre-process, followed by
-        a decision process of an action after which we act upon the action.
+        In this method you filter the state to only those properties and objects the agent is actually SUPPOSED to see.
+        Since the grid world returns ALL properties of ALL objects within a certain range(s), but perhaps some objects
+        are obscured because they are behind walls, or an agent is not able to see some properties an certain objects.
 
-        This is the Observe phase. In this phase you filter the state further to only those properties the agent is
-        actually SUPPOSED to see. Since the grid world returns ALL properties of ALL objects within a certain range(s),
-        but perhaps some objects are obscured because they are behind walls, or an agent is not able to see some
-        properties an certain objects.
-
-        This filtering is what you do here.
+        This method is separated from the decide_on_action() method because it is also used by the GridWorld to make
+        sure all UI's
 
         :param state: A state description containing all properties of EnvObject that are within a certain range as
         defined by self.sense_capability. It is a list of properties in a dictionary
@@ -213,32 +197,15 @@ class Agent:
         """
         return state
 
-    def ooda_orient(self, state):
+    def decide_on_action(self, state, possible_actions):
         """
-        All our agent work through the OODA-loop paradigm; first you observe, then you orient/pre-process, followed by
-        a decision process of an action after which we act upon the action.
+        In this method you compute your action.
 
-        This is the Orient phase. In this phase you can pre-process the state further. For example you can transform it
-        in your desired state represantion, or add other knowledge to it you infer from all what is already in the
-        state.
-
-        :param state: A state description containing all properties of EnvObject that are within a certain range as
-        defined by self.sense_capability. It is a list of properties in a dictionary
-        :return: A filtered state.
-        """
-        return state
-
-    def ooda_decide(self, state, possible_actions):
-        """
-        All our agent work through the OODA-loop paradigm; first you observe, then you orient/pre-process, followed by
-        a decision process of an action after which we act upon the action.
-
-        This is the Decide phase. In this phase you actually compute your action. For example, this default agent simply
-        randomly selects an action from the possible_actions list. However, for smarter agents you need the state
-        representation for example to know what a good action is. In addition you should also return a dictionary of
-        potential keyword arguments your intended action may require. You can set this to an empty dictionary if there
-        are none. Though if you do not provide a required keyword argument (or wronly name it), the action will through
-        an Exception and the environment will crash.
+        For example, this default agent randomly selects an action from the possible_actions list. However,
+        for smarter agents you need the state representation for example to know what a good action is. In addition
+        you should also return a dictionary of potential keyword arguments your intended action may require. You can
+        set this to an empty dictionary if there are none. Though if you do not provide a required keyword argument
+        (or wrongly name it), the action will throw an Exception and the environment will crash.
 
         :param state: A state description containing all properties of EnvObject that are within a certain range as
         defined by self.sense_capability. It is a list of properties in a dictionary
@@ -247,11 +214,10 @@ class Agent:
         self.action_set) and MAY result in a positive action result. This is not required (e.g.; a remove_object action
         might become impossible if another agent also decided to remove that object and who was a higher in the priority
         list).
-        :return: An action string of the class name of an action that is also in self.action_set (it is not required to
-        also be in possible_actions, though then the action will automatically fail.) You should also return a
-        dictionary of action arguments the world might need to perform this action. See the implementation of the action
-        to know which keyword arguments it requires. For example if you want to remove an object, you should provide
-        it object ID with a specific key (e.g. 'object_id' = some_object_id_agent_should_remove).
+        :return: An action string of the class name of an action that is also in self.action_set. You should also return
+        a dictionary of action arguments the world might need to perform this action. See the implementation of the
+        action to know which keyword arguments it requires. For example if you want to remove an object, you should
+        provide it object ID with a specific key (e.g. 'object_id' = some_object_id_agent_should_remove).
         """
 
         # Send a message to a random agent
@@ -356,22 +322,6 @@ class Agent:
                 action_kwargs['object_id'] = self.rnd_gen.choice(doors)
 
         return action, action_kwargs
-
-    def ooda_act(self, action, action_args):
-        """
-        All our agent work through the OODA-loop paradigm; first you observe, then you orient/pre-process, followed by
-        a decision process of an action after which we act upon the action.
-
-        This is the Act phase. In this phase you might perform a few things that the decided action also causes but is
-        not done in and by the grid world itself. For example changing the battery level property of this agent.
-
-        :param action: The decided action that may have additional consequences that are not performed by and in the
-        grid world.
-        :param action_args: The arguments for the selected action.
-        :return: The decided action.
-        """
-        print(action)
-        return action, action_args
 
 
 class Message:

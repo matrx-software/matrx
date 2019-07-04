@@ -23,7 +23,7 @@ def load_defaults():
     # Find the testbed's root path (searches through all the file's parents until the folder testbed is reached)
     root_path = None
     for parent in reversed(list(Path(__file__).parents)):
-        if "world_factory" in str(parent):
+        if "matrxs" in str(parent):
             root_path = parent
             break
 

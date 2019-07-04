@@ -90,7 +90,7 @@ class HumanAgent(Agent):
         self.agent_properties = agent_properties
 
         # first filter the state to only show things this particular agent can see
-        state = self.ooda_observe(state)
+        state = self.filter_observations(state)
 
         # only keep userinput which is actually connected to an agent action
         userinput = self.filter_userinputs(userinput)
@@ -161,7 +161,7 @@ class HumanAgent(Agent):
         # otherwise check which action is mapped to that key and return it
         return state, self.agent_properties, action, action_kwargs
 
-    def ooda_observe(self, state):
+    def filter_observations(self, state):
         """
         All our agent work through the OODA-loop paradigm; first you observe, then you orient/pre-process, followed by
         a decision process of an action after which we act upon the action.

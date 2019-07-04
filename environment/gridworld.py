@@ -155,7 +155,7 @@ class GridWorld:
             # go to the next agent, if this agent is still busy performing an action
             if agent_obj.check_agent_busy(curr_tick=self.current_nr_ticks):
                 # only do the observe and orient of the OODA loop to update the GUI
-                filtered_agent_state = agent_obj.ooda_observe(state)
+                filtered_agent_state = agent_obj.filter_observations(state)
                 self.visualizer.save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
                                            state=filtered_agent_state)
                 continue
@@ -542,7 +542,7 @@ class GridWorld:
             # Get the state
             state = self.__get_agent_state(agent_obj)
             # only do the observe and orient of the OODA loop to update the GUI
-            filtered_agent_state = agent_obj.ooda_observe(state)
+            filtered_agent_state = agent_obj.filter_observations(state)
             # Save the state
             self.visualizer.save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
                                        state=filtered_agent_state)
