@@ -18,7 +18,7 @@ from environment.objects.env_object import EnvObject
 from environment.objects.helper_functions import get_inheritence_path
 from environment.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
 from environment.sim_goals.sim_goal import LimitedTimeGoal
-from scenario_manager.helper_functions import get_default_value, _get_line_coords
+from world_factory.helper_functions import get_default_value, _get_line_coords
 
 ######
 # We do this so we are sure everything is imported and thus can be found
@@ -41,7 +41,7 @@ import environment.actions.object_actions
 # noinspection PyUnresolvedReferences
 import environment.actions.move_actions
 # noinspection PyUnresolvedReferences
-import scenario_manager
+import world_factory
 # noinspection PyUnresolvedReferences
 import visualization
 

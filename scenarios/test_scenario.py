@@ -1,16 +1,16 @@
 from agents.agent import Agent
-from agents.human_agent import HumanAgent
-from scenario_manager.world_factory import RandomProperty, WorldFactory
+from world_factory.world_factory import RandomProperty, WorldFactory
 
 
 def create_factory():
     factory = WorldFactory(random_seed=1, shape=[10, 10], tick_duration=0.5)
 
-    random_prop = RandomProperty(property_name="random_prop", values=["One", "Two"], distribution=[3, 1])
+    random_prop = RandomProperty(values=["One", "Two"], distribution=[3, 1])
     factory.add_env_object(location=[0, 0], name="Wall 1", random_prop=random_prop)
 
     # Obj for testing visualization depth, this block should be in front
-    factory.add_env_object(location=[3,3], is_movable=False, is_traversable=True, visualize_shape=0, visualize_colour="#000000", name="overlaying_block", visualize_depth=3)
+    factory.add_env_object(location=[3, 3], is_movable=False, is_traversable=True, visualize_shape=0,
+                           visualize_colour="#000000", name="overlaying_block", visualize_depth=3)
 
     agent = Agent()
     factory.add_agent(location=[1, 0], agent=agent, visualize_depth=5)

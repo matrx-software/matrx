@@ -2,7 +2,7 @@ import inspect
 import warnings
 
 from environment.objects.helper_functions import *
-from scenario_manager.helper_functions import get_default_value
+from world_factory.helper_functions import get_default_value
 
 
 class EnvObject:
