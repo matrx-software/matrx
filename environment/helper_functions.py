@@ -5,7 +5,7 @@ def get_all_classes(class_, omit_super_class=False):
     if omit_super_class:
         subclasses = set()
     else:
-        subclasses = set(class_)
+        subclasses = set([class_])
 
     # Go through all child classes
     work = [class_]

@@ -44,8 +44,6 @@ import environment.actions.move_actions
 import world_factory
 # noinspection PyUnresolvedReferences
 import visualization
-
-
 ######
 
 
