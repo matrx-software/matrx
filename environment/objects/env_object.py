@@ -140,8 +140,6 @@ class EnvObject:
         :return: The new properties.
         """
 
-        pass  # Implement this
-
         # Make sure that you return properties, and not simply return custom_properties as you will miss all mandatory
         # properties in that case.
         return self.properties

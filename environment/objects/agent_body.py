@@ -4,7 +4,7 @@ from environment.helper_functions import get_all_classes
 from environment.objects.env_object import EnvObject
 
 
-class AgentAvatar(EnvObject):
+class AgentBody(EnvObject):
 
     def __init__(self, location, possible_actions, sense_capability, class_callable,
                  callback_agent_get_action, callback_agent_set_action_result, callback_agent_observe,
@@ -14,29 +14,30 @@ class AgentAvatar(EnvObject):
                  is_human_agent, customizable_properties,
                  **custom_properties):
         """
-        This class is a representation of an agent in the GridWorld.
-        It is used as a measure to keep the real Agent code and Environment code separate. This AgentAvatar is used by
-        the environment to update the GUI, perform actions, and update properties. It is kept in sync with the real
-        Agent object every iteration.
+        This class is a representation of an agent's body in the GridWorld.
+
+        It is used as a measure to keep the AgentBrain code and Environment code separate. This AgentBody is used by
+        the environment to update the GUI, perform actions, and update properties. It is kept in sync with the Agent's
+        brain every iteration.
 
         It inherits from EnvObject which allows you set any custom properties you want. In addition it also has all the
         mandatory properties of an EnvObject plus a few extra. Which is the team name the agent is part of (if any) and
-        what the avatar is carrying.
+        what the Agent's body is carrying.
 
-        In addition the avatar keeps a set of callbacks to methods inside the Agent. This forms the connection between
-        the GridWorld (that calls them) and the Agent (that defined them).
+        In addition the Agent's body keeps a set of callbacks to methods inside the Agent. This forms the connection
+        between the GridWorld (that calls them) and the Agent (that defined them).
 
-        :param location: List or tuple of length two. Mandatory. The location of the AgentAvatar in the grid world.
+        :param location: List or tuple of length two. Mandatory. The location of the Agent's body in the grid world.
         :param possible_actions: The list of Action class names this agent may be able to perform. This allows you to
         create agents that can only perform a couple of the available actions.
         :param sense_capability: The SenseCapability object.
         :param class_callable: The Agent class; in other words, the class of the agent's brain. This is stored here so
-        that the Visualizer (which visualizes an agent based on this avatar object) and agents knows what kind of agent
+        that the Visualizer (which visualizes an agent based on this Agent's body object) and agents knows what kind of agent
         it is. Allows you to visualize certain agent types in a certain way.
 
         :param callback_agent_get_action: The callback function as defined by the Agent instance of which this is an
-        AgentAvatar of. It is called each tick by the GridWorld. As such the GridWorld determines when the Agent can
-        perform an action by calling this function which is stored in the Agent's AgentAvatar.
+        Agent's body of. It is called each tick by the GridWorld. As such the GridWorld determines when the Agent can
+        perform an action by calling this function which is stored in the Agent's Agent's body.
         :param callback_agent_set_action_result: Same as the callback_get_action but is used by GridWorld to set the
         ActionResult object in the Agent after performing the action. This allows the Agent to know how its planned
         action went.
@@ -51,15 +52,15 @@ class AgentAvatar(EnvObject):
         some agent to a list of received messages in an agent.
 
         :param name: String Defaults to "Agent". The name of the agent, does not need to be unique.
-        :param is_human_agent: Boolean. Defaults to False. Boolean to signal that the agent represented by this avatar
-        is a human controlled agent.
+        :param is_human_agent: Boolean. Defaults to False. Boolean to signal that the agent represented by this Agent's
+        body is a human controlled agent.
         :param customizable_properties: List. Optional, default obtained from defaults.json. The list of attribute names
-        that can be customized by other objects (including AgentAvatars and as an extension any Agent).
+        that can be customized by other objects (including Agent's body and as an extension any Agent).
         :param is_traversable: Boolean. Optional, default obtained from defaults.json. Signals whether other objects can
         be placed on top of this object.
         :param carried_by: List. Optional, default obtained from defaults.json. A list of who is carrying this object.
-        :param team: The team name the agent is part of. Defaults to the team name similar to the AgentAvatars unique
-        ID, as such denoting that by default each AgentAvatar belongs to its own team and as an extension so does its
+        :param team: The team name the agent is part of. Defaults to the team name similar to the Agent's body unique
+        ID, as such denoting that by default each Agent's body belongs to its own team and as an extension so does its
         "brain" the Agent.
         :param agent_speed_in_ticks: Integer. Optional, default obtained from defaults.json. Denotes the speed with
         which the agent can perform actions. For example, a speed of 5 would mean that it can perform an action every 5
@@ -80,15 +81,15 @@ class AgentAvatar(EnvObject):
         For example the property 'heat'=2.4 of an EnvObject representing a fire.
         """
 
-        # A list of EnvObjects or any class that inherits from it. Denotes all objects the AgentAvatar is currently
+        # A list of EnvObjects or any class that inherits from it. Denotes all objects the Agent's body is currently
         # carrying. Note that these objects do not exist on the WorldGrid anymore, so removing them in this list deletes
         # them permanently.
         self.is_carrying = []  # list of EnvObjects that this object carries
 
-        # The property that signals whether the agent this avatar represents is a human agent
+        # The property that signals whether the agent this Agent's body represents is a human agent
         self.is_human_agent = is_human_agent
 
-        # Save the other attributes the GridWorld expects an AgentAvatar to have to access an Agent
+        # Save the other attributes the GridWorld expects an Agent's body to have access to an Agent's brain
         self.get_action_func = callback_agent_get_action
         self.set_action_result_func = callback_agent_set_action_result
         self.ooda_observe = callback_agent_observe
@@ -131,22 +132,21 @@ class AgentAvatar(EnvObject):
                          visualize_colour=visualize_colour, visualize_depth=visualize_depth, visualize_opacity=visualize_opacity,
                          **custom_properties)
 
-        # If there was no team name given, the AgentAvatar (and as an extension its Agent) is part of its own team which
-        # is simply its object id. For this we need to object id, which was made in the EnvObject constructor, that is
-        # why we call this AFTER calling that.
+        # If there was no team name given, the Agent's body (and as an extension its Agent's brain) is part of its own
+        # team which is simply its object id. For this we need to object id, which was made in the EnvObject
+        # constructor, that is why we call this AFTER calling that.
         if team is None:
             self.team = self.obj_id
         self.change_property("team", self.team)
 
-
-    def set_agent_busy(self, curr_tick, action_duration):
+    def _set_agent_busy(self, curr_tick, action_duration):
         """
         specify the duration of the action in ticks currently being executed by the
         agent, and its starting tick
         """
         self.last_action = {"duration_in_ticks": action_duration, "tick": curr_tick}
 
-    def check_agent_busy(self, curr_tick):
+    def _check_agent_busy(self, curr_tick):
         """
         check if the agent is done with executing the action
         """
@@ -154,22 +154,22 @@ class AgentAvatar(EnvObject):
                             (curr_tick >= self.last_action["tick"] + self.properties["agent_speed_in_ticks"]))
         return self.blocked
 
-    def set_agent_changed_properties(self, props: dict):
+    def _set_agent_changed_properties(self, props: dict):
         """
         The Agent has possibly changed some of its properties during its OODA loop. Here the agent properties are also
-        updated in the Agent Avatar, if it is allowed to change them as defined in 'customizable_properties' list.
+        updated in the Agent's body, if it is allowed to change them as defined in 'customizable_properties' list.
         """
-        # get all agent properties of this Agent Avatar in one dictionary
-        avatar_props = self.properties
+        # get all agent properties of this Agent's body in one dictionary
+        body_properties = self.properties
 
         # check for each property if it has been changed by the agent, and if we need
-        # to update our local copy (here in Agent Avatar) of the agent properties to match that
+        # to update our local copy (here in Agent's body) of the agent properties to match that
         for prop in props.keys():
-            if prop not in avatar_props.keys():
+            if prop not in body_properties.keys():
                 raise Exception(f"Agent {self.obj_id} tried to remove the property {prop}, which is not allowed.")
 
             # check if the property has changed, and skip if not the case
-            if props[prop] == avatar_props[prop]:
+            if props[prop] == body_properties[prop]:
                 continue
 
             # if the agent has changed the property, check if the agent has permission to do so
@@ -179,7 +179,6 @@ class AgentAvatar(EnvObject):
             # The agent changed the property and the agent had permission to do so
             # update special properties
             self.change_property(prop, props[prop])
-
 
     def change_property(self, property_name, property_value):
         """
@@ -263,17 +262,17 @@ class AgentAvatar(EnvObject):
         self.__location = loc
 
         # Carrying action is done here
-        # First we check if we even have a 'carrying' property, as the future might hold an AgentAvatar who specifically
-        # removes this property. In that case we return.
+        # First we check if we even have a 'carrying' property, as the future might hold an Agent's body who
+        # specifically removes this property. In that case we return.
         if 'carrying' not in self.properties.keys():
             return
-        # Next we retrieve whatever it is the agent avatar is carrying (if we have a 'carrying' property at all)
+        # Next we retrieve whatever it is the Agent's body is carrying (if we have a 'carrying' property at all)
         carried_objs = self.properties['carrying']
         # If we carry nothing, we are done
         if len(carried_objs) == 0:
             return
         # Otherwise we loop over all objects and adjust their location accordingly (since these are also EnvObjects,
-        # their setter for location gets called, in the case we are carrying an AgentAvatar this setter is called
+        # their setter for location gets called, in the case we are carrying an Agent's body this setter is called
         for obj in carried_objs:
             obj.location = loc  # this requires all objects in self.properties['carrying'] to be of type EnvObject
 

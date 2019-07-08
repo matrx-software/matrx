@@ -1,9 +1,9 @@
 from environment.actions.action import Action, ActionResult
-from environment.objects.agent_avatar import AgentAvatar
+from environment.objects.agent_body import AgentBody
 
 
 def act_move(grid_world, agent_id, dx, dy):
-    agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentAvatar)
+    agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentBody)
     loc = agent_avatar.location
     new_loc = [loc[0] + dx, loc[1] + dy]
     grid_world.registered_agents[agent_id].location = new_loc
@@ -17,7 +17,7 @@ def is_possible_movement(grid_world, agent_id, dx, dy):
 
 def possible_movement(grid_world, agent_id, dx, dy):
 
-    agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentAvatar)
+    agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentBody)
     assert agent_avatar is not None
 
     loc = agent_avatar.location

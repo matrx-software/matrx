@@ -9,11 +9,11 @@ from noise import snoise2
 import numpy as np
 from numpy.random.mtrand import RandomState
 
-from agents.agent import Agent
+from agents.agent_brain import AgentBrain
 from agents.capabilities.capability import SenseCapability
-from agents.human_agent import HumanAgent
+from agents.human_agent_brain import HumanAgentBrain
 from environment.gridworld import GridWorld
-from environment.objects.agent_avatar import AgentAvatar
+from environment.objects.agent_body import AgentBody
 from environment.objects.env_object import EnvObject
 from environment.objects.helper_functions import get_inheritence_path
 from environment.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
@@ -127,7 +127,7 @@ class WorldFactory:
 
         # Check if location and agent are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
-        assert isinstance(agent, Agent)
+        assert isinstance(agent, AgentBrain)
 
         # Load the defaults for any variable that is not defined
         # Obtain any defaults from the defaults.json file if not set already.
@@ -423,7 +423,7 @@ class WorldFactory:
 
         # Check if location and agent are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
-        assert isinstance(agent, HumanAgent)
+        assert isinstance(agent, HumanAgentBrain)
 
         # Load the defaults for any variable that is not defined
         # Obtain any defaults from the defaults.json file if not set already.
@@ -691,11 +691,11 @@ class WorldFactory:
 
         # Register all objects (including checks)
         for env_object in objs:
-            world.register_env_object(env_object)
+            world._register_env_object(env_object)
 
         # Register all agents (including checks)
         for agent, agent_avatar in avatars:
-            world.register_agent(agent, agent_avatar)
+            world._register_agent(agent, agent_avatar)
 
         # Return the (successful/stable) world
         return world
@@ -791,17 +791,17 @@ class WorldFactory:
         args = {**mandatory_props,
                 'sense_capability': sense_capability,
                 'class_callable': agent.__class__,
-                'callback_agent_get_action': agent.get_action,
-                'callback_agent_set_action_result': agent.set_action_result,
+                'callback_agent_get_action': agent._get_action,
+                'callback_agent_set_action_result': agent._set_action_result,
                 'callback_agent_observe': agent.filter_observations,
-                'callback_agent_get_messages': agent.get_messages,
+                'callback_agent_get_messages': agent._get_messages,
                 'callback_agent_set_messages': agent._set_messages,
                 'customizable_properties': customizable_props,
                 **custom_props}
 
         # Parse arguments and create the AgentAvatar
         args = self.__instantiate_random_properties(args)
-        avatar = AgentAvatar(**args)
+        avatar = AgentBody(**args)
 
         # We return the agent and avatar (as we will complete the initialisation of the agent when we register it)
         return agent, avatar

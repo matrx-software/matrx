@@ -1,3 +1,5 @@
+import math
+
 
 def get_all_classes(class_, omit_super_class=False):
 
@@ -39,3 +41,9 @@ def get_all_inherited_classes(super_type):
         class_dict[classes.__name__] = classes
 
     return class_dict
+
+
+def get_distance(coord1, coord2):
+    dist = [(a - b) ** 2 for a, b in zip(coord1, coord2)]
+    dist = math.sqrt(sum(dist))
+    return dist

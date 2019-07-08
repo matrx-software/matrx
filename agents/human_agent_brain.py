@@ -2,13 +2,13 @@ import numpy as np
 import datetime
 import requests
 
-from agents.agent import Agent
+from agents.agent_brain import AgentBrain
 
 from environment.actions.object_actions import GrabAction
 from environment.actions.door_actions import *
 
 
-class HumanAgent(Agent):
+class HumanAgentBrain(AgentBrain):
 
     def __init__(self):
         """
@@ -17,8 +17,8 @@ class HumanAgent(Agent):
 
         super().__init__()
 
-    def factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
-                           customizable_properties, rnd_seed, usrinp_action_map={}):
+    def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
+                            customizable_properties, rnd_seed, usrinp_action_map=None):
         """
         Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
         properties. This also sets the random number generator with a seed generated based on the random seed of the
@@ -47,7 +47,7 @@ class HumanAgent(Agent):
 
         # Setting the random seed and rng
         self.rnd_seed = rnd_seed
-        self.set_rnd_seed(seed=rnd_seed)
+        self._set_rnd_seed(seed=rnd_seed)
 
         # The SenseCapability of the agent; what it can see and within what range
         self.sense_capability = sense_capability
@@ -62,9 +62,12 @@ class HumanAgent(Agent):
         self.keys_of_agent_writable_props = customizable_properties
 
         # a list which maps user inputs to actions, defined in the scenario manager
-        self.usrinp_action_map = usrinp_action_map
+        if usrinp_action_map is None:
+            self.usrinp_action_map = {}
+        else:
+            self.usrinp_action_map = usrinp_action_map
 
-    def get_action(self, state, agent_properties, possible_actions, agent_id, userinput):
+    def _get_action(self, state, agent_properties, possible_actions, agent_id, userinput):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
         for this agent to select an action.

@@ -1,5 +1,4 @@
 from environment.objects.env_object import EnvObject
-from world_factory.helper_functions import get_default_value
 
 
 class SquareBlock(EnvObject):

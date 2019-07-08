@@ -3,7 +3,7 @@ from environment.actions.object_actions import GrabAction
 from environment.actions.object_actions import RemoveObject
 
 
-class Agent:
+class AgentBrain:
 
     def __init__(self):
         """
@@ -30,8 +30,8 @@ class Agent:
         self.agent_properties = {}
         self.keys_of_agent_writable_props = []
 
-    def factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
-                           customizable_properties, rnd_seed):
+    def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
+                            customizable_properties, rnd_seed):
         """
         Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
         properties. This also sets the random number generator with a seed generated based on the random seed of the
@@ -59,7 +59,7 @@ class Agent:
 
         # Setting the random seed and rng
         self.rnd_seed = rnd_seed
-        self.set_rnd_seed(seed=rnd_seed)
+        self._set_rnd_seed(seed=rnd_seed)
 
         # The SenseCapability of the agent; what it can see and within what range
         self.sense_capability = sense_capability
@@ -73,7 +73,7 @@ class Agent:
         # NOTE: Changing which properties are writable cannot be done during runtime! Only in  the scenario manager
         self.keys_of_agent_writable_props = customizable_properties
 
-    def get_action(self, state, agent_properties, possible_actions, agent_id):
+    def _get_action(self, state, agent_properties, possible_actions, agent_id):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
         for this agent to select an action.
@@ -99,7 +99,7 @@ class Agent:
         self.previous_action = action
         return filtered_state, self.agent_properties, action, action_kwargs
 
-    def set_action_result(self, action_result):
+    def _set_action_result(self, action_result):
         """
         A function that the environment calls (similarly as the self.get_action method) to set the action_result of the
         action this agent decided upon. Note, that the result is given AFTER the action is performed (if possible).
@@ -114,20 +114,7 @@ class Agent:
         """
         self.previous_action_result = action_result
 
-    def get_properties(self):
-        """
-        Returns all properties you want the grid world to have access to. These are the properties that other agents
-        will receive when the observe this agent. Also, these are the properties that will be used to visualize the
-        agent.
-
-
-        :return: A dictionary of properties, generally with strings as key and native types as values though is not
-        required at all.
-        """
-
-        return self.agent_properties
-
-    def set_rnd_seed(self, seed):
+    def _set_rnd_seed(self, seed):
         """
         The function that seeds this agent's random seed.
 
@@ -139,7 +126,7 @@ class Agent:
         self.rnd_seed = seed
         self.rnd_gen = np.random.RandomState(self.rnd_seed)
 
-    def get_messages(self):
+    def _get_messages(self):
         """
         This method is called by the GridWorld.
 
@@ -224,7 +211,7 @@ class Agent:
         agents = []
         for obj_id, obj in state.items():
             classes = obj['class_inheritance']
-            if Agent.__name__ in classes:  # the object is an agent to which we can send our message
+            if AgentBrain.__name__ in classes:  # the object is an agent to which we can send our message
                 agents.append(obj)
         selected_agent = self.rnd_gen.choice(agents)
         message_content = f"Hello, my name is {self.agent_name}"

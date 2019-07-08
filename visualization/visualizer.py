@@ -3,8 +3,8 @@ import requests
 import numpy as np
 import copy
 
-from agents.agent import Agent
-from agents.human_agent import HumanAgent
+from agents.agent_brain import AgentBrain
+from agents.human_agent_brain import HumanAgentBrain
 from collections import OrderedDict
 
 
@@ -67,9 +67,9 @@ class Visualizer():
         # add state for specific entity with ID to states dict
         if isinstance(inheritance_chain, list):
             for c in inheritance_chain:
-                if c == Agent.__name__:
+                if c == AgentBrain.__name__:
                     self.agent_states[id] = GUIstate
-                elif c == HumanAgent.__name__:
+                elif c == HumanAgentBrain.__name__:
                     self.hu_ag_states[id] = GUIstate
         else:
             self.god_state = GUIstate
