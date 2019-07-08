@@ -3,7 +3,7 @@ from world_factory.world_factory import RandomProperty, WorldFactory
 
 
 def create_factory():
-    factory = WorldFactory(random_seed=1, shape=[10, 10], tick_duration=0.5)
+    factory = WorldFactory(random_seed=1, shape=[10, 10], tick_duration=0.5, verbose=True)
 
     random_prop = RandomProperty(values=["One", "Two"], distribution=[3, 1])
     factory.add_env_object(location=[0, 0], name="Wall 1", random_prop=random_prop)

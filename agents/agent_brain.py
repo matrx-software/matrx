@@ -210,6 +210,10 @@ class AgentBrain:
         # Send a message to a random agent
         agents = []
         for obj_id, obj in state.items():
+
+            if obj_id is "World":  # Skip the world properties
+                continue
+
             classes = obj['class_inheritance']
             if AgentBrain.__name__ in classes:  # the object is an agent to which we can send our message
                 agents.append(obj)

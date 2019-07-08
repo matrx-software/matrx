@@ -92,7 +92,7 @@ class AgentBody(EnvObject):
         # Save the other attributes the GridWorld expects an Agent's body to have access to an Agent's brain
         self.get_action_func = callback_agent_get_action
         self.set_action_result_func = callback_agent_set_action_result
-        self.ooda_observe = callback_agent_observe
+        self.filter_observations = callback_agent_observe
         self.get_messages_func = callback_agent_get_messages
         self.set_messages_func = callback_agent_set_messages
 

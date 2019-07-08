@@ -1,6 +1,5 @@
 import json
 import os
-from collections import Mapping, Callable
 from pathlib import Path
 
 from shapely.geometry import Polygon, Point
@@ -21,14 +20,20 @@ def get_default_value(class_name, property_name):
 
 def load_defaults():
     # Find the testbed's root path (searches through all the file's parents until the folder testbed is reached)
+    root_path = get_matrx_root()
+
+    file_path = os.path.join(root_path, "scenarios", "defaults.json")
+    return load_json(file_path)
+
+
+def get_matrx_root():
     root_path = None
     for parent in reversed(list(Path(__file__).parents)):
         if "matrxs" in str(parent):
             root_path = parent
             break
 
-    file_path = os.path.join(root_path, "scenarios", "defaults.json")
-    return load_json(file_path)
+    return root_path
 
 
 def load_scenario(scenario_file):

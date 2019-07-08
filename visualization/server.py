@@ -1,17 +1,10 @@
 from flask import Flask, request, render_template, jsonify
-from flask_socketio import SocketIO, join_room, emit
-from time import sleep, time
-import numpy as np
-import json
-import datetime
-
+from flask_socketio import SocketIO, join_room
 
 '''
 This file holds the code for the Flask (Python) webserver, which listens to grid updates
 via a restful API, and forwards these to the specific viewpoint (god, agent, human-agent).
 '''
-
-
 
 # Using PyCharm:
 # runfile('visualization/server.py')
@@ -135,9 +128,6 @@ def join(message):
     join_room(message['room'].lower())
     print("Added client to room:", message["room"].lower())
 
-
-
-
 ###############################################
 # User input handling for human agent
 ###############################################
@@ -162,13 +152,13 @@ def handle_usr_inp(input):
     if debug:
         print(f"Userinput:{userinput[id]}")
 
-
-
-@socketio.on('connect')
-def test_connect():
-    print('A client has connected')
+# @socketio.on('connect')
+# def test_connect():
+#     print('A client has connected')
 
 
 if __name__ == "__main__":
+    if debug:
+        print(f"Userinput:{userinput[id]}")
     print("Server running")
     socketio.run(app, host='0.0.0.0', port=3000)

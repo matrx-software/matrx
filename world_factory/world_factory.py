@@ -50,7 +50,7 @@ import visualization
 class WorldFactory:
 
     def __init__(self, shape, tick_duration, random_seed=1, simulation_goal=1000, run_sail_api=True,
-                 run_visualization_server=True, visualization_bg_clr="#C2C2C2"):
+                 run_visualization_server=True, visualization_bg_clr="#C2C2C2", verbose=False):
         """
         Create a WorldFactory who stores how you want the world to look like, and from which you can obtain infinite
         instantions of that world.
@@ -68,6 +68,9 @@ class WorldFactory:
         self.agent_settings = []
         self.object_settings = []
 
+        # Whether the world factory and evrything else should print stuff
+        self.verbose = verbose
+
         # If simulation goal is an integer, we create a LimitedTimeGoal with that number of ticks
         if isinstance(simulation_goal, int):
             simulation_goal = LimitedTimeGoal(max_nr_ticks=simulation_goal)
@@ -78,7 +81,9 @@ class WorldFactory:
                                                         simulation_goal=simulation_goal,
                                                         run_sail_api=run_sail_api,
                                                         run_visualization_server=run_visualization_server,
-                                                        visualization_bg_clr=visualization_bg_clr)
+                                                        visualization_bg_clr=visualization_bg_clr,
+                                                        verbose=self.verbose,
+                                                        rnd_seed=random_seed)
         # Keep track of the number of worlds we created
         self.worlds_created = 0
 
@@ -104,8 +109,8 @@ class WorldFactory:
         self.__reset_random()
         return world
 
-    def __set_world_settings(self, shape, tick_duration, simulation_goal, run_sail_api=True,
-                             run_visualization_server=True, rnd_seed=None, visualization_bg_clr="#C2C2C2"):
+    def __set_world_settings(self, shape, tick_duration, simulation_goal, run_sail_api,
+                             run_visualization_server, rnd_seed, visualization_bg_clr, verbose):
 
         if rnd_seed is None:
             rnd_seed = self.rng.randint(0, 1000000)
@@ -116,13 +121,15 @@ class WorldFactory:
                           "run_sail_api": run_sail_api,
                           "run_visualization_server": run_visualization_server,
                           "rnd_seed": rnd_seed,
-                          "visualization_bg_clr": visualization_bg_clr}
+                          "visualization_bg_clr": visualization_bg_clr,
+                          "verbose": verbose}
 
         return world_settings
 
     def add_agent(self, location, agent, name="Agent", customizable_properties=None, sense_capability=None,
                   is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None, is_movable=None,
-                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None, visualize_opacity=None,
+                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
+                  visualize_opacity=None,
                   **custom_properties):
 
         # Check if location and agent are of correct type
@@ -196,7 +203,7 @@ class WorldFactory:
                                  sense_capabilities=sense_capability, customizable_properties=customizable_properties,
                                  is_traversable=is_traversable, agent_speeds_in_ticks=agent_speed_in_ticks,
                                  teams=team_name, visualize_sizes=visualize_size, visualize_shapes=visualize_shape,
-                                 visualize_colours=visualize_colour, visualize_opacity=visualize_opacity)
+                                 visualize_colours=visualize_colour, visualize_opacities=visualize_opacity)
 
     def add_multiple_agents(self, agents, locations, custom_properties=None,
                             sense_capabilities=None, customizable_properties=None,
