@@ -13,11 +13,16 @@ def create_factory():
                            visualize_colour="#000000", name="overlaying_block", visualize_depth=3)
 
     agent = AgentBrain()
-    factory.add_agent(location=[1, 0], agent=agent, visualize_depth=5)
+    sense_capability = factory.create_sense_capability(["*"], [3])
+    factory.add_agent(location=[1, 0], agent=agent, visualize_depth=5, sense_capability=sense_capability)
 
-    agents = [AgentBrain() for _ in range(3)]
-    locs = [[1, 1], [2, 2], [3, 3]]
-    factory.add_multiple_agents(agents=agents, locations=locs)
+    agent = AgentBrain()
+    sense_capability = factory.create_sense_capability(["*"], [3])
+    factory.add_agent(location=[1, 1], agent=agent, visualize_depth=5, sense_capability=sense_capability)
+
+    # agents = [AgentBrain() for _ in range(3)]
+    # locs = [[1, 1], [2, 2], [3, 3]]
+    # factory.add_multiple_agents(agents=agents, locations=locs, sense_capabilities=sense_capability)
 
     # hu_agent = HumanAgent()
     # factory.add_human_agent(location=[4,1], agent=hu_agent)

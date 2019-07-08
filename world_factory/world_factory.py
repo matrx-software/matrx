@@ -358,11 +358,6 @@ class WorldFactory:
 
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
-        if names is None:
-            names = [None for _ in range(len(locations))]
-        elif isinstance(names, str):
-            names = [names for _ in range(len(locations))]
-
         if is_movable is None:
             is_movable = [None for _ in range(len(locations))]
         elif isinstance(is_movable, bool):
@@ -372,6 +367,11 @@ class WorldFactory:
             callable_classes = [EnvObject for _ in range(len(locations))]
         elif isinstance(callable_classes, Callable):
             callable_classes = [callable_classes for _ in range(len(locations))]
+
+        if names is None:
+            names = [callable_class.__name__ for callable_class in callable_classes]
+        elif isinstance(names, str):
+            names = [names for _ in range(len(locations))]
 
         if custom_properties is None:
             custom_properties = [{} for _ in range(len(locations))]

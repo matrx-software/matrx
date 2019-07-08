@@ -1,3 +1,4 @@
+from agents.utils.state_tracker import StateTracker
 from environment.actions.door_actions import *
 from environment.actions.object_actions import GrabAction
 from environment.actions.object_actions import RemoveObject
@@ -30,145 +31,6 @@ class AgentBrain:
         self.agent_properties = {}
         self.keys_of_agent_writable_props = []
 
-    def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
-                            customizable_properties, rnd_seed):
-        """
-        Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
-        properties. This also sets the random number generator with a seed generated based on the random seed of the
-        world that is generated.
-
-        Note; This method should NOT be overridden!
-
-        :param agent_name: The name of the agent.
-        :param agent_id: The unique ID given by the world to this agent's avatar. So the agent knows what body is his.
-        :param action_set: The list of action names this agent is allowed to perform.
-        :param sense_capability: The SenseCapability of the agent denoting what it can see withing what range.
-        :param agent_properties: The dictionary of properties containing all mandatory and custom properties.
-        :param customizable_properties: A list of keys in agent_properties that this agent is allowed to change.
-        :param rnd_seed: The random seed used to set the random number generator self.rng
-        """
-
-        # The name of the agent with which it is also known in the world
-        self.agent_name = agent_name
-
-        # The id of the agent
-        self.agent_id = agent_id
-
-        # The names of the actions this agent is allowed to perform
-        self.action_set = action_set
-
-        # Setting the random seed and rng
-        self.rnd_seed = rnd_seed
-        self._set_rnd_seed(seed=rnd_seed)
-
-        # The SenseCapability of the agent; what it can see and within what range
-        self.sense_capability = sense_capability
-
-        # Contains the agent_properties
-        self.agent_properties = agent_properties
-
-        # Specifies the keys of properties in self.agent_properties which can  be changed by this Agent in this file. If
-        # it is not writable, it can only be  updated through performing an action which updates that property (done by
-        # the environment).
-        # NOTE: Changing which properties are writable cannot be done during runtime! Only in  the scenario manager
-        self.keys_of_agent_writable_props = customizable_properties
-
-    def _get_action(self, state, agent_properties, possible_actions, agent_id):
-        """
-        The function the environment calls. The environment receives this function object and calls it when it is time
-        for this agent to select an action.
-
-        Note; This method should NOT be overridden!
-
-        :param state: A state description containing all properties of EnvObject that are within a certain range as
-        defined by self.sense_capability. It is a list of properties in a dictionary
-        :param agent_properties: The properties of the agent, which might have been changed by the
-        environment as a result of actions of this or other agents.
-        :param possible_actions: The possible actions the agent can perform according to the grid world. The agent can
-        send any other action (as long as it excists in the Action package), but these will not be performed in the
-        world resulting in the appriopriate ActionResult.
-        :param agent_id: the ID of this agent
-        :return: The filtered state of this agent, the agent properties which the agent might have changed,
-        and an action string, which is the class name of one of the actions in the Action package.
-        """
-        # Process any properties of this agent which were updated in the environment as a result of
-        # actions
-        self.agent_properties = agent_properties
-        filtered_state = self.filter_observations(state)
-        action, action_kwargs = self.decide_on_action(filtered_state, possible_actions)
-        self.previous_action = action
-        return filtered_state, self.agent_properties, action, action_kwargs
-
-    def _set_action_result(self, action_result):
-        """
-        A function that the environment calls (similarly as the self.get_action method) to set the action_result of the
-        action this agent decided upon. Note, that the result is given AFTER the action is performed (if possible).
-        Hence it is named the self.previous_action_result, as we can read its contents when we should decide on our
-        NEXT action after the action whose result this is.
-
-        Note; This method should NOT be overridden!
-
-        :param action_result: An object that inherits from ActionResult, containing a boolean whether the action
-        succeeded and a string denoting the reason why it failed (if it did so).
-        :return:
-        """
-        self.previous_action_result = action_result
-
-    def _set_rnd_seed(self, seed):
-        """
-        The function that seeds this agent's random seed.
-
-        Note; This method should NOT be overridden!
-
-        :param seed: The random seed this agent needs to be seeded with.
-        :return:
-        """
-        self.rnd_seed = seed
-        self.rnd_gen = np.random.RandomState(self.rnd_seed)
-
-    def _get_messages(self):
-        """
-        This method is called by the GridWorld.
-
-        Retrieves all message objects the agent has made in a tick, and returns those to the GridWorld for sending.
-        It then removes all these messages!
-
-        Note; This method should NOT be overridden!
-
-        :return: A list of message objects with a generic content, the sender (this agent's id) and optionally a
-        receiver. If a receiver is not set, the message content is send to all agents including this agent.
-        """
-        # Loop through all Message objects and create a dict out of each and append them to a list
-        messages = []
-        for mssg_obj in self.messages_to_send:
-            messages.append(
-                {'from_id': mssg_obj.from_id,
-                 'to_id': mssg_obj.to_id,
-                 'content': mssg_obj.content}
-            )
-        # Remove all messages that need to be send, as we have send them now
-        self.messages_to_send = []
-
-        return messages
-
-    def _set_messages(self, messages):
-        """
-        This method is called by the GridWorld.
-        It sets all messages intended for this agent to a list that it can access and read.
-
-        Note; This method should NOT be overridden!
-
-        :param messages: A list of dictionaries that contain a 'from_id', 'to_id' and 'content.
-        """
-        # We empty all received messages as this is from the previous tick
-        self.received_messages = []
-        # Loop through all messages and create a Message object out of the dictionaries.
-        for mssg in messages:
-            message_object = Message(from_id=mssg['from_id'], to_id=mssg['to_id'], content=mssg['content'])
-
-            # Add the message object to the received messages
-            self.received_messages.append(message_object)
-
     def filter_observations(self, state):
         """
         In this method you filter the state to only those properties and objects the agent is actually SUPPOSED to see.
@@ -182,7 +44,9 @@ class AgentBrain:
         defined by self.sense_capability. It is a list of properties in a dictionary
         :return: A filtered state.
         """
-        return state
+
+        memorized_state = self.state_tracker.update(state)
+        return memorized_state
 
     def decide_on_action(self, state, possible_actions):
         """
@@ -313,6 +177,148 @@ class AgentBrain:
                 action_kwargs['object_id'] = self.rnd_gen.choice(doors)
 
         return action, action_kwargs
+
+    def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
+                            customizable_properties, rnd_seed):
+        """
+        Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
+        properties. This also sets the random number generator with a seed generated based on the random seed of the
+        world that is generated.
+
+        Note; This method should NOT be overridden!
+
+        :param agent_name: The name of the agent.
+        :param agent_id: The unique ID given by the world to this agent's avatar. So the agent knows what body is his.
+        :param action_set: The list of action names this agent is allowed to perform.
+        :param sense_capability: The SenseCapability of the agent denoting what it can see withing what range.
+        :param agent_properties: The dictionary of properties containing all mandatory and custom properties.
+        :param customizable_properties: A list of keys in agent_properties that this agent is allowed to change.
+        :param rnd_seed: The random seed used to set the random number generator self.rng
+        """
+
+        # The name of the agent with which it is also known in the world
+        self.agent_name = agent_name
+
+        # The id of the agent
+        self.agent_id = agent_id
+
+        # The names of the actions this agent is allowed to perform
+        self.action_set = action_set
+
+        # Setting the random seed and rng
+        self.rnd_seed = rnd_seed
+        self._set_rnd_seed(seed=rnd_seed)
+
+        # The SenseCapability of the agent; what it can see and within what range
+        self.sense_capability = sense_capability
+
+        # Contains the agent_properties
+        self.agent_properties = agent_properties
+
+        # Specifies the keys of properties in self.agent_properties which can  be changed by this Agent in this file. If
+        # it is not writable, it can only be  updated through performing an action which updates that property (done by
+        # the environment).
+        # NOTE: Changing which properties are writable cannot be done during runtime! Only in  the scenario manager
+        self.keys_of_agent_writable_props = customizable_properties
+
+        # Initialize this agent's state tracker
+        self.state_tracker = StateTracker(agent_id=agent_id)
+
+    def _get_action(self, state, agent_properties, possible_actions, agent_id):
+        """
+        The function the environment calls. The environment receives this function object and calls it when it is time
+        for this agent to select an action.
+
+        Note; This method should NOT be overridden!
+
+        :param state: A state description containing all properties of EnvObject that are within a certain range as
+        defined by self.sense_capability. It is a list of properties in a dictionary
+        :param agent_properties: The properties of the agent, which might have been changed by the
+        environment as a result of actions of this or other agents.
+        :param possible_actions: The possible actions the agent can perform according to the grid world. The agent can
+        send any other action (as long as it excists in the Action package), but these will not be performed in the
+        world resulting in the appriopriate ActionResult.
+        :param agent_id: the ID of this agent
+        :return: The filtered state of this agent, the agent properties which the agent might have changed,
+        and an action string, which is the class name of one of the actions in the Action package.
+        """
+        # Process any properties of this agent which were updated in the environment as a result of
+        # actions
+        self.agent_properties = agent_properties
+        filtered_state = self.filter_observations(state)
+        action, action_kwargs = self.decide_on_action(filtered_state, possible_actions)
+        self.previous_action = action
+        return filtered_state, self.agent_properties, action, action_kwargs
+
+    def _set_action_result(self, action_result):
+        """
+        A function that the environment calls (similarly as the self.get_action method) to set the action_result of the
+        action this agent decided upon. Note, that the result is given AFTER the action is performed (if possible).
+        Hence it is named the self.previous_action_result, as we can read its contents when we should decide on our
+        NEXT action after the action whose result this is.
+
+        Note; This method should NOT be overridden!
+
+        :param action_result: An object that inherits from ActionResult, containing a boolean whether the action
+        succeeded and a string denoting the reason why it failed (if it did so).
+        :return:
+        """
+        self.previous_action_result = action_result
+
+    def _set_rnd_seed(self, seed):
+        """
+        The function that seeds this agent's random seed.
+
+        Note; This method should NOT be overridden!
+
+        :param seed: The random seed this agent needs to be seeded with.
+        :return:
+        """
+        self.rnd_seed = seed
+        self.rnd_gen = np.random.RandomState(self.rnd_seed)
+
+    def _get_messages(self):
+        """
+        This method is called by the GridWorld.
+
+        Retrieves all message objects the agent has made in a tick, and returns those to the GridWorld for sending.
+        It then removes all these messages!
+
+        Note; This method should NOT be overridden!
+
+        :return: A list of message objects with a generic content, the sender (this agent's id) and optionally a
+        receiver. If a receiver is not set, the message content is send to all agents including this agent.
+        """
+        # Loop through all Message objects and create a dict out of each and append them to a list
+        messages = []
+        for mssg_obj in self.messages_to_send:
+            messages.append(
+                {'from_id': mssg_obj.from_id,
+                 'to_id': mssg_obj.to_id,
+                 'content': mssg_obj.content}
+            )
+        # Remove all messages that need to be send, as we have send them now
+        self.messages_to_send = []
+
+        return messages
+
+    def _set_messages(self, messages):
+        """
+        This method is called by the GridWorld.
+        It sets all messages intended for this agent to a list that it can access and read.
+
+        Note; This method should NOT be overridden!
+
+        :param messages: A list of dictionaries that contain a 'from_id', 'to_id' and 'content.
+        """
+        # We empty all received messages as this is from the previous tick
+        self.received_messages = []
+        # Loop through all messages and create a Message object out of the dictionaries.
+        for mssg in messages:
+            message_object = Message(from_id=mssg['from_id'], to_id=mssg['to_id'], content=mssg['content'])
+
+            # Add the message object to the received messages
+            self.received_messages.append(message_object)
 
 
 class Message:

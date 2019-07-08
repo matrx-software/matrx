@@ -2,6 +2,7 @@ import numpy as np
 import collections, math
 
 from environment.actions.action import Action, ActionResult
+from environment.helper_functions import get_distance
 from environment.objects.agent_body import AgentBody
 from environment.objects.simple_objects import AreaTile
 import copy
@@ -244,7 +245,6 @@ class DropAction(Action):
             name = DropAction.__name__
         super().__init__(name)
 
-
     def is_possible(self, grid_world, agent_id, **kwargs):
         reg_ag = grid_world.registered_agents[agent_id]
 
@@ -259,7 +259,6 @@ class DropAction(Action):
             return False, DropActionResult(DropActionResult.RESULT_NO_OBJECT, False)
 
         return possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id, drop_range=drop_range)
-
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
@@ -363,13 +362,6 @@ def find_drop_loc(grid_world, agent, env_obj, drop_range, start_loc):
                 queue.append(path + [(x2, y2)])
                 seen.add((x2, y2))
     return False
-
-
-def get_distance(coord1, coord2):
-    """ Get distance between two x,y coordinates """
-    dist = [(a - b) ** 2 for a, b in zip(coord1, coord2)]
-    dist = math.sqrt(sum(dist))
-    return dist
 
 
 def is_drop_poss(grid_world, env_obj, dropLocation):
