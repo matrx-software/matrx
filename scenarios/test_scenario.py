@@ -4,44 +4,30 @@ from world_factory.world_factory import RandomProperty, WorldFactory
 
 
 def create_factory():
-    factory = WorldFactory(random_seed=1, shape=[10, 10], tick_duration=0.5, verbose=True)
+    factory = WorldFactory(random_seed=1, shape=[15, 6], tick_duration=0.5, verbose=True)
 
-    waypoints = [(0, 9), (9, 9), (9, 0), (0, 0)]
-    navigating_agent = NavigatingAgentBrain(waypoints)
-    factory.add_agent([0, 0], navigating_agent)
+    even = True
+    for x in range(15):
+        waypoints = [(x, 0), (x, 5)]
+        navigating_agent = NavigatingAgentBrain(waypoints)
+        if even:
+            even = False
+            start = [x, 0]
+        else:
+            even = True
+            start = [x, 5]
+        factory.add_agent(start, navigating_agent)
 
-    # waypoints = [(1, 8), (8, 8), (8, 1), (1, 1)]
-    # navigating_agent = NavigatingAgentBrain(waypoints)
-    # factory.add_agent([1, 1], navigating_agent)
+    factory.add_line(start=[1, 1], end=[3, 1], name="T")
+    factory.add_line(start=[2, 2], end=[2, 4], name="T")
 
-    # waypoints = [(2, 7), (7, 7), (7, 2), (2, 2)]
-    # navigating_agent = NavigatingAgentBrain(waypoints)
-    # factory.add_agent([2, 2], navigating_agent)
+    factory.add_line(start=[5, 1], end=[5, 4], name="N")
+    factory.add_line(start=[6, 2], end=[7, 3], name="N")
+    factory.add_line(start=[8, 1], end=[8, 4], name="N")
 
-    # factory.add_env_object(location=[0, 5], name="Wall 1")
-
-    # random_prop = RandomProperty(values=["One", "Two"], distribution=[3, 1])
-    # factory.add_env_object(location=[0, 0], name="Wall 1", random_prop=random_prop)
-
-    # Obj for testing visualization depth, this block should be in front
-    # factory.add_env_object(location=[3, 3], is_movable=False, is_traversable=True, visualize_shape=0,
-    #                       visualize_colour="#000000", name="overlaying_block", visualize_depth=3)
-
-    # agent = AgentBrain()
-    # sense_capability = factory.create_sense_capability(["*"], [3])
-    # factory.add_agent(location=[1, 0], agent=agent, visualize_depth=5, sense_capability=sense_capability)
-
-    # agent = AgentBrain()
-    # sense_capability = factory.create_sense_capability(["*"], [3])
-    # factory.add_agent(location=[1, 1], agent=agent, visualize_depth=5, sense_capability=sense_capability)
-
-    # agents = [AgentBrain() for _ in range(3)]
-    # locs = [[1, 1], [2, 2], [3, 3]]
-    # factory.add_multiple_agents(agents=agents, locations=locs, sense_capabilities=sense_capability)
-
-    # hu_agent = HumanAgent()
-    # factory.add_human_agent(location=[4,1], agent=hu_agent)
-
-    # factory.add_multiple_objects([[4, 4], [5, 5], [6, 6]])
+    factory.add_line(start=[11, 1], end=[12, 1], name="O")
+    factory.add_line(start=[10, 2], end=[10, 3], name="O")
+    factory.add_line(start=[11, 4], end=[12, 4], name="O")
+    factory.add_line(start=[13, 2], end=[13, 3], name="O")
 
     return factory

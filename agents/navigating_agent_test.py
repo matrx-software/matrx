@@ -18,7 +18,7 @@ class NavigatingAgentBrain(AgentBrain):
         self.navigator = Navigator(agent_id=self.agent_id, action_set=self.action_set,
                                    algorithm=Navigator.A_STAR_ALGORITHM)
 
-        self.navigator.add_waypoints(self.waypoints, is_circular=False)
+        self.navigator.add_waypoints(self.waypoints, is_circular=True)
 
     def filter_observations(self, state):
         self.state_tracker.update(state)

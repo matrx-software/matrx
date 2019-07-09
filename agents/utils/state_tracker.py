@@ -80,7 +80,7 @@ class StateTracker:
 
     def get_traversability_map(self, inverted=False):
         map_size = self.__memorized_state['World']['grid_shape']
-        traverse_map = np.array([[int(not inverted) for _ in range(map_size[0])] for _ in range(map_size[1])])
+        traverse_map = np.array([[int(not inverted) for _ in range(map_size[1])] for _ in range(map_size[0])])
 
         for id, properties in self.__memorized_state.items():
 
@@ -88,7 +88,7 @@ class StateTracker:
                 continue
 
             loc = properties['location']
-            traverse_map[loc[0], loc[1]] = properties['is_traversable'] \
-                if inverted else not(properties['is_traversable'])
+            traverse_map[loc[0], loc[1]] = int(properties['is_traversable']) \
+                if not inverted else int(not(properties['is_traversable']))
 
         return traverse_map

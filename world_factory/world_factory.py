@@ -44,6 +44,8 @@ import environment.actions.move_actions
 import world_factory
 # noinspection PyUnresolvedReferences
 import visualization
+
+
 ######
 
 
@@ -509,17 +511,16 @@ class WorldFactory:
                                   customizable_properties=customizable_properties, visualize_colours=visualize_colour,
                                   visualize_opacities=visualize_opacity, **custom_properties)
 
-
     def add_smoke_area(self, top_left_location, width, height, name, visualize_colour=None,
-                 smoke_thickness_multiplier=1.0, visualize_depth=None, **custom_properties):
+                       smoke_thickness_multiplier=1.0, visualize_depth=None, **custom_properties):
         # Check if width and height are large enough to make an actual room (with content)
         if width < 1 or height < 1:
             raise Exception(f"While adding area {name}; The width {width} and/or height {height} should both be larger"
                             f" than 0.")
 
         # See https://www.redblobgames.com/maps/terrain-from-noise/#elevation
-        octaves = 8 # small noiseyness
-        freq = 5 # large noiseyness
+        octaves = 8  # small noiseyness
+        freq = 5  # large noiseyness
 
         # Get all locations in the rectangle
         min_x = top_left_location[0]
@@ -537,10 +538,9 @@ class WorldFactory:
                 opacity = np.clip(opacity * smoke_thickness_multiplier, 0, 1)
 
                 # add the smokeTile
-                self.add_env_object(location=[x,y], name=name, callable_class=SmokeTile, visualize_colour=visualize_colour, visualize_opacity=opacity, visualize_depth=visualize_depth)
-
-
-
+                self.add_env_object(location=[x, y], name=name, callable_class=SmokeTile,
+                                    visualize_colour=visualize_colour, visualize_opacity=opacity,
+                                    visualize_depth=visualize_depth)
 
     def __list_area_locs(self, top_left_location, width, height):
         """
@@ -561,7 +561,6 @@ class WorldFactory:
 
         return locs
 
-
     def add_line(self, start, end, name, callable_class=None, customizable_properties=None,
                  is_traversable=None, is_movable=None,
                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
@@ -578,7 +577,8 @@ class WorldFactory:
                                   custom_properties=custom_properties, customizable_properties=customizable_properties,
                                   is_traversable=is_traversable, visualize_sizes=visualize_size,
                                   visualize_shapes=visualize_shape, visualize_colours=visualize_colour,
-                                  visualize_opacities=visualize_opacity, visualize_depths=visualize_depth, is_movable=is_movable)
+                                  visualize_opacities=visualize_opacity, visualize_depths=visualize_depth,
+                                  is_movable=is_movable)
 
     def add_room(self, top_left_location, width, height, name, door_locations=None, with_area_tiles=False,
                  doors_open=False,

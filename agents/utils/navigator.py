@@ -201,7 +201,7 @@ class AStarPlanner(PathPlanner):
         """
 
         # possible movements
-        neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        neighbors = list(self.move_actions.values())
 
         close_set = set()
         came_from = {}
@@ -245,6 +245,9 @@ class AStarPlanner(PathPlanner):
                     fscore[neighbor] = tentative_g_score + self.heuristic(neighbor, goal)
                     heapq.heappush(oheap, (fscore[neighbor], neighbor))
 
+        # If no path is available we stay put
+        return [start]
+
 
 class Waypoint:
 
@@ -284,5 +287,8 @@ def get_move_actions(action_set):
             move_actions[action_name] = (-1, 0)
         elif action_name == MoveNorthWest.__name__:
             move_actions[action_name] = (-1, -1)
+
+    # And moving nowhere is also possible
+    move_actions[None] = (0, 0)
 
     return move_actions
