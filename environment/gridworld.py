@@ -47,6 +47,10 @@ class GridWorld:
             # We update the grid, which fills everything with added objects and agents
             self.__update_grid()
 
+            # Initialize all agents
+            for agent_body in self.registered_agents.values():
+                agent_body.brain_initialize_func()
+
             # Initialize the visualizer
             self.__visualizer = Visualizer(self.shape, self.__visualization_bg_clr, verbose=self.__verbose)
 
@@ -304,6 +308,9 @@ class GridWorld:
                     agent_properties=agent_obj.properties, possible_actions=possible_actions,
                     agent_id=agent_id)
 
+            # store the action in the buffer
+            action_buffer[agent_id] = (action_class_name, action_kwargs)
+
             # Obtain all communication messages if the agent has something to say to others
             agent_messages = agent_obj.get_messages_func()
             if len(agent_messages) > 0:  # there are messages
@@ -313,9 +320,6 @@ class GridWorld:
                         self.__message_buffer[mssg['to_id']] = [mssg]
                     else:
                         self.__message_buffer[mssg['to_id']].append(mssg)
-
-            # store the action in the buffer
-            action_buffer[agent_id] = (action_class_name, action_kwargs)
 
             # the Agent (in the OODA loop) might have updated its properties,
             # process these changes in the Avatar Agent

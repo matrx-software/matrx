@@ -803,6 +803,7 @@ class WorldFactory:
                 'callback_agent_observe': agent.filter_observations,
                 'callback_agent_get_messages': agent._get_messages,
                 'callback_agent_set_messages': agent._set_messages,
+                'callback_agent_initialize': agent.initialize,
                 'customizable_properties': customizable_props,
                 **custom_props}
 

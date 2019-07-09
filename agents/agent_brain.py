@@ -31,15 +31,11 @@ class AgentBrain:
         self.agent_properties = {}
         self.keys_of_agent_writable_props = []
 
-        # Tracks if the agent had its self.initialize() called (which can be overridden by the user)
-        self.is_initialized = False
-
-    def initialize(self, state):
+    def initialize(self):
         """
         Method called the very first time this AgentBrain is called from the world. Here you can initialize everything
         you need for your agent to work since you can't do much in the constructor as the brain needs to be connected to
         a GridWorld first in most cases (e.g. to get an AgentID, its random seed, etc.)
-        :param state: The state the AgentBrain sees for the very first time (unfiltered and all).
         """
 
     def filter_observations(self, state):
@@ -56,8 +52,7 @@ class AgentBrain:
         :return: A filtered state.
         """
 
-        memorized_state = self.state_tracker.update(state)
-        return memorized_state
+        return state
 
     def decide_on_action(self, state, possible_actions):
         """
@@ -232,9 +227,6 @@ class AgentBrain:
         # NOTE: Changing which properties are writable cannot be done during runtime! Only in  the scenario manager
         self.keys_of_agent_writable_props = customizable_properties
 
-        # Initialize this agent's state tracker
-        self.state_tracker = StateTracker(agent_id=agent_id)
-
     def _get_action(self, state, agent_properties, possible_actions, agent_id):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
@@ -255,11 +247,6 @@ class AgentBrain:
         """
         # Process any properties of this agent which were updated in the environment as a result of actions
         self.agent_properties = agent_properties
-
-        # Check if we still need to call the user initialize
-        if not self.is_initialized:
-            self.initialize(state=state)
-            self.is_initialized = True
 
         # Call the filter method to filter the observation
         filtered_state = self.filter_observations(state)

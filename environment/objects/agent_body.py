@@ -8,7 +8,7 @@ class AgentBody(EnvObject):
 
     def __init__(self, location, possible_actions, sense_capability, class_callable,
                  callback_agent_get_action, callback_agent_set_action_result, callback_agent_observe,
-                 callback_agent_get_messages, callback_agent_set_messages,
+                 callback_agent_get_messages, callback_agent_set_messages, callback_agent_initialize,
                  visualize_size, visualize_shape, visualize_colour, visualize_depth, visualize_opacity,
                  is_traversable, team, agent_speed_in_ticks, name, is_movable,
                  is_human_agent, customizable_properties,
@@ -45,6 +45,8 @@ class AgentBody(EnvObject):
         processed state dictionary of the Agent. As the GridWorld does not know exactly what the Agent is allowed to
         see or not, the 'observe' preprocesses the given state further. But to accurately visualize what the agent sees
         we have to obtain that pre-processed state, which is done through this callback.
+        :param callback_agent_initialize: Call the initialize function in an Agent's Brain. Is done at the initialize
+        of a GridWorld.
 
         :param callback_agent_get_messages: A callback function that allows the GridWorld to obtain the agent's messages
         that need to be send to different agents.
@@ -95,6 +97,7 @@ class AgentBody(EnvObject):
         self.filter_observations = callback_agent_observe
         self.get_messages_func = callback_agent_get_messages
         self.set_messages_func = callback_agent_set_messages
+        self.brain_initialize_func = callback_agent_initialize
 
         # Set all mandatory properties
         self.agent_speed_in_ticks = agent_speed_in_ticks
