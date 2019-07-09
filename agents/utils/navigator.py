@@ -67,17 +67,20 @@ class Navigator:
         return wp.location
 
     def get_move_action(self, state_tracker: StateTracker):
+        # If we are done, don't do anything
+        if self.is_done:
+            return None
+
         # Check if the state tracker is for the right agent
         assert state_tracker.agent_id == self.__agent_id
 
         route = self.__get_route(state_tracker)
 
-        if self.is_done and len(route) == 0:
-            return None
-        
         agent_loc = state_tracker.get_memorized_state()[self.__agent_id]['location']
 
-        if agent_loc in route:
+        if len(route) == 0 and self.is_done:
+            return None
+        elif agent_loc in route:
             move_action = route[agent_loc]
         else:
             agent_id = self.__agent_id
