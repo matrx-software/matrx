@@ -21,7 +21,7 @@ class AgentBrain:
         self.messages_to_send = []
         self.received_messages = []
 
-        # Filled by the WorldFactory during self.initialise
+        # Filled by the WorldFactory during self.factory_initialise()
         self.agent_id = None
         self.agent_name = None
         self.action_set = None  # list of action names (strings)
@@ -30,6 +30,17 @@ class AgentBrain:
         self.rnd_seed = None
         self.agent_properties = {}
         self.keys_of_agent_writable_props = []
+
+        # Tracks if the agent had its self.initialize() called (which can be overridden by the user)
+        self.is_initialized = False
+
+    def initialize(self, state):
+        """
+        Method called the very first time this AgentBrain is called from the world. Here you can initialize everything
+        you need for your agent to work since you can't do much in the constructor as the brain needs to be connected to
+        a GridWorld first in most cases (e.g. to get an AgentID, its random seed, etc.)
+        :param state: The state the AgentBrain sees for the very first time (unfiltered and all).
+        """
 
     def filter_observations(self, state):
         """
@@ -242,12 +253,25 @@ class AgentBrain:
         :return: The filtered state of this agent, the agent properties which the agent might have changed,
         and an action string, which is the class name of one of the actions in the Action package.
         """
-        # Process any properties of this agent which were updated in the environment as a result of
-        # actions
+        # Process any properties of this agent which were updated in the environment as a result of actions
         self.agent_properties = agent_properties
+
+        # Check if we still need to call the user initialize
+        if not self.is_initialized:
+            self.initialize(state=state)
+            self.is_initialized = True
+
+        # Call the filter method to filter the observation
         filtered_state = self.filter_observations(state)
+
+        # Call the method that decides on an action
         action, action_kwargs = self.decide_on_action(filtered_state, possible_actions)
+
+        # Store the action so in the next call the agent still knows what it did
         self.previous_action = action
+
+        # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
+        # action if needed.
         return filtered_state, self.agent_properties, action, action_kwargs
 
     def _set_action_result(self, action_result):
