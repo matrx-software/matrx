@@ -22,7 +22,7 @@ class Visualizer:
         self.__hu_ag_states = {}
         self.__god_state = {}
         self.__verbose = verbose
-        self.__userinputs = {}
+        self._userinputs = {}
 
         self.__initGUI(grid_size=grid_size, vis_bg_clr=vis_bg_clr)
 
@@ -172,9 +172,9 @@ class Visualizer:
 
         # return None if there was no userinput
         if repl == {}:
-            self.__userinputs = {}
+            self._userinputs = {}
         elif self.__verbose:
             print(f"@{os.path.basename(__file__)}: User input received:", repl, file=sys.stderr)
 
         # otherwise return the userinput
-        self.__userinputs = repl
+        self._userinputs = repl
