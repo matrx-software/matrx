@@ -796,6 +796,7 @@ class WorldFactory:
         mandatory_props = settings['mandatory_properties']
 
         args = {**mandatory_props,
+                'isAgent': True,
                 'sense_capability': sense_capability,
                 'class_callable': agent.__class__,
                 'callback_agent_get_action': agent._get_action,

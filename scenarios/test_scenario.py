@@ -13,10 +13,11 @@ def create_factory():
         if even:
             even = False
             start = [x, 0]
+            factory.add_agent(start, navigating_agent, visualize_shape=2)
         else:
             even = True
             start = [x, 5]
-        factory.add_agent(start, navigating_agent)
+            factory.add_agent(start, navigating_agent, visualize_shape='img', imgName="transparent.png")
 
     factory.add_line(start=[1, 1], end=[3, 1], name="T")
     factory.add_line(start=[2, 2], end=[2, 4], name="T")

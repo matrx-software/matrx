@@ -4,6 +4,7 @@
  */
 
  var doVisualUpdates = true;
+ var isFirstCall=true;
 
 /**
  * Check if the current tab is in focus or not
@@ -45,7 +46,11 @@ $(document).ready(function(){
         state = data.state;
         tick = data.params.tick;
         vis_bg_clr = data.params.vis_bg_clr;
-
+        //draw the menu if it is the first call
+        if(isFirstCall){
+            isFirstCall=false;
+            populateMenu(state);
+        }
         // draw the grid again
         requestAnimationFrame(function() {
             doTick(grid_size, state, tick, vis_bg_clr);

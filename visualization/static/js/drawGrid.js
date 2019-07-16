@@ -256,6 +256,9 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
             else if (obj['visualization']['shape'] == 2) {
                 drawCircle(x, y, px_per_cell, px_per_cell, clr, sz);
             }
+            else if (obj['visualization']['shape'] == 'img') {
+                drawImage(obj['imgName'],x, y, px_per_cell, px_per_cell, sz);
+            }
         })
     });
 
@@ -403,6 +406,19 @@ function drawCircle(x, y, tileW, tileH, clr, size) {
     ctx.fill();
 }
 
+function drawImage(imgName, x, y, tileW, tileH, size)
+{
+    var img = new Image();
+	img.src = window.location.origin + '/static/avatars/'+imgName;
+	top_left_x = x + ((1 - size) * 0.5 * tileW);
+    top_left_y = y + ((1 - size) * 0.5 * tileH);
+
+    // width and height of rectangle
+    w = size * tileW;
+    h = size * tileH;
+
+    ctx.drawImage(img, top_left_x, top_left_y, w, h);  // DRAW THE IMAGE TO THE CANVAS.
+}
 
 /**
  * Draw a triangle on screen
