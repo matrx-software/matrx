@@ -26,6 +26,8 @@ class Visualizer:
 
         self.__initGUI(grid_size=grid_size, vis_bg_clr=vis_bg_clr)
 
+
+
     def __initGUI(self, grid_size, vis_bg_clr):
         """
         Send an initialization message to the GUI webserver, which sends the grid_size.

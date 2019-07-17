@@ -138,6 +138,11 @@ class WorldFactory:
         assert isinstance(location, list) or isinstance(location, tuple)
         assert isinstance(agent, AgentBrain)
 
+        #Check if the agent name is unique
+        for existingAgent in self.agent_settings:
+            if existingAgent["mandatory_properties"]["name"] == name:
+                raise Exception(f"An agent with the name {name} was already added. Agent names should be unique.", name)
+
         # Load the defaults for any variable that is not defined
         # Obtain any defaults from the defaults.json file if not set already.
         if is_traversable is None:
@@ -434,6 +439,9 @@ class WorldFactory:
         assert isinstance(location, list) or isinstance(location, tuple)
         assert isinstance(agent, HumanAgentBrain)
 
+        for existingAgent in self.agent_settings:
+            if existingAgent["mandatory_properties"]["name"] == name:
+                raise Exception(f"A human agent with the name {name} was already added. Agent names should be unique.", name)
         # Load the defaults for any variable that is not defined
         # Obtain any defaults from the defaults.json file if not set already.
         if is_traversable is None:
@@ -796,6 +804,7 @@ class WorldFactory:
         mandatory_props = settings['mandatory_properties']
 
         args = {**mandatory_props,
+                'isAgent': True,
                 'sense_capability': sense_capability,
                 'class_callable': agent.__class__,
                 'callback_agent_get_action': agent._get_action,

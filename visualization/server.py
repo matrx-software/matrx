@@ -117,6 +117,14 @@ def god_view():
     return render_template('god.html')
 
 
+###############################################
+# Routes Images
+###############################################
+
+# route for agent picture
+@app.route('/avatars')
+def image():
+    return render_template('avatars.html')
 
 ###############################################
 # Managing rooms (connections for a specific agent)
