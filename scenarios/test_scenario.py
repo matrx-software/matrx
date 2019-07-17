@@ -1,4 +1,5 @@
 from agents.agent_brain import AgentBrain
+from agents.human_agent_brain import HumanAgentBrain
 from agents.navigating_agent_test import NavigatingAgentBrain
 from world_factory.world_factory import RandomProperty, WorldFactory
 
@@ -10,14 +11,15 @@ def create_factory():
     for x in range(15):
         waypoints = [(x, 0), (x, 5)]
         navigating_agent = NavigatingAgentBrain(waypoints)
+        human_agent = HumanAgentBrain()
         if even:
             even = False
             start = [x, 0]
-            factory.add_agent(start, navigating_agent, visualize_shape=2)
+            factory.add_agent(start, navigating_agent, name="navigate " + str(x), visualize_shape=2)
         else:
             even = True
             start = [x, 5]
-            factory.add_agent(start, navigating_agent, visualize_shape='img', imgName="transparent.png")
+            factory.add_human_agent(start, human_agent, name="human " + str(x), visualize_shape='img', imgName="transparent.png")
 
     factory.add_line(start=[1, 1], end=[3, 1], name="T")
     factory.add_line(start=[2, 2], end=[2, 4], name="T")
