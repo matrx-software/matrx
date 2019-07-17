@@ -46,6 +46,7 @@ $(document).ready(function(){
         state = data.state;
         tick = data.params.tick;
         vis_bg_clr = data.params.vis_bg_clr;
+        vis_bg_img = data.params.vis_bg_img;
         //draw the menu if it is the first call
         if(isFirstCall){
             isFirstCall=false;
@@ -53,7 +54,7 @@ $(document).ready(function(){
         }
         // draw the grid again
         requestAnimationFrame(function() {
-            doTick(grid_size, state, tick, vis_bg_clr);
+            doTick(grid_size, state, tick, vis_bg_clr,vis_bg_img);
         });
     });
 });

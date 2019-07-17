@@ -128,7 +128,7 @@ function updateGridSize(grid_size) {
 /**
  * called when a new tick is received by the agent
  */
-function doTick(grid_size, state, curr_tick, vis_bg_clr) {
+function doTick(grid_size, state, curr_tick, vis_bg_clr, vis_bg_img) {
     // for the first time drawing the visualization, calculate the optimal
     // screen size based on the grid size
     if (firstDraw) {
@@ -136,6 +136,7 @@ function doTick(grid_size, state, curr_tick, vis_bg_clr) {
         fixCanvasSize();
         firstDraw = false;
         bgTileColour = vis_bg_clr;
+        bgImage=vis_bg_img;
     }
 
     // console.log("\n#####################################\nNew tick #", curr_tick);
@@ -346,8 +347,16 @@ function calcNewAnimatedCoord(obj, coord, timePerMove) {
  */
 function drawBg() {
     // full size rect
-    ctx.fillStyle = bgTileColour;
-    ctx.fillRect( 0, 0, mapW * px_per_cell, mapH * px_per_cell);
+    if(bgImage!=null){
+        var img = new Image();
+	    img.src = window.location.origin + '/static/backgrounds/'+bgImage;
+	    ctx.drawImage(img, 0, 0, mapW * px_per_cell, mapH * px_per_cell);  // DRAW THE IMAGE TO THE CANVAS.
+    }
+    else
+    {
+        ctx.fillStyle = bgTileColour;
+        ctx.fillRect( 0, 0, mapW * px_per_cell, mapH * px_per_cell);
+        }
 }
 
 

@@ -14,13 +14,14 @@ from visualization.visualizer import Visualizer
 class GridWorld:
 
     def __init__(self, shape, tick_duration, simulation_goal, run_sail_api=True, run_visualization_server=True,
-                 rnd_seed=1, visualization_bg_clr="#C2C2C2", verbose=False):
+                 rnd_seed=1, visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False):
         self.tick_duration = tick_duration  # How long each tick should take (thread sleeps until thatr time is passed)
         self.simulation_goal = simulation_goal  # The simulation goal, the simulation end when this/these are reached
         self.shape = shape  # The width and height of the GridWorld
         self.__run_sail_api = run_sail_api  # Whether we should run the (SAIL) API
         self.__run_visualization_server = run_visualization_server  # Whether we should run the (Visualisation) API
         self.__visualization_bg_clr = visualization_bg_clr  # The background color of the visualisation
+        self.__visualization_bg_img = visualization_bg_img  # The background image of the visualisation
         self.__verbose = verbose  # Set whether we should print anything or not
 
         self.registered_agents = OrderedDict()  # The dictionary of all existing agents in the GridWorld
@@ -52,7 +53,7 @@ class GridWorld:
                 agent_body.brain_initialize_func()
 
             # Initialize the visualizer
-            self.__visualizer = Visualizer(self.shape, self.__visualization_bg_clr, verbose=self.__verbose)
+            self.__visualizer = Visualizer(self.shape, self.__visualization_bg_clr, self.__visualization_bg_img, verbose=self.__verbose)
 
             # Visualize already
             self.__initial_visualisation()

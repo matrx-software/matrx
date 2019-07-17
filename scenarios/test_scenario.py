@@ -5,7 +5,7 @@ from world_factory.world_factory import RandomProperty, WorldFactory
 
 
 def create_factory():
-    factory = WorldFactory(random_seed=1, shape=[15, 6], tick_duration=0.5, verbose=True)
+    factory = WorldFactory(random_seed=1, shape=[15, 6], tick_duration=0.5, visualization_bg_img="soesterberg_luchtfoto.jpg", verbose=True)
 
     even = True
     for x in range(15):
