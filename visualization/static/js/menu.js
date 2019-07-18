@@ -38,7 +38,7 @@ function populateMenu(state){
       $('<a>').attr('href','/' + agentType + '/'+ agent["obj_id"]).append($('<div>').attr('class', 'textMenuDiv').append(agent["name"] +" "+ agent["obj_id"])));
       if (agent['visualization']['shape'] == 'img'){
          var img = new Image();
-         img.src = window.location.origin + '/static/avatars/'+agent['imgName'];
+         img.src = window.location.origin + '/static/avatars/'+agent['img_name'];
          newLi.append($('<div>').attr('class', 'imageMenuDiv').append(img))
          }
        else if(agent['visualization']['shape'] == 0) {

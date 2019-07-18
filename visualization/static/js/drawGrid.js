@@ -258,7 +258,7 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
                 drawCircle(x, y, px_per_cell, px_per_cell, clr, sz);
             }
             else if (obj['visualization']['shape'] == 'img') {
-                drawImage(obj['imgName'],x, y, px_per_cell, px_per_cell, sz);
+                drawImage(obj['img_name'],x, y, px_per_cell, px_per_cell, sz);
             }
         })
     });

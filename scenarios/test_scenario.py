@@ -27,7 +27,7 @@ def create_factory():
             }
             factory.add_human_agent(start, human_agent, name="human " + str(x),
                     usrinp_action_map=usrinp_action_map, visualize_shape='img',
-                    imgName="transparent.png")
+                    img_name="transparent.png")
 
     factory.add_line(start=[1, 1], end=[3, 1], name="T")
     factory.add_line(start=[2, 2], end=[2, 4], name="T")
