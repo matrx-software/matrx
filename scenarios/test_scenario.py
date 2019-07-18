@@ -2,7 +2,7 @@ from agents.agent_brain import AgentBrain
 from agents.human_agent_brain import HumanAgentBrain
 from agents.navigating_agent_test import NavigatingAgentBrain
 from world_factory.world_factory import RandomProperty, WorldFactory
-
+from environment.actions.move_actions import *
 
 def create_factory():
     factory = WorldFactory(random_seed=1, shape=[15, 6], tick_duration=0.5, visualization_bg_img="soesterberg_luchtfoto.jpg", verbose=True)
@@ -19,7 +19,15 @@ def create_factory():
         else:
             even = True
             start = [x, 5]
-            factory.add_human_agent(start, human_agent, name="human " + str(x), visualize_shape='img', imgName="transparent.png")
+            usrinp_action_map = {
+                'w': MoveNorth.__name__,
+                'd': MoveEast.__name__,
+                's': MoveSouth.__name__,
+                'a': MoveWest.__name__
+            }
+            factory.add_human_agent(start, human_agent, name="human " + str(x),
+                    usrinp_action_map=usrinp_action_map, visualize_shape='img',
+                    imgName="transparent.png")
 
     factory.add_line(start=[1, 1], end=[3, 1], name="T")
     factory.add_line(start=[2, 2], end=[2, 4], name="T")
