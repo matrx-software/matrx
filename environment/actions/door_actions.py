@@ -9,14 +9,12 @@ class OpenDoorAction(Action):
     Action to open a Door
     """
 
-    def __init__(self, name=None, duration_in_ticks=1):
+    def __init__(self, duration_in_ticks=1):
         """
         :param name: The name of the action.
         :param duration_in_ticks: The duration of the action in ticks. By default this is 1.
         """
-        if name is None:
-            name = OpenDoorAction.__name__
-        super().__init__(name, 3)
+        super().__init__(3)
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
@@ -68,14 +66,12 @@ class CloseDoorAction(Action):
     Action to open a Door
     """
 
-    def __init__(self, name=None, duration_in_ticks=1):
+    def __init__(self, duration_in_ticks=1):
         """
         :param name: The name of the action.
         :param duration_in_ticks: The duration of the action in ticks. By default this is 1.
         """
-        if name is None:
-            name = CloseDoorAction.__name__
-        super().__init__(name, 3)
+        super().__init__(3)
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
