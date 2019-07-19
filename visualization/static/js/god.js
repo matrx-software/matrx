@@ -51,10 +51,10 @@ $(document).ready(function(){
         if(isFirstCall){
             isFirstCall=false;
             populateMenu(state);
-        }
+            parseGifs(state);}
         // draw the grid again
         requestAnimationFrame(function() {
-            doTick(grid_size, state, tick, vis_bg_clr,vis_bg_img);
+            doTick(grid_size, state, tick, vis_bg_clr,vis_bg_img, parsedGifs);
         });
     });
 });

@@ -14,6 +14,8 @@ var currentSecondTicks = 0, tpsCount = 0, ticksLastSecond = 0;
 var currentSecondFrames = 0, fpsCount = 0, framesListSecond = 0;
 var lastTickSecond = 0;
 var firstDraw = true;
+var parsedGifs=[];
+
 
 // Colour of the default BG tile
 var bgTileColour = "#C2C2C2";
@@ -125,6 +127,39 @@ function updateGridSize(grid_size) {
     }
 }
 
+//Used to parse Gifs(in case they exist) into the frames they are made out of on the first load of the screen.
+function parseGifs(state){
+    var vis_depths = Object.keys(state);
+    vis_depths.forEach(function(vis_depth) {
+
+    // Loop through the objects at this depth and visualize them
+    var objects = Object.keys(state[vis_depth]);
+    objects.forEach(function(objID) {
+
+        // fetch object
+        obj = state[vis_depth][objID]
+        if (obj['visualization']['shape'] == 'img') {
+        if (/^.+\.gif$/.test(obj['imgName'])) {
+            var img = new Image();
+            img.src = window.location.origin + '/static/avatars/'+obj['imgName'];
+            if(!parsedGifs.hasOwnProperty(img.src))
+                {
+                parsedGifs[img.src]=[]
+                var gif = new SuperGif({ gif: img } );
+                gif.load(function(){
+                for (var i = 0; i < gif.get_length(); i++)
+                      {
+                        gif.move_to(i);
+                        parsedGifs[img.src][i]=gif.get_canvas();
+                        }
+                 parsedGifs[img.src]["currFrame"]=0;
+
+                    });
+                }
+        }
+        }})
+            })
+}
 /**
  * called when a new tick is received by the agent
  */
@@ -359,8 +394,6 @@ function drawBg() {
         }
 }
 
-
-
 /**
  * Draw a rectangle on screen
  *
@@ -418,14 +451,22 @@ function drawCircle(x, y, tileW, tileH, clr, size) {
 function drawImage(imgName, x, y, tileW, tileH, size)
 {
     var img = new Image();
-	img.src = window.location.origin + '/static/avatars/'+imgName;
+	var src=img.src = window.location.origin + '/static/avatars/'+imgName;
 	top_left_x = x + ((1 - size) * 0.5 * tileW);
     top_left_y = y + ((1 - size) * 0.5 * tileH);
 
     // width and height of rectangle
     w = size * tileW;
     h = size * tileH;
-
+    if (parsedGifs.hasOwnProperty(img.src) && parsedGifs[img.src].hasOwnProperty("currFrame"))
+    {
+        var currFrame=parsedGifs[src]["currFrame"];
+        img=parsedGifs[src][currFrame];
+        currFrame++;
+        if (currFrame>= parsedGifs[src].length){
+            currFrame=0;}
+         parsedGifs[src]["currFrame"]=currFrame;
+    }
     ctx.drawImage(img, top_left_x, top_left_y, w, h);  // DRAW THE IMAGE TO THE CANVAS.
 }
 
