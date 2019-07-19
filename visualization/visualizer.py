@@ -50,7 +50,7 @@ class Visualizer:
         tick_duration = tick_end_time - tick_start_time
         if self.__verbose:
             print(f"@{os.path.basename(__file__)}:  Request + reply took:", tick_duration.total_seconds(), file=sys.stderr)
-            print(f"@{os.path.basename(__file__)}: post url:", r.url, file=sys.stderr)
+            # print(f"@{os.path.basename(__file__)}: post url:", r.url, file=sys.stderr)
 
         # check for errors in the response
         if r.status_code != requests.codes.ok:
@@ -155,22 +155,28 @@ class Visualizer:
         tick_start_time = datetime.datetime.now()
 
         # send an update of the agent state to the GUI via its API
-        r = requests.post(url, json=data)
+        try:
+            r = requests.post(url, json=data)
+        except requests.exceptions.ConnectionError:
+            raise requests.exceptions.ConnectionError("Connection error; the visualisation server is likely not "
+                                                      "running or has crashed. Please start this first by running /visualisation/"
+                                                      "server.py")
+
 
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time
         if self.__verbose:
-            print(f"@{os.path.basename(__file__)}: Request + reply took:", tick_duration.total_seconds(), file=sys.stderr)
-            print(f"@{os.path.basename(__file__)}: post url:", r.url, file=sys.stderr)
+            print(f"@{os.path.basename(__file__)}: Visualization API Request + reply took:", tick_duration.total_seconds(), file=sys.stderr)
+            # print(f"@{os.path.basename(__file__)}: post url:", r.url, file=sys.stderr)
 
         # reset saved states
         self.__reset()
 
         # check if there was any user input for a human agent
         repl = r.json()
-
-        if self.__verbose:
-            print(f"@{os.path.basename(__file__)}: User inputs received: {repl}", file=sys.stderr)
+        #
+        # if self.__verbose:
+        #     print(f"@{os.path.basename(__file__)}: User inputs received: {repl}", file=sys.stderr)
 
         # return None if there was no userinput
         if repl == {}:
