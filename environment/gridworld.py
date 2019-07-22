@@ -363,7 +363,7 @@ class GridWorld:
 
         # Perform the update method of all objects
         for env_obj in self.environment_objects.values():
-            env_obj.update_properties(self)
+            env_obj.update(self)
 
         # Increment the number of tick we performed
         self.current_nr_ticks += 1

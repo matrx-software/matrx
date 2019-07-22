@@ -1,6 +1,7 @@
 import inspect
 import warnings
 
+from environment.gridworld import GridWorld
 from environment.objects.helper_functions import *
 from world_factory.helper_functions import get_default_value
 
@@ -132,17 +133,23 @@ class EnvObject:
         # AgentAvatar)
         self.location = location
 
-    def update_properties(self, grid_world):
+    def update(self, grid_world: GridWorld):
         """
-        Used to update some properties if needed. For example a 'status' property that changes over time. If you want
-        this functionality, you should create a new object that inherits from this class EnvObject. Is called in
-        \GridWorld after the agent actions are performed.
-        :return: The new properties.
-        """
+        Used to update some properties of this object if needed. For example a 'status' property that changes over time.
+        It can also be used to update something in the GridWorld. For example a Fire object that damages other objects
+        in its location.
 
-        # Make sure that you return properties, and not simply return custom_properties as you will miss all mandatory
-        # properties in that case.
-        return self.properties
+        If you want this functionality, you should create a new object that inherits from this class EnvObject.
+
+        This method is called automatically in the game-loop inside a running GridWorld instance.
+
+        Parameters
+        ----------
+        grid_world
+            The GridWorld instance representing the entire grid world. Can be used to alter itself or others in the
+            world in some way.
+        """
+        pass
 
     def change_property(self, property_name, property_value):
         """
