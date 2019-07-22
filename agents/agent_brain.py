@@ -1,3 +1,5 @@
+from typing import Union
+
 from agents.utils.state_tracker import StateTracker
 from environment.actions.door_actions import *
 from environment.actions.object_actions import GrabAction
@@ -89,8 +91,7 @@ class AgentBrain:
                 agents.append(obj)
         selected_agent = self.rnd_gen.choice(agents)
         message_content = f"Hello, my name is {self.agent_name}"
-        message = Message(content=message_content, from_id=self.agent_id, to_id=selected_agent['obj_id'])
-        self.messages_to_send.append(message)
+        self.send_message(message_content=message_content, to_id=selected_agent['agent_id'])
 
         # Select a random action
         if possible_actions:
@@ -183,6 +184,25 @@ class AgentBrain:
                 action_kwargs['object_id'] = self.rnd_gen.choice(doors)
 
         return action, action_kwargs
+
+    def send_message(self, message_content: Union[str, dict], to_id: str = None):
+        """
+        Method that allows you to construct a message that will be send to either a specified agent, a team of agents
+        or all agents.
+
+        Parameters
+        ----------
+        message_content
+            A string or a dictionary containing anything.
+        to_id
+            Defaults to None. A string denoting a specific agent's ID, a team name or None to send to all agents.
+
+        Returns
+        -------
+            Nothing.
+        """
+        message = Message(content=message_content, from_id=self.agent_id, to_id=to_id)
+        self.messages_to_send.append(message)
 
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
                             customizable_properties, rnd_seed):
