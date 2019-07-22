@@ -3,7 +3,7 @@ import os
 import sys
 import warnings
 from collections import OrderedDict
-from typing import Callable
+from typing import Callable, Union
 from noise import snoise2
 
 import numpy as np
@@ -17,7 +17,7 @@ from environment.objects.agent_body import AgentBody
 from environment.objects.env_object import EnvObject
 from environment.objects.helper_functions import get_inheritence_path
 from environment.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
-from environment.sim_goals.sim_goal import LimitedTimeGoal
+from environment.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
 from world_factory.helper_functions import get_default_value, _get_line_coords
 
 ######
@@ -50,20 +50,43 @@ import visualization
 
 
 class WorldFactory:
+    """ A factory instance to create a blueprint from which multiple GridWorlds can be generated.
+    """
 
-    def __init__(self, shape, tick_duration, random_seed=1, simulation_goal=1000, run_sail_api=True,
-                 run_visualization_server=True, visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False):
+    def __init__(self, shape: Union[list, tuple], tick_duration: float = 0.5, random_seed: int = 1,
+                 simulation_goal: Union[int, SimulationGoal] = 1000, run_sail_api: bool = True,
+                 run_visualization_server: bool = True, visualization_bg_clr: str = "#C2C2C2",
+                 visualization_bg_img: str = None, verbose: bool = False):
         """
-        Create a WorldFactory who stores how you want the world to look like, and from which you can obtain infinite
-        instantions of that world.
-        :param shape: The grid size, (width, height)
-        :param tick_duration: The duration of a tick in seconds.
-        :param random_seed: The master random seed from which all other seeds are obtains
-        :param simulation_goal: The goal that denotes when the simulation ended. Can be a SimulationGoal, a list of
-         SimulationGoal, or an integer denoting the number of ticks the simulation runs.
-        :param run_sail_api: Boolean if the SAIL api server should be started (not yet implemented)
-        :param run_visualization_server: Boolean if the Visualisation server should be started (not yet implemented)
+        Create a new WorldFactory instance that stores where and what you want to add to a world. In a way it acts as
+        a blueprint of a GridWorld. With the constructor you can set a number of general properties and from the
+        resulting instance you can call numerous methods to add new objects and/or agents.
+
+        Parameters
+        ----------
+        shape
+            Denotes the width and height of the world you create.
+        tick_duration
+            The duration of a single 'tick', or loop in the game-loop of the world you create. Defaults to 0.5.
+        random_seed
+            The master random seed on which all objects, agents and worls are seeded. Defaults 1.0.
+        simulation_goal
+            The goal or goals of the world, either a single SimulationGoal, a list of such or a postive non-zero integer
+            to denote the maximum number of 'ticks' the world(s) have to run.
+        run_sail_api
+            Not implemented yet.
+        run_visualization_server
+            Not implemented yet.
+        visualization_bg_clr
+            The color of the world when visualized using MATRXS' own visualisation server. A string representation of
+            hexidecimal color.
+        visualization_bg_img
+            An optional background image of the world when visualized using MATRXS' own visualisation server. A string
+            of the path to the image file.
+        verbose
+            Whether the subsequent creater world should be verbose or not.
         """
+
         # Set our random number generator
         self.rng = np.random.RandomState(random_seed)
         # Set our settings place holders
@@ -102,11 +125,30 @@ class WorldFactory:
 
         warnings.showwarning = _warning
 
-    def worlds(self, nr_of_worlds=10):
+    def worlds(self, nr_of_worlds: int = 10):
+        """
+        Returns a Generator of GridWorld instance for the specified number of worlds.
+
+        Parameters
+        ----------
+        nr_of_worlds
+            The number of worlds the Generator contains. Defaults to 10.
+
+        -------
+
+        """
         while self.worlds_created < nr_of_worlds:
             yield self.get_world()
 
     def get_world(self):
+        """
+        Creates a single GridWorld instance based on the current state of this WorldFactor instance.
+
+        Returns
+            A GridWorld instance.
+        -------
+
+        """
         self.worlds_created += 1
         world = self.__create_world()
         self.__reset_random()
@@ -130,20 +172,84 @@ class WorldFactory:
 
         return world_settings
 
-    def add_agent(self, location, agent, name="Agent", customizable_properties=None, sense_capability=None,
-                  is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None, is_movable=None,
-                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                  visualize_opacity=None,
+    def add_agent(self, location: Union[tuple, list], agent_brain: AgentBrain, name: str = "Agent",
+                  customizable_properties: Union[tuple, list] = None, sense_capability: SenseCapability = None,
+                  is_traversable: bool = None, team: str = None, agent_speed_in_ticks: int = None,
+                  possible_actions: list = None, is_movable: bool = None, visualize_size: float = None,
+                  visualize_shape: float = None, visualize_colour: str = None, visualize_depth: int = None,
+                  visualize_opacity: float = None,
                   **custom_properties):
+        """
+        The helper method within a WorldFactory instance to add a single agent. This method makes sure that when this
+        factory generates a GridWorld instance, it contains an AgentBody connected to the given AgentBrain.
+
+        All parameters except for the location and agent_brain default to None. Which means that their values are
+        obtained from the scenarios/defaults.json file under the segment Agent.
+
+        Parameters
+        ----------
+        location
+            The location (x,y) of the to be added agent.
+        agent_brain
+            The AgentBrain instance that will control the agent.
+        name
+            The name of the agent, should be unique to allow the visualisation to have a single web page per agent. If
+            the name is already used, an exception is thrown.
+        customizable_properties
+            A list or tuple of names of properties for this agent that can be altered or customized. Either by the agent
+            itself or by other agents or objects. If a property value gets changed that is not in this list than an
+            exception is thrown.
+        sense_capability
+            The SenseCapability object belonging this this agent's AgentBody. Used by the GridWorld to pre-filter
+            objects and agents from this agent's states when querying for actions.
+        is_traversable
+            Denotes whether other agents and object can move over this agent. It also throws an exception when this is
+            set to False and another object/agent with this set to False is added to the same location.
+        team
+            The team name. Used to group agents together.
+        agent_speed_in_ticks
+            The number of 'ticks' this agent will have to wait between each time it is queried for an action. By setting
+            this to a higher number than other agents, this agent will be slower.
+        possible_actions
+            A list or tuple of the names of the Action classes this agent can perform. With this you can limit the
+            actions this agent can perform.
+        is_movable
+            Whether this agent can be moved by other agents (currently this only happens with the DropObjectAction and
+            PickUpAction).
+        visualize_size
+            The size of this agent in its visualisation. A value of 1.0 denotes the full grid location square, whereas
+            a value of 0.5 denotes half, and 0.0 an infinitisimal small size.
+        visualize_shape
+            The shape of this agent in its visualisation. Depending on the value it obtains this shape: 0 = a square,
+            1 = a triangle, 2 = a circle.
+        visualize_colour
+            The colour of this agent in its visualisation. Should be a string hexidecimal colour value.
+        visualize_depth
+            The visualisation depth of this agent in its visualisation. It denotes the 'layer' on which it is
+            visualized. A larger value is more on 'top'.
+        visualize_opacity
+            The opacity of this agent in its visualization. A value of 1.0 means full opacity and 0.0 no opacity.
+        custom_properties
+            Any additional given keyword arguments will be encapsulated in this dictionary. These will be added to the
+            AgentBody as custom_properties which can be perceived by other agents and objects or which can be used or
+            altered (if allowed to by the customizable_properties list) by the AgentBrain or others.
+
+        Raises
+        ------
+        AttributeError
+            When the given agent name is already added to this WorldFactory instance.
+
+        """
 
         # Check if location and agent are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
-        assert isinstance(agent, AgentBrain)
+        assert isinstance(agent_brain, AgentBrain)
 
-        #Check if the agent name is unique
+        # Check if the agent name is unique
         for existingAgent in self.agent_settings:
             if existingAgent["mandatory_properties"]["name"] == name:
-                raise Exception(f"An agent with the name {name} was already added. Agent names should be unique.", name)
+                raise AttributeError(f"An agent with the name {name} was already added. Agent names should be unique.",
+                                     name)
 
         # Load the defaults for any variable that is not defined
         # Obtain any defaults from the defaults.json file if not set already.
@@ -176,13 +282,13 @@ class WorldFactory:
             customizable_properties = []
 
         # Check if the agent is not of HumanAgent, if so; use the add_human_agent method
-        inh_path = get_inheritence_path(agent.__class__)
+        inh_path = get_inheritence_path(agent_brain.__class__)
         if 'HumanAgent' in inh_path:
             Exception(f"You are adding an agent that is or inherits from HumanAgent with the name {name}. Use "
                       f"factory.add_human_agent to add such agents.")
 
         # Define a settings dictionary with all we need to register and add an agent to the GridWorld
-        agent_setting = {"agent": agent,
+        agent_setting = {"agent": agent_brain,
                          "custom_properties": custom_properties,
                          "customizable_properties": customizable_properties,
                          "sense_capability": sense_capability,
@@ -443,7 +549,8 @@ class WorldFactory:
 
         for existingAgent in self.agent_settings:
             if existingAgent["mandatory_properties"]["name"] == name:
-                raise Exception(f"A human agent with the name {name} was already added. Agent names should be unique.", name)
+                raise Exception(f"A human agent with the name {name} was already added. Agent names should be unique.",
+                                name)
         # Load the defaults for any variable that is not defined
         # Obtain any defaults from the defaults.json file if not set already.
         if is_traversable is None:

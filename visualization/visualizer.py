@@ -17,7 +17,7 @@ class Visualizer:
     simulation iteration, and sending these to the Flask webserver via an API where they are visualized.
     """
 
-    def __init__(self, grid_size, vis_bg_clr,vis_bg_img=None, verbose=False):
+    def __init__(self, grid_size, vis_bg_clr, vis_bg_img=None, verbose=False):
         self.__agent_states = {}
         self.__hu_ag_states = {}
         self.__god_state = {}
@@ -25,8 +25,6 @@ class Visualizer:
         self._userinputs = {}
 
         self.__initGUI(grid_size=grid_size, vis_bg_clr=vis_bg_clr, vis_bg_img=vis_bg_img)
-
-
 
     def __initGUI(self, grid_size, vis_bg_clr, vis_bg_img):
         """
@@ -49,7 +47,8 @@ class Visualizer:
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time
         if self.__verbose:
-            print(f"@{os.path.basename(__file__)}:  Request + reply took:", tick_duration.total_seconds(), file=sys.stderr)
+            print(f"@{os.path.basename(__file__)}:  Request + reply took:", tick_duration.total_seconds(),
+                  file=sys.stderr)
             # print(f"@{os.path.basename(__file__)}: post url:", r.url, file=sys.stderr)
 
         # check for errors in the response
@@ -162,11 +161,11 @@ class Visualizer:
                                                       "running or has crashed. Please start this first by running /visualisation/"
                                                       "server.py")
 
-
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - tick_start_time
         if self.__verbose:
-            print(f"@{os.path.basename(__file__)}: Visualization API Request + reply took:", tick_duration.total_seconds(), file=sys.stderr)
+            print(f"@{os.path.basename(__file__)}: Visualization API Request + reply took:",
+                  tick_duration.total_seconds(), file=sys.stderr)
             # print(f"@{os.path.basename(__file__)}: post url:", r.url, file=sys.stderr)
 
         # reset saved states

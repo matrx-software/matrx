@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class SimulationGoal:
     """
     A class that tracks whether the simulation has reached its global goal.

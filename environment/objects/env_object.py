@@ -1,7 +1,3 @@
-import inspect
-import warnings
-
-from environment.gridworld import GridWorld
 from environment.objects.helper_functions import *
 from world_factory.helper_functions import get_default_value
 
@@ -133,7 +129,7 @@ class EnvObject:
         # AgentAvatar)
         self.location = location
 
-    def update(self, grid_world: GridWorld):
+    def update(self, grid_world):
         """
         Used to update some properties of this object if needed. For example a 'status' property that changes over time.
         It can also be used to update something in the GridWorld. For example a Fire object that damages other objects
