@@ -1,6 +1,6 @@
 import numpy as np
 
-from environment.helper_functions import get_distance
+from utils.grid_world_utils import get_distance
 
 
 class StateTracker:

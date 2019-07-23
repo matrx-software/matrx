@@ -3,7 +3,7 @@ import collections
 import numpy as np
 
 from environment.actions.action import Action, ActionResult
-from environment.helper_functions import get_distance
+from utils.grid_world_utils import get_distance
 from environment.objects.agent_body import AgentBody
 from environment.objects.simple_objects import AreaTile
 

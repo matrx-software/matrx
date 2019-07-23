@@ -1,6 +1,6 @@
 from agents.capabilities.capability import SenseCapability
 from environment.actions.action import Action
-from environment.helper_functions import get_all_classes
+from utils.grid_world_utils import get_all_classes
 from environment.objects.env_object import EnvObject
 
 

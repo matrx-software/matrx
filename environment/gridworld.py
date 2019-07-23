@@ -3,9 +3,8 @@ import time
 import os.path
 from collections import OrderedDict
 
-from environment.helper_functions import get_distance
 from environment.actions.object_actions import *
-from environment.helper_functions import get_all_classes
+from utils.grid_world_utils import get_all_classes
 from environment.objects.env_object import *
 from environment.objects.simple_objects import AreaTile
 from visualization.visualizer import Visualizer
