@@ -1,0 +1,11 @@
+world\_factory
+==============
+
+.. rubric:: Description
+
+.. automodule:: world_factory
+
+.. currentmodule:: world_factory
+
+
+

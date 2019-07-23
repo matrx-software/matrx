@@ -1,0 +1,6 @@
+environment.actions.door\_actions.OpenDoorAction.is\_possible
+=============================================================
+
+.. currentmodule:: environment.actions.door_actions
+
+.. automethod:: OpenDoorAction.is_possible

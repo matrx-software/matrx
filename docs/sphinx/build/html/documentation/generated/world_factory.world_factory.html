@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>world_factory.world_factory &#8212; MATRXS 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="Documentation Reference" href="../documentation.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html"><span><img src="../../_static/winnie_pooh_matrxs.jpg"></span>
+          MATRXS</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../examples/examples.html">Examples</a></li>
+                <li><a href="../documentation.html">Documentation</a></li>
+                <li><a href="../../usage/quickstart.html">Quickstart</a></li>
+                <li><a href="https://ci.tno.nl/gitlab/matrxs/matrxs">Repository</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">About MATRXS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../documentation.html">Documentation Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">world_factory.world_factory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment.gridworld.html">environment.gridworld</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment.actions.html">environment.actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="world_factory.world_factory.WorldFactory.html">world_factory.world_factory.WorldFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment.actions.action.Action.html">environment.actions.action.Action</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment.actions.door_actions.OpenDoorAction.html">environment.actions.door_actions.OpenDoorAction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/examples.html#list-of-examples">List of examples</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../../_sources/documentation/generated/world_factory.world_factory.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="module-world_factory.world_factory">
+<span id="world-factory-world-factory"></span><h1>world_factory.world_factory<a class="headerlink" href="#module-world_factory.world_factory" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#world_factory.world_factory.RandomLocation" title="world_factory.world_factory.RandomLocation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomLocation</span></code></a>(area_corners)</p></td>
+<td><p><p class="rubric">Methods</p>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#world_factory.world_factory.RandomProperty" title="world_factory.world_factory.RandomProperty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomProperty</span></code></a>(values[, distribution, …])</p></td>
+<td><p><p class="rubric">Methods</p>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="world_factory.world_factory.WorldFactory.html#world_factory.world_factory.WorldFactory" title="world_factory.world_factory.WorldFactory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WorldFactory</span></code></a>(shape[, tick_duration, …])</p></td>
+<td><p>A factory instance to create a blueprint from which multiple GridWorlds can be generated.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="world_factory.world_factory.RandomLocation">
+<em class="property">class </em><code class="sig-prename descclassname">world_factory.world_factory.</code><code class="sig-name descname">RandomLocation</code><span class="sig-paren">(</span><em class="sig-param">area_corners</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.RandomLocation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 62%" />
+<col style="width: 38%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>get_location</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>reset</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="world_factory.world_factory.RandomLocation.get_location">
+<code class="sig-name descname">get_location</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">rng</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.RandomLocation.get_location" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.RandomLocation.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.RandomLocation.reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="world_factory.world_factory.RandomProperty">
+<em class="property">class </em><code class="sig-prename descclassname">world_factory.world_factory.</code><code class="sig-name descname">RandomProperty</code><span class="sig-paren">(</span><em class="sig-param">values</em>, <em class="sig-param">distribution=None</em>, <em class="sig-param">allow_duplicates=True</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.RandomProperty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 62%" />
+<col style="width: 38%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>get_property</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>reset</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="world_factory.world_factory.RandomProperty.get_property">
+<code class="sig-name descname">get_property</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">rng: mtrand.RandomState</em>, <em class="sig-param">size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.RandomProperty.get_property" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.RandomProperty.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.RandomProperty.reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="world_factory.world_factory.WorldFactory">
+<em class="property">class </em><code class="sig-prename descclassname">world_factory.world_factory.</code><code class="sig-name descname">WorldFactory</code><span class="sig-paren">(</span><em class="sig-param">shape: Union[list, tuple], tick_duration: float = 0.5, random_seed: int = 1, simulation_goal: Union[int, environment.sim_goals.sim_goal.SimulationGoal, list, tuple] = 1000, run_sail_api: bool = False, run_visualization_server: bool = False, visualization_bg_clr: str = '#C2C2C2', visualization_bg_img: str = None, verbose: bool = False</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A factory instance to create a blueprint from which multiple GridWorlds can be generated.</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="world_factory.world_factory.WorldFactory.html#world_factory.world_factory.WorldFactory.add_agent" title="world_factory.world_factory.WorldFactory.add_agent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_agent</span></code></a>(self, location, list], …)</p></td>
+<td><p>The helper method within a WorldFactory instance to add a single agent.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="world_factory.world_factory.WorldFactory.html#world_factory.world_factory.WorldFactory.add_team" title="world_factory.world_factory.WorldFactory.add_team"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_team</span></code></a>(self, agent_brains, tuple], …[, …])</p></td>
+<td><p>Adds a group of agents as a single team (meaning that their ‘team’ property all have the given team name).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="world_factory.world_factory.WorldFactory.html#world_factory.world_factory.WorldFactory.get_world" title="world_factory.world_factory.WorldFactory.get_world"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_world</span></code></a>(self)</p></td>
+<td><p>Creates a single GridWorld instance based on the current state of this WorldFactor instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="world_factory.world_factory.WorldFactory.html#world_factory.world_factory.WorldFactory.worlds" title="world_factory.world_factory.WorldFactory.worlds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">worlds</span></code></a>(self, nr_of_worlds)</p></td>
+<td><p>Returns a Generator of GridWorld instance for the specified number of worlds.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 73%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>add_agent_prospect</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>add_area</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>add_env_object</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>add_env_object_prospect</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>add_human_agent</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>add_line</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>add_multiple_agents</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>add_multiple_objects</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>add_room</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>add_smoke_area</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>create_sense_capability</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.add_agent">
+<code class="sig-name descname">add_agent</code><span class="sig-paren">(</span><em class="sig-param">self, location: Union[tuple, list], agent_brain: agents.agent_brain.AgentBrain, name, customizable_properties: Union[tuple, list] = None, sense_capability: agents.capabilities.capability.SenseCapability = None, is_traversable: bool = None, team: str = None, agent_speed_in_ticks: int = None, possible_actions: list = None, is_movable: bool = None, visualize_size: float = None, visualize_shape: float = None, visualize_colour: str = None, visualize_depth: int = None, visualize_opacity: float = None, **custom_properties</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.add_agent" title="Permalink to this definition">¶</a></dt>
+<dd><p>The helper method within a WorldFactory instance to add a single agent.</p>
+<p>This method makes sure that when this
+factory generates a GridWorld instance, it contains an AgentBody connected to the given AgentBrain.</p>
+<p>All keyword parameters default to None. Which means that their values are obtained from the
+“scenarios/defaults.json” file under the segment AgentBody.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>location</strong></dt><dd><p>The location (x,y) of the to be added agent.</p>
+</dd>
+<dt><strong>agent_brain</strong></dt><dd><p>The AgentBrain instance that will control the agent.</p>
+</dd>
+<dt><strong>name</strong></dt><dd><p>The name of the agent, should be unique to allow the visualisation to have a single web page per agent. If
+the name is already used, an exception is thrown.</p>
+</dd>
+<dt><strong>customizable_properties: optional</strong></dt><dd><p>A list or tuple of names of properties for this agent that can be altered or customized. Either by the agent
+itself or by other agents or objects. If a property value gets changed that is not in this list than an
+exception is thrown.</p>
+</dd>
+<dt><strong>sense_capability: optional</strong></dt><dd><p>The SenseCapability object belonging this this agent’s AgentBody. Used by the GridWorld to pre-filter
+objects and agents from this agent’s states when querying for actions. Defaults to a SenseCapability that
+sees all object types within the entire world.</p>
+</dd>
+<dt><strong>is_traversable: optional</strong></dt><dd><p>Denotes whether other agents and object can move over this agent. It also throws an exception when this is
+set to False and another object/agent with this set to False is added to the same location.</p>
+</dd>
+<dt><strong>team: optional</strong></dt><dd><p>The team name. Used to group agents together. Defaults to this agent’s name to signify it forms its own
+team.</p>
+</dd>
+<dt><strong>agent_speed_in_ticks: optional</strong></dt><dd><p>The number of ‘ticks’ this agent will have to wait between each time it is queried for an action. By setting
+this to a higher number than other agents, this agent will be slower.</p>
+</dd>
+<dt><strong>possible_actions: optional</strong></dt><dd><p>A list or tuple of the names of the Action classes this agent can perform. With this you can limit the
+actions this agent can perform.</p>
+</dd>
+<dt><strong>is_movable: optional</strong></dt><dd><p>Whether this agent can be moved by other agents (currently this only happens with the DropObjectAction and
+PickUpAction).</p>
+</dd>
+<dt><strong>visualize_size: optional</strong></dt><dd><p>The size of this agent in its visualisation. A value of 1.0 denotes the full grid location square, whereas
+a value of 0.5 denotes half, and 0.0 an infinitisimal small size.</p>
+</dd>
+<dt><strong>visualize_shape: optional</strong></dt><dd><p>The shape of this agent in its visualisation. Depending on the value it obtains this shape: 0 = a square,
+1 = a triangle, 2 = a circle.</p>
+</dd>
+<dt><strong>visualize_colour: optional</strong></dt><dd><p>The colour of this agent in its visualisation. Should be a string hexidecimal colour value.</p>
+</dd>
+<dt><strong>visualize_depth: optional</strong></dt><dd><p>The visualisation depth of this agent in its visualisation. It denotes the ‘layer’ on which it is
+visualized. A larger value is more on ‘top’.</p>
+</dd>
+<dt><strong>visualize_opacity: optional</strong></dt><dd><p>The opacity of this agent in its visualization. A value of 1.0 means full opacity and 0.0 no opacity.</p>
+</dd>
+<dt><strong>custom_properties: optional</strong></dt><dd><p>Any additional given keyword arguments will be encapsulated in this dictionary. These will be added to the
+AgentBody as custom_properties which can be perceived by other agents and objects or which can be used or
+altered (if allowed to by the customizable_properties list) by the AgentBrain or others.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd><p>…</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>AttributeError</dt><dd><p>When the given agent name is already added to this WorldFactory instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.add_agent_prospect">
+<code class="sig-name descname">add_agent_prospect</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">location</em>, <em class="sig-param">agent</em>, <em class="sig-param">probability</em>, <em class="sig-param">name='Agent'</em>, <em class="sig-param">customizable_properties=None</em>, <em class="sig-param">sense_capability=None</em>, <em class="sig-param">is_traversable=None</em>, <em class="sig-param">team=None</em>, <em class="sig-param">agent_speed_in_ticks=None</em>, <em class="sig-param">possible_actions=None</em>, <em class="sig-param">is_movable=None</em>, <em class="sig-param">visualize_size=None</em>, <em class="sig-param">visualize_shape=None</em>, <em class="sig-param">visualize_colour=None</em>, <em class="sig-param">visualize_opacity=None</em>, <em class="sig-param">visualize_depth=None</em>, <em class="sig-param">**custom_properties</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.add_agent_prospect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.add_area">
+<code class="sig-name descname">add_area</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">top_left_location</em>, <em class="sig-param">width</em>, <em class="sig-param">height</em>, <em class="sig-param">name</em>, <em class="sig-param">customizable_properties=None</em>, <em class="sig-param">visualize_colour=None</em>, <em class="sig-param">visualize_opacity=None</em>, <em class="sig-param">**custom_properties</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.add_area" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.add_env_object">
+<code class="sig-name descname">add_env_object</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">location</em>, <em class="sig-param">name</em>, <em class="sig-param">callable_class=None</em>, <em class="sig-param">customizable_properties=None</em>, <em class="sig-param">is_traversable=None</em>, <em class="sig-param">is_movable=None</em>, <em class="sig-param">visualize_size=None</em>, <em class="sig-param">visualize_shape=None</em>, <em class="sig-param">visualize_colour=None</em>, <em class="sig-param">visualize_depth=None</em>, <em class="sig-param">visualize_opacity=None</em>, <em class="sig-param">**custom_properties</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.add_env_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.add_env_object_prospect">
+<code class="sig-name descname">add_env_object_prospect</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">location</em>, <em class="sig-param">name</em>, <em class="sig-param">probability</em>, <em class="sig-param">callable_class=None</em>, <em class="sig-param">customizable_properties=None</em>, <em class="sig-param">is_traversable=None</em>, <em class="sig-param">visualize_size=None</em>, <em class="sig-param">visualize_shape=None</em>, <em class="sig-param">visualize_colour=None</em>, <em class="sig-param">visualize_depth=None</em>, <em class="sig-param">visualize_opacity=None</em>, <em class="sig-param">**custom_properties</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.add_env_object_prospect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.add_human_agent">
+<code class="sig-name descname">add_human_agent</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">location</em>, <em class="sig-param">agent</em>, <em class="sig-param">name='HumanAgent'</em>, <em class="sig-param">customizable_properties=None</em>, <em class="sig-param">sense_capability=None</em>, <em class="sig-param">is_traversable=None</em>, <em class="sig-param">team=None</em>, <em class="sig-param">agent_speed_in_ticks=None</em>, <em class="sig-param">possible_actions=None</em>, <em class="sig-param">is_movable=None</em>, <em class="sig-param">visualize_size=None</em>, <em class="sig-param">visualize_shape=None</em>, <em class="sig-param">visualize_colour=None</em>, <em class="sig-param">visualize_depth=None</em>, <em class="sig-param">visualize_opacity=None</em>, <em class="sig-param">usrinp_action_map=None</em>, <em class="sig-param">**custom_properties</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.add_human_agent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.add_line">
+<code class="sig-name descname">add_line</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">start</em>, <em class="sig-param">end</em>, <em class="sig-param">name</em>, <em class="sig-param">callable_class=None</em>, <em class="sig-param">customizable_properties=None</em>, <em class="sig-param">is_traversable=None</em>, <em class="sig-param">is_movable=None</em>, <em class="sig-param">visualize_size=None</em>, <em class="sig-param">visualize_shape=None</em>, <em class="sig-param">visualize_colour=None</em>, <em class="sig-param">visualize_depth=None</em>, <em class="sig-param">visualize_opacity=None</em>, <em class="sig-param">**custom_properties</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.add_line" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.add_multiple_agents">
+<code class="sig-name descname">add_multiple_agents</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">agents</em>, <em class="sig-param">locations</em>, <em class="sig-param">custom_properties=None</em>, <em class="sig-param">sense_capabilities=None</em>, <em class="sig-param">customizable_properties=None</em>, <em class="sig-param">is_traversable=None</em>, <em class="sig-param">agent_speeds_in_ticks=None</em>, <em class="sig-param">teams=None</em>, <em class="sig-param">visualize_sizes=None</em>, <em class="sig-param">visualize_shapes=None</em>, <em class="sig-param">visualize_colours=None</em>, <em class="sig-param">visualize_opacities=None</em>, <em class="sig-param">visualize_depths=None</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.add_multiple_agents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.add_multiple_objects">
+<code class="sig-name descname">add_multiple_objects</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">locations</em>, <em class="sig-param">names=None</em>, <em class="sig-param">callable_classes=None</em>, <em class="sig-param">custom_properties=None</em>, <em class="sig-param">customizable_properties=None</em>, <em class="sig-param">is_traversable=None</em>, <em class="sig-param">visualize_sizes=None</em>, <em class="sig-param">visualize_shapes=None</em>, <em class="sig-param">visualize_colours=None</em>, <em class="sig-param">visualize_depths=None</em>, <em class="sig-param">visualize_opacities=None</em>, <em class="sig-param">is_movable=None</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.add_multiple_objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.add_room">
+<code class="sig-name descname">add_room</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">top_left_location</em>, <em class="sig-param">width</em>, <em class="sig-param">height</em>, <em class="sig-param">name</em>, <em class="sig-param">door_locations=None</em>, <em class="sig-param">with_area_tiles=False</em>, <em class="sig-param">doors_open=False</em>, <em class="sig-param">wall_custom_properties=None</em>, <em class="sig-param">wall_customizable_properties=None</em>, <em class="sig-param">area_custom_properties=None</em>, <em class="sig-param">area_customizable_properties=None</em>, <em class="sig-param">area_visualize_colour=None</em>, <em class="sig-param">area_visualize_opacity=None</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.add_room" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.add_smoke_area">
+<code class="sig-name descname">add_smoke_area</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">top_left_location</em>, <em class="sig-param">width</em>, <em class="sig-param">height</em>, <em class="sig-param">name</em>, <em class="sig-param">visualize_colour=None</em>, <em class="sig-param">smoke_thickness_multiplier=1.0</em>, <em class="sig-param">visualize_depth=None</em>, <em class="sig-param">**custom_properties</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.add_smoke_area" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.add_team">
+<code class="sig-name descname">add_team</code><span class="sig-paren">(</span><em class="sig-param">self, agent_brains: Union[list, tuple], locations: Union[list, tuple], team_name, custom_properties=None, sense_capability=None, customizable_properties=None, is_traversable=None, agent_speed_in_ticks=None, visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_opacity=None</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.add_team" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a group of agents as a single team (meaning that their ‘team’ property all have the given team name).</p>
+<p>All parameters except for the <cite>locations</cite> and <cite>agent_brain</cite> defaults to <cite>None</cite>. Which means that their values
+are obtained from the “scenarios/defaults.json” file under the segment AgentBody.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>agent_brains</strong></dt><dd><p>The list or tuple of AgentBrain that will control each agent in the team. Should be of the same size as
+<cite>locations</cite>.</p>
+</dd>
+<dt><strong>locations</strong></dt><dd><p>The list or tuple of locations in the form of [x, y] at which coordinates each agent starts in the team.
+Should be of the same size as <cite>locations</cite>.</p>
+</dd>
+<dt><strong>team_name</strong></dt><dd><p>The</p>
+</dd>
+<dt><strong>custom_properties</strong></dt><dd></dd>
+<dt><strong>sense_capability</strong></dt><dd></dd>
+<dt><strong>customizable_properties</strong></dt><dd></dd>
+<dt><strong>is_traversable</strong></dt><dd></dd>
+<dt><strong>agent_speed_in_ticks</strong></dt><dd></dd>
+<dt><strong>visualize_size</strong></dt><dd></dd>
+<dt><strong>visualize_shape</strong></dt><dd></dd>
+<dt><strong>visualize_colour</strong></dt><dd></dd>
+<dt><strong>visualize_opacity</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.create_sense_capability">
+<code class="sig-name descname">create_sense_capability</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">objects_to_perceive</em>, <em class="sig-param">range_to_perceive_them_in</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.create_sense_capability" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.get_world">
+<code class="sig-name descname">get_world</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.get_world" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a single GridWorld instance based on the current state of this WorldFactor instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>GridWorld</dt><dd><p>A GridWorld instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="world_factory.world_factory.WorldFactory.worlds">
+<code class="sig-name descname">worlds</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">nr_of_worlds: int = 10</em><span class="sig-paren">)</span><a class="headerlink" href="#world_factory.world_factory.WorldFactory.worlds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Generator of GridWorld instance for the specified number of worlds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>nr_of_worlds</strong></dt><dd><p>The number of worlds the Generator contains. Defaults to 10.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><dl class="simple">
+<dt>GridWorld</dt><dd><p>A GridWorld, where all random properties and prospects are sampled using the given master seed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ValueError</dt><dd><p>The nr_of_worlds should be a postive non-zero integer.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, TNO, Jasper van der Waa, Tjalling Haije, Ioana Cocu.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

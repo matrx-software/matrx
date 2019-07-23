@@ -1,0 +1,6 @@
+world\_factory.world\_factory.RandomLocation.get\_location
+==========================================================
+
+.. currentmodule:: world_factory.world_factory
+
+.. automethod:: RandomLocation.get_location

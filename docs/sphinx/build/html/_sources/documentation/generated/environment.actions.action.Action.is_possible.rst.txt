@@ -1,0 +1,6 @@
+environment.actions.action.Action.is\_possible
+==============================================
+
+.. currentmodule:: environment.actions.action
+
+.. automethod:: Action.is_possible
