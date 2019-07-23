@@ -1,6 +1,0 @@
-environment.actions.action.Action.mutate
-========================================
-
-.. currentmodule:: environment.actions.action
-
-.. automethod:: Action.mutate

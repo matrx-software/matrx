@@ -1,6 +1,0 @@
-world\_factory.world\_factory.WorldFactory.add\_line
-====================================================
-
-.. currentmodule:: world_factory.world_factory
-
-.. automethod:: WorldFactory.add_line

@@ -1,6 +1,0 @@
-environment.actions.door\_actions.OpenDoorAction.mutate
-=======================================================
-
-.. currentmodule:: environment.actions.door_actions
-
-.. automethod:: OpenDoorAction.mutate

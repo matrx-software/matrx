@@ -1,34 +1,70 @@
 Documentation Reference
 =======================
 
-.. rubric:: Modules
+.. rubric:: World
 
 .. autosummary::
     :toctree: generated
 
-    world_factory.world_factory
-    environment.gridworld
-    environment.actions
+    world_factory.WorldFactory
+    grid_world.GridWorld
 
 
 
-.. rubric:: Classes
+.. rubric:: Actions
+
+.. autosummary::
+    :toctree: generated
+
+    action.Action
+    door_actions.OpenDoorAction
+    door_actions.CloseDoorAction
+    door_actions.OpenDoorActionResult
+    door_actions.CloseDoorActionResult
+    object_actions.RemoveObject
+    object_actions.RemoveObjectResult
+    object_actions.GrabObject
+    object_actions.GrabObjectResult
+    object_actions.DropObject
+    object_actions.DropObjectResult
+
+
+
+.. rubric:: Objects
 
 .. autosummary::
     :toctree: generated
 
+    env_object.EnvObject
+    agent_body.AgentBody
+    simple_objects.SquareBlock
+    simple_objects.Door
+    simple_objects.Wall
+    simple_objects.AreaTile
+    simple_objects.SmokeTile
+    advanced_objects.Battery
 
-    world_factory.world_factory.WorldFactory
-    environment.actions.action.Action
-    environment.actions.door_actions.OpenDoorAction
 
 
-
-.. rubric:: Methods
+.. rubric:: Simulation Goals
 
 .. autosummary::
     :toctree: generated
-    :titlesonly:
+
+    sim_goal.SimulationGoal
+    sim_goal.LimitedTimeGoal
 
 
-    world_factory.world_factory.WorldFactory
+
+.. rubric:: Agents
+
+.. autosummary::
+    :toctree: generated
+
+    agent_brain.AgentBrain
+    human_agent_brain.HumanAgentBrain
+    patrolling_agent.PatrollingAgentBrain
+    capabilities.Capability
+    navigator.Navigator
+    state_tracker.StateTracker
+

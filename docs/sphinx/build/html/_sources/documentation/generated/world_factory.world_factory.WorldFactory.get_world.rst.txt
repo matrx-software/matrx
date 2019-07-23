@@ -1,6 +1,0 @@
-world\_factory.world\_factory.WorldFactory.get\_world
-=====================================================
-
-.. currentmodule:: world_factory.world_factory
-
-.. automethod:: WorldFactory.get_world

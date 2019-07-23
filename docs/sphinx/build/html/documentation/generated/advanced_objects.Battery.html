@@ -1,0 +1,364 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>advanced_objects.Battery &mdash; MATRXS 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> MATRXS
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">About MATRXS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../documentation.html">Documentation Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="world_factory.WorldFactory.html">world_factory.WorldFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grid_world.GridWorld.html">grid_world.GridWorld</a></li>
+<li class="toctree-l2"><a class="reference internal" href="action.Action.html">action.Action</a></li>
+<li class="toctree-l2"><a class="reference internal" href="door_actions.OpenDoorAction.html">door_actions.OpenDoorAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="door_actions.CloseDoorAction.html">door_actions.CloseDoorAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="door_actions.OpenDoorActionResult.html">door_actions.OpenDoorActionResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="door_actions.CloseDoorActionResult.html">door_actions.CloseDoorActionResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_actions.RemoveObject.html">object_actions.RemoveObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_actions.RemoveObjectResult.html">object_actions.RemoveObjectResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_actions.GrabObject.html">object_actions.GrabObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_actions.GrabObjectResult.html">object_actions.GrabObjectResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_actions.DropObject.html">object_actions.DropObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_actions.DropObjectResult.html">object_actions.DropObjectResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="env_object.EnvObject.html">env_object.EnvObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="agent_body.AgentBody.html">agent_body.AgentBody</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple_objects.SquareBlock.html">simple_objects.SquareBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple_objects.Door.html">simple_objects.Door</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple_objects.Wall.html">simple_objects.Wall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple_objects.AreaTile.html">simple_objects.AreaTile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple_objects.SmokeTile.html">simple_objects.SmokeTile</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">advanced_objects.Battery</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sim_goal.SimulationGoal.html">sim_goal.SimulationGoal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim_goal.LimitedTimeGoal.html">sim_goal.LimitedTimeGoal</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/examples.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MATRXS</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../documentation.html">Documentation Reference</a> &raquo;</li>
+        
+      <li>advanced_objects.Battery</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/documentation/generated/advanced_objects.Battery.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="advanced-objects-battery">
+<h1>advanced_objects.Battery<a class="headerlink" href="#advanced-objects-battery" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="advanced_objects.Battery">
+<em class="property">class </em><code class="sig-prename descclassname">advanced_objects.</code><code class="sig-name descname">Battery</code><span class="sig-paren">(</span><em class="sig-param">location</em>, <em class="sig-param">name='Battery'</em>, <em class="sig-param">start_energy_level=1.0</em>, <em class="sig-param">energy_decay=0.01</em><span class="sig-paren">)</span><a class="headerlink" href="#advanced_objects.Battery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">environment.objects.env_object.EnvObject</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#advanced_objects.Battery.location" title="advanced_objects.Battery.location"><code class="xref py py-obj docutils literal notranslate"><span class="pre">location</span></code></a></dt><dd><p>The location of any object is a pythonic property, this allows us to do various checks on it.</p>
+</dd>
+<dt><a class="reference internal" href="#advanced_objects.Battery.properties" title="advanced_objects.Battery.properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">properties</span></code></a></dt><dd><p>Returns the custom properties of this object, but also any mandatory properties such as location, name, is_traversable and all visualization properties (those are in their own dictionary under ‘visualization’).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#advanced_objects.Battery.add_property" title="advanced_objects.Battery.add_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_property</span></code></a>(self, property_name, property_value)</p></td>
+<td><p>Adds a new(!) property with its value to the object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#advanced_objects.Battery.change_property" title="advanced_objects.Battery.change_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">change_property</span></code></a>(self, property_name, …)</p></td>
+<td><p>Changes the value of an existing (!) property.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#advanced_objects.Battery.update" title="advanced_objects.Battery.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(self, grid_world)</p></td>
+<td><p>Updates the current energy level, changes the property accordingly, and also change the visualization color.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="advanced_objects.Battery.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">location</em>, <em class="sig-param">name='Battery'</em>, <em class="sig-param">start_energy_level=1.0</em>, <em class="sig-param">energy_decay=0.01</em><span class="sig-paren">)</span><a class="headerlink" href="#advanced_objects.Battery.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>A simple exanple of an object with an update_properties method that is called each simulation step. It also has
+two default properties that are unique to this object; start_energy_level, and energy_decay. These are added
+as properties by passing them as keyword arguments to the constructor of EnvObject. In addition this constructor
+also makes a current_enery_level attribute which is also treated as a property by giving it to the EnvObject
+constructor as well. All other properties are obtained from the defaults.json as defined for all EnvObject,
+except for the size (which is set to be 0.25) and the colour (which is a shade of green turning to red based on
+the current_energy_level).</p>
+<p>Its update_properties method simply decays the current energy level with the given factor and the colour
+accordingly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>location</strong> – The location of the battery.</p></li>
+<li><p><strong>name</strong> – Optional. Defaults to ‘Battery’.</p></li>
+<li><p><strong>start_energy_level</strong> – Optional. Defaults to 1.0</p></li>
+<li><p><strong>energy_decay</strong> – Optional. Defaults to 0.01, meaning the energy decreases with 1% of its current value each</p></li>
+</ul>
+</dd>
+</dl>
+<p>simulation step.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#advanced_objects.Battery.__init__" title="advanced_objects.Battery.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, location[, name, …])</p></td>
+<td><p>A simple exanple of an object with an update_properties method that is called each simulation step.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#advanced_objects.Battery.add_property" title="advanced_objects.Battery.add_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_property</span></code></a>(self, property_name, property_value)</p></td>
+<td><p>Adds a new(!) property with its value to the object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#advanced_objects.Battery.change_property" title="advanced_objects.Battery.change_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">change_property</span></code></a>(self, property_name, …)</p></td>
+<td><p>Changes the value of an existing (!) property.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#advanced_objects.Battery.update" title="advanced_objects.Battery.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(self, grid_world)</p></td>
+<td><p>Updates the current energy level, changes the property accordingly, and also change the visualization color.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#advanced_objects.Battery.location" title="advanced_objects.Battery.location"><code class="xref py py-obj docutils literal notranslate"><span class="pre">location</span></code></a></p></td>
+<td><p>The location of any object is a pythonic property, this allows us to do various checks on it.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#advanced_objects.Battery.properties" title="advanced_objects.Battery.properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">properties</span></code></a></p></td>
+<td><p>Returns the custom properties of this object, but also any mandatory properties such as location, name, is_traversable and all visualization properties (those are in their own dictionary under ‘visualization’).</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="advanced_objects.Battery.add_property">
+<code class="sig-name descname">add_property</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">property_name</em>, <em class="sig-param">property_value</em><span class="sig-paren">)</span><a class="headerlink" href="#advanced_objects.Battery.add_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new(!) property with its value to the object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="advanced_objects.Battery.change_property">
+<code class="sig-name descname">change_property</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">property_name</em>, <em class="sig-param">property_value</em><span class="sig-paren">)</span><a class="headerlink" href="#advanced_objects.Battery.change_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes the value of an existing (!) property.
+:param property_name: The name of the property.
+:param property_value:  The value of the property.
+:return: The new properties.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="advanced_objects.Battery.location">
+<em class="property">property </em><code class="sig-name descname">location</code><a class="headerlink" href="#advanced_objects.Battery.location" title="Permalink to this definition">¶</a></dt>
+<dd><p>The location of any object is a pythonic property, this allows us to do various checks on it. One of them is the
+setter that is overridden in AgentAvatar to also transfer all carried objects with it.
+:return: The current location as a tuple; (x, y)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="advanced_objects.Battery.properties">
+<em class="property">property </em><code class="sig-name descname">properties</code><a class="headerlink" href="#advanced_objects.Battery.properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the custom properties of this object, but also any mandatory properties such as location, name,
+is_traversable and all visualization properties (those are in their own dictionary under ‘visualization’).</p>
+<p>In the case we return the properties of a class that inherits from EnvObject, we check if that class has</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>All mandatory and custom properties in a dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="advanced_objects.Battery.update">
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em><span class="sig-paren">)</span><a class="headerlink" href="#advanced_objects.Battery.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the current energy level, changes the property accordingly, and also change the visualization color.
+:param grid_world: The state of the world. Not used.
+:return: The new properties</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, TNO, Jasper van der Waa, Tjalling Haije, Ioana Cocu
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

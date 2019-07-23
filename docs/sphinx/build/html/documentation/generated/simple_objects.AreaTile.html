@@ -1,0 +1,360 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>simple_objects.AreaTile &mdash; MATRXS 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> MATRXS
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">About MATRXS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../documentation.html">Documentation Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="world_factory.WorldFactory.html">world_factory.WorldFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grid_world.GridWorld.html">grid_world.GridWorld</a></li>
+<li class="toctree-l2"><a class="reference internal" href="action.Action.html">action.Action</a></li>
+<li class="toctree-l2"><a class="reference internal" href="door_actions.OpenDoorAction.html">door_actions.OpenDoorAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="door_actions.CloseDoorAction.html">door_actions.CloseDoorAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="door_actions.OpenDoorActionResult.html">door_actions.OpenDoorActionResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="door_actions.CloseDoorActionResult.html">door_actions.CloseDoorActionResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_actions.RemoveObject.html">object_actions.RemoveObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_actions.RemoveObjectResult.html">object_actions.RemoveObjectResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_actions.GrabObject.html">object_actions.GrabObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_actions.GrabObjectResult.html">object_actions.GrabObjectResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_actions.DropObject.html">object_actions.DropObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_actions.DropObjectResult.html">object_actions.DropObjectResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="env_object.EnvObject.html">env_object.EnvObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="agent_body.AgentBody.html">agent_body.AgentBody</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple_objects.SquareBlock.html">simple_objects.SquareBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple_objects.Door.html">simple_objects.Door</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple_objects.Wall.html">simple_objects.Wall</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">simple_objects.AreaTile</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simple_objects.SmokeTile.html">simple_objects.SmokeTile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_objects.Battery.html">advanced_objects.Battery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim_goal.SimulationGoal.html">sim_goal.SimulationGoal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim_goal.LimitedTimeGoal.html">sim_goal.LimitedTimeGoal</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/examples.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MATRXS</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../documentation.html">Documentation Reference</a> &raquo;</li>
+        
+      <li>simple_objects.AreaTile</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/documentation/generated/simple_objects.AreaTile.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="simple-objects-areatile">
+<h1>simple_objects.AreaTile<a class="headerlink" href="#simple-objects-areatile" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="simple_objects.AreaTile">
+<em class="property">class </em><code class="sig-prename descclassname">simple_objects.</code><code class="sig-name descname">AreaTile</code><span class="sig-paren">(</span><em class="sig-param">location</em>, <em class="sig-param">name='AreaTile'</em>, <em class="sig-param">visualize_colour='#8ca58c'</em>, <em class="sig-param">visualize_depth=None</em>, <em class="sig-param">visualize_opacity=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#simple_objects.AreaTile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">environment.objects.env_object.EnvObject</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#simple_objects.AreaTile.location" title="simple_objects.AreaTile.location"><code class="xref py py-obj docutils literal notranslate"><span class="pre">location</span></code></a></dt><dd><p>The location of any object is a pythonic property, this allows us to do various checks on it.</p>
+</dd>
+<dt><a class="reference internal" href="#simple_objects.AreaTile.properties" title="simple_objects.AreaTile.properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">properties</span></code></a></dt><dd><p>Returns the custom properties of this object, but also any mandatory properties such as location, name, is_traversable and all visualization properties (those are in their own dictionary under ‘visualization’).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simple_objects.AreaTile.add_property" title="simple_objects.AreaTile.add_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_property</span></code></a>(self, property_name, property_value)</p></td>
+<td><p>Adds a new(!) property with its value to the object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simple_objects.AreaTile.change_property" title="simple_objects.AreaTile.change_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">change_property</span></code></a>(self, property_name, …)</p></td>
+<td><p>Changes the value of an existing (!) property.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simple_objects.AreaTile.update" title="simple_objects.AreaTile.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(self, grid_world)</p></td>
+<td><p>Used to update some properties of this object if needed.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simple_objects.AreaTile.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">location</em>, <em class="sig-param">name='AreaTile'</em>, <em class="sig-param">visualize_colour='#8ca58c'</em>, <em class="sig-param">visualize_depth=None</em>, <em class="sig-param">visualize_opacity=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#simple_objects.AreaTile.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>A simple AreaTile object. Is always traversable, not movable, the colour can be set but has otherwise the default EnvObject
+property values. Can be used to define different areas in the GridWorld.
+:param location: The location of the area.
+:param name: The name, default “AreaTile”.
+:param visualize_colour: hex colour code for tile</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simple_objects.AreaTile.__init__" title="simple_objects.AreaTile.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, location[, name, …])</p></td>
+<td><p>A simple AreaTile object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simple_objects.AreaTile.add_property" title="simple_objects.AreaTile.add_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_property</span></code></a>(self, property_name, property_value)</p></td>
+<td><p>Adds a new(!) property with its value to the object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simple_objects.AreaTile.change_property" title="simple_objects.AreaTile.change_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">change_property</span></code></a>(self, property_name, …)</p></td>
+<td><p>Changes the value of an existing (!) property.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simple_objects.AreaTile.update" title="simple_objects.AreaTile.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(self, grid_world)</p></td>
+<td><p>Used to update some properties of this object if needed.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simple_objects.AreaTile.location" title="simple_objects.AreaTile.location"><code class="xref py py-obj docutils literal notranslate"><span class="pre">location</span></code></a></p></td>
+<td><p>The location of any object is a pythonic property, this allows us to do various checks on it.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simple_objects.AreaTile.properties" title="simple_objects.AreaTile.properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">properties</span></code></a></p></td>
+<td><p>Returns the custom properties of this object, but also any mandatory properties such as location, name, is_traversable and all visualization properties (those are in their own dictionary under ‘visualization’).</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simple_objects.AreaTile.add_property">
+<code class="sig-name descname">add_property</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">property_name</em>, <em class="sig-param">property_value</em><span class="sig-paren">)</span><a class="headerlink" href="#simple_objects.AreaTile.add_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new(!) property with its value to the object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simple_objects.AreaTile.change_property">
+<code class="sig-name descname">change_property</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">property_name</em>, <em class="sig-param">property_value</em><span class="sig-paren">)</span><a class="headerlink" href="#simple_objects.AreaTile.change_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes the value of an existing (!) property.
+:param property_name: The name of the property.
+:param property_value:  The value of the property.
+:return: The new properties.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simple_objects.AreaTile.location">
+<em class="property">property </em><code class="sig-name descname">location</code><a class="headerlink" href="#simple_objects.AreaTile.location" title="Permalink to this definition">¶</a></dt>
+<dd><p>The location of any object is a pythonic property, this allows us to do various checks on it. One of them is the
+setter that is overridden in AgentAvatar to also transfer all carried objects with it.
+:return: The current location as a tuple; (x, y)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simple_objects.AreaTile.properties">
+<em class="property">property </em><code class="sig-name descname">properties</code><a class="headerlink" href="#simple_objects.AreaTile.properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the custom properties of this object, but also any mandatory properties such as location, name,
+is_traversable and all visualization properties (those are in their own dictionary under ‘visualization’).</p>
+<p>In the case we return the properties of a class that inherits from EnvObject, we check if that class has</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>All mandatory and custom properties in a dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="simple_objects.AreaTile.update">
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em><span class="sig-paren">)</span><a class="headerlink" href="#simple_objects.AreaTile.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to update some properties of this object if needed. For example a ‘status’ property that changes over time.
+It can also be used to update something in the GridWorld. For example a Fire object that damages other objects
+in its location.</p>
+<p>If you want this functionality, you should create a new object that inherits from this class EnvObject.</p>
+<p>This method is called automatically in the game-loop inside a running GridWorld instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>grid_world</strong></dt><dd><p>The GridWorld instance representing the entire grid world. Can be used to alter itself or others in the
+world in some way.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, TNO, Jasper van der Waa, Tjalling Haije, Ioana Cocu
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

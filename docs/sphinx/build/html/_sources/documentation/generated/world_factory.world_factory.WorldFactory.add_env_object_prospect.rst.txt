@@ -1,6 +1,0 @@
-world\_factory.world\_factory.WorldFactory.add\_env\_object\_prospect
-=====================================================================
-
-.. currentmodule:: world_factory.world_factory
-
-.. automethod:: WorldFactory.add_env_object_prospect
