@@ -15,7 +15,7 @@
       }
     }
   },
-  "AgentAvatar":
+  "AgentBody":
   {
     "is_traversable": false,
     "is_movable": false,

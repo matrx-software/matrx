@@ -1,5 +1,5 @@
 from environment.objects.helper_functions import *
-from world_factory.helper_functions import get_default_value
+from utils.factory_utils import get_default_value
 
 
 class EnvObject:

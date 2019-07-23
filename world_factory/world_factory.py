@@ -18,7 +18,7 @@ from environment.objects.env_object import EnvObject
 from environment.objects.helper_functions import get_inheritence_path
 from environment.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
 from environment.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
-from world_factory.helper_functions import get_default_value, _get_line_coords
+from utils.factory_utils import get_default_value, _get_line_coords
 
 ######
 # We do this so we are sure everything is imported and thus can be found
@@ -54,8 +54,8 @@ class WorldFactory:
     """
 
     def __init__(self, shape: Union[list, tuple], tick_duration: float = 0.5, random_seed: int = 1,
-                 simulation_goal: Union[int, SimulationGoal] = 1000, run_sail_api: bool = True,
-                 run_visualization_server: bool = True, visualization_bg_clr: str = "#C2C2C2",
+                 simulation_goal: Union[int, SimulationGoal, list, tuple] = 1000, run_sail_api: bool = False,
+                 run_visualization_server: bool = False, visualization_bg_clr: str = "#C2C2C2",
                  visualization_bg_img: str = None, verbose: bool = False):
         """
         Create a new WorldFactory instance that stores where and what you want to add to a world. In a way it acts as
@@ -85,7 +85,54 @@ class WorldFactory:
             of the path to the image file.
         verbose
             Whether the subsequent creater world should be verbose or not.
+
+        Raises
+        ------
+        ValueError
+            On an incorrect argument. The exception specifies further what argument and what is erroneous about it.
+
+        NotImplementedError
+            On setting either the run_sail_api or run_visualisation_server boolean to True. As this functionality is not
+            yet implemented.
         """
+
+        # Check if shape is of correct type and length
+        if not isinstance(shape, list) or not isinstance(shape, tuple) and len(shape) != 2:
+            raise ValueError(f"The given grid shape {shape} is not of type List, Typle or of length two.")
+
+        # Check that tick duration is of float and a positive number.
+        if not isinstance(tick_duration, float) and tick_duration >= 0.0:
+            raise ValueError(f"The given tick_duration {tick_duration} should be a Float and larger or equal than 0.0.")
+
+        # Check that the random seed is a positive non-zero integer
+        if not isinstance(random_seed, int) and random_seed > 0:
+            raise ValueError(f"The given random_seed {random_seed} should be an Int and bigger or equal to 1.")
+
+        # Check if the simulation_goal is a SimulationGoal, an int or a list or tuple of SimulationGoal
+        if not isinstance(simulation_goal, SimulationGoal) or not isinstance(simulation_goal, int) \
+                or not ((isinstance(simulation_goal, list) or isinstance(simulation_goal, tuple))
+                        and len(simulation_goal) > 0 and isinstance(simulation_goal[0], SimulationGoal)):
+            raise ValueError(f"The given simulation_goal {simulation_goal} should be of type {SimulationGoal.__name__} "
+                             f"or a list/tuple of {SimulationGoal.__name__}, or it should be an int denoting the max"
+                             f"number of ticks the world should run (negative for infinite).")
+
+        # Check if the sail api and visualisation booleans are set to True and raise a NotImplementedError.
+        if run_sail_api is True:
+            raise NotImplementedError("You set the boolean run_sail_api to True. This setting is not implemented yet.")
+        if run_visualization_server is True:
+            raise NotImplementedError("You set the boolean run_visualization_server to True. This setting is not "
+                                      "implemented yet.")
+
+        # Check the background color
+        if not isinstance(visualization_bg_clr, str) and len(visualization_bg_clr) != 7 and \
+                visualization_bg_clr[0] is not "#":
+            raise ValueError(f"The given visualization_bg_clr {visualization_bg_clr} should be a Str of length 7 with"
+                             f"an initial '#'' (a hexidecimal color string).")
+
+        # Check if the background image is a path
+        if not isinstance(visualization_bg_img, str):
+            raise ValueError(f"The given visualization_bg_img {visualization_bg_img} should of type str denoting a path"
+                             f"to an image.")
 
         # Set our random number generator
         self.rng = np.random.RandomState(random_seed)
@@ -134,9 +181,21 @@ class WorldFactory:
         nr_of_worlds
             The number of worlds the Generator contains. Defaults to 10.
 
-        -------
+        Yields
+        ------
+        GridWorld
+            A GridWorld, where all random properties and prospects are sampled using the given master seed.
+
+        Raises
+        ------
+        ValueError
+            The nr_of_worlds should be a postive non-zero integer.
 
         """
+
+        if not isinstance(nr_of_worlds, int) and nr_of_worlds <= 0:
+            raise ValueError(f"The given nr_of_worlds {nr_of_worlds} should be of type Int and larger or equal to 1.")
+
         while self.worlds_created < nr_of_worlds:
             yield self.get_world()
 
@@ -145,8 +204,9 @@ class WorldFactory:
         Creates a single GridWorld instance based on the current state of this WorldFactor instance.
 
         Returns
-            A GridWorld instance.
         -------
+        GridWorld
+            A GridWorld instance.
 
         """
         self.worlds_created += 1
@@ -172,19 +232,20 @@ class WorldFactory:
 
         return world_settings
 
-    def add_agent(self, location: Union[tuple, list], agent_brain: AgentBrain, name: str = "Agent",
+    def add_agent(self, location: Union[tuple, list], agent_brain: AgentBrain, name,
                   customizable_properties: Union[tuple, list] = None, sense_capability: SenseCapability = None,
                   is_traversable: bool = None, team: str = None, agent_speed_in_ticks: int = None,
                   possible_actions: list = None, is_movable: bool = None, visualize_size: float = None,
                   visualize_shape: float = None, visualize_colour: str = None, visualize_depth: int = None,
                   visualize_opacity: float = None,
                   **custom_properties):
-        """
-        The helper method within a WorldFactory instance to add a single agent. This method makes sure that when this
+        """The helper method within a WorldFactory instance to add a single agent.
+
+        This method makes sure that when this
         factory generates a GridWorld instance, it contains an AgentBody connected to the given AgentBrain.
 
-        All parameters except for the location and agent_brain default to None. Which means that their values are
-        obtained from the scenarios/defaults.json file under the segment Agent.
+        All keyword parameters default to None. Which means that their values are obtained from the
+        "scenarios/defaults.json" file under the segment AgentBody.
 
         Parameters
         ----------
@@ -195,44 +256,51 @@ class WorldFactory:
         name
             The name of the agent, should be unique to allow the visualisation to have a single web page per agent. If
             the name is already used, an exception is thrown.
-        customizable_properties
+        customizable_properties: optional
             A list or tuple of names of properties for this agent that can be altered or customized. Either by the agent
             itself or by other agents or objects. If a property value gets changed that is not in this list than an
             exception is thrown.
-        sense_capability
+        sense_capability: optional
             The SenseCapability object belonging this this agent's AgentBody. Used by the GridWorld to pre-filter
-            objects and agents from this agent's states when querying for actions.
-        is_traversable
+            objects and agents from this agent's states when querying for actions. Defaults to a SenseCapability that
+            sees all object types within the entire world.
+        is_traversable: optional
             Denotes whether other agents and object can move over this agent. It also throws an exception when this is
             set to False and another object/agent with this set to False is added to the same location.
-        team
-            The team name. Used to group agents together.
-        agent_speed_in_ticks
+        team: optional
+            The team name. Used to group agents together. Defaults to this agent's name to signify it forms its own
+            team.
+        agent_speed_in_ticks: optional
             The number of 'ticks' this agent will have to wait between each time it is queried for an action. By setting
             this to a higher number than other agents, this agent will be slower.
-        possible_actions
+        possible_actions: optional
             A list or tuple of the names of the Action classes this agent can perform. With this you can limit the
             actions this agent can perform.
-        is_movable
+        is_movable: optional
             Whether this agent can be moved by other agents (currently this only happens with the DropObjectAction and
             PickUpAction).
-        visualize_size
+        visualize_size: optional
             The size of this agent in its visualisation. A value of 1.0 denotes the full grid location square, whereas
             a value of 0.5 denotes half, and 0.0 an infinitisimal small size.
-        visualize_shape
+        visualize_shape: optional
             The shape of this agent in its visualisation. Depending on the value it obtains this shape: 0 = a square,
             1 = a triangle, 2 = a circle.
-        visualize_colour
+        visualize_colour: optional
             The colour of this agent in its visualisation. Should be a string hexidecimal colour value.
-        visualize_depth
+        visualize_depth: optional
             The visualisation depth of this agent in its visualisation. It denotes the 'layer' on which it is
             visualized. A larger value is more on 'top'.
-        visualize_opacity
+        visualize_opacity: optional
             The opacity of this agent in its visualization. A value of 1.0 means full opacity and 0.0 no opacity.
-        custom_properties
+        custom_properties: optional
             Any additional given keyword arguments will be encapsulated in this dictionary. These will be added to the
             AgentBody as custom_properties which can be perceived by other agents and objects or which can be used or
             altered (if allowed to by the customizable_properties list) by the AgentBrain or others.
+
+        Returns
+        -------
+        None
+            ...
 
         Raises
         ------
@@ -242,35 +310,40 @@ class WorldFactory:
         """
 
         # Check if location and agent are of correct type
-        assert isinstance(location, list) or isinstance(location, tuple)
-        assert isinstance(agent_brain, AgentBrain)
+        if not isinstance(location, list) or not isinstance(location, tuple) and len(location) != 2:
+            raise ValueError(f"The given location {location} while adding the agent with name {name} is not a list, "
+                             f"tuple or  of length two.")
+
+        if isinstance(agent_brain, AgentBrain):
+            raise ValueError(f"The given agent_brain while adding agent with name {name} is not of type "
+                             f"{AgentBrain.__name__} but of type {agent_brain.__class__.__name__}.")
 
         # Check if the agent name is unique
         for existingAgent in self.agent_settings:
             if existingAgent["mandatory_properties"]["name"] == name:
-                raise AttributeError(f"An agent with the name {name} was already added. Agent names should be unique.",
-                                     name)
+                raise ValueError(f"An agent with the name {name} was already added. Agent names should be unique.",
+                                 name)
 
         # Load the defaults for any variable that is not defined
         # Obtain any defaults from the defaults.json file if not set already.
         if is_traversable is None:
-            is_traversable = get_default_value(class_name="AgentAvatar", property_name="is_traversable")
+            is_traversable = get_default_value(class_name="AgentBody", property_name="is_traversable")
         if visualize_size is None:
-            visualize_size = get_default_value(class_name="AgentAvatar", property_name="visualize_size")
+            visualize_size = get_default_value(class_name="AgentBody", property_name="visualize_size")
         if visualize_shape is None:
-            visualize_shape = get_default_value(class_name="AgentAvatar", property_name="visualize_shape")
+            visualize_shape = get_default_value(class_name="AgentBody", property_name="visualize_shape")
         if visualize_colour is None:
-            visualize_colour = get_default_value(class_name="AgentAvatar", property_name="visualize_colour")
+            visualize_colour = get_default_value(class_name="AgentBody", property_name="visualize_colour")
         if visualize_opacity is None:
-            visualize_opacity = get_default_value(class_name="AgentAvatar", property_name="visualize_opacity")
+            visualize_opacity = get_default_value(class_name="AgentBody", property_name="visualize_opacity")
         if visualize_depth is None:
-            visualize_depth = get_default_value(class_name="AgentAvatar", property_name="visualize_depth")
+            visualize_depth = get_default_value(class_name="AgentBody", property_name="visualize_depth")
         if agent_speed_in_ticks is None:
-            agent_speed_in_ticks = get_default_value(class_name="AgentAvatar", property_name="agent_speed_in_ticks")
+            agent_speed_in_ticks = get_default_value(class_name="AgentBody", property_name="agent_speed_in_ticks")
         if possible_actions is None:
-            possible_actions = get_default_value(class_name="AgentAvatar", property_name="possible_actions")
+            possible_actions = get_default_value(class_name="AgentBody", property_name="possible_actions")
         if is_movable is None:
-            is_movable = get_default_value(class_name="AgentAvatar", property_name="is_movable")
+            is_movable = get_default_value(class_name="AgentBody", property_name="is_movable")
 
         # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
         # objects with infinite range).
@@ -310,11 +383,52 @@ class WorldFactory:
 
         self.agent_settings.append(agent_setting)
 
-    def add_team(self, agents, locations, team_name, custom_properties=None, sense_capability=None,
+    def add_team(self, agent_brains: Union[list, tuple], locations: Union[list, tuple], team_name,
+                 custom_properties=None, sense_capability=None,
                  customizable_properties=None, is_traversable=None, agent_speed_in_ticks=None,
                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_opacity=None):
+        """Adds a group of agents as a single team (meaning that their 'team' property all have the given team name).
 
-        self.add_multiple_agents(agents, locations, custom_properties=custom_properties,
+        All parameters except for the `locations` and `agent_brain` defaults to `None`. Which means that their values
+        are obtained from the "scenarios/defaults.json" file under the segment AgentBody.
+
+        Parameters
+        ----------
+        agent_brains
+            The list or tuple of AgentBrain that will control each agent in the team. Should be of the same size as
+            `locations`.
+        locations
+            The list or tuple of locations in the form of [x, y] at which coordinates each agent starts in the team.
+            Should be of the same size as `locations`.
+        team_name
+            The
+        custom_properties
+            ..
+        sense_capability
+            ..
+        customizable_properties
+            ..
+        is_traversable
+            ..
+        agent_speed_in_ticks
+            ..
+        visualize_size
+            ..
+        visualize_shape
+            ..
+        visualize_colour
+            ..
+        visualize_opacity
+            ..
+
+        Returns
+        -------
+        None
+            ..
+
+        """
+
+        self.add_multiple_agents(agent_brains, locations, custom_properties=custom_properties,
                                  sense_capabilities=sense_capability, customizable_properties=customizable_properties,
                                  is_traversable=is_traversable, agent_speeds_in_ticks=agent_speed_in_ticks,
                                  teams=team_name, visualize_sizes=visualize_size, visualize_shapes=visualize_shape,
@@ -554,23 +668,23 @@ class WorldFactory:
         # Load the defaults for any variable that is not defined
         # Obtain any defaults from the defaults.json file if not set already.
         if is_traversable is None:
-            is_traversable = get_default_value(class_name="AgentAvatar", property_name="is_traversable")
+            is_traversable = get_default_value(class_name="AgentBody", property_name="is_traversable")
         if visualize_size is None:
-            visualize_size = get_default_value(class_name="AgentAvatar", property_name="visualize_size")
+            visualize_size = get_default_value(class_name="AgentBody", property_name="visualize_size")
         if visualize_shape is None:
-            visualize_shape = get_default_value(class_name="AgentAvatar", property_name="visualize_shape")
+            visualize_shape = get_default_value(class_name="AgentBody", property_name="visualize_shape")
         if visualize_colour is None:
-            visualize_colour = get_default_value(class_name="AgentAvatar", property_name="visualize_colour")
+            visualize_colour = get_default_value(class_name="AgentBody", property_name="visualize_colour")
         if visualize_opacity is None:
-            visualize_opacity = get_default_value(class_name="AgentAvatar", property_name="visualize_opacity")
+            visualize_opacity = get_default_value(class_name="AgentBody", property_name="visualize_opacity")
         if visualize_depth is None:
-            visualize_depth = get_default_value(class_name="AgentAvatar", property_name="visualize_depth")
+            visualize_depth = get_default_value(class_name="AgentBody", property_name="visualize_depth")
         if agent_speed_in_ticks is None:
-            agent_speed_in_ticks = get_default_value(class_name="AgentAvatar", property_name="agent_speed_in_ticks")
+            agent_speed_in_ticks = get_default_value(class_name="AgentBody", property_name="agent_speed_in_ticks")
         if possible_actions is None:
-            possible_actions = get_default_value(class_name="AgentAvatar", property_name="possible_actions")
+            possible_actions = get_default_value(class_name="AgentBody", property_name="possible_actions")
         if is_movable is None:
-            is_movable = get_default_value(class_name="AgentAvatar", property_name="is_movable")
+            is_movable = get_default_value(class_name="AgentBody", property_name="is_movable")
 
         # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
         # objects with infinite range).
