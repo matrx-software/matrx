@@ -1,6 +1,6 @@
 from agents.agent_brain import AgentBrain
 from agents.human_agent_brain import HumanAgentBrain
-from agents.navigating_agent_test import NavigatingAgentBrain
+from agents.patrolling_agent import PatrollingAgentBrain
 from world_factory.world_factory import RandomProperty, WorldFactory
 from environment.actions.move_actions import *
 
@@ -10,7 +10,7 @@ def create_factory():
     even = True
     for x in range(15):
         waypoints = [(x, 0), (x, 5)]
-        navigating_agent = NavigatingAgentBrain(waypoints)
+        navigating_agent = PatrollingAgentBrain(waypoints)
         human_agent = HumanAgentBrain()
         if even:
             even = False

@@ -2,7 +2,7 @@ from typing import Union
 
 from agents.utils.state_tracker import StateTracker
 from environment.actions.door_actions import *
-from environment.actions.object_actions import GrabAction
+from environment.actions.object_actions import GrabObject
 from environment.actions.object_actions import RemoveObject
 
 
@@ -129,7 +129,7 @@ class AgentBrain:
             #     action_kwargs['remove_range'] = 0
 
         # if the agent randomly chose a grab action, choose a random object to pickup
-        elif action == GrabAction.__name__:
+        elif action == GrabObject.__name__:
             # Set grab range
             grab_range = 1
 

@@ -3,7 +3,7 @@ from agents.utils.navigator import Navigator
 from agents.utils.state_tracker import StateTracker
 
 
-class NavigatingAgentBrain(AgentBrain):
+class PatrollingAgentBrain(AgentBrain):
 
     def __init__(self, waypoints):
         super().__init__()

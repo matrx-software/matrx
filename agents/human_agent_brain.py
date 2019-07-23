@@ -4,7 +4,7 @@ import requests
 
 from agents.agent_brain import AgentBrain
 
-from environment.actions.object_actions import GrabAction
+from environment.actions.object_actions import GrabObject
 from environment.actions.door_actions import *
 
 
@@ -109,7 +109,7 @@ class HumanAgentBrain(AgentBrain):
         action = self.usrinp_action_map[userinput]
 
         # if the user chose a grab action, choose an object with a grab_range of 1
-        if action == GrabAction.__name__:
+        if action == GrabObject.__name__:
             # Assign it to the arguments list
             action_kwargs['grab_range'] = 1  # Set grab range
             action_kwargs['max_objects'] = 3  # Set max amount of objects

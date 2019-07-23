@@ -12,10 +12,10 @@ from numpy.random.mtrand import RandomState
 from agents.agent_brain import AgentBrain
 from agents.capabilities.capability import SenseCapability
 from agents.human_agent_brain import HumanAgentBrain
-from environment.gridworld import GridWorld
+from environment.grid_world import GridWorld
 from environment.objects.agent_body import AgentBody
 from environment.objects.env_object import EnvObject
-from environment.objects.helper_functions import get_inheritence_path
+from utils.object_utils import get_inheritence_path
 from environment.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
 from environment.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
 from utils.factory_utils import get_default_value, _get_line_coords
@@ -439,6 +439,28 @@ class WorldFactory:
                             is_traversable=None, agent_speeds_in_ticks=None,
                             teams=None, visualize_sizes=None, visualize_shapes=None,
                             visualize_colours=None, visualize_opacities=None, visualize_depths=None):
+        """
+
+        Parameters
+        ----------
+        agents
+        locations
+        custom_properties
+        sense_capabilities
+        customizable_properties
+        is_traversable
+        agent_speeds_in_ticks
+        teams
+        visualize_sizes
+        visualize_shapes
+        visualize_colours
+        visualize_opacities
+        visualize_depths
+
+        Returns
+        -------
+
+        """
 
         # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
         # copy it in a list. A none value causes the default value to be loaded.
