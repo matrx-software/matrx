@@ -41,7 +41,7 @@ import environment.actions.object_actions
 # noinspection PyUnresolvedReferences
 import environment.actions.move_actions
 # noinspection PyUnresolvedReferences
-import world_factory
+import world_builder
 # noinspection PyUnresolvedReferences
 import visualization
 
@@ -49,8 +49,17 @@ import visualization
 ######
 
 
-class WorldFactory:
-    """ A factory instance to create a blueprint from which multiple GridWorlds can be generated.
+class WorldBuilder:
+    """ A class used to create a blueprint from which multiple GridWorlds can be generated.
+
+    Its function is to abstract from the logic of creating and filling a GridWorld instance. It does so with the help of
+    a number of easy to use methods.
+
+    In addition each time a world is created, it seeds the random generators of the GridWorld, AgentBrains and
+    EnvObjects as well as resample from any RandomProperty.
+
+    With this class we follow the `Builder Design Pattern <https://en.wikipedia.org/wiki/Builder_pattern>`_.
+
     """
 
     def __init__(self, shape: Union[list, tuple], tick_duration: float = 0.5, random_seed: int = 1,
@@ -58,9 +67,10 @@ class WorldFactory:
                  run_visualization_server: bool = False, visualization_bg_clr: str = "#C2C2C2",
                  visualization_bg_img: str = None, verbose: bool = False):
         """
-        Create a new WorldFactory instance that stores where and what you want to add to a world. In a way it acts as
-        a blueprint of a GridWorld. With the constructor you can set a number of general properties and from the
-        resulting instance you can call numerous methods to add new objects and/or agents.
+        Creates a new WorldFactory instance.
+
+        With the constructor you can set a number of general properties and from the resulting instance you can call
+        numerous methods to add new objects and/or agents.
 
         Parameters
         ----------

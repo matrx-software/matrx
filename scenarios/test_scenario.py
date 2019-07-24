@@ -1,11 +1,11 @@
 from agents.agent_brain import AgentBrain
 from agents.human_agent_brain import HumanAgentBrain
 from agents.patrolling_agent import PatrollingAgentBrain
-from world_factory.world_factory import RandomProperty, WorldFactory
+from world_builder.world_builder import RandomProperty, WorldBuilder
 from environment.actions.move_actions import *
 
 def create_factory():
-    factory = WorldFactory(random_seed=1, shape=[15, 6], tick_duration=0.5, visualization_bg_img="soesterberg_luchtfoto.jpg", verbose=True)
+    factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.5, visualization_bg_img="soesterberg_luchtfoto.jpg", verbose=True)
 
     even = True
     for x in range(15):

@@ -15,7 +15,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath("../../../"))
-sys.path.insert(0, os.path.abspath("../../../world_factory/"))
+sys.path.insert(0, os.path.abspath("../../../world_builder/"))
 sys.path.insert(0, os.path.abspath("../../../environment/"))
 sys.path.insert(0, os.path.abspath("../../../environment/actions/"))
 sys.path.insert(0, os.path.abspath("../../../environment/objects/"))

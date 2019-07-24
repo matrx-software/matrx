@@ -6,7 +6,7 @@ Documentation Reference
 .. autosummary::
     :toctree: generated
 
-    world_factory.WorldFactory
+    world_builder.WorldBuilder
     grid_world.GridWorld
 
 
