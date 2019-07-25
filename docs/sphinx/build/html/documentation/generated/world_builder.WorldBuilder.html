@@ -185,13 +185,12 @@
 <dt id="world_builder.WorldBuilder">
 <em class="property">class </em><code class="sig-prename descclassname">world_builder.</code><code class="sig-name descname">WorldBuilder</code><span class="sig-paren">(</span><em class="sig-param">shape: Union[list, tuple], tick_duration: float = 0.5, random_seed: int = 1, simulation_goal: Union[int, environment.sim_goals.sim_goal.SimulationGoal, list, tuple] = 1000, run_sail_api: bool = False, run_visualization_server: bool = False, visualization_bg_clr: str = '#C2C2C2', visualization_bg_img: str = None, verbose: bool = False</em><span class="sig-paren">)</span><a class="headerlink" href="#world_builder.WorldBuilder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A factory instance to create a blueprint from which multiple GridWorlds can be generated.</p>
+<p>A class used to create a blueprint from which multiple GridWorlds can be generated.</p>
 <p>Its function is to abstract from the logic of creating and filling a GridWorld instance. It does so with the help of
 a number of easy to use methods.</p>
 <p>In addition each time a world is created, it seeds the random generators of the GridWorld, AgentBrains and
 EnvObjects as well as resample from any RandomProperty.</p>
-<p>With this class we follow the <a class="reference external" href="https://en.wikipedia.org/wiki/Builder_pattern">Builder Pattern</a> design
-pattern.</p>
+<p>With this class we follow the <a class="reference external" href="https://en.wikipedia.org/wiki/Builder_pattern">Builder Design Pattern</a>.</p>
 <p class="rubric">Methods</p>
 <table class="longtable docutils align-default">
 <colgroup>

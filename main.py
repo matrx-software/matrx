@@ -1,4 +1,4 @@
-from scenarios import test_scenario
+import test_scenario
 
 if __name__ == "__main__":
 
