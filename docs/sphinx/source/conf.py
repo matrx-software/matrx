@@ -2,7 +2,7 @@
 #
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
-# http://www.sphinx-doc.org/en/master/config
+# http://www.sphinx-doc.org/en/master/usage/configuration.html
 
 # -- Path setup --------------------------------------------------------------
 
@@ -14,12 +14,8 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath("../../../"))
-sys.path.insert(0, os.path.abspath("../../../world_builder/"))
-sys.path.insert(0, os.path.abspath("../../../environment/"))
-sys.path.insert(0, os.path.abspath("../../../environment/actions/"))
-sys.path.insert(0, os.path.abspath("../../../environment/objects/"))
-sys.path.insert(0, os.path.abspath("../../../environment/sim_goals/"))
+sys.path.insert(0, os.path.abspath("../../../matrxs/"))
+sys.path.insert(0, os.path.abspath("../../../matrxs/world_builder/"))
 # sys.path.insert(0, os.path.abspath("../../../agents/"))
 # sys.path.insert(0, os.path.abspath("../../../agents/capabilities/"))
 # sys.path.insert(0, os.path.abspath("../../../agents/agent_utils/"))
@@ -30,12 +26,20 @@ print("\n\n")
 
 # -- Project information -----------------------------------------------------
 
+# Project's name
 project = 'MATRXS'
-copyright = '2019, TNO, Jasper van der Waa, Tjalling Haije, Ioana Cocu'
+
+# Copyright
+copyright = "2019, Jasper van der Waa, Tjalling Haije, Ioana Cocu"
+
+# The author names of the document
 author = 'Jasper van der Waa, Tjalling Haije, Ioana Cocu'
 
+# Major project version
+version = '0.1'
+
 # The full version, including alpha/beta/rc tags
-release = '1.0.0'
+release = '0.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -63,6 +67,20 @@ exclude_patterns = []
 autodoc_default_flags = ['members', 'show-inheritance', 'inherited-members']
 autosummary_generate = True
 
+# Suppress certain warnings
+suppress_warnings = []
+
+# If the author names should be shown for codeautho and sectionauthor
+show_authors = False
+
+# If module names are appended
+add_module_names = False
+
+# If copyright at bottom is shown
+html_show_copyright = False
+
+# If created by Sphinx is shown at bottom
+html_show_sphinx = False
 
 # -- Options for HTML output -------------------------------------------------
 

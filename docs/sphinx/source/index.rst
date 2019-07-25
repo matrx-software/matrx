@@ -6,17 +6,17 @@
 Welcome to MATRXS' documentation!
 ==================================
 
-Welcome!
+MATRXS; Man-Agent Teaming - Rapid Experimentation Software
 
 .. toctree::
    :caption: Table of Contents
-   :maxdepth: 2
+   :maxdepth: 1
 
    release_notes
    usage/installation
    usage/quick_start
-   documentation/documentation
-   examples/examples
+   documentation/api_reference
+   development
 
 
 Indices

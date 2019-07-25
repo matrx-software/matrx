@@ -1,0 +1,84 @@
+####################
+Creating a new world
+####################
+
+.. currentmodule:: matrxs
+
+.. autosummary::
+    :toctree: generated
+
+    world_builder
+
+Constructor
+===========
+
+.. autosummary::
+    :toctree: generated
+
+    WorldBuilder.__init__
+
+Create Worlds
+=============
+
+.. autosummary::
+    :toctree: generated
+
+    WorldBuilder.get_world
+    WorldBuilder.worlds
+
+Add agents
+==========
+
+.. autosummary::
+    :toctree: generated
+
+    WorldBuilder.add_agent
+    WorldBuilder.add_multiple_agents
+    WorldBuilder.add_agent_prospect
+    WorldBuilder.add_team
+    WorldBuilder.add_human_agent
+
+Add objects
+===========
+
+.. autosummary::
+    :toctree: generated
+
+    WorldBuilder.add_object
+    WorldBuilder.add_multiple_objects
+    WorldBuilder.add_object_prospect
+    WorldBuilder.add_agent_prospect
+    WorldBuilder.add_area
+    WorldBuilder.add_smoke_area
+    WorldBuilder.add_line
+    WorldBuilder.add_room
+
+Add events
+==========
+
+.. note::
+    Events are not yet implemented.
+
+Logging
+=======
+
+.. note::
+    Logging is not yet implemented.
+
+Random properties
+=================
+
+.. autosummary::
+    :toctree: generated
+
+    RandomProperty.__init__
+
+
+Attributes
+==========
+
+.. autosummary::
+    :toctree: generated
+
+    :attributes:
+
