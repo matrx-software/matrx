@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.abspath("../../../environment/objects/"))
 sys.path.insert(0, os.path.abspath("../../../environment/sim_goals/"))
 # sys.path.insert(0, os.path.abspath("../../../agents/"))
 # sys.path.insert(0, os.path.abspath("../../../agents/capabilities/"))
-# sys.path.insert(0, os.path.abspath("../../../agents/utils/"))
+# sys.path.insert(0, os.path.abspath("../../../agents/agent_utils/"))
 print("\n\n\n -- System Path --> \n")
 for p in sys.path:
     print(f"{p}")
@@ -68,7 +68,7 @@ autosummary_generate = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "sphinx_rtd_theme"
+html_theme = "nature"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

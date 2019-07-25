@@ -12,9 +12,9 @@ Welcome!
    :caption: Table of Contents
    :maxdepth: 2
 
-   intro
+   release_notes
    usage/installation
-   usage/quickstart
+   usage/quick_start
    documentation/documentation
    examples/examples
 
