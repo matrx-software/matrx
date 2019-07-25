@@ -1,5 +1,5 @@
 from matrxs.agents.agent_brain import AgentBrain
-from matrxs.utils.agent_utils import Navigator
+from matrxs.utils.agent_utils.navigator import Navigator
 from matrxs.utils.agent_utils.state_tracker import StateTracker
 
 

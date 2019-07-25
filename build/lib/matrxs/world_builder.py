@@ -15,84 +15,50 @@ from matrxs.agents.human_agent_brain import HumanAgentBrain
 from matrxs.grid_world import GridWorld
 from matrxs.objects.agent_body import AgentBody
 from matrxs.objects.env_object import EnvObject
-from matrxs.utils.utils import get_inheritence_path
+from matrxs.utils.utils import get_inheritence_path, get_default_value, _get_line_coords
 from matrxs.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
 from matrxs.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
-from matrxs.utils.builder_utils import get_default_value, _get_line_coords
-
-######
-# We do this so we are sure everything is imported and thus can be found
-# noinspection PyUnresolvedReferences
-# noinspection PyUnresolvedReferences
-import matrxs.agents.capabilities
-# noinspection PyUnresolvedReferences
-# noinspection PyUnresolvedReferences
-import matrxs.sim_goals
-# noinspection PyUnresolvedReferences
-import matrxs.objects
-# noinspection PyUnresolvedReferences
-import matrxs.actions
-# noinspection PyUnresolvedReferences
-import matrxs.actions.door_actions
-# noinspection PyUnresolvedReferences
-import matrxs.actions.object_actions
-# noinspection PyUnresolvedReferences
-import matrxs.actions.move_actions
-# noinspection PyUnresolvedReferences
-from matrxs import world_builder, agents, environment
-# noinspection PyUnresolvedReferences
-import matrxs.visualization
-
-
-######
 
 
 class WorldBuilder:
-    """ A class used to create a blueprint from which multiple GridWorlds can be generated.
 
-    Its function is to abstract from the logic of creating and filling a GridWorld instance. It does so with the help of
-    a number of easy to use methods.
-
-    In addition each time a world is created, it seeds the random generators of the GridWorld, AgentBrains and
-    EnvObjects as well as resample from any RandomProperty.
-
-    With this class we follow the `Builder Design Pattern <https://en.wikipedia.org/wiki/Builder_pattern>`_.
-
-    """
-
-    def __init__(self, shape: Union[list, tuple], tick_duration: float = 0.5, random_seed: int = 1,
-                 simulation_goal: Union[int, SimulationGoal, list, tuple] = 1000, run_sail_api: bool = False,
-                 run_visualization_server: bool = False, visualization_bg_clr: str = "#C2C2C2",
-                 visualization_bg_img: str = None, verbose: bool = False):
+    def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=1000, run_sail_api=False,
+                 run_visualization_server=False, visualization_bg_clr="#C2C2C2", visualization_bg_img=None,
+                 verbose=False):
         """
-        Creates a new WorldFactory instance.
+        Creates a builder instance to create worlds.
 
         With the constructor you can set a number of general properties and from the resulting instance you can call
         numerous methods to add new objects and/or agents.
 
         Parameters
         ----------
-        shape
+        shape : tuple
             Denotes the width and height of the world you create.
-        tick_duration
+        tick_duration : float
             The duration of a single 'tick', or loop in the game-loop of the world you create. Defaults to 0.5.
-        random_seed
+        random_seed : int
             The master random seed on which all objects, agents and worls are seeded. Defaults 1.0.
-        simulation_goal
+        simulation_goal : Union[int, SimulationGoal, list, tuple]
             The goal or goals of the world, either a single SimulationGoal, a list of such or a postive non-zero integer
             to denote the maximum number of 'ticks' the world(s) have to run.
-        run_sail_api
+        run_sail_api : bool
             Not implemented yet.
-        run_visualization_server
+        run_visualization_server : bool
             Not implemented yet.
-        visualization_bg_clr
+        visualization_bg_clr : str
             The color of the world when visualized using MATRXS' own visualisation server. A string representation of
             hexidecimal color.
-        visualization_bg_img
+        visualization_bg_img : str
             An optional background image of the world when visualized using MATRXS' own visualisation server. A string
             of the path to the image file.
-        verbose
+        verbose : bool
             Whether the subsequent creater world should be verbose or not.
+
+        Examples
+        --------
+
+
 
         Raises
         ------
@@ -558,10 +524,10 @@ class WorldBuilder:
         # Get the last settings (which we just added) and add the probability
         self.agent_settings[-1]['probability'] = probability
 
-    def add_env_object(self, location, name, callable_class=None, customizable_properties=None,
-                       is_traversable=None, is_movable=None,
-                       visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                       visualize_opacity=None, **custom_properties):
+    def add_object(self, location, name, callable_class=None, customizable_properties=None,
+                   is_traversable=None, is_movable=None,
+                   visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
+                   visualize_opacity=None, **custom_properties):
         if callable_class is None:
             callable_class = EnvObject
 
@@ -597,15 +563,15 @@ class WorldBuilder:
                           }
         self.object_settings.append(object_setting)
 
-    def add_env_object_prospect(self, location, name, probability, callable_class=None, customizable_properties=None,
-                                is_traversable=None,
-                                visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                                visualize_opacity=None, **custom_properties):
+    def add_object_prospect(self, location, name, probability, callable_class=None, customizable_properties=None,
+                            is_traversable=None,
+                            visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
+                            visualize_opacity=None, **custom_properties):
         # Add object as normal
-        self.add_env_object(location, name, callable_class, customizable_properties,
-                            is_traversable,
-                            visualize_size, visualize_shape, visualize_colour, visualize_depth,
-                            visualize_opacity, **custom_properties)
+        self.add_object(location, name, callable_class, customizable_properties,
+                        is_traversable,
+                        visualize_size, visualize_shape, visualize_colour, visualize_depth,
+                        visualize_opacity, **custom_properties)
 
         # Get the last settings (which we just added) and add the probability
         self.object_settings[-1]['probability'] = probability
@@ -674,12 +640,12 @@ class WorldBuilder:
 
         # Loop through all agents and add them
         for idx in range(len(locations)):
-            self.add_env_object(location=locations[idx], name=names[idx], callable_class=callable_classes[idx],
-                                customizable_properties=customizable_properties[idx],
-                                is_traversable=is_traversable[idx], is_movable=is_movable[idx],
-                                visualize_size=visualize_sizes[idx], visualize_shape=visualize_shapes[idx],
-                                visualize_colour=visualize_colours[idx], visualize_depth=visualize_depths[idx],
-                                visualize_opacity=visualize_opacities[idx], **custom_properties[idx])
+            self.add_object(location=locations[idx], name=names[idx], callable_class=callable_classes[idx],
+                            customizable_properties=customizable_properties[idx],
+                            is_traversable=is_traversable[idx], is_movable=is_movable[idx],
+                            visualize_size=visualize_sizes[idx], visualize_shape=visualize_shapes[idx],
+                            visualize_colour=visualize_colours[idx], visualize_depth=visualize_depths[idx],
+                            visualize_opacity=visualize_opacities[idx], **custom_properties[idx])
 
     def add_human_agent(self, location, agent, name="HumanAgent", customizable_properties=None, sense_capability=None,
                         is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None,
@@ -799,9 +765,9 @@ class WorldBuilder:
                 opacity = np.clip(opacity * smoke_thickness_multiplier, 0, 1)
 
                 # add the smokeTile
-                self.add_env_object(location=[x, y], name=name, callable_class=SmokeTile,
-                                    visualize_colour=visualize_colour, visualize_opacity=opacity,
-                                    visualize_depth=visualize_depth)
+                self.add_object(location=[x, y], name=name, callable_class=SmokeTile,
+                                visualize_colour=visualize_colour, visualize_opacity=opacity,
+                                visualize_depth=visualize_depth)
 
     def __list_area_locs(self, top_left_location, width, height):
         """
@@ -901,8 +867,8 @@ class WorldBuilder:
 
         # Add all doors
         for door_loc in door_locations:
-            self.add_env_object(location=door_loc, name=f"{name} - door@{door_loc}", callable_class=Door,
-                                is_open=doors_open)
+            self.add_object(location=door_loc, name=f"{name} - door@{door_loc}", callable_class=Door,
+                            is_open=doors_open)
 
         # Add all area tiles if required
         if with_area_tiles:
@@ -917,26 +883,6 @@ class WorldBuilder:
             self.add_area(top_left_location=area_top_left, width=area_width, height=area_height, name=f"{name}_area",
                           visualize_colour=area_visualize_colour, visualize_opacity=area_visualize_opacity,
                           customizable_properties=area_customizable_properties, **area_custom_properties)
-
-    def create_sense_capability(self, objects_to_perceive, range_to_perceive_them_in):
-        # Check if range and objects are the same length
-        assert len(objects_to_perceive) == len(range_to_perceive_them_in)
-
-        # Check if lists are empty, if so return a capability to see all at any range
-        if len(objects_to_perceive) == 0:
-            return SenseCapability({"*": np.inf})
-
-        # Create sense dictionary
-        sense_dict = {}
-        for idx, obj_class in enumerate(objects_to_perceive):
-            perceive_range = range_to_perceive_them_in[idx]
-            if perceive_range is None:
-                perceive_range = np.inf
-            sense_dict[obj_class] = perceive_range
-
-        sense_capability = SenseCapability(sense_dict)
-
-        return sense_capability
 
     def __create_world(self):
 
@@ -1081,9 +1027,7 @@ class WorldBuilder:
         # RandomLocation, their (random) value is retrieved.
         for k, v in args.items():
             if isinstance(v, RandomProperty):
-                args[k] = v.get_property(self.rng)
-            elif isinstance(v, RandomLocation):
-                args[k] = v.get_location(self.rng)
+                args[k] = v._get_property(self.rng)
 
         return args
 
@@ -1114,7 +1058,7 @@ class RandomProperty:
         self.allow_duplicates = allow_duplicates
         self.selected_values = set()
 
-    def get_property(self, rng: RandomState, size=None):
+    def _get_property(self, rng: RandomState, size=None):
         vals = self.values.copy()
         if not self.allow_duplicates:
             for it in self.selected_values:
@@ -1125,17 +1069,3 @@ class RandomProperty:
 
     def reset(self):
         self.selected_values = set()
-
-
-class RandomLocation:
-
-    def __init__(self, area_corners):
-        self.area_corners = area_corners
-
-    def get_location(self, rng):
-        # TODO
-        pass
-
-    def reset(self):
-        # TODO
-        pass

@@ -1,6 +1,6 @@
 from matrxs.agents.capabilities.capability import SenseCapability
 from matrxs.actions.action import Action
-from matrxs.utils.grid_world_utils import get_all_classes
+from matrxs.utils.utils import get_all_classes
 from matrxs.objects.env_object import EnvObject
 
 

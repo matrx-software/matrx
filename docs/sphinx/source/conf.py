@@ -4,6 +4,7 @@
 # list see the documentation:
 # http://www.sphinx-doc.org/en/master/usage/configuration.html
 
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -13,16 +14,14 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath("../../../matrxs/"))
-sys.path.insert(0, os.path.abspath("../../../matrxs/world_builder/"))
-# sys.path.insert(0, os.path.abspath("../../../agents/"))
-# sys.path.insert(0, os.path.abspath("../../../agents/capabilities/"))
-# sys.path.insert(0, os.path.abspath("../../../agents/agent_utils/"))
-print("\n\n\n -- System Path --> \n")
+# sys.path.insert(0, os.path.abspath("."))
+sys.path.insert(0, os.path.abspath("../../.."))
+sys.path.insert(0, os.path.abspath("../../../matrxs"))
+print("\n\n -- System Path -->")
 for p in sys.path:
     print(f"{p}")
 print("\n\n")
+
 
 # -- Project information -----------------------------------------------------
 
@@ -63,8 +62,13 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
-# Auto generate TOC elements for when using this autodoc flag (e.g. 'members'
-autodoc_default_flags = ['members', 'show-inheritance', 'inherited-members']
+# Auto generate the TOC elements for when using this autodoc flag (e.g. 'members')
+autodoc_default_options = {
+    'members': True,
+    'member-order': 'alphabetical',
+    'special-members': '__init__',
+    'undoc-members': True
+}
 autosummary_generate = True
 
 # Suppress certain warnings
@@ -81,6 +85,7 @@ html_show_copyright = False
 
 # If created by Sphinx is shown at bottom
 html_show_sphinx = False
+
 
 # -- Options for HTML output -------------------------------------------------
 
