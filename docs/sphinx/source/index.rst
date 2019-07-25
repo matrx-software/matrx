@@ -14,15 +14,9 @@ MATRXS; Man-Agent Teaming - Rapid Experimentation Software
 
    intro
    usage/installation
-<<<<<<< HEAD
    usage/quick_start
    documentation/api_reference
    development
-=======
-   usage/quickstart
-   documentation/documentation
-   examples/examples
->>>>>>> parent of a52b42d... Documentation update
 
 
 Indices

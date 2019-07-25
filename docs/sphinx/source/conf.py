@@ -14,24 +14,20 @@
 import os
 import sys
 
-<<<<<<< HEAD
 # sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath("../../.."))
 sys.path.insert(0, os.path.abspath("../../../matrxs"))
-print("\n\n -- System Path -->")
-=======
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath("../../../"))
-sys.path.insert(0, os.path.abspath("../../../world_builder/"))
-sys.path.insert(0, os.path.abspath("../../../environment/"))
-sys.path.insert(0, os.path.abspath("../../../environment/actions/"))
-sys.path.insert(0, os.path.abspath("../../../environment/objects/"))
-sys.path.insert(0, os.path.abspath("../../../environment/sim_goals/"))
+# sys.path.insert(0, os.path.abspath('.'))
+# sys.path.insert(0, os.path.abspath("../../../"))
+# sys.path.insert(0, os.path.abspath("../../../world_builder/"))
+# sys.path.insert(0, os.path.abspath("../../../environment/"))
+# sys.path.insert(0, os.path.abspath("../../../environment/actions/"))
+# sys.path.insert(0, os.path.abspath("../../../environment/objects/"))
+# sys.path.insert(0, os.path.abspath("../../../environment/sim_goals/"))
 # sys.path.insert(0, os.path.abspath("../../../agents/"))
 # sys.path.insert(0, os.path.abspath("../../../agents/capabilities/"))
 # sys.path.insert(0, os.path.abspath("../../../agents/utils/"))
-print("\n\n\n -- System Path --> \n")
->>>>>>> parent of a52b42d... Documentation update
+print("\n\n -- System Path --> \n")
 for p in sys.path:
     print(f"{p}")
 print("\n\n")
@@ -105,7 +101,7 @@ html_show_sphinx = False
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "sphinx_rtd_theme"
+html_theme = "nature"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
