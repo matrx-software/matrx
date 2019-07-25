@@ -15,36 +15,9 @@ from matrxs.agents.human_agent_brain import HumanAgentBrain
 from matrxs.grid_world import GridWorld
 from matrxs.objects.agent_body import AgentBody
 from matrxs.objects.env_object import EnvObject
-from matrxs.utils.utils import get_inheritence_path
+from matrxs.utils.utils import get_inheritence_path, get_default_value, _get_line_coords
 from matrxs.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
-from matrxs.sim_goals import LimitedTimeGoal, SimulationGoal
-from matrxs.utils.builder_utils import get_default_value, _get_line_coords
-
-######
-# We do this so we are sure everything is imported and thus can be found
-# noinspection PyUnresolvedReferences
-# noinspection PyUnresolvedReferences
-import matrxs.agents.capabilities
-# noinspection PyUnresolvedReferences
-# noinspection PyUnresolvedReferences
-import matrxs.sim_goals
-# noinspection PyUnresolvedReferences
-import matrxs.objects
-# noinspection PyUnresolvedReferences
-import matrxs.actions
-# noinspection PyUnresolvedReferences
-import matrxs.actions.door_actions
-# noinspection PyUnresolvedReferences
-import matrxs.actions.object_actions
-# noinspection PyUnresolvedReferences
-import matrxs.actions.move_actions
-# noinspection PyUnresolvedReferences
-from matrxs import world_builder, agents, environment
-# noinspection PyUnresolvedReferences
-import matrxs.visualization
-
-
-######
+from matrxs.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
 
 
 class WorldBuilder:
@@ -138,9 +111,9 @@ class WorldBuilder:
                              f"an initial '#'' (a hexidecimal color string).")
 
         # Check if the background image is a path
-        if not isinstance(visualization_bg_img, str):
+        if visualization_bg_img is not None and not isinstance(visualization_bg_img, str):
             raise ValueError(f"The given visualization_bg_img {visualization_bg_img} should of type str denoting a path"
-                             f"to an image.")
+                             f" to an image.")
 
         # Set our random number generator
         self.rng = np.random.RandomState(random_seed)

@@ -1,12 +1,12 @@
+import matrxs
 from matrxs.agents.human_agent_brain import HumanAgentBrain
 from matrxs.agents.patrolling_agent import PatrollingAgentBrain
-from matrxs.environment.actions.move_actions import *
-from matrxs.world_builder.world_builder import WorldBuilder
+from matrxs.world_builder import WorldBuilder
+from matrxs.actions.move_actions import *
 
 
 def create_factory():
-    factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.5,
-                           visualization_bg_img="soesterberg_luchtfoto.jpg", verbose=True)
+    factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.5, verbose=True)
 
     even = True
     for x in range(15):
@@ -16,8 +16,7 @@ def create_factory():
         if even:
             even = False
             start = [x, 0]
-            factory.add_agent(start, navigating_agent, name="navigate " + str(x), visualize_shape='img',
-                              image_file="smiley.gif")
+            factory.add_agent(start, navigating_agent, name="navigate " + str(x), visualize_shape=0)
         else:
             even = True
             start = [x, 5]

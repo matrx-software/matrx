@@ -5,7 +5,7 @@ import warnings
 from collections import OrderedDict
 
 from matrxs.actions.object_actions import *
-from matrxs.utils.grid_world_utils import get_all_classes
+from matrxs.utils.utils import get_all_classes
 from matrxs.objects.simple_objects import AreaTile
 from matrxs.visualization.visualizer import Visualizer
 from matrxs.objects.env_object import EnvObject

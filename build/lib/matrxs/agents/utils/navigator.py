@@ -2,7 +2,7 @@ import heapq
 from collections import OrderedDict
 
 import numpy as np
-from matrxs.agents.utils.state_tracker import StateTracker
+from matrxs.utils.agent_utils.state_tracker import StateTracker
 
 
 class Navigator:

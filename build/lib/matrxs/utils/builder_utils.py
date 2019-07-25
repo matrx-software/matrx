@@ -22,7 +22,8 @@ def load_defaults():
     # Find the testbed's root path (searches through all the file's parents until the folder testbed is reached)
     root_path = get_matrx_root()
 
-    file_path = os.path.join(root_path, "scenarios", "defaults.json")
+    # file_path = os.path.join(root_path, "scenarios", "defaults.json")
+    file_path = "matrxs/scenarios/defaults.json"
     return load_json(file_path)
 
 

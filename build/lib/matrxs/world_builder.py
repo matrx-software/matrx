@@ -17,7 +17,7 @@ from matrxs.objects.agent_body import AgentBody
 from matrxs.objects.env_object import EnvObject
 from matrxs.utils.utils import get_inheritence_path
 from matrxs.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
-from matrxs.sim_goals import LimitedTimeGoal, SimulationGoal
+from matrxs.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
 from matrxs.utils.builder_utils import get_default_value, _get_line_coords
 
 ######
@@ -138,9 +138,9 @@ class WorldBuilder:
                              f"an initial '#'' (a hexidecimal color string).")
 
         # Check if the background image is a path
-        if not isinstance(visualization_bg_img, str):
+        if visualization_bg_img is not None and not isinstance(visualization_bg_img, str):
             raise ValueError(f"The given visualization_bg_img {visualization_bg_img} should of type str denoting a path"
-                             f"to an image.")
+                             f" to an image.")
 
         # Set our random number generator
         self.rng = np.random.RandomState(random_seed)

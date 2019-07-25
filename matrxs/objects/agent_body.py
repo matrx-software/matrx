@@ -1,7 +1,7 @@
 from matrxs.agents.capabilities.capability import SenseCapability
-from matrxs.environment.actions.action import Action
-from matrxs.utils.grid_world_utils import get_all_classes
-from matrxs.environment.objects.env_object import EnvObject
+from matrxs.actions.action import Action
+from matrxs.utils.utils import get_all_classes
+from matrxs.objects.env_object import EnvObject
 
 
 class AgentBody(EnvObject):

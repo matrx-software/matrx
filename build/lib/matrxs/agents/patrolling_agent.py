@@ -1,6 +1,6 @@
 from matrxs.agents.agent_brain import AgentBrain
-from matrxs.agents.utils.navigator import Navigator
-from matrxs.agents.utils.state_tracker import StateTracker
+from matrxs.utils.agent_utils import Navigator
+from matrxs.utils.agent_utils.state_tracker import StateTracker
 
 
 class PatrollingAgentBrain(AgentBrain):

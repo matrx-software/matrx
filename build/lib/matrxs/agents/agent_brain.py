@@ -1,8 +1,8 @@
 from typing import Union
 
-from matrxs.environment.actions.door_actions import *
-from matrxs.environment.actions.object_actions import GrabObject
-from matrxs.environment.actions.object_actions import RemoveObject
+from matrxs.actions.door_actions import *
+from matrxs.actions.object_actions import GrabObject
+from matrxs.actions.object_actions import RemoveObject
 
 
 class AgentBrain:
