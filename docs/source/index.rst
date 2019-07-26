@@ -11,6 +11,11 @@ Welcome to MATRXS's documentation!
    :caption: Contents:
 
 
+.. autosummary::
+    :toctree: _generated_autodoc
+
+    matrxs.world_builder.WorldBuilder
+
 
 Indices and tables
 ==================
