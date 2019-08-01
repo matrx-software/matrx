@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <title>matrxs.world_builder.WorldBuilder &#8212; MATRXS 0.0.1 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
@@ -14,21 +14,27 @@
     <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Welcome to MATRXS’s documentation!" href="../index.html" />
-   
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="prev" title="Welcome to MATRXS’s documentation!" href="../index.html" /> 
   </head><body>
-  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Welcome to MATRXS’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MATRXS 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          
-
           <div class="body" role="main">
             
   <div class="section" id="matrxs-world-builder-worldbuilder">
@@ -110,24 +116,25 @@ numerous methods to add new objects and/or agents.</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>shape</strong><span class="classifier">tuple</span></dt><dd><p>Denotes the width and height of the world you create.</p>
 </dd>
-<dt><strong>tick_duration</strong><span class="classifier">float</span></dt><dd><p>The duration of a single ‘tick’, or loop in the game-loop of the world you create. Defaults to 0.5.</p>
+<dt><strong>tick_duration</strong><span class="classifier">float, optional</span></dt><dd><p>The duration of a single ‘tick’ or loop in the game-loop of the world you create. Defaults to 0.5.</p>
 </dd>
-<dt><strong>random_seed</strong><span class="classifier">int</span></dt><dd><p>The master random seed on which all objects, agents and worls are seeded. Defaults 1.0.</p>
+<dt><strong>random_seed</strong><span class="classifier">int, optional</span></dt><dd><p>The master random seed on which all objects, agents and worlds are seeded. Should be a positive non-zero
+integer. Defaults 1.0.</p>
 </dd>
-<dt><strong>simulation_goal</strong><span class="classifier">int, SimulationGoal, Iterable</span></dt><dd><p>The goal or goals of the world, either a single SimulationGoal, a list of such or a postive non-zero integer
-to denote the maximum number of ‘ticks’ the world(s) have to run.</p>
+<dt><strong>simulation_goal</strong><span class="classifier">int, SimulationGoal, list of SimulationGoal, optional</span></dt><dd><p>The goal or goals of the world, either a single SimulationGoal, a list of such or a positive non-zero
+integer to denote the maximum number of ‘ticks’ the world(s) have to run. Defaults to 1000.</p>
 </dd>
-<dt><strong>run_sail_api</strong><span class="classifier">bool</span></dt><dd><p>Not implemented yet.</p>
+<dt><strong>run_sail_api</strong><span class="classifier">bool, optional</span></dt><dd><p>Not Yet Implemented.</p>
 </dd>
-<dt><strong>run_visualization_server</strong><span class="classifier">bool</span></dt><dd><p>Not implemented yet.</p>
+<dt><strong>run_visualization_server</strong><span class="classifier">bool, optional</span></dt><dd><p>Not Yet Implemented.</p>
 </dd>
-<dt><strong>visualization_bg_clr</strong><span class="classifier">str</span></dt><dd><p>The color of the world when visualized using MATRXS’ own visualisation server. A string representation of
-hexadecimal color.</p>
+<dt><strong>visualization_bg_clr</strong><span class="classifier">str, optional</span></dt><dd><p>The color of the world when visualized using MATRXS’ own visualisation server. A string representation of
+hexadecimal color. Defaults to “#C2C2C2” (light grey).</p>
 </dd>
-<dt><strong>visualization_bg_img</strong><span class="classifier">str</span></dt><dd><p>An optional background image of the world when visualized using MATRXS’ own visualisation server. A string
-of the path to the image file.</p>
+<dt><strong>visualization_bg_img</strong><span class="classifier">str, optional</span></dt><dd><p>An optional background image of the world when visualized using MATRXS’ own visualisation server. A string
+of the path to the image file. Defaults to None (no image).</p>
 </dd>
-<dt><strong>verbose</strong><span class="classifier">bool</span></dt><dd><p>Whether the subsequent creater world should be verbose or not.</p>
+<dt><strong>verbose</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether the subsequent created world should be verbose or not. Defaults to False.</p>
 </dd>
 </dl>
 </dd>
@@ -135,12 +142,24 @@ of the path to the image file.</p>
 <dd class="field-even"><dl class="simple">
 <dt>ValueError</dt><dd><p>On an incorrect argument. The exception specifies further what argument and what is erroneous about it.</p>
 </dd>
-<dt>NotImplementedError</dt><dd><p>On setting either the run_sail_api or run_visualisation_server boolean to True. As this functionality is not
-yet implemented.</p>
+<dt>NotImplementedError</dt><dd><p>On setting either the <cite>run_sail_api</cite> or ‘run_visualisation_server’ booleans to True. As this functionality
+is not yet implemented.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<p>This creates a WorldBuilder that creates world of a certain size (here 10 by 10);</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matrxs.world_builder</span> <span class="k">import</span> <span class="n">WorldBuilder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WorldBuilder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>To create a WorldBuilder with a black background, a tick duration as fast as possible and with a different
+master random seed;</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matrxs.world_builder</span> <span class="k">import</span> <span class="n">WorldBuilder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WorldBuilder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random_seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">tick_duration</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">visualization_bg_clr</span><span class="o">=</span><span class="s2">&quot;#000000&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <p class="rubric">Methods</p>
@@ -212,24 +231,25 @@ numerous methods to add new objects and/or agents.</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>shape</strong><span class="classifier">tuple</span></dt><dd><p>Denotes the width and height of the world you create.</p>
 </dd>
-<dt><strong>tick_duration</strong><span class="classifier">float</span></dt><dd><p>The duration of a single ‘tick’, or loop in the game-loop of the world you create. Defaults to 0.5.</p>
+<dt><strong>tick_duration</strong><span class="classifier">float, optional</span></dt><dd><p>The duration of a single ‘tick’ or loop in the game-loop of the world you create. Defaults to 0.5.</p>
 </dd>
-<dt><strong>random_seed</strong><span class="classifier">int</span></dt><dd><p>The master random seed on which all objects, agents and worls are seeded. Defaults 1.0.</p>
+<dt><strong>random_seed</strong><span class="classifier">int, optional</span></dt><dd><p>The master random seed on which all objects, agents and worlds are seeded. Should be a positive non-zero
+integer. Defaults 1.0.</p>
 </dd>
-<dt><strong>simulation_goal</strong><span class="classifier">int, SimulationGoal, Iterable</span></dt><dd><p>The goal or goals of the world, either a single SimulationGoal, a list of such or a postive non-zero integer
-to denote the maximum number of ‘ticks’ the world(s) have to run.</p>
+<dt><strong>simulation_goal</strong><span class="classifier">int, SimulationGoal, list of SimulationGoal, optional</span></dt><dd><p>The goal or goals of the world, either a single SimulationGoal, a list of such or a positive non-zero
+integer to denote the maximum number of ‘ticks’ the world(s) have to run. Defaults to 1000.</p>
 </dd>
-<dt><strong>run_sail_api</strong><span class="classifier">bool</span></dt><dd><p>Not implemented yet.</p>
+<dt><strong>run_sail_api</strong><span class="classifier">bool, optional</span></dt><dd><p>Not Yet Implemented.</p>
 </dd>
-<dt><strong>run_visualization_server</strong><span class="classifier">bool</span></dt><dd><p>Not implemented yet.</p>
+<dt><strong>run_visualization_server</strong><span class="classifier">bool, optional</span></dt><dd><p>Not Yet Implemented.</p>
 </dd>
-<dt><strong>visualization_bg_clr</strong><span class="classifier">str</span></dt><dd><p>The color of the world when visualized using MATRXS’ own visualisation server. A string representation of
-hexadecimal color.</p>
+<dt><strong>visualization_bg_clr</strong><span class="classifier">str, optional</span></dt><dd><p>The color of the world when visualized using MATRXS’ own visualisation server. A string representation of
+hexadecimal color. Defaults to “#C2C2C2” (light grey).</p>
 </dd>
-<dt><strong>visualization_bg_img</strong><span class="classifier">str</span></dt><dd><p>An optional background image of the world when visualized using MATRXS’ own visualisation server. A string
-of the path to the image file.</p>
+<dt><strong>visualization_bg_img</strong><span class="classifier">str, optional</span></dt><dd><p>An optional background image of the world when visualized using MATRXS’ own visualisation server. A string
+of the path to the image file. Defaults to None (no image).</p>
 </dd>
-<dt><strong>verbose</strong><span class="classifier">bool</span></dt><dd><p>Whether the subsequent creater world should be verbose or not.</p>
+<dt><strong>verbose</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether the subsequent created world should be verbose or not. Defaults to False.</p>
 </dd>
 </dl>
 </dd>
@@ -237,17 +257,29 @@ of the path to the image file.</p>
 <dd class="field-even"><dl class="simple">
 <dt>ValueError</dt><dd><p>On an incorrect argument. The exception specifies further what argument and what is erroneous about it.</p>
 </dd>
-<dt>NotImplementedError</dt><dd><p>On setting either the run_sail_api or run_visualisation_server boolean to True. As this functionality is not
-yet implemented.</p>
+<dt>NotImplementedError</dt><dd><p>On setting either the <cite>run_sail_api</cite> or ‘run_visualisation_server’ booleans to True. As this functionality
+is not yet implemented.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<p>This creates a WorldBuilder that creates world of a certain size (here 10 by 10);</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matrxs.world_builder</span> <span class="k">import</span> <span class="n">WorldBuilder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WorldBuilder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>To create a WorldBuilder with a black background, a tick duration as fast as possible and with a different
+master random seed;</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matrxs.world_builder</span> <span class="k">import</span> <span class="n">WorldBuilder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WorldBuilder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random_seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">tick_duration</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">visualization_bg_clr</span><span class="o">=</span><span class="s2">&quot;#000000&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="matrxs.world_builder.WorldBuilder.add_agent">
-<code class="sig-name descname">add_agent</code><span class="sig-paren">(</span><em class="sig-param">self, location: Union[tuple, list], agent_brain: matrxs.agents.agent_brain.AgentBrain, name, customizable_properties: Union[tuple, list] = None, sense_capability: matrxs.agents.capabilities.capability.SenseCapability = None, is_traversable: bool = None, team: str = None, agent_speed_in_ticks: int = None, possible_actions: list = None, is_movable: bool = None, visualize_size: float = None, visualize_shape: Union[float, str] = None, visualize_colour: str = None, visualize_depth: int = None, visualize_opacity: float = None, **custom_properties</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.world_builder.WorldBuilder.add_agent" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_agent</code><span class="sig-paren">(</span><em class="sig-param">self, location: Union[tuple, list], agent_brain: matrxs.agents.agent_brain.AgentBrain, name, customizable_properties: Union[tuple, list] = None, sense_capability: matrxs.agents.capabilities.capability.SenseCapability = None, is_traversable: bool = True, team: str = None, agent_speed_in_ticks: int = None, possible_actions: list = None, is_movable: bool = None, visualize_size: float = None, visualize_shape: Union[float, str] = None, visualize_colour: str = None, visualize_depth: int = None, visualize_opacity: float = None, **custom_properties</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.world_builder.WorldBuilder.add_agent" title="Permalink to this definition">¶</a></dt>
 <dd><p>The helper method within a WorldFactory instance to add a single agent.</p>
 <p>This method makes sure that when this
 factory generates a GridWorld instance, it contains an AgentBody connected to the given AgentBrain.</p>
@@ -471,54 +503,20 @@ Should be of the same size as <cite>locations</cite>.</p>
 
 
           </div>
-          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">MATRXS</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">matrxs.world_builder.WorldBuilder</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.grid_world.GridWorld.html">matrxs.grid_world.GridWorld</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.agents.agent_brain.AgentBrain.html">matrxs.agents.agent_brain.AgentBrain</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.agents.human_agent_brain.HumanAgentBrain.html">matrxs.agents.human_agent_brain.HumanAgentBrain</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.agents.patrolling_agent.PatrollingAgentBrain.html">matrxs.agents.patrolling_agent.PatrollingAgentBrain</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.agents.capabilities.capability.SenseCapability.html">matrxs.agents.capabilities.capability.SenseCapability</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.objects.env_object.EnvObject.html">matrxs.objects.env_object.EnvObject</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.objects.simple_objects.Wall.html">matrxs.objects.simple_objects.Wall</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.objects.simple_objects.Door.html">matrxs.objects.simple_objects.Door</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.objects.simple_objects.SquareBlock.html">matrxs.objects.simple_objects.SquareBlock</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.objects.simple_objects.AreaTile.html">matrxs.objects.simple_objects.AreaTile</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.objects.simple_objects.SmokeTile.html">matrxs.objects.simple_objects.SmokeTile</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.objects.agent_body.AgentBody.html">matrxs.objects.agent_body.AgentBody</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.objects.advanced_objects.Battery.html">matrxs.objects.advanced_objects.Battery</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.sim_goals.sim_goal.SimulationGoal.html">matrxs.sim_goals.sim_goal.SimulationGoal</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.sim_goals.sim_goal.LimitedTimeGoal.html">matrxs.sim_goals.sim_goal.LimitedTimeGoal</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.utils.utils.html">matrxs.utils.utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.utils.agent_utils.state_tracker.StateTracker.html">matrxs.utils.agent_utils.state_tracker.StateTracker</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.utils.agent_utils.navigator.Navigator.html">matrxs.utils.agent_utils.navigator.Navigator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="matrxs.utils.agent_utils.task_manager.TaskManager.html">matrxs.utils.agent_utils.task_manager.TaskManager</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to MATRXS’s documentation!</a></li>
-  </ul></li>
-</ul>
-</div>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../index.html"
+                        title="previous chapter">Welcome to MATRXS’s documentation!</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_generated_autodoc/matrxs.world_builder.WorldBuilder.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
@@ -529,32 +527,28 @@ Should be of the same size as <cite>locations</cite>.</p>
     </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2019, The MATRXS Team at TNO.nl.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../_sources/_generated_autodoc/matrxs.world_builder.WorldBuilder.rst.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Welcome to MATRXS’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MATRXS 0.0.1 documentation</a> &#187;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, The MATRXS Team at TNO.nl.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+    </div>
   </body>
 </html>

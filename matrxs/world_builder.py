@@ -35,25 +35,26 @@ class WorldBuilder:
         ----------
         shape : tuple
             Denotes the width and height of the world you create.
-        tick_duration : float
-            The duration of a single 'tick', or loop in the game-loop of the world you create. Defaults to 0.5.
-        random_seed : int
-            The master random seed on which all objects, agents and worls are seeded. Defaults 1.0.
-        simulation_goal : int, SimulationGoal, Iterable
-            The goal or goals of the world, either a single SimulationGoal, a list of such or a postive non-zero integer
-            to denote the maximum number of 'ticks' the world(s) have to run.
-        run_sail_api : bool
-            Not implemented yet.
-        run_visualization_server : bool
-            Not implemented yet.
-        visualization_bg_clr : str
+        tick_duration : float, optional
+            The duration of a single 'tick' or loop in the game-loop of the world you create. Defaults to 0.5.
+        random_seed : int, optional
+            The master random seed on which all objects, agents and worlds are seeded. Should be a positive non-zero
+            integer. Defaults 1.0.
+        simulation_goal : int, SimulationGoal, list of SimulationGoal, optional
+            The goal or goals of the world, either a single SimulationGoal, a list of such or a positive non-zero
+            integer to denote the maximum number of 'ticks' the world(s) have to run. Defaults to 1000.
+        run_sail_api : bool, optional
+            Not Yet Implemented.
+        run_visualization_server : bool, optional
+            Not Yet Implemented.
+        visualization_bg_clr : str, optional
             The color of the world when visualized using MATRXS' own visualisation server. A string representation of
-            hexadecimal color.
-        visualization_bg_img : str
+            hexadecimal color. Defaults to "#C2C2C2" (light grey).
+        visualization_bg_img : str, optional
             An optional background image of the world when visualized using MATRXS' own visualisation server. A string
-            of the path to the image file.
-        verbose : bool
-            Whether the subsequent creater world should be verbose or not.
+            of the path to the image file. Defaults to None (no image).
+        verbose : bool, optional
+            Whether the subsequent created world should be verbose or not. Defaults to False.
 
         Raises
         ------
@@ -61,8 +62,23 @@ class WorldBuilder:
             On an incorrect argument. The exception specifies further what argument and what is erroneous about it.
 
         NotImplementedError
-            On setting either the run_sail_api or run_visualisation_server boolean to True. As this functionality is not
-            yet implemented.
+            On setting either the `run_sail_api` or `run_visualisation_server` booleans to True. As this functionality
+            is not yet implemented.
+
+        Examples
+        --------
+
+        This creates a WorldBuilder that creates world of a certain size (here 10 by 10);
+
+            >>> from matrxs.world_builder import WorldBuilder
+            >>> WorldBuilder(shape=(10, 10))
+
+        To create a WorldBuilder with a black background, a tick duration as fast as possible and with a different
+        master random seed;
+
+            >>> from matrxs.world_builder import WorldBuilder
+            >>> WorldBuilder(shape=(10, 10), random_seed=42, tick_duration=-1, visualization_bg_clr="#000000")
+
         """
 
         # Check if shape is of correct type and length
@@ -128,7 +144,7 @@ class WorldBuilder:
         # Keep track of the number of worlds we created
         self.worlds_created = 0
 
-        # Set our custom warning method for all of the testbed
+        # Set our custom warning method for all of MATRXS
         def _warning(message, category, filename, lineno, file=None, line=None):
             filename = filename.split(os.sep)[-1].split(".")[0]
             if lineno is not None:
@@ -202,7 +218,7 @@ class WorldBuilder:
 
     def add_agent(self, location: Union[tuple, list], agent_brain: AgentBrain, name,
                   customizable_properties: Union[tuple, list] = None, sense_capability: SenseCapability = None,
-                  is_traversable: bool = None, team: str = None, agent_speed_in_ticks: int = None,
+                  is_traversable: bool = True, team: str = None, agent_speed_in_ticks: int = None,
                   possible_actions: list = None, is_movable: bool = None, visualize_size: float = None,
                   visualize_shape: Union[float, str] = None, visualize_colour: str = None, visualize_depth: int = None,
                   visualize_opacity: float = None,
