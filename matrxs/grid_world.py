@@ -530,9 +530,16 @@ class GridWorld:
             action = action_class()
             # Apply world mutation
             result = action.mutate(self, agent_id, **action_kwargs)
+
+            # Obtain the duration of the action, defaults to the one of the action class if not in action_kwargs, and
+            # otherwise that of Action
+            duration_in_ticks = action.duration_in_ticks
+            if "duration_in_ticks" in action_kwargs.keys():
+                duration_in_ticks = action_kwargs["duration_in_ticks"]
+
             # The agent is now busy performing this action
             self.registered_agents[agent_id]._set_agent_busy(curr_tick=self.current_nr_ticks,
-                                                             action_duration=action.duration_in_ticks)
+                                                             action_duration=duration_in_ticks)
 
             # Get agent's send_result function
             set_action_result = self.registered_agents[agent_id].set_action_result_func
