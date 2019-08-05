@@ -178,7 +178,7 @@ class AgentBrain:
 
         return action, action_kwargs
 
-    def send_message(self, message_content: Union[str, dict], to_id: str = None):
+    def send_message(self, message_content: Union[str, dict], to_id: Union[str, list] = None):
         """
         Method that allows you to construct a message that will be send to either a specified agent, a team of agents
         or all agents.
@@ -187,18 +187,25 @@ class AgentBrain:
         ----------
         message_content
             A string or a dictionary containing anything.
-        to_id
-            Defaults to None. A string denoting a specific agent's ID, a team name or None to send to all agents.
+        to_id: str, list, None, optional
+            Defaults to None. A string denoting a either a specific agent's ID when it is a string, or a list of
+            agent IDs when it is a list of strings. When set to None, the message is send to all agents.
 
         Returns
         -------
-            Nothing.
+        None
+            ...
         """
-        message = Message(content=message_content, from_id=self.agent_id, to_id=to_id)
-        self.messages_to_send.append(message)
 
-    def is_action_possible(self, action, action_args):
-        action_result = self.__callback_is_action_possible(self.agent_id, action, action_args)
+        if to_id is None or isinstance(to_id, str):
+            to_id = [to_id]
+
+        for single_to_id in to_id:
+            message = Message(content=message_content, from_id=self.agent_id, to_id=single_to_id)
+            self.messages_to_send.append(message)
+
+    def is_action_possible(self, action, action_kwargs):
+        action_result = self.__callback_is_action_possible(self.agent_id, action, action_kwargs)
 
         return action_result.succeeded, action_result
 
