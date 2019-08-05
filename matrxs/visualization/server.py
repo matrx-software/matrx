@@ -2,6 +2,7 @@ import warnings
 
 from flask import Flask, request, render_template, jsonify
 from flask_socketio import SocketIO, join_room
+import os
 
 '''
 This file holds the code for the Flask (Python) webserver, which listens to grid updates
@@ -18,7 +19,8 @@ user_input = {}  # can't be None, otherwise Flask flips out when returning it
 
 
 def create_app():
-    app = Flask("MATRXS Visualisation", template_folder="static/templates")
+    template_folder = os.path.join(__file__, "..", "static", "templates")
+    app = Flask("MATRXS Visualisation", template_folder=template_folder)
     app.config['SECRET_KEY'] = 'secret!'
 
     sio = SocketIO(app)
