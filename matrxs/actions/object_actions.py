@@ -76,12 +76,12 @@ class RemoveObject(Action):
         objects_in_range.pop(agent_avatar.obj_id)
 
         if len(objects_in_range) == 0:  # if there are no objects in infinite range besides ourselves, we return fail
-            return False, RemoveObjectResult(RemoveObjectResult.NO_OBJECTS_IN_RANGE \
-                                             .replace('remove_range'.upper(), str(remove_range)), False)
+            return RemoveObjectResult(RemoveObjectResult.NO_OBJECTS_IN_RANGE.replace('remove_range'.upper(),
+                                                                                     str(remove_range)), False)
 
         # otherwise some instance of RemoveObject is possible, although we do not know yet IF the intended removal is
         # possible.
-        return True, RemoveObjectResult(RemoveObjectResult.ACTION_SUCCEEDED, True)
+        return RemoveObjectResult(RemoveObjectResult.ACTION_SUCCEEDED, True)
 
 
 class RemoveObjectResult(ActionResult):
@@ -171,11 +171,11 @@ class GrabObject(Action):
         loc_agent = reg_ag.location  # Agent location
 
         if object_id is None:
-            return False, GrabObjectResult(GrabObjectResult.RESULT_NO_OBJECT, False)
+            return GrabObjectResult(GrabObjectResult.RESULT_NO_OBJECT, False)
 
         # Already carries an object
         if len(reg_ag.is_carrying) >= max_objects:
-            return False, GrabObjectResult(GrabObjectResult.RESULT_CARRIES_OBJECT, False)
+            return GrabObjectResult(GrabObjectResult.RESULT_CARRIES_OBJECT, False)
 
         # Go through all objects at the desired locations
         objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type="*", sense_range=grab_range)
@@ -192,32 +192,32 @@ class GrabObject(Action):
             if objects_in_range:
                 object_id = grid_world.rnd_gen.choice(list(objects_in_range.keys()))
             else:
-                return False, GrabObjectResult(GrabObjectResult.NOT_IN_RANGE, False)
+                return GrabObjectResult(GrabObjectResult.NOT_IN_RANGE, False)
 
         # Check if object is in range
         if object_id not in objects_in_range:
-            return False, GrabObjectResult(GrabObjectResult.NOT_IN_RANGE, False)
+            return GrabObjectResult(GrabObjectResult.NOT_IN_RANGE, False)
 
         # Check if object_id is the id of an agent
         if object_id in grid_world.registered_agents.keys():
             # If it is an agent at that location, grabbing is not possible
-            return False, GrabObjectResult(GrabObjectResult.RESULT_AGENT, False)
+            return GrabObjectResult(GrabObjectResult.RESULT_AGENT, False)
 
         # Check if it is an object
         if object_id in grid_world.environment_objects.keys():
             env_obj = grid_world.environment_objects[object_id]  # Environment object
             # Check if the object is not carried by another agent
             if len(env_obj.carried_by) != 0:
-                return False, GrabObjectResult(GrabObjectResult.RESULT_OBJECT_CARRIED.replace("{AGENT_ID}",
+                return GrabObjectResult(GrabObjectResult.RESULT_OBJECT_CARRIED.replace("{AGENT_ID}",
                                                                                               str(env_obj.carried_by)),
                                                False)
             elif not env_obj.properties["is_movable"]:
-                return False, GrabObjectResult(GrabObjectResult.RESULT_OBJECT_UNMOVABLE, False)
+                return GrabObjectResult(GrabObjectResult.RESULT_OBJECT_UNMOVABLE, False)
             else:
                 # Success
-                return True, GrabObjectResult(GrabObjectResult.RESULT_SUCCESS, False)
+                return GrabObjectResult(GrabObjectResult.RESULT_SUCCESS, False)
         else:
-            return False, GrabObjectResult(GrabObjectResult.RESULT_UNKNOWN_OBJECT_TYPE, False)
+            return GrabObjectResult(GrabObjectResult.RESULT_UNKNOWN_OBJECT_TYPE, False)
 
 
 class GrabObjectResult(ActionResult):
@@ -250,7 +250,7 @@ class DropObject(Action):
         elif len(reg_ag.is_carrying) > 0:
             obj_id = reg_ag.is_carrying[-1]
         else:
-            return False, DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
+            return DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
 
         return self.possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id, drop_range=drop_range)
 
@@ -391,14 +391,14 @@ class DropObject(Action):
 
         # No object given
         if not obj_id:
-            return False, DropObjectResult(DropObjectResult.RESULT_NONE_GIVEN, False)
+            return DropObjectResult(DropObjectResult.RESULT_NONE_GIVEN, False)
 
         # No object with that name
         if not (obj_id in reg_ag.is_carrying):
-            return False, DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
+            return DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
 
         if len(loc_obj_ids) == 1:
-            return True, DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
+            return DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
 
         # TODO: incorporate is_possible check from DropAction.mutate is_possible here
 

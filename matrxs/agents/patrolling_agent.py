@@ -24,7 +24,7 @@ class PatrollingAgentBrain(AgentBrain):
         self.state_tracker.update(state)
         return state
 
-    def decide_on_action(self, state, possible_actions):
+    def decide_on_action(self, state):
 
         move_action = self.navigator.get_move_action(self.state_tracker)
 

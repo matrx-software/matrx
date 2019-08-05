@@ -14,7 +14,7 @@ class HumanAgentBrain(AgentBrain):
         super().__init__()
 
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
-                            customizable_properties, rnd_seed, usrinp_action_map=None):
+                            customizable_properties, rnd_seed, callback_is_action_possible, usrinp_action_map=None):
         """
         Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
         properties. This also sets the random number generator with a seed generated based on the random seed of the
@@ -57,13 +57,17 @@ class HumanAgentBrain(AgentBrain):
         # NOTE: Changing which properties are writable cannot be done during runtime! Only in  the scenario manager
         self.keys_of_agent_writable_props = customizable_properties
 
+        # A callback to the GridWorld instance that can check whether any action (with its arguments) will succeed and
+        # if not why not (in the form of an ActionResult).
+        self.__callback_is_action_possible = callback_is_action_possible
+
         # a list which maps user inputs to actions, defined in the scenario manager
         if usrinp_action_map is None:
             self.usrinp_action_map = {}
         else:
             self.usrinp_action_map = usrinp_action_map
 
-    def _get_action(self, state, agent_properties, possible_actions, agent_id, userinput):
+    def _get_action(self, state, agent_properties, agent_id, userinput):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
         for this agent to select an action.
@@ -76,9 +80,6 @@ class HumanAgentBrain(AgentBrain):
         i.e. within the detectable range as defined by self.sense_capability. It is a list of properties in a dictionary
         :param agent_properties: The properties of the agent, which might have been changed by the
         environment as a result of actions of this or other agents.
-        :param possible_actions: The possible actions the agent can perform according to the grid world. The agent can
-        send any other action (as long as it excists in the Action package), but these will not be performed in the
-        world resulting in the appriopriate ActionResult.
         :param agent_id: the ID of this agent
         :param userinput: any userinput given by the user for this human agent via the GUI
         :return: The filtered state of this agent, the agent properties which the agent might have changed,

@@ -58,7 +58,7 @@ class OpenDoorAction(Action):
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
 
         result = is_possible_door_open_close(grid_world, agent_id, OpenDoorActionResult, object_id, door_range)
-        return result.succeeded, result.result
+        return result
 
 
 class CloseDoorAction(Action):
@@ -115,7 +115,7 @@ class CloseDoorAction(Action):
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
 
         result = is_possible_door_open_close(grid_world, agent_id, CloseDoorActionResult, object_id, door_range)
-        return result.succeeded, result.result
+        return result
 
 
 class CloseDoorActionResult(ActionResult):

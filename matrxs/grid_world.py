@@ -221,6 +221,7 @@ class GridWorld:
                                       sense_capability=agent_avatar.sense_capability,
                                       agent_properties=avatar_props,
                                       customizable_properties=agent_avatar.customizable_properties,
+                                      callback_is_action_possible=self.__check_action_is_possible,
                                       rnd_seed=agent_seed)
         else:  # if the agent is a human agent, we also assign its user input action map
             agent._factory_initialise(agent_name=agent_avatar.obj_name,
@@ -229,6 +230,7 @@ class GridWorld:
                                       sense_capability=agent_avatar.sense_capability,
                                       agent_properties=avatar_props,
                                       customizable_properties=agent_avatar.customizable_properties,
+                                      callback_is_action_possible=self.__check_action_is_possible,
                                       rnd_seed=agent_seed,
                                       usrinp_action_map=agent_avatar.properties["usrinp_action_map"])
 
@@ -304,22 +306,16 @@ class GridWorld:
                                               state=filtered_agent_state)
                 continue
 
-            possible_actions = self.__get_possible_actions(agent_id=agent_id, action_set=agent_obj.action_set)
-
             # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
             if agent_obj.is_human_agent:
                 usrinp = self.__visualizer._userinputs[agent_id.lower()] if \
                     agent_id.lower() in self.__visualizer._userinputs else None
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
-                    state=state,
-                    agent_properties=agent_obj.properties, possible_actions=possible_actions, agent_id=agent_id,
-                    userinput=usrinp)
+                    state=state, agent_properties=agent_obj.properties, agent_id=agent_id, userinput=usrinp)
             else:
                 # perform the OODA loop and get an action back
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
-                    state=state,
-                    agent_properties=agent_obj.properties, possible_actions=possible_actions,
-                    agent_id=agent_id)
+                    state=state, agent_properties=agent_obj.properties, agent_id=agent_id)
 
             # store the action in the buffer
             action_buffer[agent_id] = (action_class_name, action_kwargs)
@@ -480,37 +476,11 @@ class GridWorld:
 
         return state
 
-    def __get_possible_actions(self, action_set, agent_id):
-        # List where we store our possible actions in for a specific agent
-
-        possible_actions = []
-        # Go through the action set
-        for action_type in action_set:
-            # If the action from the set is a known action we continue
-            if action_type in self.__all_actions:
-                # We get the action constructor
-                action_class = self.__all_actions[action_type]
-                # And we call that constructor to create an action object
-                action = action_class()
-                # Then we check if the action is possible, which returns a boolean, and a string that we ignore
-                # (contains the reason why the action is not possible)
-                is_possible, reason = action.is_possible(grid_world=self, agent_id=agent_id, kwargs={})
-
-                # If the action is possible, we append it to possible actions list
-                if is_possible:
-                    possible_actions.append(action_type)
-        # If no actions, we warn that this is the case
-        if len(possible_actions) == 0:
-            warn_str = f"No possible actions for agent {agent_id}."
-            warnings.warn(self.__warn(warn_str))
-
-        # Sort alphabeticcelly, since the order was determined by the order of a dictionary we fix it now such that any
-        # random selection (e.g. through 'choice') makes sense.
-        possible_actions.sort()
-
-        return possible_actions
-
-    def __perform_action(self, agent_id, action_name, action_kwargs):
+    def __check_action_is_possible(self, agent_id, action_name, action_kwargs):
+        # If the action_name is None, the agent idles
+        if action_name is None:
+            result = ActionResult(ActionResult.IDLE_ACTION, succeeded=True)
+            return result
 
         # Check if the agent still exists (you would only get here if the agent is removed during this tick).
         if agent_id not in self.registered_agents.keys():
@@ -521,46 +491,58 @@ class GridWorld:
             result = ActionResult(ActionResult.NO_ACTION_GIVEN, succeeded=True)
 
         # action known, but agent not capable of performing it
-        elif action_name in self.__all_actions.keys() and not action_name in self.registered_agents[
-            agent_id].action_set:
+        elif action_name in self.__all_actions.keys() and \
+                action_name not in self.registered_agents[agent_id].action_set:
             result = ActionResult(ActionResult.AGENT_NOT_CAPABLE, succeeded=False)
 
-        elif action_name in self.__all_actions.keys():  # Check if action is known
+        # Check if action is known
+        elif action_name in self.__all_actions.keys():
             # Get action class
             action_class = self.__all_actions[action_name]
             # Make instance of action
             action = action_class()
             # Check if action is possible, if so we can perform the action otherwise we send an ActionResult that it was
             # not possible.
-            is_possible = action.is_possible(self, agent_id, **action_kwargs)
+            result = action.is_possible(self, agent_id, **action_kwargs)
 
-            if is_possible[0]:  # First return value is the boolean (seceond is reason why, optional)
-                # Apply world mutation
-                result = action.mutate(self, agent_id, **action_kwargs)
-
-                # The agent is now busy performing this action
-                self.registered_agents[agent_id]._set_agent_busy(curr_tick=self.current_nr_ticks,
-                                                                 action_duration=action.duration_in_ticks)
-            else:
-                # If the action is not possible, send a failed ActionResult with the is_possible message if given,
-                # otherwise use the default one.
-                custom_not_possible_message = is_possible[1]  # is_possible[1]
-                if custom_not_possible_message is not None:
-                    result = ActionResult(custom_not_possible_message, succeeded=False)
-                else:
-                    result = ActionResult(ActionResult.ACTION_NOT_POSSIBLE, succeeded=False)
         else:  # If the action is not known
+            warnings.warn(f"The action with name {action_name} was not found when checking whether this action is "
+                          f"possible to perform by agent {agent_id}.")
             result = ActionResult(ActionResult.UNKNOWN_ACTION, succeeded=False)
 
-        # Get agent's send_result function
-        set_action_result = self.registered_agents[agent_id].set_action_result_func
-        # Send result of mutation to agent
-        set_action_result(result)
+        return result
 
-        # Update world if needed
-        if action_name is not None:
+    def __perform_action(self, agent_id, action_name, action_kwargs):
+
+        # Check if the action will succeed
+        result = self.__check_action_is_possible(agent_id, action_name, action_kwargs)
+
+        # If it will succeed, perform it.
+        if result.succeeded:
+
+            # If the action is None, nothing has to change in the world
+            if action_name is None:
+                return result
+            
+            # Get action class
+            action_class = self.__all_actions[action_name]
+            # Make instance of action
+            action = action_class()
+            # Apply world mutation
+            result = action.mutate(self, agent_id, **action_kwargs)
+            # The agent is now busy performing this action
+            self.registered_agents[agent_id]._set_agent_busy(curr_tick=self.current_nr_ticks,
+                                                             action_duration=action.duration_in_ticks)
+
+            # Get agent's send_result function
+            set_action_result = self.registered_agents[agent_id].set_action_result_func
+            # Send result of mutation to agent
+            set_action_result(result)
+
+            # Update the grid
             self.__update_agent_location(agent_id)
 
+        # Whether the action succeeded or not, we return the result
         return result
 
     def __update_agent_location(self, agent_id):
