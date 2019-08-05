@@ -5,8 +5,6 @@ import warnings
 from multiprocessing import Process
 from collections import OrderedDict
 
-import eventlet
-
 from matrxs.actions.object_actions import *
 from matrxs.utils.utils import get_all_classes
 from matrxs.objects.simple_objects import AreaTile
@@ -420,7 +418,7 @@ class GridWorld:
         :return:
         """
         if self.sleep_duration > 0:
-            eventlet.sleep(self.sleep_duration)
+            time.sleep(self.sleep_duration)
         else:
             self.__warn(
                 f"The average tick took longer than the set tick duration of {self.tick_duration}. "
@@ -618,9 +616,5 @@ class GridWorld:
         # Create the process and run it
         server.run_visualisation_server()
         self.__visualisation_process = True
-        #self.__visualisation_process = Process(target=server.run_visualisation_server, args=(),
-        #                                       name="MATRXS Visualisation Server")
-        #self.__visualisation_process.start()
-        #self.__visualisation_process.join()
 
         return succeeded

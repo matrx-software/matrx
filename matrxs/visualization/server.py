@@ -21,9 +21,9 @@ def create_app():
     app = Flask("MATRXS Visualisation", template_folder="static/templates")
     app.config['SECRET_KEY'] = 'secret!'
 
-    socketio = SocketIO(app)
+    sio = SocketIO(app)
 
-    return app, socketio
+    return app, sio
 
 
 app, socketio = create_app()
@@ -233,21 +233,11 @@ def handle_usr_inp(input):
         print(f"User input: {user_input[id]}")
 
 
-def run_server():
-    print("Server running...")
-    socketio.run(app, host='0.0.0.0', port=3000)
-
-
-def run_server_threaded():
-    socketio.start_background_task(target=run_server)
-
-
 def __start_server():
     try:
-        socketio.run(app, host='0.0.0.0', port=3000, debug=debug, use_reloader=False)
-
         if debug:
-            print("Server running")
+            print("Server running..")
+        socketio.run(app, host='0.0.0.0', port=3000, debug=debug, use_reloader=False)
 
     except OSError as err:
         if "port" in err.strerror:
@@ -261,7 +251,8 @@ def __start_server():
 
 def run_visualisation_server():
     thread = socketio.start_background_task(__start_server)
+    return thread
 
 
 if __name__ == "__main__":
-    run_server()
+    __start_server()
