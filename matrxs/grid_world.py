@@ -304,22 +304,16 @@ class GridWorld:
                                               state=filtered_agent_state)
                 continue
 
-            possible_actions = self.__get_possible_actions(agent_id=agent_id, action_set=agent_obj.action_set)
-
             # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
             if agent_obj.is_human_agent:
                 usrinp = self.__visualizer._userinputs[agent_id.lower()] if \
                     agent_id.lower() in self.__visualizer._userinputs else None
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
-                    state=state,
-                    agent_properties=agent_obj.properties, possible_actions=possible_actions, agent_id=agent_id,
-                    userinput=usrinp)
+                    state=state, agent_properties=agent_obj.properties, agent_id=agent_id, userinput=usrinp)
             else:
                 # perform the OODA loop and get an action back
                 filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
-                    state=state,
-                    agent_properties=agent_obj.properties, possible_actions=possible_actions,
-                    agent_id=agent_id)
+                    state=state, agent_properties=agent_obj.properties, agent_id=agent_id)
 
             # store the action in the buffer
             action_buffer[agent_id] = (action_class_name, action_kwargs)
@@ -479,36 +473,6 @@ class GridWorld:
         }
 
         return state
-
-    def __get_possible_actions(self, action_set, agent_id):
-        # List where we store our possible actions in for a specific agent
-
-        possible_actions = []
-        # Go through the action set
-        for action_type in action_set:
-            # If the action from the set is a known action we continue
-            if action_type in self.__all_actions:
-                # We get the action constructor
-                action_class = self.__all_actions[action_type]
-                # And we call that constructor to create an action object
-                action = action_class()
-                # Then we check if the action is possible, which returns a boolean, and a string that we ignore
-                # (contains the reason why the action is not possible)
-                is_possible, reason = action.is_possible(grid_world=self, agent_id=agent_id, kwargs={})
-
-                # If the action is possible, we append it to possible actions list
-                if is_possible:
-                    possible_actions.append(action_type)
-        # If no actions, we warn that this is the case
-        if len(possible_actions) == 0:
-            warn_str = f"No possible actions for agent {agent_id}."
-            warnings.warn(self.__warn(warn_str))
-
-        # Sort alphabeticcelly, since the order was determined by the order of a dictionary we fix it now such that any
-        # random selection (e.g. through 'choice') makes sense.
-        possible_actions.sort()
-
-        return possible_actions
 
     def __perform_action(self, agent_id, action_name, action_kwargs):
 

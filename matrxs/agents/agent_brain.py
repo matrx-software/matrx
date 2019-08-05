@@ -54,7 +54,7 @@ class AgentBrain:
 
         return state
 
-    def decide_on_action(self, state, possible_actions):
+    def decide_on_action(self, state):
         """
         In this method you compute your action.
 
@@ -66,11 +66,6 @@ class AgentBrain:
 
         :param state: A state description containing all properties of EnvObject that are within a certain range as
         defined by self.sense_capability. It is a list of properties in a dictionary
-        :param possible_actions: A list of strings of the action class names that are possible to do according to the
-        grid world. This means that this list contain ALL actions this agent is allowed to do (as in; they are in
-        self.action_set) and MAY result in a positive action result. This is not required (e.g.; a remove_object action
-        might become impossible if another agent also decided to remove that object and who was a higher in the priority
-        list).
         :return: An action string of the class name of an action that is also in self.action_set. You should also return
         a dictionary of action arguments the world might need to perform this action. See the implementation of the
         action to know which keyword arguments it requires. For example if you want to remove an object, you should
@@ -92,8 +87,8 @@ class AgentBrain:
         self.send_message(message_content=message_content, to_id=selected_agent['agent_id'])
 
         # Select a random action
-        if possible_actions:
-            action = self.rnd_gen.choice(possible_actions)
+        if self.action_set:
+            action = self.rnd_gen.choice(self.action_set)
         else:
             action = None
 
@@ -245,7 +240,7 @@ class AgentBrain:
         # NOTE: Changing which properties are writable cannot be done during runtime! Only in  the scenario manager
         self.keys_of_agent_writable_props = customizable_properties
 
-    def _get_action(self, state, agent_properties, possible_actions, agent_id):
+    def _get_action(self, state, agent_properties, agent_id):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
         for this agent to select an action.
@@ -256,9 +251,6 @@ class AgentBrain:
         defined by self.sense_capability. It is a list of properties in a dictionary
         :param agent_properties: The properties of the agent, which might have been changed by the
         environment as a result of actions of this or other agents.
-        :param possible_actions: The possible actions the agent can perform according to the grid world. The agent can
-        send any other action (as long as it excists in the Action package), but these will not be performed in the
-        world resulting in the appriopriate ActionResult.
         :param agent_id: the ID of this agent
         :return: The filtered state of this agent, the agent properties which the agent might have changed,
         and an action string, which is the class name of one of the actions in the Action package.
@@ -270,7 +262,7 @@ class AgentBrain:
         filtered_state = self.filter_observations(state)
 
         # Call the method that decides on an action
-        action, action_kwargs = self.decide_on_action(filtered_state, possible_actions)
+        action, action_kwargs = self.decide_on_action(filtered_state)
 
         # Store the action so in the next call the agent still knows what it did
         self.previous_action = action

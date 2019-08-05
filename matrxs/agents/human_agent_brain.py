@@ -63,7 +63,7 @@ class HumanAgentBrain(AgentBrain):
         else:
             self.usrinp_action_map = usrinp_action_map
 
-    def _get_action(self, state, agent_properties, possible_actions, agent_id, userinput):
+    def _get_action(self, state, agent_properties, agent_id, userinput):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
         for this agent to select an action.
@@ -76,9 +76,6 @@ class HumanAgentBrain(AgentBrain):
         i.e. within the detectable range as defined by self.sense_capability. It is a list of properties in a dictionary
         :param agent_properties: The properties of the agent, which might have been changed by the
         environment as a result of actions of this or other agents.
-        :param possible_actions: The possible actions the agent can perform according to the grid world. The agent can
-        send any other action (as long as it excists in the Action package), but these will not be performed in the
-        world resulting in the appriopriate ActionResult.
         :param agent_id: the ID of this agent
         :param userinput: any userinput given by the user for this human agent via the GUI
         :return: The filtered state of this agent, the agent properties which the agent might have changed,
