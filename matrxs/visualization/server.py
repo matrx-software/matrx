@@ -20,7 +20,7 @@ user_input = {}  # can't be None, otherwise Flask flips out when returning it
 
 def create_app():
     template_folder = os.path.join(__file__, "..", "static", "templates")
-    app = Flask("MATRXS Visualisation", template_folder=template_folder)
+    app = Flask("matrxs", template_folder=template_folder)
     app.config['SECRET_KEY'] = 'secret!'
 
     sio = SocketIO(app)
