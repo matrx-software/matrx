@@ -14,8 +14,8 @@ class RemoveObject(Action):
     permanently. This includes other AgentAvatars.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, duration_in_ticks=1):
+        super().__init__(duration_in_ticks)
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
@@ -101,8 +101,8 @@ class GrabObject(Action):
     Carrying is implemented in movement actions.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, duration_in_ticks=1):
+        super().__init__(duration_in_ticks)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
         """
@@ -236,8 +236,9 @@ class GrabObjectResult(ActionResult):
 
 
 class DropObject(Action):
-    def __init__(self):
-        super().__init__()
+    
+    def __init__(self, duration_in_ticks=1):
+        super().__init__(duration_in_ticks)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
         reg_ag = grid_world.registered_agents[agent_id]

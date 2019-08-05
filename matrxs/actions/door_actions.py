@@ -14,7 +14,7 @@ class OpenDoorAction(Action):
         :param name: The name of the action.
         :param duration_in_ticks: The duration of the action in ticks. By default this is 1.
         """
-        super().__init__(3)
+        super().__init__(duration_in_ticks)
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
@@ -71,7 +71,7 @@ class CloseDoorAction(Action):
         :param name: The name of the action.
         :param duration_in_ticks: The duration of the action in ticks. By default this is 1.
         """
-        super().__init__(3)
+        super().__init__(duration_in_ticks)
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
@@ -88,7 +88,7 @@ class CloseDoorAction(Action):
         door_range = 1 if 'door_range' not in kwargs else kwargs['door_range']
         # object_id is required
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
-        if object_id == None:
+        if object_id is None:
             result = CloseDoorActionResult(CloseDoorActionResult.NO_OBJECT_SPECIFIED, False)
             return result
 
