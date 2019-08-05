@@ -1,4 +1,6 @@
-from flask import Flask, request, render_template, jsonify, Response
+import warnings
+
+from flask import Flask, request, render_template, jsonify
 from flask_socketio import SocketIO, join_room
 
 '''
@@ -238,6 +240,27 @@ def run_server():
 
 def run_server_threaded():
     socketio.start_background_task(target=run_server)
+
+
+def __start_server():
+    try:
+        socketio.run(app, host='0.0.0.0', port=3000, debug=debug, use_reloader=False)
+
+        if debug:
+            print("Server running")
+
+    except OSError as err:
+        if "port" in err.strerror:
+            if debug:
+                warnings.warn("Visualisation server is already running, not starting another visualisation server "
+                              "thread.")
+            return
+        else:
+            raise err
+
+
+def run_visualisation_server():
+    thread = socketio.start_background_task(__start_server)
 
 
 if __name__ == "__main__":

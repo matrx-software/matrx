@@ -23,7 +23,7 @@ from matrxs.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
 class WorldBuilder:
 
     def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=1000, run_sail_api=False,
-                 run_visualization_server=False, visualization_bg_clr="#C2C2C2", visualization_bg_img=None,
+                 run_visualization_server=True, visualization_bg_clr="#C2C2C2", visualization_bg_img=None,
                  verbose=False):
         """
         A builder to create one or more worlds.
@@ -100,12 +100,9 @@ class WorldBuilder:
                              f"or a list/tuple of {SimulationGoal.__name__}, or it should be an int denoting the max"
                              f"number of ticks the world should run (negative for infinite).")
 
-        # Check if the sail api and visualisation booleans are set to True and raise a NotImplementedError.
+        # Check if the sail api is set to True and raise a NotImplementedError.
         if run_sail_api is True:
             raise NotImplementedError("You set the boolean run_sail_api to True. This setting is not implemented yet.")
-        if run_visualization_server is True:
-            raise NotImplementedError("You set the boolean run_visualization_server to True. This setting is not "
-                                      "implemented yet.")
 
         # Check the background color
         if not isinstance(visualization_bg_clr, str) and len(visualization_bg_clr) != 7 and \
@@ -143,6 +140,10 @@ class WorldBuilder:
                                                         rnd_seed=random_seed)
         # Keep track of the number of worlds we created
         self.worlds_created = 0
+
+        # Visualisation thread (stays None when run_visulisation_server is False, otherwise starts the thread on a first
+        # created world)
+        self.__visualisation_thread = None
 
         # Set our custom warning method for all of MATRXS
         def _warning(message, category, filename, lineno, file=None, line=None):
@@ -187,10 +188,17 @@ class WorldBuilder:
         """
         Creates a single GridWorld instance based on the current state of this WorldFactor instance.
 
+        The returned GridWorld can be started with world.run().
+
         Returns
         -------
-        GridWorld
+        world: GridWorld
             A GridWorld instance.
+
+        See Also
+        --------
+
+        TODO Refer to GridWorld.run()
 
         """
         self.worlds_created += 1
