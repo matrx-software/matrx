@@ -72,8 +72,8 @@ class MoveActionResult(ActionResult):
 
 
 class Move(Action):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, duration_in_ticks=1):
+        super().__init__(duration_in_ticks)
         self.dx = 0
         self.dy = 0
 
