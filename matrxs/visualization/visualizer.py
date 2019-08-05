@@ -17,11 +17,12 @@ class Visualizer:
     simulation iteration, and sending these to the Flask webserver via an API where they are visualized.
     """
 
-    def __init__(self, grid_size, vis_bg_clr, vis_bg_img=None, verbose=False):
+    def __init__(self, grid_size, vis_bg_clr, vis_bg_img=None, verbose=False, server_running=False):
         self.__agent_states = {}
         self.__hu_ag_states = {}
         self.__god_state = {}
         self.__verbose = verbose
+        self.__server_running = server_running
         self._userinputs = {}
 
         self.__initGUI(grid_size=grid_size, vis_bg_clr=vis_bg_clr, vis_bg_img=vis_bg_img)
@@ -30,6 +31,10 @@ class Visualizer:
         """
         Send an initialization message to the GUI webserver, which sends the grid_size.
         """
+        # If the server is not running, we skip visualisation.
+        if not self.__server_running:
+            return
+
         data = {'params': {'grid_size': grid_size, 'vis_bg_clr': vis_bg_clr, 'vis_bg_img': vis_bg_img}}
 
         url = 'http://localhost:3000/init'
@@ -38,9 +43,10 @@ class Visualizer:
 
         # send an update of the agent state to the GUI via its API
         try:
-            r = requests.post(url, json=data)
+            r = requests.post(url, json=data, timeout=5)
         except requests.exceptions.ConnectionError:
-            raise requests.exceptions.ConnectionError("Connection error; the visualisation server is likely not "
+            self.__server_running = False  # If connection fails, we stop trying it again
+            raise requests.exceptions.ConnectionError("The visualisation server is likely not "
                                                       "running. Please start this first by running /visualisation/"
                                                       "server.py")
 
@@ -145,6 +151,9 @@ class Visualizer:
         """
         Send the states of all (human)agents and god to the webserver for updating of the GUI
         """
+        # If the server is not running, we skip visualisation.
+        if not self.__server_running:
+            return
 
         # put data in a json array
         data = {'god': self.__god_state, 'agent_states': self.__agent_states, 'hu_ag_states': self.__hu_ag_states,
@@ -157,6 +166,7 @@ class Visualizer:
         try:
             r = requests.post(url, json=data)
         except requests.exceptions.ConnectionError:
+            self.__server_running = False  # If connection fails, we stop trying it again
             raise requests.exceptions.ConnectionError("Connection error; the visualisation server is likely not "
                                                       "running or has crashed. Please start this first by running /visualisation/"
                                                       "server.py")
