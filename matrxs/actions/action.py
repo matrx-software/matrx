@@ -41,7 +41,7 @@ class Action:
         omitted here since that method is always called before mutate.
         :return: An action result depicting the action's success or failure and reason/description of that result.
         """
-        pass
+        return None
 
     def is_possible(self, grid_world, agent_id, **kwargs):
         """
@@ -72,11 +72,12 @@ class Action:
         (signalling that the action is not possible). If the string is None, the default message for an impossible
         action is used in the ActionResult. If the action is possible (the boolean is True), this string is ignored.
         """
-        pass
+        return None
 
 
 class ActionResult:
 
+    IDLE_ACTION = "The action is None, hence the agent will idle which always succeeds."
     AGENT_WAS_REMOVED = "Agent {AGENT_ID} was removed during this tick, cannot perform anymore actions."
     ACTION_SUCCEEDED = "The action succeeded."
     ACTION_NOT_POSSIBLE = "The `is_possible(...)` method returned False. Signalling that the action was not possible."

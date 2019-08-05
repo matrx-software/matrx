@@ -14,7 +14,7 @@ class HumanAgentBrain(AgentBrain):
         super().__init__()
 
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
-                            customizable_properties, rnd_seed, usrinp_action_map=None):
+                            customizable_properties, rnd_seed, callback_is_action_possible, usrinp_action_map=None):
         """
         Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
         properties. This also sets the random number generator with a seed generated based on the random seed of the
@@ -56,6 +56,10 @@ class HumanAgentBrain(AgentBrain):
         # the environment).
         # NOTE: Changing which properties are writable cannot be done during runtime! Only in  the scenario manager
         self.keys_of_agent_writable_props = customizable_properties
+
+        # A callback to the GridWorld instance that can check whether any action (with its arguments) will succeed and
+        # if not why not (in the form of an ActionResult).
+        self.__callback_is_action_possible = callback_is_action_possible
 
         # a list which maps user inputs to actions, defined in the scenario manager
         if usrinp_action_map is None:

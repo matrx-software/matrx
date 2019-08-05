@@ -81,7 +81,7 @@ class Move(Action):
 
     def is_possible(self, grid_world, agent_id, **kwargs):
         result = is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
-        return result.succeeded, result.result
+        return result
 
     def mutate(self, grid_world, agent_id, **kwargs):
         return act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)

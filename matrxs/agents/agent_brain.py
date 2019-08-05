@@ -197,8 +197,13 @@ class AgentBrain:
         message = Message(content=message_content, from_id=self.agent_id, to_id=to_id)
         self.messages_to_send.append(message)
 
+    def is_action_possible(self, action, action_args):
+        action_result = self.__callback_is_action_possible(self.agent_id, action, action_args)
+
+        return action_result.succeeded, action_result
+
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
-                            customizable_properties, rnd_seed):
+                            customizable_properties, rnd_seed, callback_is_action_possible):
         """
         Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
         properties. This also sets the random number generator with a seed generated based on the random seed of the
@@ -237,8 +242,12 @@ class AgentBrain:
         # Specifies the keys of properties in self.agent_properties which can  be changed by this Agent in this file. If
         # it is not writable, it can only be  updated through performing an action which updates that property (done by
         # the environment).
-        # NOTE: Changing which properties are writable cannot be done during runtime! Only in  the scenario manager
+        # NOTE: Changing which properties are writable cannot be done during runtime! Only when adding it to the world.
         self.keys_of_agent_writable_props = customizable_properties
+
+        # A callback to the GridWorld instance that can check whether any action (with its arguments) will succeed and
+        # if not why not (in the form of an ActionResult).
+        self.__callback_is_action_possible = callback_is_action_possible
 
     def _get_action(self, state, agent_properties, agent_id):
         """
