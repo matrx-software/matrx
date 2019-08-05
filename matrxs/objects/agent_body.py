@@ -132,7 +132,8 @@ class AgentBody(EnvObject):
         super().__init__(location, name, customizable_properties=customizable_properties, is_traversable=is_traversable,
                          class_callable=class_callable,
                          visualize_size=visualize_size, visualize_shape=visualize_shape,
-                         visualize_colour=visualize_colour, visualize_depth=visualize_depth, visualize_opacity=visualize_opacity,
+                         visualize_colour=visualize_colour, visualize_depth=visualize_depth,
+                         visualize_opacity=visualize_opacity,
                          **custom_properties)
 
         # If there was no team name given, the Agent's body (and as an extension its Agent's brain) is part of its own
@@ -153,8 +154,8 @@ class AgentBody(EnvObject):
         """
         check if the agent is done with executing the action
         """
-        self.blocked = not ((curr_tick >= self.last_action["tick"] + self.last_action["duration_in_ticks"]) and \
-                            (curr_tick >= self.last_action["tick"] + self.properties["agent_speed_in_ticks"]))
+        self.blocked = not ((curr_tick >= self.last_action["tick"] + self.last_action["duration_in_ticks"])
+                            and (curr_tick >= self.last_action["tick"] + self.properties["agent_speed_in_ticks"]))
         return self.blocked
 
     def _set_agent_changed_properties(self, props: dict):
