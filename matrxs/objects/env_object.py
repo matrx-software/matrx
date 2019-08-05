@@ -156,7 +156,7 @@ class EnvObject:
         """
 
         # We check if it is a custom property and if so change it simply in the dictionary
-        if property_name in self.customazable_properties.keys():
+        if property_name in self.customizable_properties.keys():
             self.custom_properties[property_name] = property_value
         else:  # else we need to check if property_name is a mandatory class attribute that is also a property
             if property_name == "is_traversable":
@@ -178,7 +178,7 @@ class EnvObject:
                 assert isinstance(property_value, str)
                 self.visualize_colour = property_value
             elif property_name == "visualize_opacity":
-                assert isinstance(property_value, int)
+                assert isinstance(property_value, float)
                 self.visualize_opacity = property_value
             elif property_name == "visualize_shape":
                 assert isinstance(property_value, int)
