@@ -298,7 +298,7 @@ class GridWorld:
         else:
             success = False  # Object type not specified
 
-        if success is not False:  # if succes is not false, we successfully removed the object from the grid
+        if success is not False:  # if success is not false, we successfully removed the object from the grid
             success = True
 
         if self.verbose:
