@@ -15,8 +15,7 @@ class RemoveObject(Action):
     """
 
     def __init__(self):
-        name = RemoveObject.__name__
-        super().__init__(name)
+        super().__init__()
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """
@@ -102,10 +101,8 @@ class GrabObject(Action):
     Carrying is implemented in movement actions.
     """
 
-    def __init__(self, name=None):
-        if name is None:
-            name = GrabObject.__name__
-        super().__init__(name)
+    def __init__(self):
+        super().__init__()
 
     def is_possible(self, grid_world, agent_id, **kwargs):
         """
@@ -239,10 +236,8 @@ class GrabObjectResult(ActionResult):
 
 
 class DropObject(Action):
-    def __init__(self, name=None):
-        if name is None:
-            name = DropObject.__name__
-        super().__init__(name)
+    def __init__(self):
+        super().__init__()
 
     def is_possible(self, grid_world, agent_id, **kwargs):
         reg_ag = grid_world.registered_agents[agent_id]
@@ -336,7 +331,7 @@ class DropObject(Action):
         coords of the closest drop location
         """
         queue = collections.deque([[start_loc]])
-        seen = set([start_loc])
+        seen = {start_loc}
 
         width = grid_world.shape[0]
         height = grid_world.shape[1]
