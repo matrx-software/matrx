@@ -923,11 +923,11 @@ class WorldBuilder:
 
         # Register all objects (including checks)
         for env_object in objs:
-            world._register_env_object(env_object)
+            world._add_env_object(env_object)
 
         # Register all agents (including checks)
         for agent, agent_avatar in avatars:
-            world._register_agent(agent, agent_avatar)
+            world._add_agent(agent, agent_avatar)
 
         # Return the (successful/stable) world
         return world

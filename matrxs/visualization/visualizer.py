@@ -23,7 +23,7 @@ class Visualizer:
         self.__god_state = {}
         self.__verbose = verbose
         self.__server_running = server_running
-        self._userinputs = {}
+        self._user_inputs = {}
 
         self.__initGUI(grid_size=grid_size, vis_bg_clr=vis_bg_clr, vis_bg_img=vis_bg_img)
 
@@ -112,16 +112,13 @@ class Visualizer:
         new_state = {}
 
         # loop through all objects in the state
-        for objID, obj in state.items():
-
-            if objID is "World":
-                continue
+        for objID, obj in state["perceived_objects"].items():
 
             # fetch the visualization depth
-            vis_depth = state[objID]["visualization"]['depth']
+            vis_depth = obj["visualization"]['depth']
 
             if "sense_capability" in obj:
-                obj["sense_capability"] = str(obj["sense_capability"])
+                obj["sense_capability"] = str(obj["sense_capability"].copy())
 
             # save the object in the new_state dict at its visualization_depth
             if vis_depth not in new_state:
@@ -189,9 +186,9 @@ class Visualizer:
 
         # return None if there was no userinput
         if repl == {}:
-            self._userinputs = {}
+            self._user_inputs = {}
         elif self.__verbose:
             print(f"@{os.path.basename(__file__)}: User input received:", repl, file=sys.stderr)
 
         # otherwise return the userinput
-        self._userinputs = repl
+        self._user_inputs = repl

@@ -151,11 +151,11 @@ def is_possible_door_open_close(grid_world, agent_id, action_result, object_id=N
     Same as is_possible, but this function uses the action_kwargs to get a more accurate prediction.
     Can be used both for checking if the door is already open or closed
     """
-    reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
+    reg_ag = grid_world.agent_bodies[agent_id]  # Registered Agent
     loc_agent = reg_ag.location  # Agent location
 
     # check if there is a Door object in the scenario
-    objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type=Door, sense_range=door_range)
+    objects_in_range = grid_world.get_objects_in_range(loc_agent, object_class=Door, detect_range=door_range)
 
     # there is no Door in range, so not possible to open any door
     if len(objects_in_range) is 0:
@@ -186,7 +186,7 @@ def is_possible_door_open_close(grid_world, agent_id, action_result, object_id=N
     # when closing, check that there are no objects in the door opening
     if action_result == CloseDoorActionResult:
         # get all objects at the location of the door
-        objects_in_door_opening = grid_world.get_objects_in_range(obj.location, object_type="*", sense_range=0)
+        objects_in_door_opening = grid_world.get_objects_in_range(origin_location=obj.location, detect_range=0)
 
         # more than 1 object at that location (besides the door itself) means the door is blocked
         if len(objects_in_door_opening) > 1:

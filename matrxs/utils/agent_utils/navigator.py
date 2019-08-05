@@ -76,7 +76,7 @@ class Navigator:
 
         route = self.__get_route(state_tracker)
 
-        agent_loc = state_tracker.get_memorized_state()[self.__agent_id]['location']
+        agent_loc = state_tracker.get_memorized_state()['internal_state']['location']
 
         if len(route) == 0 and self.is_done:
             return None
@@ -118,8 +118,11 @@ class Navigator:
             self.is_done = True
 
     def __get_route(self, state_tracker: StateTracker):
+        # Get the memorized state
+        memorized_state = state_tracker.get_memorized_state()
+
         # Get our agent's location
-        agent_loc = state_tracker.get_memorized_state()[state_tracker.agent_id]['location']
+        agent_loc = memorized_state['internal_state']['location']
 
         # Update our waypoints based on agent's current location (if arrived at our current waypoint)
         self.__update_waypoints(agent_loc)
