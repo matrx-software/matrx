@@ -75,7 +75,7 @@ class Move(Action):
     def __init__(self, name=None):
         if not name:
             name = Move.__name__
-        super().__init__(name)
+        super().__init__()
         self.dx = 0
         self.dy = 0
 
@@ -90,7 +90,7 @@ class Move(Action):
 class MoveNorth(Move):
     def __init__(self):
         name = MoveNorth.__name__
-        super().__init__(name)
+        super().__init__()
         self.dx = 0
         self.dy = -1
 
@@ -99,7 +99,7 @@ class MoveNorthEast(Move):
 
     def __init__(self):
         name = MoveNorthEast.__name__
-        super().__init__(name)
+        super().__init__()
         self.dx = +1
         self.dy = -1
 
@@ -108,7 +108,7 @@ class MoveEast(Move):
 
     def __init__(self):
         name = MoveEast.__name__
-        super().__init__(name)
+        super().__init__()
         self.dx = +1
         self.dy = 0
 
@@ -117,7 +117,7 @@ class MoveSouthEast(Move):
 
     def __init__(self):
         name = MoveSouthEast.__name__
-        super().__init__(name)
+        super().__init__()
         self.dx = +1
         self.dy = +1
 
@@ -126,7 +126,7 @@ class MoveSouth(Move):
 
     def __init__(self):
         name = MoveSouth.__name__
-        super().__init__(name)
+        super().__init__()
         self.dx = 0
         self.dy = +1
 
@@ -135,7 +135,7 @@ class MoveSouthWest(Move):
 
     def __init__(self):
         name = MoveSouthWest.__name__
-        super().__init__(name)
+        super().__init__()
         self.dx = -1
         self.dy = +1
 
@@ -144,7 +144,7 @@ class MoveWest(Move):
 
     def __init__(self):
         name = MoveWest.__name__
-        super().__init__(name)
+        super().__init__()
         self.dx = -1
         self.dy = 0
 
@@ -153,6 +153,6 @@ class MoveNorthWest(Move):
 
     def __init__(self):
         name = MoveNorthWest.__name__
-        super().__init__(name)
+        super().__init__()
         self.dx = -1
         self.dy = -1
