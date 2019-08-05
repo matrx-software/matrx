@@ -1,3 +1,4 @@
+import logging
 import warnings
 
 from flask import Flask, request, render_template, jsonify
@@ -9,7 +10,7 @@ This file holds the code for the Flask (Python) webserver, which listens to grid
 via a restful API, and forwards these to the specific viewpoint (god, agent, human-agent).
 '''
 
-debug = False
+debug = True
 
 # overwritten by settings from MATRXS
 grid_sz = None  # [4, 4]
@@ -17,18 +18,30 @@ vis_bg_clr = None  # "#C2C2C2"
 vis_bg_img = None
 user_input = {}  # can't be None, otherwise Flask flips out when returning it
 
+created = False  # bool to prevent the creation of the Flask app at each import of this file
+
 
 def create_app():
-    template_folder = os.path.join(__file__, "..", "static", "templates")
-    app = Flask("matrxs", template_folder=template_folder)
-    app.config['SECRET_KEY'] = 'secret!'
+    global created, app, sio
 
-    sio = SocketIO(app)
+    if not created:
+        template_folder = os.path.join(__file__, "..", "static", "templates")
+        app = Flask("matrxs", template_folder=template_folder)
+        app.config['SECRET_KEY'] = 'secret!'
+
+        sio = SocketIO(app, logger=False)
+
+        if not debug:
+            logging.getLogger('flask').setLevel(logging.ERROR)
+            logging.getLogger('werkzeug').setLevel(logging.ERROR)
+            logging.getLogger('socketio').setLevel(logging.ERROR)
+
+        created = True
 
     return app, sio
 
 
-app, socketio = create_app()
+app, sio = create_app()
 
 
 @app.route('/init', methods=['POST'])
@@ -81,7 +94,7 @@ def update_gui():
     # send update to god view
     new_data = {'params': {"grid_size": grid_sz, "tick": tick, "vis_bg_clr": vis_bg_clr, "vis_bg_img": vis_bg_img},
                 'state': god_state}
-    socketio.emit('update', new_data, namespace="/god")
+    sio.emit('update', new_data, namespace="/god")
 
     # send updates to agent view
     for agent_id in agent_states:
@@ -89,7 +102,7 @@ def update_gui():
                     'state': agent_states[agent_id]}
         room = f"/agent/{agent_id.lower()}"
         # print(f"Sending to agent {agent_id} {room}")
-        socketio.emit('update', new_data, room=room, namespace="/agent")
+        sio.emit('update', new_data, room=room, namespace="/agent")
 
     # send updates to human agents
     for hu_ag_id in hu_ag_states:
@@ -97,7 +110,7 @@ def update_gui():
                     'state': hu_ag_states[hu_ag_id]}
         room = f"/humanagent/{hu_ag_id.lower()}"
         # print(f"Sending to human agent {hu_ag_id} {room}")
-        socketio.emit('update', new_data, room=room, namespace="/humanagent")
+        sio.emit('update', new_data, room=room, namespace="/humanagent")
 
     # return user inputs
     global user_input
@@ -174,8 +187,8 @@ def image():
     return render_template('avatars.html')
 
 
-@socketio.on('join', namespace='/agent')
-@socketio.on('join', namespace='/humanagent')
+@sio.on('join', namespace='/agent')
+@sio.on('join', namespace='/humanagent')
 def join(message):
     """
     Add client to a room for their specific (human) agent ID
@@ -201,7 +214,7 @@ def join(message):
 ###############################################
 
 #
-@socketio.on('userinput', namespace="/humanagent")
+@sio.on('userinput', namespace="/humanagent")
 def handle_usr_inp(input):
     """
     Fetch user input messages sent from human agents
@@ -239,7 +252,7 @@ def __start_server():
     try:
         if debug:
             print("Server running..")
-        socketio.run(app, host='0.0.0.0', port=3000, debug=debug, use_reloader=False)
+        sio.run(app, host='0.0.0.0', port=3000, debug=debug, use_reloader=False)
 
     except OSError as err:
         if "port" in err.strerror:
@@ -252,7 +265,7 @@ def __start_server():
 
 
 def run_visualisation_server():
-    thread = socketio.start_background_task(__start_server)
+    thread = sio.start_background_task(__start_server)
     return thread
 
 
