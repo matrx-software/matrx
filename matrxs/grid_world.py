@@ -362,8 +362,12 @@ class GridWorld:
 
         # Send all messages between agents
         for receiver_id, messages in self.__message_buffer.items():
+            if receiver_id == None:
+                # If receiver id is set to None, send to all registered agents
+                for receiver_id in self.registered_agents.keys():
+                    self.registered_agents[receiver_id].set_messages_func(messages)
             # check if the receiver exists
-            if receiver_id in self.registered_agents.keys():
+            elif receiver_id in self.registered_agents.keys():
                 # Call the callback method that sets the messages
                 self.registered_agents[receiver_id].set_messages_func(messages)
         # Clean the message buffer so we don't send the same messages next tick
