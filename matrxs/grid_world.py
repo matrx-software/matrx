@@ -360,6 +360,10 @@ class GridWorld:
             # Update the grid
             self.__update_grid()
 
+        # Clear previously send messages
+        for receiver_id in self.registered_agents.keys():
+            self.registered_agents[receiver_id].set_messages_func()
+
         # Send all messages between agents
         for receiver_id, messages in self.__message_buffer.items():
             if receiver_id == None:
