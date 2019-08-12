@@ -25,8 +25,7 @@ def create_app():
     global created, app, sio
 
     if not created:
-        template_folder = os.path.join(__file__, "..", "static", "templates")
-        app = Flask("matrxs", template_folder=template_folder)
+        app = Flask(__name__, template_folder='static/templates')
         app.config['SECRET_KEY'] = 'secret!'
 
         sio = SocketIO(app, logger=False)
@@ -44,7 +43,7 @@ def create_app():
 app, sio = create_app()
 
 
-@app.route('/init', methods=['POST'])
+@app.route('/init', methods=['GET', 'POST'])
 def init_gui():
     """
     Routes initialisation.

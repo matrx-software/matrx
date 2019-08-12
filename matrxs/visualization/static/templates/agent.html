@@ -2,10 +2,17 @@
     <head>
         <link rel="shortcut icon" href="#" />
         <title>Agent {{ id }}</title>
+        <button class="hamburger">&#9776;</button>
+        <button class="cross">&#735;</button>
+
         <link href="/static/css/sim.css" rel="stylesheet">
     </head>
     <body>
+        <div class="menu">
+            <ul id="ListAgents"></ul>
+        </div>
         <canvas id="grid" width="400" height="400"></canvas>
+
         <span style="display:none" id="id">{{ id }}</span>
     </body>
 
