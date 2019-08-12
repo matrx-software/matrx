@@ -9,27 +9,28 @@ This file holds the code for the Flask (Python) webserver, which listens to grid
 via a restful API, and forwards these to the specific viewpoint (god, agent, human-agent).
 '''
 
-debug = False
+debug = True
 
 # overwritten by settings from MATRXS
 grid_sz = None  # [4, 4]
 vis_bg_clr = None  # "#C2C2C2"
 vis_bg_img = None
 user_input = {}  # can't be None, otherwise Flask flips out when returning it
-
+async_mode = "gevent" # gevent (preferred) or eventlet. 
 
 def create_app():
-    template_folder = os.path.join(__file__, "..", "static", "templates")
+    current_folder = os.path.dirname(os.path.abspath(__file__)) # alternative: os.getcwd()
+    template_folder = os.path.join(current_folder, "static", "templates")
     app = Flask("matrxs", template_folder=template_folder)
     app.config['SECRET_KEY'] = 'secret!'
 
-    sio = SocketIO(app)
+    sio = SocketIO(app, async_mode=async_mode)
 
     return app, sio
 
 
 app, socketio = create_app()
-
+print("Creating socketio app in server.py")
 
 @app.route('/init', methods=['POST'])
 def init_gui():
@@ -239,7 +240,7 @@ def __start_server():
     try:
         if debug:
             print("Server running..")
-        socketio.run(app, host='0.0.0.0', port=3000, debug=debug, use_reloader=False)
+        socketio.run(app, host='0.0.0.0', port=3000, debug=False, use_reloader=False)
 
     except OSError as err:
         if "port" in err.strerror:
@@ -252,9 +253,17 @@ def __start_server():
 
 
 def run_visualisation_server():
+    print("Starting background vis server")
     thread = socketio.start_background_task(__start_server)
     return thread
 
 
 if __name__ == "__main__":
-    __start_server()
+    # __start_server()
+    run_visualisation_server()
+
+    #
+    # import time
+    # i = 0
+    # for i in range(10):
+    #     time.sleep(5)

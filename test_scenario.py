@@ -41,5 +41,5 @@ def create_factory():
     factory.add_line(start=[10, 2], end=[10, 3], name="O")
     factory.add_line(start=[11, 4], end=[12, 4], name="O")
     factory.add_line(start=[13, 2], end=[13, 3], name="O")
-    factory.add_object((4, 3), "Object", visualize_shape='img', imgName="fire.gif")
+    factory.add_object((4, 3), "Object", visualize_shape='img', img_name="fire.gif")
     return factory
