@@ -339,7 +339,7 @@ class AgentBrain:
 
         return messages
 
-    def _set_messages(self, messages):
+    def _set_messages(self, messages=None):
         """
         This method is called by the GridWorld.
         It sets all messages intended for this agent to a list that it can access and read.
@@ -347,9 +347,11 @@ class AgentBrain:
         Note; This method should NOT be overridden!
 
         :param messages: A list of dictionaries that contain a 'from_id', 'to_id' and 'content.
+        If messages is set to None (or no messages are used as input), only the previous messages are removed
         """
         # We empty all received messages as this is from the previous tick
         self.received_messages = []
+
         # Loop through all messages and create a Message object out of the dictionaries.
         for mssg in messages:
             message_object = Message(from_id=mssg['from_id'], to_id=mssg['to_id'], content=mssg['content'])
