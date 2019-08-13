@@ -55,6 +55,7 @@ $(document).ready(function(){
         vis_bg_img = data.params.vis_bg_img;
         if(isFirstCall){
             isFirstCall=false;
+            populateMenu(state);
             parseGifs(state);}
         // draw the grid again
         requestAnimationFrame(function() {
