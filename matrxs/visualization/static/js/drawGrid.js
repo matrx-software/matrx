@@ -139,9 +139,9 @@ function parseGifs(state){
         // fetch object
         obj = state[vis_depth][objID]
         if (obj['visualization']['shape'] == 'img') {
-        if (/^.+\.gif$/.test(obj['imgName'])) {
+        if (/^.+\.gif$/.test(obj['img_name'])) {
             var img = new Image();
-            img.src = window.location.origin + '/static/avatars/'+obj['imgName'];
+            img.src = window.location.origin + '/static/avatars/'+obj['img_name'];
             if(!parsedGifs.hasOwnProperty(img.src))
                 {
                 parsedGifs[img.src]=[]

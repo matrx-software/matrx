@@ -10,6 +10,7 @@ from matrxs.objects.simple_objects import AreaTile
 from matrxs.visualization import server
 from matrxs.visualization.visualizer import Visualizer
 from matrxs.objects.env_object import EnvObject
+import threading
 
 
 class GridWorld:
@@ -122,7 +123,7 @@ class GridWorld:
 
             # Start the visualisation server process if we need to
             started_visualisation = False  # tracks if the server is running successfully
-            if self.__run_visualization_server and self.__visualisation_process is None:
+            if self.__visualisation_process is None:
 
                 # Start the visualisation server
                 started_visualisation = self.__start_visualisation_server()
@@ -152,6 +153,7 @@ class GridWorld:
         This call blocks the main thread. A GridWorld does not run in a separate thread.
 
         """
+
         self.initialize()
 
         if self.verbose:
@@ -914,6 +916,7 @@ class GridWorld:
         # server.debug = self.__verbose
 
         # Create the process and run it
+        #server.start_server()
         server.run_visualisation_server()
         self.__visualisation_process = True
 

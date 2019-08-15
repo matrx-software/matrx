@@ -33,7 +33,8 @@ class Visualizer:
         """
         # If the server is not running, we skip visualisation.
         if not self.__server_running:
-            return
+            # return
+            pass
 
         data = {'params': {'grid_size': grid_size, 'vis_bg_clr': vis_bg_clr, 'vis_bg_img': vis_bg_img}}
 
@@ -43,7 +44,7 @@ class Visualizer:
 
         # send an update of the agent state to the GUI via its API
         try:
-            r = requests.post(url, json=data, timeout=5)
+            r = requests.post(url, json=data)
         except requests.exceptions.ConnectionError:
             self.__server_running = False  # If connection fails, we stop trying it again
             raise requests.exceptions.ConnectionError("The visualisation server is likely not "
@@ -162,6 +163,7 @@ class Visualizer:
         # send an update of the agent state to the GUI via its API
         try:
             r = requests.post(url, json=data)
+
         except requests.exceptions.ConnectionError:
             self.__server_running = False  # If connection fails, we stop trying it again
             raise requests.exceptions.ConnectionError("Connection error; the visualisation server is likely not "
