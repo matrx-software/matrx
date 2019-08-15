@@ -16,8 +16,12 @@ $(".cross").click(function() {
     });
 });
 
-function populateMenu(state){
+function populateMenu(state, id){
   agents=[];
+  showMenu=false;
+  if(typeof id =='undefined'){ //it is coming from god view
+    showMenu=true
+  }
   var vis_depths = Object.keys(state);
   vis_depths.forEach(function(vis_depth)
     {
@@ -28,6 +32,11 @@ function populateMenu(state){
 
         // fetch location of object in pixel values
         if(obj.hasOwnProperty('isAgent')){
+            if(objID==id){
+                if(obj.hasOwnProperty('has_menu')){
+                    showMenu = obj['has_menu']
+                }
+            }
             agents.push(obj);
         }
         })
@@ -54,4 +63,7 @@ function populateMenu(state){
 
       $("#ListAgents").append(newLi);
     })
+    if(!showMenu){
+        $(".menuButton").hide();
+      }
 }
