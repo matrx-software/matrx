@@ -624,12 +624,18 @@ class GridWorld:
             # Update the grid
             self.__update_grid()
 
-    def __send_all_messages(self, all_messages):
-        # Send all messages between agents
-        for receiver_id, messages in all_messages.items():
+        # Clear previously send messages
+        #for receiver_id in self.registered_agents.keys():
+         #   self.registered_agents[receiver_id].set_messages_func()
 
+        # Send all messages between agents
+        for receiver_id, messages in self.__message_buffer.items():
+            if receiver_id == None:
+                # If receiver id is set to None, send to all registered agents
+                for receiver_id in self.registered_agents.keys():
+                    self.registered_agents[receiver_id].set_messages_func(messages)
             # check if the receiver exists
-            if receiver_id in self.agent_bodies.keys():
+            elif receiver_id in self.registered_agents.keys():
                 # Call the callback method that sets the messages
                 self.agent_bodies[receiver_id].set_messages_func(messages)
 

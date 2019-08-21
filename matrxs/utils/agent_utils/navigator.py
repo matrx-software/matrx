@@ -10,6 +10,8 @@ class Navigator:
     A_STAR_ALGORITHM = "a_star"
 
     def __init__(self, agent_id, action_set, algorithm=A_STAR_ALGORITHM, is_circular=False):
+        # Set action set
+        self.__action_set = action_set
 
         # Set the path planning algorithm, currently only A* is supported
         self.__algorithm = algorithm
@@ -94,6 +96,10 @@ class Navigator:
         self.__current_waypoint = 0
         for wp in self.__waypoints.values():
             wp.reset()
+
+    def reset_full(self):
+        # This function resets the navigator to a new instance
+        self.__init__(self.__agent_id, self.__action_set, self.__algorithm, self.is_circular)
 
     def __get_current_waypoint(self):
         if self.__current_waypoint is None:
