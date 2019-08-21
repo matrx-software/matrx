@@ -5,6 +5,7 @@ import warnings
 from collections import OrderedDict
 from typing import Callable, Union, Iterable
 from noise import snoise2
+import jsonpickle
 
 import numpy as np
 from numpy.random.mtrand import RandomState
@@ -18,7 +19,6 @@ from matrxs.objects.env_object import EnvObject
 from matrxs.utils.utils import get_inheritence_path, get_default_value, _get_line_coords, create_sense_capability
 from matrxs.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
 from matrxs.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
-
 
 class WorldBuilder:
 
@@ -901,6 +901,7 @@ class WorldBuilder:
             self.add_area(top_left_location=area_top_left, width=area_width, height=area_height, name=f"{name}_area",
                           visualize_colour=area_visualize_colour, visualize_opacity=area_visualize_opacity,
                           customizable_properties=area_customizable_properties, **area_custom_properties)
+
 
     def __create_world(self):
 
