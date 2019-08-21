@@ -23,7 +23,7 @@ class Visualizer:
         self.__god_state = {}
         self.__verbose = verbose
         self.__server_running = server_running
-        self._user_inputs = {}
+        self._userinputs = {}
 
         self.__initGUI(grid_size=grid_size, vis_bg_clr=vis_bg_clr, vis_bg_img=vis_bg_img)
 
@@ -33,8 +33,7 @@ class Visualizer:
         """
         # If the server is not running, we skip visualisation.
         if not self.__server_running:
-            # return
-            pass
+            return
 
         data = {'params': {'grid_size': grid_size, 'vis_bg_clr': vis_bg_clr, 'vis_bg_img': vis_bg_img}}
 
@@ -44,7 +43,7 @@ class Visualizer:
 
         # send an update of the agent state to the GUI via its API
         try:
-            r = requests.post(url, json=data)
+            r = requests.post(url, json=data, timeout=5)
         except requests.exceptions.ConnectionError:
             self.__server_running = False  # If connection fails, we stop trying it again
             raise requests.exceptions.ConnectionError("The visualisation server is likely not "
@@ -113,13 +112,16 @@ class Visualizer:
         new_state = {}
 
         # loop through all objects in the state
-        for objID, obj in state["perceived_objects"].items():
+        for objID, obj in state.items():
+
+            if objID is "World":
+                continue
 
             # fetch the visualization depth
-            vis_depth = obj["visualization"]['depth']
+            vis_depth = state[objID]["visualization"]['depth']
 
             if "sense_capability" in obj:
-                obj["sense_capability"] = str(obj["sense_capability"].copy())
+                obj["sense_capability"] = str(obj["sense_capability"])
 
             # save the object in the new_state dict at its visualization_depth
             if vis_depth not in new_state:
@@ -163,7 +165,6 @@ class Visualizer:
         # send an update of the agent state to the GUI via its API
         try:
             r = requests.post(url, json=data)
-
         except requests.exceptions.ConnectionError:
             self.__server_running = False  # If connection fails, we stop trying it again
             raise requests.exceptions.ConnectionError("Connection error; the visualisation server is likely not "
@@ -188,9 +189,9 @@ class Visualizer:
 
         # return None if there was no userinput
         if repl == {}:
-            self._user_inputs = {}
+            self._userinputs = {}
         elif self.__verbose:
             print(f"@{os.path.basename(__file__)}: User input received:", repl, file=sys.stderr)
 
         # otherwise return the userinput
-        self._user_inputs = repl
+        self._userinputs = repl

@@ -67,7 +67,7 @@ class HumanAgentBrain(AgentBrain):
         else:
             self.usrinp_action_map = usrinp_action_map
 
-    def _get_action(self, state, agent_properties, agent_id):
+    def _get_action(self, state, agent_properties, agent_id, userinput):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
         for this agent to select an action.
@@ -93,7 +93,7 @@ class HumanAgentBrain(AgentBrain):
         state = self.filter_observations(state)
 
         # only keep userinput which is actually connected to an agent action
-        userinput = self.filter_userinputs(state["user_inputs"])
+        userinput = self.filter_userinputs(userinput)
 
         action_kwargs = {}
 

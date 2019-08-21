@@ -39,11 +39,11 @@ class RemoveObject(Action):
             remove_range = kwargs['remove_range']  # assign
 
         # get the current agent (exists, otherwise the is_possible failed)
-        agent_avatar = grid_world.agent_bodies[agent_id]
+        agent_avatar = grid_world.registered_agents[agent_id]
         agent_loc = agent_avatar.location  # current location
 
         # Get all objects in the remove_range
-        objects_in_range = grid_world.get_objects_in_range(agent_loc, detect_range=remove_range)
+        objects_in_range = grid_world.get_objects_in_range(agent_loc, object_type="*", sense_range=remove_range)
 
         # You can't remove yourself
         objects_in_range.pop(agent_id)
@@ -64,13 +64,13 @@ class RemoveObject(Action):
                                   .replace('object_id'.upper(), str(object_id)), False)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
-        agent_avatar = grid_world.get_env_object(agent_id, object_class=AgentBody)  # get ourselves
+        agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentBody)  # get ourselves
         assert agent_avatar is not None  # check if we actually exist
         agent_loc = agent_avatar.location  # get our location
 
         remove_range = np.inf  # we do not know the intended range, so assume infinite
         # get all objects within infinite range
-        objects_in_range = grid_world.get_objects_in_range(agent_loc, detect_range=remove_range)
+        objects_in_range = grid_world.get_objects_in_range(agent_loc, object_type="*", sense_range=remove_range)
 
         # You can't remove yourself
         objects_in_range.pop(agent_avatar.obj_id)
@@ -148,7 +148,7 @@ class GrabObject(Action):
         object_id = kwargs['object_id']  # assign
 
         # Loading properties
-        reg_ag = grid_world.agent_bodies[agent_id]  # Registered Agent
+        reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
         env_obj = grid_world.environment_objects[object_id]  # Environment object
 
         # Updating properties
@@ -167,7 +167,7 @@ class GrabObject(Action):
         return GrabObjectResult(GrabObjectResult.RESULT_SUCCESS, True)
 
     def is_possible_grab(self, grid_world, agent_id, object_id, grab_range, max_objects):
-        reg_ag = grid_world.agent_bodies[agent_id]  # Registered Agent
+        reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
         loc_agent = reg_ag.location  # Agent location
 
         if object_id is None:
@@ -178,7 +178,7 @@ class GrabObject(Action):
             return GrabObjectResult(GrabObjectResult.RESULT_CARRIES_OBJECT, False)
 
         # Go through all objects at the desired locations
-        objects_in_range = grid_world.get_objects_in_range(loc_agent, detect_range=grab_range)
+        objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type="*", sense_range=grab_range)
         objects_in_range.pop(agent_id)
 
         # Set random object in range
@@ -199,7 +199,7 @@ class GrabObject(Action):
             return GrabObjectResult(GrabObjectResult.NOT_IN_RANGE, False)
 
         # Check if object_id is the id of an agent
-        if object_id in grid_world.agent_bodies.keys():
+        if object_id in grid_world.registered_agents.keys():
             # If it is an agent at that location, grabbing is not possible
             return GrabObjectResult(GrabObjectResult.RESULT_AGENT, False)
 
@@ -241,7 +241,7 @@ class DropObject(Action):
         super().__init__(duration_in_ticks)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
-        reg_ag = grid_world.agent_bodies[agent_id]
+        reg_ag = grid_world.registered_agents[agent_id]
 
         drop_range = 1 if not 'drop_range' in kwargs else kwargs['drop_range']
 
@@ -267,7 +267,7 @@ class DropObject(Action):
         two or more items, this specifies which item should be dropped.
         :return: Always True
         """
-        reg_ag = grid_world.agent_bodies[agent_id]
+        reg_ag = grid_world.registered_agents[agent_id]
 
         # fetch range from kwargs
         drop_range = 1 if not 'drop_range' in kwargs else kwargs['drop_range']
@@ -314,7 +314,7 @@ class DropObject(Action):
 
         # We return the object to the grid location we are standing at
         env_obj.location = drop_loc
-        grid_world._add_env_object(env_obj)
+        grid_world._register_env_object(env_obj)
 
         return DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
 
@@ -368,7 +368,7 @@ class DropObject(Action):
 
         # Count the intraversable objects at the current location if we would drop the
         # object here
-        objs_at_loc = grid_world.get_objects_in_range(dropLocation, detect_range=0)
+        objs_at_loc = grid_world.get_objects_in_range(dropLocation, object_type="*", sense_range=0)
 
         # Remove area objects from the list
         for key in list(objs_at_loc.keys()):
@@ -386,7 +386,7 @@ class DropObject(Action):
             return True
 
     def possible_drop(self, grid_world, agent_id, obj_id, drop_range):
-        reg_ag = grid_world.agent_bodies[agent_id]  # Registered Agent
+        reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
         loc_agent = reg_ag.location
         loc_obj_ids = grid_world.grid[loc_agent[1], loc_agent[0]]
 
