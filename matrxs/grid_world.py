@@ -2,11 +2,9 @@ import datetime
 import time
 import os.path
 import warnings
-import jsonpickle
-from multiprocessing import Process
+import threading
 from collections import OrderedDict
 from matrxs.visualization import logMatrx
-import logging
 
 from matrxs.actions.object_actions import *
 from matrxs.utils.utils import get_all_classes
@@ -71,9 +69,9 @@ class GridWorld:
             # Visualize already
             self.__initial_visualisation()
 
-            jsonobject = jsonpickle.encode(self, unpicklable=False)
-            worldAsStructure = jsonpickle.decode(jsonobject)
-            logMatrx.walk_dict(worldAsStructure)
+            thread = threading.Thread(target=logMatrx.log_object_complete, args=(self,))
+            thread.start()
+
             if self.__verbose:
                 print(f"@{os.path.basename(__file__)}: Initialized the GridWorld.")
 
@@ -85,12 +83,8 @@ class GridWorld:
         is_done = False
         while not is_done:
             is_done, tick_duration = self.__step()
-            jsonobject = jsonpickle.encode(self, unpicklable=False)
-            rs = jsonpickle.decode(jsonobject)
-            a=rs["_GridWorld__visualizer"]
-
-            logMatrx.logger_2.log(210, a["tick"])
-
+            thread = threading.Thread(target=logMatrx.log_object_custom, args=(self, [], {"tick"},))
+            thread.start()
 
     def get_env_object(self, requested_id, obj_type=None):
         obj = None
