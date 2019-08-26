@@ -19,7 +19,6 @@ from matrxs.utils.utils import get_inheritence_path, get_default_value, _get_lin
 from matrxs.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
 from matrxs.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
 
-
 class WorldBuilder:
 
     def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=1000, run_sail_api=False,
@@ -901,6 +900,7 @@ class WorldBuilder:
             self.add_area(top_left_location=area_top_left, width=area_width, height=area_height, name=f"{name}_area",
                           visualize_colour=area_visualize_colour, visualize_opacity=area_visualize_opacity,
                           customizable_properties=area_customizable_properties, **area_custom_properties)
+
 
     def __create_world(self):
 

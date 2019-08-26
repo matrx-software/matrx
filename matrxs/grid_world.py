@@ -2,8 +2,9 @@ import datetime
 import time
 import os.path
 import warnings
-from multiprocessing import Process
+import threading
 from collections import OrderedDict
+from matrxs.visualization import logMatrx
 
 from matrxs.actions.object_actions import *
 from matrxs.utils.utils import get_all_classes
@@ -52,14 +53,12 @@ class GridWorld:
             # We update the grid, which fills everything with added objects and agents
             self.__update_grid()
 
-            # Initialize all agents
             for agent_body in self.registered_agents.values():
                 agent_body.brain_initialize_func()
 
             # Start the visualisation server process if we need to
             started_visualisation = False  # tracks if the server is running successfully
             if self.__run_visualization_server and self.__visualisation_process is None:
-
                 # Start the visualisation server
                 started_visualisation = self.__start_visualisation_server()
 
@@ -69,6 +68,9 @@ class GridWorld:
 
             # Visualize already
             self.__initial_visualisation()
+
+            thread = threading.Thread(target=logMatrx.log_object_complete, args=(self,))
+            thread.start()
 
             if self.__verbose:
                 print(f"@{os.path.basename(__file__)}: Initialized the GridWorld.")
@@ -81,6 +83,8 @@ class GridWorld:
         is_done = False
         while not is_done:
             is_done, tick_duration = self.__step()
+            thread = threading.Thread(target=logMatrx.log_object_custom, args=(self, [], {"tick"},))
+            thread.start()
 
     def get_env_object(self, requested_id, obj_type=None):
         obj = None
@@ -361,8 +365,8 @@ class GridWorld:
             self.__update_grid()
 
         # Clear previously send messages
-        #for receiver_id in self.registered_agents.keys():
-         #   self.registered_agents[receiver_id].set_messages_func()
+        # for receiver_id in self.registered_agents.keys():
+        #   self.registered_agents[receiver_id].set_messages_func()
 
         # Send all messages between agents
         for receiver_id, messages in self.__message_buffer.items():
@@ -398,7 +402,8 @@ class GridWorld:
         self.__curr_tick_duration = tick_duration.total_seconds()
 
         if self.__verbose:
-            print(f"@{os.path.basename(__file__)}: Tick {self.current_nr_ticks} took {tick_duration.total_seconds()} seconds.")
+            print(
+                f"@{os.path.basename(__file__)}: Tick {self.current_nr_ticks} took {tick_duration.total_seconds()} seconds.")
 
         return self.is_done, self.__curr_tick_duration
 
@@ -531,7 +536,7 @@ class GridWorld:
             # If the action is None, nothing has to change in the world
             if action_name is None:
                 return result
-            
+
             # Get action class
             action_class = self.__all_actions[action_name]
             # Make instance of action
