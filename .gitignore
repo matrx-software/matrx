@@ -9,3 +9,7 @@ environment/sim_goals/__pycache__/
 *.pyc
 *.stackdump
 __pycache__/
+
+generalStructure.log
+
+logData.log
