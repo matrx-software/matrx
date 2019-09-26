@@ -81,8 +81,8 @@ class WorldBuilder:
         """
 
         # Check if shape is of correct type and length
-        if not isinstance(shape, list) or not isinstance(shape, tuple) and len(shape) != 2:
-            raise ValueError(f"The given grid shape {shape} is not of type List, Typle or of length two.")
+        if not isinstance(shape, list) and not isinstance(shape, tuple) and len(shape) != 2:
+            raise ValueError(f"The given grid shape {shape} is not of type List, Tuple or of length two.")
 
         # Check that tick duration is of float and a positive number.
         if not isinstance(tick_duration, float) and tick_duration >= 0.0:
