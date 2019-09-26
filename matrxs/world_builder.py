@@ -4,7 +4,6 @@ import sys
 import warnings
 from collections import OrderedDict
 from typing import Callable, Union, Iterable
-from noise import snoise2
 
 import numpy as np
 from numpy.random.mtrand import RandomState
