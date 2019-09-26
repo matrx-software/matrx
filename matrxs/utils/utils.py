@@ -1,7 +1,6 @@
 import json
 
 import math
-from shapely.geometry import Polygon, Point
 import numpy as np
 
 from matrxs.agents.capabilities.capability import SenseCapability
@@ -140,43 +139,6 @@ def _get_line_coords(p1, p2):
         line_coords.reverse()
 
     return line_coords
-
-
-def _get_hull_and_volume_coords(corner_coords):
-    # Check if there are any corners given
-    if len(corner_coords) <= 1:
-        raise Exception(f"Cannot create area; {len(corner_coords)} corner coordinates given, requires at least 2.")
-
-    # Get the polygon represented by the corner coordinates
-    # TODO remove the dependency to Shapely
-    polygon = Polygon(corner_coords)
-
-    (minx, miny, maxx, maxy) = polygon.bounds
-    minx = int(minx)
-    miny = int(miny)
-    maxx = int(maxx)
-    maxy = int(maxy)
-
-    volume_coords = []
-    for x in range(minx, maxx + 1):
-        for y in range(miny, maxy + 1):
-            p = Point(x, y)
-            if polygon.contains(p):
-                volume_coords.append((x, y))
-
-    hull_coords = []
-    corners = list(zip(polygon.exterior.xy[0], polygon.exterior.xy[1]))
-    for idx in range(len(corners) - 1):
-        p1 = corners[idx]
-        p2 = corners[idx + 1]
-        line_coords = _get_line_coords(p1, p2)
-        hull_coords.extend(line_coords)
-
-    # Add corners as well
-    for corner in corner_coords:
-        hull_coords.append(tuple(corner))
-
-    return hull_coords, volume_coords
 
 
 def create_sense_capability(objects_to_perceive, range_to_perceive_them_in):
