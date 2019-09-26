@@ -15,6 +15,7 @@ from matrxs.agents.human_agent_brain import HumanAgentBrain
 from matrxs.grid_world import GridWorld
 from matrxs.objects.agent_body import AgentBody
 from matrxs.objects.env_object import EnvObject
+from matrxs.utils import utils
 from matrxs.utils.utils import get_inheritence_path, get_default_value, _get_line_coords, create_sense_capability
 from matrxs.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
 from matrxs.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
@@ -762,29 +763,27 @@ class WorldBuilder:
             raise Exception(f"While adding area {name}; The width {width} and/or height {height} should both be larger"
                             f" than 0.")
 
-        # See https://www.redblobgames.com/maps/terrain-from-noise/#elevation
-        octaves = 8  # small noiseyness
-        freq = 5  # large noiseyness
-
         # Get all locations in the rectangle
         min_x = top_left_location[0]
         max_x = top_left_location[0] + width
         min_y = top_left_location[1]
         max_y = top_left_location[1] + height
 
-        for x in range(min_x, max_x):
-            for y in range(min_y, max_y):
+        noise_grid = utils._white_noise(min_x, max_x, min_y, max_y, rng=self.rng)
+
+        for x in range(noise_grid.shape[0]):
+            for y in range(noise_grid.shape[1]):
                 # get noise point
-                noise = snoise2(x / freq, y / freq, octaves)
+                noise = noise_grid[x, y]
 
                 # convert from [-1,1] range to [0,1] range, and flip
                 opacity = 1 - ((noise + 1.0) / 2.0)
                 opacity = np.clip(opacity * smoke_thickness_multiplier, 0, 1)
 
                 # add the smokeTile
-                self.add_object(location=[x, y], name=name, callable_class=SmokeTile,
+                self.add_object(location=[x, y], name=name, callable_class=SmokeTile, is_traversable=True,
                                 visualize_colour=visualize_colour, visualize_opacity=opacity,
-                                visualize_depth=visualize_depth)
+                                visualize_depth=visualize_depth, **custom_properties)
 
     def __list_area_locs(self, top_left_location, width, height):
         """
