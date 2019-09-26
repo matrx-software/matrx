@@ -1,11 +1,11 @@
 import datetime
-import time
 import os.path
 import warnings
+import gevent
 import threading
 from collections import OrderedDict
-from matrxs.visualization import logMatrx
 
+from matrxs.visualization import logMatrx
 from matrxs.actions.object_actions import *
 from matrxs.utils.utils import get_all_classes
 from matrxs.objects.simple_objects import AreaTile
@@ -427,7 +427,7 @@ class GridWorld:
         :return:
         """
         if self.sleep_duration > 0:
-            time.sleep(self.sleep_duration)
+            gevent.sleep(self.sleep_duration)
         else:
             self.__warn(
                 f"The average tick took longer than the set tick duration of {self.tick_duration}. "
