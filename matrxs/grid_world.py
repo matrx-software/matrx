@@ -69,8 +69,11 @@ class GridWorld:
             # Visualize already
             self.__initial_visualisation()
 
-            thread = threading.Thread(target=logMatrx.log_object_complete, args=(self,))
-            thread.start()
+            # thread = threading.Thread(target=logMatrx.log_object_complete, args=(self,))
+            # thread.start()
+
+            # Set initialisation boolean
+            self.__is_initialized = True
 
             if self.__verbose:
                 print(f"@{os.path.basename(__file__)}: Initialized the GridWorld.")
