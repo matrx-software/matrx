@@ -13,3 +13,5 @@ __pycache__/
 generalStructure.log
 
 logData.log
+
+*.log
