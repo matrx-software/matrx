@@ -42,4 +42,6 @@ def create_factory():
     factory.add_line(start=[11, 4], end=[12, 4], name="O")
     factory.add_line(start=[13, 2], end=[13, 3], name="O")
     factory.add_object((4, 3), "Object", visualize_shape='img', img_name="fire.gif")
+
+    factory.add_smoke_area([0, 0], width=15, height=6, name="smoke", smoke_thickness_multiplier=0.5)
     return factory
