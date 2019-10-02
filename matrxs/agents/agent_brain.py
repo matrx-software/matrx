@@ -178,31 +178,25 @@ class AgentBrain:
 
         return action, action_kwargs
 
-    def send_message(self, message_content: Union[str, dict], to_id: Union[str, list] = None):
+    def send_message(self, message):
         """
         Method that allows you to construct a message that will be send to either a specified agent, a team of agents
         or all agents.
 
         Parameters
         ----------
-        message_content
-            A string or a dictionary containing anything.
-        to_id: str, list, None, optional
-            Defaults to None. A string denoting a either a specific agent's ID when it is a string, or a list of
-            agent IDs when it is a list of strings. When set to None, the message is send to all agents.
+        message: Message
+            A message object that needs to be send. Should be of type Message. It's to_id can contain a single
+            recipient, a list of recipients or None. If None, it is send to all other agents.
 
         Returns
         -------
         None
-            ...
         """
-
-        if to_id is None or isinstance(to_id, str):
-            to_id = [to_id]
-
-        for single_to_id in to_id:
-            message = Message(content=message_content, from_id=self.agent_id, to_id=single_to_id)
-            self.messages_to_send.append(message)
+        # Check if the message is a true message
+        self.__check_message(message)
+        # Add the message to our list
+        self.messages_to_send.append(message)
 
     def is_action_possible(self, action, action_kwargs):
         action_result = self.__callback_is_action_possible(self.agent_id, action, action_kwargs)
@@ -314,7 +308,7 @@ class AgentBrain:
         self.rnd_seed = seed
         self.rnd_gen = np.random.RandomState(self.rnd_seed)
 
-    def _get_messages(self):
+    def _get_messages(self, all_agent_ids):
         """
         This method is called by the GridWorld.
 
@@ -326,14 +320,31 @@ class AgentBrain:
         :return: A list of message objects with a generic content, the sender (this agent's id) and optionally a
         receiver. If a receiver is not set, the message content is send to all agents including this agent.
         """
+
+        # Filter out the agent itself from the agent id's
+        agent_ids = [agent_id for agent_id in all_agent_ids if agent_id != self.agent_id]
+
         # Loop through all Message objects and create a dict out of each and append them to a list
         messages = []
-        for mssg_obj in self.messages_to_send:
-            messages.append(
-                {'from_id': mssg_obj.from_id,
-                 'to_id': mssg_obj.to_id,
-                 'content': mssg_obj.content}
-            )
+        for mssg in self.messages_to_send:
+
+            self.__check_message(mssg)
+
+            # Check if the message is None (send to all agents) or single id; if so make a list out if
+            if mssg.to_id is None:
+                to_ids = agent_ids.copy()
+            elif isinstance(mssg.to_id, str):
+                to_ids = [mssg.to_id]
+            else:
+                to_ids = mssg.to_id
+
+            # For each receiver, create a Message object that wraps the actual object
+            for single_to_id in to_ids:
+                message = Message(content=mssg, from_id=self.agent_id, to_id=single_to_id)
+
+                # Add the message object to the messages
+                messages.append(message)
+
         # Remove all messages that need to be send, as we have send them now
         self.messages_to_send = []
 
@@ -349,15 +360,27 @@ class AgentBrain:
         :param messages: A list of dictionaries that contain a 'from_id', 'to_id' and 'content.
         If messages is set to None (or no messages are used as input), only the previous messages are removed
         """
+
         # We empty all received messages as this is from the previous tick
         self.received_messages = []
 
         # Loop through all messages and create a Message object out of the dictionaries.
         for mssg in messages:
-            message_object = Message(from_id=mssg['from_id'], to_id=mssg['to_id'], content=mssg['content'])
+
+            # Check if the message is of type Message (its content contains the actual message)
+            self.__check_message(mssg)
+
+            # Since each message is secretly wrapped inside a Message (as its content), we unpack its content and
+            # set that as the actual received message.
+            received_message = mssg.content
 
             # Add the message object to the received messages
-            self.received_messages.append(message_object)
+            self.received_messages.append(received_message)
+
+    def __check_message(self, mssg):
+        if not isinstance(mssg, Message):
+            raise Exception(f"A message to {self.agent_id} is not, nor inherits from, the class {Message.__name__}."
+                            f" This is required for agents to be able to send and receive them.")
 
 
 class Message:

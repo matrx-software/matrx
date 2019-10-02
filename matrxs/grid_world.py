@@ -327,15 +327,17 @@ class GridWorld:
             # store the action in the buffer
             action_buffer[agent_id] = (action_class_name, action_kwargs)
 
+            # Get all agents we have, as we need these to process all messages that are send to all agents
+            all_agent_ids = self.registered_agents.keys()
             # Obtain all communication messages if the agent has something to say to others
-            agent_messages = agent_obj.get_messages_func()
+            agent_messages = agent_obj.get_messages_func(all_agent_ids)
             if len(agent_messages) > 0:  # there are messages
                 # go through all messages
                 for mssg in agent_messages:
-                    if mssg['to_id'] not in self.__message_buffer.keys():  # first message for this receiver
-                        self.__message_buffer[mssg['to_id']] = [mssg]
+                    if mssg.to_id not in self.__message_buffer.keys():  # first message for this receiver
+                        self.__message_buffer[mssg.to_id] = [mssg]
                     else:
-                        self.__message_buffer[mssg['to_id']].append(mssg)
+                        self.__message_buffer[mssg.to_id].append(mssg)
 
             # the Agent (in the OODA loop) might have updated its properties,
             # process these changes in the Avatar Agent
