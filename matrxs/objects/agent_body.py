@@ -143,12 +143,13 @@ class AgentBody(EnvObject):
             self.team = self.obj_id
         self.change_property("team", self.team)
 
-    def _set_agent_busy(self, curr_tick, action_duration):
+    def _set_agent_busy(self, curr_tick, action_duration, action_name, action_result):
         """
         specify the duration of the action in ticks currently being executed by the
         agent, and its starting tick
         """
-        self.last_action = {"duration_in_ticks": action_duration, "tick": curr_tick}
+        self.last_action = {"duration_in_ticks": action_duration, "tick": curr_tick,
+                            "action_name": action_name, "action_result": action_result}
 
     def _check_agent_busy(self, curr_tick):
         """
@@ -241,6 +242,8 @@ class AgentBody(EnvObject):
             elif property_name == "is_movable":
                 assert isinstance(property_value, bool)
                 self.is_movable = property_value
+            # We deliberately ignore the current_action property, and several others such as agent_id as these can never
+            # be altered as they are governed by the GridWorld
 
         return self.properties
 
@@ -315,6 +318,10 @@ class AgentBody(EnvObject):
             "depth": self.visualize_depth,
             "opacity": self.visualize_opacity
         }
+
+        # Add the current action (this is in self.last_action, because if the action takes longer than a tick, it is in
+        # here. Otherwise it is overwritten each tick and last_action is the action done in that tick).
+        properties['current_action'] = self.last_action['action_name']
 
         return properties
 
