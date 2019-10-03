@@ -122,7 +122,7 @@ class AgentBody(EnvObject):
         self.blocked = False
 
         # Denotes the last action performed by the agent, at what tick and how long it must take
-        self.last_action = {"duration_in_ticks": 0, "tick": 0}
+        self.last_action = {"duration_in_ticks": 0, "tick": 0, "action_name": None, "action_result": None}
 
         # We set a placeholder for the 'team' property so that it can be found in self.properties
         self.team = ""
