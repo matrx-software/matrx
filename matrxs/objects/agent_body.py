@@ -124,6 +124,7 @@ class AgentBody(EnvObject):
         # Place holders for action information
         self.__current_action = None
         self.__current_action_result = None
+        self.__current_action_args = None
 
         # Denotes the last action performed by the agent, at what tick and how long it must take
         self.__last_action_duration_data = {"duration_in_ticks": 0, "tick": 0, "action_name": None,
@@ -163,13 +164,14 @@ class AgentBody(EnvObject):
                             and (curr_tick >= self.current_action_tick_started + self.agent_speed_in_ticks))
         return self.blocked
 
-    def _set_current_action(self, action_name, action_result):
+    def _set_current_action(self, action_name, action_result, action_args):
         """
         Sets the current action of the agent. Since the GridWorld performs the mutate of an action first, and then waits
         for the duration to pass, we also have the result available.
         """
         self.__current_action = action_name
         self.__current_action_result = action_result
+        self.__current_action_args = action_args
 
     def _set_agent_changed_properties(self, props: dict):
         """
@@ -336,9 +338,11 @@ class AgentBody(EnvObject):
         if self.current_action is not None:  # all None actions are 'idle' actions and have no name or result
             properties['current_action_succeeded'] = self.current_action_result.succeeded  # the boolean
             properties['current_action_result'] = self.current_action_result.result  # the string reason
+            properties['current_action_args'] = self.current_action_args  # the action arguments
         else:
             properties['current_action_succeeded'] = True
             properties['current_action_result'] = ActionResult.IDLE_ACTION
+            properties['current_action_args'] = {}
 
         properties['current_action_duration'] = self.current_action_duration_in_ticks
         properties['current_action_started_at_tick'] = self.current_action_tick_started
@@ -367,3 +371,7 @@ class AgentBody(EnvObject):
     @property
     def current_action_tick_started(self):
         return self.__last_action_duration_data["tick"]
+
+    @property
+    def current_action_args(self):
+        return self.__current_action_args
