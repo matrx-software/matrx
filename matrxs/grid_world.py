@@ -536,7 +536,8 @@ class GridWorld:
         result = self.__check_action_is_possible(agent_id, action_name, action_kwargs)
 
         # Set the current action and the result in the agent (appended to its properties so others know what agent did)
-        self.registered_agents[agent_id]._set_current_action(action_name=action_name, action_result=result)
+        self.registered_agents[agent_id]._set_current_action(action_name=action_name, action_result=result,
+                                                             action_args=action_kwargs)
 
         # If it will succeed, perform it.
         if result.succeeded:
