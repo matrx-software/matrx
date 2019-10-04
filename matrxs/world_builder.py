@@ -225,7 +225,7 @@ class WorldBuilder:
 
     def add_agent(self, location: Union[tuple, list], agent_brain: AgentBrain, name,
                   customizable_properties: Union[tuple, list] = None, sense_capability: SenseCapability = None,
-                  is_traversable: bool = True, team: str = None, agent_speed_in_ticks: int = None,
+                  is_traversable: bool = True, team: str = None,
                   possible_actions: list = None, is_movable: bool = None, visualize_size: float = None,
                   visualize_shape: Union[float, str] = None, visualize_colour: str = None, visualize_depth: int = None,
                   visualize_opacity: float = None,
@@ -261,9 +261,6 @@ class WorldBuilder:
         team: optional
             The team name. Used to group agents together. Defaults to this agent's name to signify it forms its own
             team.
-        agent_speed_in_ticks: optional
-            The number of 'ticks' this agent will have to wait between each time it is queried for an action. By setting
-            this to a higher number than other agents, this agent will be slower.
         possible_actions: optional
             A list or tuple of the names of the Action classes this agent can perform. With this you can limit the
             actions this agent can perform.
@@ -329,8 +326,6 @@ class WorldBuilder:
             visualize_opacity = get_default_value(class_name="AgentBody", property_name="visualize_opacity")
         if visualize_depth is None:
             visualize_depth = get_default_value(class_name="AgentBody", property_name="visualize_depth")
-        if agent_speed_in_ticks is None:
-            agent_speed_in_ticks = get_default_value(class_name="AgentBody", property_name="agent_speed_in_ticks")
         if possible_actions is None:
             possible_actions = get_default_value(class_name="AgentBody", property_name="possible_actions")
         if is_movable is None:
@@ -362,7 +357,6 @@ class WorldBuilder:
                              "is_traversable": is_traversable,
                              "possible_actions": possible_actions,
                              "is_human_agent": False,  # is you want a human agent, use factory.add_human_agent()
-                             "agent_speed_in_ticks": agent_speed_in_ticks,
                              "visualize_size": visualize_size,
                              "visualize_shape": visualize_shape,
                              "visualize_colour": visualize_colour,
@@ -376,7 +370,7 @@ class WorldBuilder:
 
     def add_team(self, agent_brains: Union[list, tuple], locations: Union[list, tuple], team_name,
                  custom_properties=None, sense_capability=None,
-                 customizable_properties=None, is_traversable=None, agent_speed_in_ticks=None,
+                 customizable_properties=None, is_traversable=None,
                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_opacity=None):
         """Adds a group of agents as a single team (meaning that their 'team' property all have the given team name).
 
@@ -401,8 +395,6 @@ class WorldBuilder:
             ..
         is_traversable
             ..
-        agent_speed_in_ticks
-            ..
         visualize_size
             ..
         visualize_shape
@@ -421,13 +413,13 @@ class WorldBuilder:
 
         self.add_multiple_agents(agent_brains, locations, custom_properties=custom_properties,
                                  sense_capabilities=sense_capability, customizable_properties=customizable_properties,
-                                 is_traversable=is_traversable, agent_speeds_in_ticks=agent_speed_in_ticks,
+                                 is_traversable=is_traversable,
                                  teams=team_name, visualize_sizes=visualize_size, visualize_shapes=visualize_shape,
                                  visualize_colours=visualize_colour, visualize_opacities=visualize_opacity)
 
     def add_multiple_agents(self, agents, locations, custom_properties=None,
                             sense_capabilities=None, customizable_properties=None,
-                            is_traversable=None, agent_speeds_in_ticks=None,
+                            is_traversable=None,
                             teams=None, visualize_sizes=None, visualize_shapes=None,
                             visualize_colours=None, visualize_opacities=None, visualize_depths=None):
         """
@@ -440,7 +432,6 @@ class WorldBuilder:
         sense_capabilities
         customizable_properties
         is_traversable
-        agent_speeds_in_ticks
         teams
         visualize_sizes
         visualize_shapes
@@ -474,11 +465,6 @@ class WorldBuilder:
             is_traversable = [None for _ in range(len(agents))]
         elif isinstance(is_traversable, bool):
             is_traversable = [is_traversable for _ in range(len(agents))]
-
-        if agent_speeds_in_ticks is None:
-            agent_speeds_in_ticks = [None for _ in range(len(agents))]
-        elif isinstance(agent_speeds_in_ticks, int):
-            agent_speeds_in_ticks = [agent_speeds_in_ticks for _ in range(len(agents))]
 
         if teams is None:
             teams = [None for _ in range(len(agents))]
@@ -517,7 +503,6 @@ class WorldBuilder:
                            customizable_properties=customizable_properties[idx],
                            is_traversable=is_traversable[idx],
                            team=teams[idx],
-                           agent_speed_in_ticks=agent_speeds_in_ticks[idx],
                            visualize_size=visualize_sizes[idx],
                            visualize_shape=visualize_shapes[idx],
                            visualize_colour=visualize_colours[idx],
@@ -527,14 +512,14 @@ class WorldBuilder:
 
     def add_agent_prospect(self, location, agent, probability, name="Agent", customizable_properties=None,
                            sense_capability=None,
-                           is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None,
+                           is_traversable=None, team=None, possible_actions=None,
                            is_movable=None,
                            visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_opacity=None,
                            visualize_depth=None, **custom_properties):
 
         # Add agent as normal
         self.add_agent(location, agent, name, customizable_properties, sense_capability,
-                       is_traversable, team, agent_speed_in_ticks, possible_actions, is_movable,
+                       is_traversable, team, possible_actions, is_movable,
                        visualize_size, visualize_shape, visualize_colour, visualize_depth,
                        visualize_opacity, **custom_properties)
 
@@ -665,7 +650,7 @@ class WorldBuilder:
                             visualize_opacity=visualize_opacities[idx], **custom_properties[idx])
 
     def add_human_agent(self, location, agent, name="HumanAgent", customizable_properties=None, sense_capability=None,
-                        is_traversable=None, team=None, agent_speed_in_ticks=None, possible_actions=None,
+                        is_traversable=None, team=None, possible_actions=None,
                         is_movable=None,
                         visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
                         visualize_opacity=None, usrinp_action_map=None, **custom_properties):
@@ -692,8 +677,6 @@ class WorldBuilder:
             visualize_opacity = get_default_value(class_name="AgentBody", property_name="visualize_opacity")
         if visualize_depth is None:
             visualize_depth = get_default_value(class_name="AgentBody", property_name="visualize_depth")
-        if agent_speed_in_ticks is None:
-            agent_speed_in_ticks = get_default_value(class_name="AgentBody", property_name="agent_speed_in_ticks")
         if possible_actions is None:
             possible_actions = get_default_value(class_name="AgentBody", property_name="possible_actions")
         if is_movable is None:
@@ -728,7 +711,6 @@ class WorldBuilder:
                              "is_traversable": is_traversable,
                              "possible_actions": possible_actions,
                              "is_human_agent": True,
-                             "agent_speed_in_ticks": agent_speed_in_ticks,
                              "visualize_size": visualize_size,
                              "visualize_shape": visualize_shape,
                              "visualize_colour": visualize_colour,

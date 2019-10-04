@@ -18,9 +18,9 @@ class GridWorld:
 
     def __init__(self, shape, tick_duration, simulation_goal, run_sail_api=True, run_visualization_server=True,
                  rnd_seed=1, visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False):
-        self.tick_duration = tick_duration  # How long each tick should take (process sleeps until thatr time is passed)
-        self.simulation_goal = simulation_goal  # The simulation goal, the simulation end when this/these are reached
-        self.shape = shape  # The width and height of the GridWorld
+        self.__tick_duration = tick_duration  # How long each tick should take (process sleeps until thatr time is passed)
+        self.__simulation_goal = simulation_goal  # The simulation goal, the simulation end when this/these are reached
+        self.__shape = shape  # The width and height of the GridWorld
         self.__run_sail_api = run_sail_api  # Whether we should run the (SAIL) API
         self.__run_visualization_server = run_visualization_server  # Whether we should run the (Visualisation) API
         self.__visualisation_process = None  # placeholder for the visualisation server process
@@ -28,20 +28,20 @@ class GridWorld:
         self.__visualization_bg_img = visualization_bg_img  # The background image of the visualisation
         self.__verbose = verbose  # Set whether we should print anything or not
 
-        self.registered_agents = OrderedDict()  # The dictionary of all existing agents in the GridWorld
-        self.environment_objects = OrderedDict()  # The dictionary of all existing objects in the GridWorld
+        self.__registered_agents = OrderedDict()  # The dictionary of all existing agents in the GridWorld
+        self.__environment_objects = OrderedDict()  # The dictionary of all existing objects in the GridWorld
 
         # Get all actions within all currently imported files
         self.__all_actions = get_all_classes(Action, omit_super_class=True)
 
         # Initialise an empty grid, a simple 2D array with ID's
-        self.grid = np.array([[None for _ in range(shape[0])] for _ in range(shape[1])])
+        self.__grid = np.array([[None for _ in range(shape[0])] for _ in range(shape[1])])
 
-        self.is_done = False  # Whether the simulation is done (goal(s) reached)
+        self.__is_done = False  # Whether the simulation is done (goal(s) reached)
         self.__rnd_seed = rnd_seed  # The random seed of this GridWorld
         self.__rnd_gen = np.random.RandomState(seed=self.__rnd_seed)  # The random state of this GridWorld
         self.__curr_tick_duration = 0.  # Duration of the current tick
-        self.current_nr_ticks = 0  # The number of tick this GridWorld has ran already
+        self.__current_nr_ticks = 0  # The number of tick this GridWorld has ran already
         self.__visualizer = None  # Placeholder for the Visualizer class
         self.__is_initialized = False  # Whether this GridWorld is already initialized
         self.__message_buffer = {}  # dictionary of messages that need to be send to agents, with receiver ids as keys
@@ -301,47 +301,66 @@ class GridWorld:
         # This blocks until a response from the agent is received (hence a tick can take longer than self.tick_
         # duration!!)
         action_buffer = OrderedDict()
-        for agent_id, agent_obj in self.registered_agents.items():
+        for agent_id, agent_obj in self.__registered_agents.items():
 
             state = self.__get_agent_state(agent_obj)
 
-            # go to the next agent, if this agent is still busy performing an action
-            if agent_obj._check_agent_busy(curr_tick=self.current_nr_ticks):
-                # only do the observe and orient of the OODA loop to update the GUI
+            # check if this agent is busy performing an action , if so then also check if it as its last tick of waiting
+            # because then we want to do that action. If not busy, call its get_action function.
+            if agent_obj._check_agent_busy(curr_tick=self.__current_nr_ticks):
+
+                # only do the filter observation method to be able to update the agent's state to the API
                 filtered_agent_state = agent_obj.filter_observations(state)
                 self.__visualizer._save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
                                               state=filtered_agent_state)
-                continue
 
-            # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
-            if agent_obj.is_human_agent:
-                usrinp = self.__visualizer._userinputs[agent_id.lower()] if \
-                    agent_id.lower() in self.__visualizer._userinputs else None
-                filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
-                    state=state, agent_properties=agent_obj.properties, agent_id=agent_id, userinput=usrinp)
-            else:
-                # perform the OODA loop and get an action back
-                filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
-                    state=state, agent_properties=agent_obj.properties, agent_id=agent_id)
+                # if this busy agent is at its last tick of waiting, we want to actually perform the action
+                if agent_obj._at_last_action_duration_tick(curr_tick=self.__current_nr_ticks):
+                    action_class_name, action_kwargs = agent_obj._get_duration_action()
 
-            # store the action in the buffer
-            action_buffer[agent_id] = (action_class_name, action_kwargs)
+                    # store the action in the buffer
+                    action_buffer[agent_id] = (action_class_name, action_kwargs)
 
-            # Get all agents we have, as we need these to process all messages that are send to all agents
-            all_agent_ids = self.registered_agents.keys()
-            # Obtain all communication messages if the agent has something to say to others
-            agent_messages = agent_obj.get_messages_func(all_agent_ids)
-            if len(agent_messages) > 0:  # there are messages
-                # go through all messages
-                for mssg in agent_messages:
-                    if mssg.to_id not in self.__message_buffer.keys():  # first message for this receiver
-                        self.__message_buffer[mssg.to_id] = [mssg]
-                    else:
-                        self.__message_buffer[mssg.to_id].append(mssg)
+            else:  # agent is not busy
 
-            # the Agent (in the OODA loop) might have updated its properties,
-            # process these changes in the Avatar Agent
-            agent_obj._set_agent_changed_properties(agent_properties)
+                # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
+                if agent_obj.is_human_agent:
+                    usrinp = self.__visualizer._userinputs[agent_id.lower()] if \
+                        agent_id.lower() in self.__visualizer._userinputs else None
+                    filtered_agent_state, agent_properties, action_class_name, action_kwargs = \
+                        agent_obj.get_action_func(state=state, agent_properties=agent_obj.properties, agent_id=agent_id,
+                                                  userinput=usrinp)
+                else:  # not a HumanAgent
+
+                    # perform the agent's get_action method (goes through filter_observations and decide_on_action)
+                    filtered_agent_state, agent_properties, action_class_name, action_kwargs = agent_obj.get_action_func(
+                        state=state, agent_properties=agent_obj.properties, agent_id=agent_id)
+
+                # the Agent (in the OODA loop) might have updated its properties, process these changes in the Avatar
+                # Agent
+                agent_obj._set_agent_changed_properties(agent_properties)
+
+                # Set the agent to busy, we do this only here and not when the agent was already busy to prevent the
+                # agent to perform an action with a duration indefinitely (and since all actions have a duration, that
+                # would be killing...)
+                self.__set_agent_busy(action_name=action_class_name, action_kwargs=action_kwargs, agent_id=agent_id)
+
+                # store the action in the buffer
+                action_buffer[agent_id] = (action_class_name, action_kwargs)
+
+                # Get all agents we have, as we need these to process all messages that are send to all agents
+                all_agent_ids = self.__registered_agents.keys()
+
+                # Obtain all communication messages if the agent has something to say to others (only comes here when
+                # the agent is NOT busy)
+                agent_messages = agent_obj.get_messages_func(all_agent_ids)
+                if len(agent_messages) > 0:  # there are messages
+                    # go through all messages
+                    for mssg in agent_messages:
+                        if mssg.to_id not in self.__message_buffer.keys():  # first message for this receiver
+                            self.__message_buffer[mssg.to_id] = [mssg]
+                        else:
+                            self.__message_buffer[mssg.to_id].append(mssg)
 
             # save what the agent observed to the visualizer
             self.__visualizer._save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
@@ -351,7 +370,7 @@ class GridWorld:
         self.__visualizer._save_state(inheritance_chain="god", id="god", state=self.__get_complete_state())
 
         # update the visualizations of all (human)agents and god
-        self.__visualizer._update_guis(tick=self.current_nr_ticks)
+        self.__visualizer._update_guis(tick=self.__current_nr_ticks)
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
         for agent_id, action in action_buffer.items():
@@ -377,26 +396,29 @@ class GridWorld:
         for receiver_id, messages in self.__message_buffer.items():
             if receiver_id == None:
                 # If receiver id is set to None, send to all registered agents
-                for receiver_id in self.registered_agents.keys():
-                    self.registered_agents[receiver_id].set_messages_func(messages)
+                for receiver_id in self.__registered_agents.keys():
+                    self.__registered_agents[receiver_id].set_messages_func(messages)
             # check if the receiver exists
-            elif receiver_id in self.registered_agents.keys():
+            elif receiver_id in self.__registered_agents.keys():
                 # Call the callback method that sets the messages
-                self.registered_agents[receiver_id].set_messages_func(messages)
-        # Clean the message buffer so we don't send the same messages next tick
+                self.__registered_agents[receiver_id].set_messages_func(messages)
+        # Clean the message buffer so we don't send the same messages next tick, but save it so it is accessible
+        self.__messages_send_previous_tick = [mssg.content
+                                              for mssg_list in self.__message_buffer.values()
+                                              for mssg in mssg_list]
         self.__message_buffer = {}
 
         # Perform the update method of all objects
-        for env_obj in self.environment_objects.values():
+        for env_obj in self.__environment_objects.values():
             env_obj.update(self)
 
         # Increment the number of tick we performed
-        self.current_nr_ticks += 1
+        self.__current_nr_ticks += 1
 
         # Check how much time the tick lasted already
         tick_end_time = datetime.datetime.now()
         tick_duration = tick_end_time - start_time_current_tick
-        self.sleep_duration = self.tick_duration - tick_duration.total_seconds()
+        self.sleep_duration = self.__tick_duration - tick_duration.total_seconds()
 
         # Sleep for the remaining time of self.tick_duration
         self.__sleep()
@@ -408,7 +430,7 @@ class GridWorld:
 
         if self.__verbose:
             print(
-                f"@{os.path.basename(__file__)}: Tick {self.current_nr_ticks} took {tick_duration.total_seconds()} seconds.")
+                f"@{os.path.basename(__file__)}: Tick {self.__current_nr_ticks} took {tick_duration.total_seconds()} seconds.")
 
         return self.is_done, self.__curr_tick_duration
 
@@ -461,7 +483,7 @@ class GridWorld:
 
         # Append generic properties (e.g. number of ticks, size of grid, etc.}
         state["World"] = {
-            "nr_ticks": self.current_nr_ticks,
+            "nr_ticks": self.__current_nr_ticks,
             "grid_shape": self.shape
         }
 
@@ -487,7 +509,7 @@ class GridWorld:
         team_members = [agent_id for agent_id, other_agent in self.registered_agents.items()
                         if agent_obj.team == other_agent.team]
         state["World"] = {
-            "nr_ticks": self.current_nr_ticks,
+            "nr_ticks": self.__current_nr_ticks,
             "grid_shape": self.shape,
             "team_members": team_members
         }
@@ -560,7 +582,7 @@ class GridWorld:
                 duration_in_ticks = action_kwargs["duration_in_ticks"]
 
             # The agent is now busy performing this action
-            self.registered_agents[agent_id]._set_agent_busy(curr_tick=self.current_nr_ticks,
+            self.registered_agents[agent_id]._set_agent_busy(curr_tick=self.__current_nr_ticks,
                                                              action_duration=duration_in_ticks)
 
             # Get agent's send_result function
@@ -594,7 +616,7 @@ class GridWorld:
             self.grid[loc[1], loc[0]] = [obj_id]
 
     def __warn(self, warn_str):
-        return f"[@{self.current_nr_ticks}] {warn_str}"
+        return f"[@{self.__current_nr_ticks}] {warn_str}"
 
     def __initial_visualisation(self):
 
@@ -614,7 +636,7 @@ class GridWorld:
             self.__visualizer._save_state(inheritance_chain="god", id="god", state=self.__get_complete_state())
 
             # update the visualizations of all (human)agents and god
-            self.__visualizer._update_guis(tick=self.current_nr_ticks)
+            self.__visualizer._update_guis(tick=self.__current_nr_ticks)
 
     def __start_visualisation_server(self):
         # bool to denote whether we succeeded in starting the visualisation server
@@ -629,3 +651,39 @@ class GridWorld:
         self.__visualisation_process = True
 
         return succeeded
+
+    @property
+    def messages_send_previous_tick(self):
+        return self.__messages_send_previous_tick
+
+    @property
+    def registered_agents(self):
+        return self.__registered_agents
+
+    @property
+    def environment_objects(self):
+        return self.__environment_objects
+
+    @property
+    def is_done(self):
+        return self.__is_done
+
+    @property
+    def current_nr_ticks(self):
+        return self.__current_nr_ticks
+
+    @property
+    def grid(self):
+        return self.__grid
+
+    @property
+    def shape(self):
+        return self.__shape
+
+    @property
+    def simulation_goal(self):
+        return self.__simulation_goal
+
+    @property
+    def tick_duration(self):
+        return self.__tick_duration
