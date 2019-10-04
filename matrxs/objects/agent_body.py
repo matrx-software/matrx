@@ -1,5 +1,5 @@
 from matrxs.agents.capabilities.capability import SenseCapability
-from matrxs.actions.action import Action
+from matrxs.actions.action import Action, ActionResult
 from matrxs.utils.utils import get_all_classes
 from matrxs.objects.env_object import EnvObject
 
@@ -121,8 +121,13 @@ class AgentBody(EnvObject):
         # which an agent can perform actions.
         self.blocked = False
 
+        # Place holders for action information
+        self.__current_action = None
+        self.__current_action_result = None
+
         # Denotes the last action performed by the agent, at what tick and how long it must take
-        self.last_action = {"duration_in_ticks": 0, "tick": 0, "action_name": None, "action_result": None}
+        self.__last_action_duration_data = {"duration_in_ticks": 0, "tick": 0, "action_name": None,
+                                            "action_result": None}
 
         # We set a placeholder for the 'team' property so that it can be found in self.properties
         self.team = ""
@@ -143,21 +148,28 @@ class AgentBody(EnvObject):
             self.team = self.obj_id
         self.change_property("team", self.team)
 
-    def _set_agent_busy(self, curr_tick, action_duration, action_name, action_result):
+    def _set_agent_busy(self, curr_tick, action_duration):
         """
         specify the duration of the action in ticks currently being executed by the
         agent, and its starting tick
         """
-        self.last_action = {"duration_in_ticks": action_duration, "tick": curr_tick,
-                            "action_name": action_name, "action_result": action_result}
+        self.__last_action_duration_data = {"duration_in_ticks": action_duration, "tick": curr_tick}
 
     def _check_agent_busy(self, curr_tick):
         """
         check if the agent is done with executing the action
         """
-        self.blocked = not ((curr_tick >= self.last_action["tick"] + self.last_action["duration_in_ticks"])
-                            and (curr_tick >= self.last_action["tick"] + self.properties["agent_speed_in_ticks"]))
+        self.blocked = not ((curr_tick >= self.current_action_tick_started + self.current_action_duration_in_ticks)
+                            and (curr_tick >= self.current_action_tick_started + self.agent_speed_in_ticks))
         return self.blocked
+
+    def _set_current_action(self, action_name, action_result):
+        """
+        Sets the current action of the agent. Since the GridWorld performs the mutate of an action first, and then waits
+        for the duration to pass, we also have the result available.
+        """
+        self.__current_action = action_name
+        self.__current_action_result = action_result
 
     def _set_agent_changed_properties(self, props: dict):
         """
@@ -319,9 +331,17 @@ class AgentBody(EnvObject):
             "opacity": self.visualize_opacity
         }
 
-        # Add the current action (this is in self.last_action, because if the action takes longer than a tick, it is in
-        # here. Otherwise it is overwritten each tick and last_action is the action done in that tick).
-        properties['current_action'] = self.last_action['action_name']
+        # Add the current action and all of its data
+        properties['current_action'] = self.current_action
+        if self.current_action is not None:  # all None actions are 'idle' actions and have no name or result
+            properties['current_action_succeeded'] = self.current_action_result.succeeded  # the boolean
+            properties['current_action_result'] = self.current_action_result.result  # the string reason
+        else:
+            properties['current_action_succeeded'] = True
+            properties['current_action_result'] = ActionResult.IDLE_ACTION
+
+        properties['current_action_duration'] = self.current_action_duration_in_ticks
+        properties['current_action_started_at_tick'] = self.current_action_tick_started
 
         return properties
 
@@ -331,3 +351,19 @@ class AgentBody(EnvObject):
         Here to protect the 'properties' variable. It does not do anything and should not do anything!
         """
         pass
+
+    @property
+    def current_action(self):
+        return self.__current_action
+
+    @property
+    def current_action_result(self):
+        return self.__current_action_result
+
+    @property
+    def current_action_duration_in_ticks(self):
+        return self.__last_action_duration_data["duration_in_ticks"]
+
+    @property
+    def current_action_tick_started(self):
+        return self.__last_action_duration_data["tick"]
