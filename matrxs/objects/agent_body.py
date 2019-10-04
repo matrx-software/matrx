@@ -10,7 +10,7 @@ class AgentBody(EnvObject):
                  callback_agent_get_action, callback_agent_set_action_result, callback_agent_observe,
                  callback_agent_get_messages, callback_agent_set_messages, callback_agent_initialize,
                  visualize_size, visualize_shape, visualize_colour, visualize_depth, visualize_opacity,
-                 is_traversable, team, agent_speed_in_ticks, name, is_movable,
+                 is_traversable, team, name, is_movable,
                  is_human_agent, customizable_properties,
                  **custom_properties):
         """
@@ -64,9 +64,6 @@ class AgentBody(EnvObject):
         :param team: The team name the agent is part of. Defaults to the team name similar to the Agent's body unique
         ID, as such denoting that by default each Agent's body belongs to its own team and as an extension so does its
         "brain" the Agent.
-        :param agent_speed_in_ticks: Integer. Optional, default obtained from defaults.json. Denotes the speed with
-        which the agent can perform actions. For example, a speed of 5 would mean that it can perform an action every 5
-        steps of the simulation.
 
         :param visualize_size: Float. Optional, default obtained from defaults.json. A visualization property used by
         the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualization (e.g. a
@@ -100,7 +97,6 @@ class AgentBody(EnvObject):
         self.brain_initialize_func = callback_agent_initialize
 
         # Set all mandatory properties
-        self.agent_speed_in_ticks = agent_speed_in_ticks
         self.is_traversable = is_traversable
         self.sense_capability = sense_capability
         self.action_set = possible_actions
@@ -119,11 +115,10 @@ class AgentBody(EnvObject):
 
         # Defines an agent is blocked by an action which takes multiple time steps. Is updated based on the speed with
         # which an agent can perform actions.
-        self.blocked = False
+        self.__is_blocked = False
 
         # Place holders for action information
         self.__current_action = None
-        self.__current_action_result = None
         self.__current_action_args = None
 
         # Denotes the last action performed by the agent, at what tick and how long it must take
@@ -160,17 +155,29 @@ class AgentBody(EnvObject):
         """
         check if the agent is done with executing the action
         """
-        self.blocked = not ((curr_tick >= self.current_action_tick_started + self.current_action_duration_in_ticks)
-                            and (curr_tick >= self.current_action_tick_started + self.agent_speed_in_ticks))
-        return self.blocked
+        self.__is_blocked = curr_tick < (self.current_action_tick_started + self.current_action_duration_in_ticks)
 
-    def _set_current_action(self, action_name, action_result, action_args):
+        return self.__is_blocked
+
+    def _at_last_action_duration_tick(self, curr_tick):
+        """ Returns True if this agent is at its last tick of the action with an action duration. """
+        is_last_tick = curr_tick == (self.current_action_tick_started + self.current_action_duration_in_ticks)
+        return is_last_tick
+
+    def _get_duration_action(self):
+        """ Returns the action we are waiting for 'self.current_action_duration_in_ticks', gets called in the GridWorld
+        when we are at the last tick on which we should wait (see self._at_last_action_duration_tick)."""
+        action_name = self.current_action
+        action_kwargs = self.current_action_args
+
+        return action_name, action_kwargs
+
+    def _set_current_action(self, action_name, action_args):
         """
         Sets the current action of the agent. Since the GridWorld performs the mutate of an action first, and then waits
         for the duration to pass, we also have the result available.
         """
         self.__current_action = action_name
-        self.__current_action_result = action_result
         self.__current_action_args = action_args
 
     def _set_agent_changed_properties(self, props: dict):
@@ -241,9 +248,6 @@ class AgentBody(EnvObject):
             elif property_name == "team":
                 assert isinstance(property_value, str)
                 self.team = property_value
-            elif property_name == "agent_speed_in_ticks":
-                assert isinstance(property_value, int)
-                self.agent_speed_in_ticks = property_value
             elif property_name == "sense_capability":
                 assert isinstance(property_value, SenseCapability)
                 self.sense_capability = property_value
@@ -322,7 +326,7 @@ class AgentBody(EnvObject):
         properties['is_human_agent'] = self.is_human_agent
         properties['is_traversable'] = self.is_traversable
         properties['class_inheritance'] = self.class_inheritance
-        properties['agent_speed_in_ticks'] = self.agent_speed_in_ticks
+        properties['is_blocked_by_action'] = self.is_blocked
         properties['is_carrying'] = [obj.properties for obj in self.is_carrying]
         properties['sense_capability'] = self.sense_capability.get_capabilities()
         properties['visualization'] = {
@@ -336,12 +340,8 @@ class AgentBody(EnvObject):
         # Add the current action and all of its data
         properties['current_action'] = self.current_action
         if self.current_action is not None:  # all None actions are 'idle' actions and have no name or result
-            properties['current_action_succeeded'] = self.current_action_result.succeeded  # the boolean
-            properties['current_action_result'] = self.current_action_result.result  # the string reason
             properties['current_action_args'] = self.current_action_args  # the action arguments
         else:
-            properties['current_action_succeeded'] = True
-            properties['current_action_result'] = ActionResult.IDLE_ACTION
             properties['current_action_args'] = {}
 
         properties['current_action_duration'] = self.current_action_duration_in_ticks
@@ -361,10 +361,6 @@ class AgentBody(EnvObject):
         return self.__current_action
 
     @property
-    def current_action_result(self):
-        return self.__current_action_result
-
-    @property
     def current_action_duration_in_ticks(self):
         return self.__last_action_duration_data["duration_in_ticks"]
 
@@ -375,3 +371,7 @@ class AgentBody(EnvObject):
     @property
     def current_action_args(self):
         return self.__current_action_args
+
+    @property
+    def is_blocked(self):
+        return self.__is_blocked
