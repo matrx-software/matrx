@@ -9,7 +9,7 @@ def create_factory():
     factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.5, verbose=True,
                            run_visualization_server=True)
 
-    factory.add_logger(logger_class=LogActions, save_path="data/")
+    factory.add_logger(logger_class=LogActions, save_path="log_data/")
 
     even = True
     for x in range(15):
