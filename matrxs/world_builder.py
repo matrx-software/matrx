@@ -12,6 +12,7 @@ from matrxs.agents.agent_brain import AgentBrain
 from matrxs.agents.capabilities.capability import SenseCapability
 from matrxs.agents.human_agent_brain import HumanAgentBrain
 from matrxs.grid_world import GridWorld
+from matrxs.logger.logger import GridWorldLogger
 from matrxs.objects.agent_body import AgentBody
 from matrxs.objects.env_object import EnvObject
 from matrxs.utils import utils
@@ -119,6 +120,8 @@ class WorldBuilder:
         # Set our settings place holders
         self.agent_settings = []
         self.object_settings = []
+        # Set our logger place holders
+        self.loggers = []
 
         # Whether the world factory and evrything else should print stuff
         self.verbose = verbose
@@ -222,6 +225,49 @@ class WorldBuilder:
                           "verbose": verbose}
 
         return world_settings
+
+    def add_logger(self, logger_class, log_strategy=None, save_path=None, file_name=None,
+                   file_extension=None, delimiter=None, **kwargs):
+        """ Missing docs
+
+        Parameters
+        ----------
+        logger_class
+        log_strategy
+        save_path
+        file_name
+        file_extension
+        delimiter
+        kwargs
+
+        Returns
+        -------
+
+        """
+
+        if issubclass(logger_class, GridWorldLogger):
+
+            set_params = {'log_strategy': log_strategy, 'save_path': save_path, 'file_name': file_name,
+                          'file_extension': file_extension, 'delimiter': delimiter}
+
+            # Add all kwarg
+            set_params = {**set_params, **kwargs}
+
+            # Get the variables this logger class needs, and ignore the rest
+            accepted_parameters = {}
+            class_signature = inspect.signature(logger_class.__init__)
+            class_params = class_signature.parameters
+            for param in class_params.values():
+                if param.name in set_params.keys():
+                    if set_params[param.name] is not None:
+                        accepted_parameters[param.name] = set_params[param.name]
+                    else:
+                        accepted_parameters[param.name] = param.default
+
+            # Append the class and its parameters to the list of loggers
+            self.loggers.append((logger_class, accepted_parameters))
+        else:
+            raise Exception(f"The logger is not of type, nor inherits from, {GridWorldLogger.__name__}.")
 
     def add_agent(self, location: Union[tuple, list], agent_brain: AgentBrain, name,
                   customizable_properties: Union[tuple, list] = None, sense_capability: SenseCapability = None,
@@ -908,6 +954,12 @@ class WorldBuilder:
         # Register all agents (including checks)
         for agent, agent_avatar in avatars:
             world._register_agent(agent, agent_avatar)
+
+        # Add all loggers if any
+        for logger_class, arguments in self.loggers:
+            logger = logger_class(**arguments)
+            logger._set_world_nr(self.worlds_created)
+            world._register_logger(logger)
 
         # Return the (successful/stable) world
         return world

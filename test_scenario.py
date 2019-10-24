@@ -1,5 +1,6 @@
 from matrxs.agents.human_agent_brain import HumanAgentBrain
 from matrxs.agents.patrolling_agent import PatrollingAgentBrain
+from matrxs.logger.log_agent_actions import LogActions
 from matrxs.world_builder import WorldBuilder
 from matrxs.actions.move_actions import *
 
@@ -7,6 +8,8 @@ from matrxs.actions.move_actions import *
 def create_factory():
     factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.5, verbose=True,
                            run_visualization_server=True)
+
+    factory.add_logger(logger_class=LogActions, save_path="data/")
 
     even = True
     for x in range(15):
