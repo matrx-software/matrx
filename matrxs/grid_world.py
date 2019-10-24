@@ -5,6 +5,7 @@ import gevent
 import threading
 from collections import OrderedDict
 
+from matrxs.logger.logger import GridWorldLogger
 from matrxs.visualization import logMatrx
 from matrxs.actions.object_actions import *
 from matrxs.utils.utils import get_all_classes
@@ -37,6 +38,7 @@ class GridWorld:
         # Initialise an empty grid, a simple 2D array with ID's
         self.__grid = np.array([[None for _ in range(shape[0])] for _ in range(shape[1])])
 
+        self.__loggers = []  # a list of GridWorldLogger use to log the data
         self.__is_done = False  # Whether the simulation is done (goal(s) reached)
         self.__rnd_seed = rnd_seed  # The random seed of this GridWorld
         self.__rnd_gen = np.random.RandomState(seed=self.__rnd_seed)  # The random state of this GridWorld
@@ -53,7 +55,7 @@ class GridWorld:
             # We update the grid, which fills everything with added objects and agents
             self.__update_grid()
 
-            for agent_body in self.registered_agents.values():
+            for agent_body in self.__registered_agents.values():
                 agent_body.brain_initialize_func()
 
             # Start the visualisation server process if we need to
@@ -63,7 +65,7 @@ class GridWorld:
                 started_visualisation = self.__start_visualisation_server()
 
             # Initialize the visualizer
-            self.__visualizer = Visualizer(self.shape, self.__visualization_bg_clr, self.__visualization_bg_img,
+            self.__visualizer = Visualizer(self.__shape, self.__visualization_bg_clr, self.__visualization_bg_img,
                                            verbose=self.__verbose, server_running=started_visualisation)
 
             # Visualize already
@@ -92,19 +94,19 @@ class GridWorld:
     def get_env_object(self, requested_id, obj_type=None):
         obj = None
 
-        if requested_id in self.registered_agents.keys():
+        if requested_id in self.__registered_agents.keys():
             if obj_type is not None:
-                if isinstance(self.registered_agents[requested_id], obj_type):
-                    obj = self.registered_agents[requested_id]
+                if isinstance(self.__registered_agents[requested_id], obj_type):
+                    obj = self.__registered_agents[requested_id]
             else:
-                obj = self.registered_agents[requested_id]
+                obj = self.__registered_agents[requested_id]
 
-        if requested_id in self.environment_objects.keys():
+        if requested_id in self.__environment_objects.keys():
             if obj_type is not None:
-                if isinstance(self.environment_objects[requested_id], obj_type):
-                    obj = self.environment_objects[requested_id]
+                if isinstance(self.__environment_objects[requested_id], obj_type):
+                    obj = self.__environment_objects[requested_id]
             else:
-                obj = self.environment_objects[requested_id]
+                obj = self.__environment_objects[requested_id]
 
         return obj
 
@@ -116,7 +118,7 @@ class GridWorld:
 
         env_objs = OrderedDict()
         # loop through all environment objects
-        for obj_id, env_obj in self.environment_objects.items():
+        for obj_id, env_obj in self.__environment_objects.items():
             # get the distance from the agent location to the object
             coordinates = env_obj.location
             distance = get_distance(coordinates, agent_loc)
@@ -127,7 +129,7 @@ class GridWorld:
                 env_objs[obj_id] = env_obj
 
         # agents are also environment objects, but stored separably. Also check them.
-        for agent_id, agent_obj in self.registered_agents.items():
+        for agent_id, agent_obj in self.__registered_agents.items():
             coordinates = agent_obj.location
             distance = get_distance(coordinates, agent_loc)
 
@@ -148,32 +150,32 @@ class GridWorld:
         grid_obj = self.get_env_object(object_id)  # get the object
         loc = grid_obj.location  # its location
 
-        self.grid[loc[1], loc[0]].remove(grid_obj.obj_id)  # remove the object id from the list at that location
-        if len(self.grid[loc[1], loc[0]]) == 0:  # if the list is empty, just add None there
-            self.grid[loc[1], loc[0]] = None
+        self.__grid[loc[1], loc[0]].remove(grid_obj.obj_id)  # remove the object id from the list at that location
+        if len(self.__grid[loc[1], loc[0]]) == 0:  # if the list is empty, just add None there
+            self.__grid[loc[1], loc[0]] = None
 
         # Remove object from the list of registered agents or environmental objects
         # Check if it is an agent
-        if object_id in self.registered_agents.keys():
+        if object_id in self.__registered_agents.keys():
             # Check if the agent was carrying something, if so remove property from carried item
-            for obj_id in self.registered_agents[object_id].is_carrying:
-                self.environment_objects[obj_id].carried_by.remove(object_id)
+            for obj_id in self.__registered_agents[object_id].is_carrying:
+                self.__environment_objects[obj_id].carried_by.remove(object_id)
 
             # Remove agent
-            success = self.registered_agents.pop(object_id,
+            success = self.__registered_agents.pop(object_id,
                                                  default=False)  # if it exists, we get it otherwise False
 
         # Else, check if it is an object
-        elif object_id in self.environment_objects.keys():
+        elif object_id in self.__environment_objects.keys():
             # remove from any agents carrying this object if asked for
             if remove_from_carrier:
                 # If the object was carried, remove this from the agent properties as well
-                for agent_id in self.environment_objects[object_id].carried_by:
-                    obj = self.environment_objects[object_id]
-                    self.registered_agents[agent_id].is_carrying.remove(obj)
+                for agent_id in self.__environment_objects[object_id].carried_by:
+                    obj = self.__environment_objects[object_id]
+                    self.__registered_agents[agent_id].is_carrying.remove(obj)
 
             # Remove object
-            success = self.environment_objects.pop(object_id,
+            success = self.__environment_objects.pop(object_id,
                                                    default=False)  # if it exists, we get it otherwise False
         else:
             success = False  # Object type not specified
@@ -192,16 +194,16 @@ class GridWorld:
     def add_to_grid(self, grid_obj):
         if isinstance(grid_obj, EnvObject):
             loc = grid_obj.location
-            if self.grid[loc[1], loc[0]] is not None:
-                self.grid[loc[1], loc[0]].append(grid_obj.obj_id)
+            if self.__grid[loc[1], loc[0]] is not None:
+                self.__grid[loc[1], loc[0]].append(grid_obj.obj_id)
             else:
-                self.grid[loc[1], loc[0]] = [grid_obj.obj_id]
+                self.__grid[loc[1], loc[0]] = [grid_obj.obj_id]
         else:
             loc = grid_obj.location
-            if self.grid[loc[1], loc[0]] is not None:
-                self.grid[loc[1], loc[0]].append(grid_obj.obj_id)
+            if self.__grid[loc[1], loc[0]] is not None:
+                self.__grid[loc[1], loc[0]].append(grid_obj.obj_id)
             else:
-                self.grid[loc[1], loc[0]] = [grid_obj.obj_id]
+                self.__grid[loc[1], loc[0]] = [grid_obj.obj_id]
 
     def _register_agent(self, agent, agent_avatar: AgentBody):
         """ Register human agents and agents to the gridworld environment """
@@ -213,7 +215,7 @@ class GridWorld:
         self.__validate_obj_placement(agent_avatar)
 
         # Add agent to registered agents
-        self.registered_agents[agent_avatar.obj_id] = agent_avatar
+        self.__registered_agents[agent_avatar.obj_id] = agent_avatar
 
         if self.__verbose:
             print(f"@{os.path.basename(__file__)}: Created agent with id {agent_avatar.obj_id}.")
@@ -250,12 +252,18 @@ class GridWorld:
         self.__validate_obj_placement(env_object)
 
         # Assign id to environment sparse dictionary grid
-        self.environment_objects[env_object.obj_id] = env_object
+        self.__environment_objects[env_object.obj_id] = env_object
 
         if self.__verbose:
             print(f"@{__file__}: Created an environment object with id {env_object.obj_id}.")
 
         return env_object.obj_id
+
+    def _register_logger(self, logger: GridWorldLogger):
+        if self.__loggers is None:
+            self.__loggers = [logger]
+        else:
+            self.__loggers.append(logger)
 
     def __validate_obj_placement(self, env_object):
         """
@@ -284,15 +292,24 @@ class GridWorld:
 
     def __step(self):
 
-        # Check if we are done based on our global goal assessment function
-        self.is_done = self.__check_simulation_goal()
-
-        # If this grid_world is done, we return immediately
-        if self.is_done:
-            return self.is_done, 0.
-
         # Set tick start of current tick
         start_time_current_tick = datetime.datetime.now()
+
+        # Check if we are done based on our global goal assessment function
+        self.__is_done, goal_status = self.__check_simulation_goal()
+
+        # Log the data if we have any loggers
+        for logger in self.__loggers:
+            agent_data_dict = {}
+            for agent_id, agent_body in self.__registered_agents.items():
+                agent_data_dict[agent_id] = agent_body.get_log_data()
+
+            logger._grid_world_log(grid_world=self, agent_data=agent_data_dict,
+                                   last_tick=self.__is_done, goal_status=goal_status)
+
+        # If this grid_world is done, we return immediately
+        if self.__is_done:
+            return self.__is_done, 0.
 
         # Go over all agents, detect what each can detect, figure out what actions are possible and send these to
         # that agent. Then receive the action back and store the action in a buffer.
@@ -389,8 +406,8 @@ class GridWorld:
             self.__update_grid()
 
         # Clear previously send messages
-        # for receiver_id in self.registered_agents.keys():
-        #   self.registered_agents[receiver_id].set_messages_func()
+        # for receiver_id in self.__registered_agents.keys():
+        #   self.__registered_agents[receiver_id].set_messages_func()
 
         # Send all messages between agents
         for receiver_id, messages in self.__message_buffer.items():
@@ -420,7 +437,7 @@ class GridWorld:
         tick_duration = tick_end_time - start_time_current_tick
         self.sleep_duration = self.__tick_duration - tick_duration.total_seconds()
 
-        # Sleep for the remaining time of self.tick_duration
+        # Sleep for the remaining time of self.__tick_duration
         self.__sleep()
 
         # Compute the total time of our tick (including potential sleep)
@@ -432,39 +449,41 @@ class GridWorld:
             print(
                 f"@{os.path.basename(__file__)}: Tick {self.__current_nr_ticks} took {tick_duration.total_seconds()} seconds.")
 
-        return self.is_done, self.__curr_tick_duration
+        return self.__is_done, self.__curr_tick_duration
 
     def __check_simulation_goal(self):
 
-        if self.simulation_goal is not None:
-            if isinstance(self.simulation_goal, list):
-                for sim_goal in self.simulation_goal:
+        goal_status = {}
+        if self.__simulation_goal is not None:
+            if isinstance(self.__simulation_goal, list):
+                for sim_goal in self.__simulation_goal:
                     is_done = sim_goal.goal_reached(self)
-                    if is_done is False:
-                        return False
+                    goal_status[sim_goal] = is_done
             else:
-                return self.simulation_goal.goal_reached(self)
+                is_done = self.__simulation_goal.goal_reached(self)
+                goal_status[self.__simulation_goal] = is_done
 
-        return False
+        is_done = np.array(list(goal_status.values())).all()
+        return is_done, goal_status
 
     def __sleep(self):
         """
         Sleeps the current python process for the amount of time that is left after self.curr_tick_duration up to
-        in self.tick_duration
+        in self.__tick_duration
         :return:
         """
         if self.sleep_duration > 0:
             gevent.sleep(self.sleep_duration)
         else:
             self.__warn(
-                f"The average tick took longer than the set tick duration of {self.tick_duration}. "
+                f"The average tick took longer than the set tick duration of {self.__tick_duration}. "
                 f"Program is to heavy to run real time")
 
     def __update_grid(self):
-        self.grid = np.array([[None for _ in range(self.shape[0])] for _ in range(self.shape[1])])
-        for obj_id, obj in self.environment_objects.items():
+        self.__grid = np.array([[None for _ in range(self.__shape[0])] for _ in range(self.__shape[1])])
+        for obj_id, obj in self.__environment_objects.items():
             self.add_to_grid(obj)
-        for agent_id, agent in self.registered_agents.items():
+        for agent_id, agent in self.__registered_agents.items():
             self.add_to_grid(agent)
 
     # get all objects and agents on the grid
@@ -476,15 +495,15 @@ class GridWorld:
 
         # create a state with all objects and agents
         state = {}
-        for obj_id, obj in self.environment_objects.items():
+        for obj_id, obj in self.__environment_objects.items():
             state[obj.obj_id] = obj.properties
-        for agent_id, agent in self.registered_agents.items():
+        for agent_id, agent in self.__registered_agents.items():
             state[agent.obj_id] = agent.properties
 
         # Append generic properties (e.g. number of ticks, size of grid, etc.}
         state["World"] = {
             "nr_ticks": self.__current_nr_ticks,
-            "grid_shape": self.shape
+            "grid_shape": self.__shape
         }
 
         return state
@@ -506,11 +525,11 @@ class GridWorld:
             state[env_obj] = objs_in_range[env_obj].properties
 
         # Append generic properties (e.g. number of ticks, fellow team members, etc.}
-        team_members = [agent_id for agent_id, other_agent in self.registered_agents.items()
+        team_members = [agent_id for agent_id, other_agent in self.__registered_agents.items()
                         if agent_obj.team == other_agent.team]
         state["World"] = {
             "nr_ticks": self.__current_nr_ticks,
-            "grid_shape": self.shape,
+            "grid_shape": self.__shape,
             "team_members": team_members
         }
 
@@ -523,7 +542,7 @@ class GridWorld:
             return result
 
         # Check if the agent still exists (you would only get here if the agent is removed during this tick).
-        if agent_id not in self.registered_agents.keys():
+        if agent_id not in self.__registered_agents.keys():
             result = ActionResult(ActionResult.AGENT_WAS_REMOVED.replace("{AGENT_ID}", agent_id), succeeded=False)
             return result
 
@@ -532,7 +551,7 @@ class GridWorld:
 
         # action known, but agent not capable of performing it
         elif action_name in self.__all_actions.keys() and \
-                action_name not in self.registered_agents[agent_id].action_set:
+                action_name not in self.__registered_agents[agent_id].action_set:
             result = ActionResult(ActionResult.AGENT_NOT_CAPABLE, succeeded=False)
 
         # Check if action is known
@@ -557,10 +576,6 @@ class GridWorld:
         # Check if the action will succeed
         result = self.__check_action_is_possible(agent_id, action_name, action_kwargs)
 
-        # Set the current action and the result in the agent (appended to its properties so others know what agent did)
-        self.registered_agents[agent_id]._set_current_action(action_name=action_name, action_result=result,
-                                                             action_args=action_kwargs)
-
         # If it will succeed, perform it.
         if result.succeeded:
 
@@ -575,18 +590,8 @@ class GridWorld:
             # Apply world mutation
             result = action.mutate(self, agent_id, **action_kwargs)
 
-            # Obtain the duration of the action, defaults to the one of the action class if not in action_kwargs, and
-            # otherwise that of Action
-            duration_in_ticks = action.duration_in_ticks
-            if "duration_in_ticks" in action_kwargs.keys():
-                duration_in_ticks = action_kwargs["duration_in_ticks"]
-
-            # The agent is now busy performing this action
-            self.registered_agents[agent_id]._set_agent_busy(curr_tick=self.__current_nr_ticks,
-                                                             action_duration=duration_in_ticks)
-
             # Get agent's send_result function
-            set_action_result = self.registered_agents[agent_id].set_action_result_func
+            set_action_result = self.__registered_agents[agent_id].set_action_result_func
             # Send result of mutation to agent
             set_action_result(result)
 
@@ -596,24 +601,51 @@ class GridWorld:
         # Whether the action succeeded or not, we return the result
         return result
 
+    def __set_agent_busy(self, action_name, action_kwargs, agent_id):
+
+        # Check if the action_name is None, in which case we simply idle for one tick
+        if action_name is None:
+            duration_in_ticks = 1
+
+        else:  # action is not None
+
+            # Get action class
+            action_class = self.__all_actions[action_name]
+            # Make instance of action
+            action = action_class()
+
+            # Obtain the duration of the action, defaults to the one of the action class if not in action_kwargs, and
+            # otherwise that of Action
+            duration_in_ticks = action.duration_in_ticks
+            if "duration_in_ticks" in action_kwargs.keys():
+                duration_in_ticks = action_kwargs["duration_in_ticks"]
+
+        # The agent is now busy performing this action
+        self.registered_agents[agent_id]._set_agent_busy(curr_tick=self.current_nr_ticks,
+                                                         action_duration=duration_in_ticks)
+
+        # Set the action and result in the agent so we know where the agent is busy with. In addition this is appended
+        # to its properties so others know what agent did)
+        self.registered_agents[agent_id]._set_current_action(action_name=action_name, action_args=action_kwargs)
+
     def __update_agent_location(self, agent_id):
         # Get current location of the agent
-        loc = self.registered_agents[agent_id].location
+        loc = self.__registered_agents[agent_id].location
         # Check if that spot in our list that represents the grid, is None or a list of other objects
-        if self.grid[loc[1], loc[0]] is not None:  # If not None, we append the agent id to it
-            self.grid[loc[1], loc[0]].append(agent_id)
+        if self.__grid[loc[1], loc[0]] is not None:  # If not None, we append the agent id to it
+            self.__grid[loc[1], loc[0]].append(agent_id)
         else:  # if none, we make a new list with the agent id in it.
-            self.grid[loc[1], loc[0]] = [agent_id]
+            self.__grid[loc[1], loc[0]] = [agent_id]
 
         # Update the Agent Avatar's location as well
-        self.registered_agents[agent_id].location = loc
+        self.__registered_agents[agent_id].location = loc
 
     def __update_obj_location(self, obj_id):
-        loc = self.environment_objects[obj_id].location
-        if self.grid[loc[1], loc[0]] is not None:
-            self.grid[loc[1], loc[0]].append(obj_id)
+        loc = self.__environment_objects[obj_id].location
+        if self.__grid[loc[1], loc[0]] is not None:
+            self.__grid[loc[1], loc[0]].append(obj_id)
         else:
-            self.grid[loc[1], loc[0]] = [obj_id]
+            self.__grid[loc[1], loc[0]] = [obj_id]
 
     def __warn(self, warn_str):
         return f"[@{self.__current_nr_ticks}] {warn_str}"
@@ -623,7 +655,7 @@ class GridWorld:
         # Perform the initiali visualisation of the process is set and the boolean for running it is true
         if self.__run_visualization_server and self.__visualisation_process is None:
             # Loop through all agents, apply their observe to get their state for the gui
-            for agent_id, agent_obj in self.registered_agents.items():
+            for agent_id, agent_obj in self.__registered_agents.items():
                 # TODO the agent's filtered state is now empty as it has not yet performed an action. Fill it or forget
                 # TODO about initializing the agent views?
                 # Obtain the agent's filtered state
