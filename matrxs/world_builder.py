@@ -20,6 +20,7 @@ from matrxs.utils.utils import get_inheritence_path, get_default_value, _get_lin
 from matrxs.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
 from matrxs.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
 
+
 class WorldBuilder:
 
     def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=1000, run_sail_api=False,
@@ -228,22 +229,6 @@ class WorldBuilder:
 
     def add_logger(self, logger_class, log_strategy=None, save_path=None, file_name=None,
                    file_extension=None, delimiter=None, **kwargs):
-        """ Missing docs
-
-        Parameters
-        ----------
-        logger_class
-        log_strategy
-        save_path
-        file_name
-        file_extension
-        delimiter
-        kwargs
-
-        Returns
-        -------
-
-        """
 
         if issubclass(logger_class, GridWorldLogger):
 
@@ -271,10 +256,9 @@ class WorldBuilder:
 
     def add_agent(self, location: Union[tuple, list], agent_brain: AgentBrain, name,
                   customizable_properties: Union[tuple, list] = None, sense_capability: SenseCapability = None,
-                  is_traversable: bool = True, team: str = None,
-                  possible_actions: list = None, is_movable: bool = None, visualize_size: float = None,
-                  visualize_shape: Union[float, str] = None, visualize_colour: str = None, visualize_depth: int = None,
-                  visualize_opacity: float = None,
+                  is_traversable: bool = True, team: str = None, possible_actions: list = None, is_movable: bool = None,
+                  visualize_size: float = None, visualize_shape: Union[float, str] = None, visualize_colour: str = None,
+                  visualize_depth: int = None, visualize_opacity: float = None,
                   **custom_properties):
         """The helper method within a WorldFactory instance to add a single agent.
 
@@ -1059,6 +1043,7 @@ class WorldBuilder:
                 'callback_agent_get_action': agent._get_action,
                 'callback_agent_set_action_result': agent._set_action_result,
                 'callback_agent_observe': agent.filter_observations,
+                'callback_agent_log': agent._get_log_data,
                 'callback_agent_get_messages': agent._get_messages,
                 'callback_agent_set_messages': agent._set_messages,
                 'callback_agent_initialize': agent.initialize,

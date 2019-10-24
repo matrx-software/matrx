@@ -178,6 +178,16 @@ class AgentBrain:
 
         return action, action_kwargs
 
+    def get_log_data(self):
+        """
+        Method that is called by the GridWorld to obtain this agent's brain specific data that is send towards all the
+        loggers.
+
+        :return:
+            A dictionary with the keys as columns and values as the data to be logged.
+        """
+        return {}
+
     def send_message(self, message):
         """
         Method that allows you to construct a message that will be send to either a specified agent, a team of agents
@@ -280,6 +290,9 @@ class AgentBrain:
         # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
         # action if needed.
         return filtered_state, self.agent_properties, action, action_kwargs
+
+    def _get_log_data(self):
+        return self.get_log_data()
 
     def _set_action_result(self, action_result):
         """

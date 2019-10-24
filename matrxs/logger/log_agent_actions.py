@@ -11,6 +11,6 @@ class LogActions(GridWorldLogger):
     def log(self, grid_world: GridWorld, agent_data: dict):
         log_data = {}
         for agent_id, agent_body in grid_world.registered_agents.items():
-            log_data[agent_id] = agent_body.current_action()
+            log_data[agent_id] = agent_body.current_action
 
         return log_data
