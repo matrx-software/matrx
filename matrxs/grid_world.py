@@ -88,8 +88,6 @@ class GridWorld:
         is_done = False
         while not is_done:
             is_done, tick_duration = self.__step()
-            thread = threading.Thread(target=logMatrx.log_object_custom, args=(self, [], {"tick"},))
-            thread.start()
 
     def get_env_object(self, requested_id, obj_type=None):
         obj = None
