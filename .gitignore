@@ -15,3 +15,5 @@ generalStructure.log
 logData.log
 
 *.log
+
+log_data/
