@@ -9,6 +9,7 @@ class AgentBody(EnvObject):
     def __init__(self, location, possible_actions, sense_capability, class_callable,
                  callback_agent_get_action, callback_agent_set_action_result, callback_agent_observe,
                  callback_agent_get_messages, callback_agent_set_messages, callback_agent_initialize,
+                 callback_agent_log,
                  visualize_size, visualize_shape, visualize_colour, visualize_depth, visualize_opacity,
                  is_traversable, team, name, is_movable,
                  is_human_agent, customizable_properties,
@@ -94,6 +95,7 @@ class AgentBody(EnvObject):
         self.filter_observations = callback_agent_observe
         self.get_messages_func = callback_agent_get_messages
         self.set_messages_func = callback_agent_set_messages
+        self.get_log_data = callback_agent_log
         self.brain_initialize_func = callback_agent_initialize
 
         # Set all mandatory properties

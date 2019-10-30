@@ -84,7 +84,7 @@ class AgentBrain:
                 agents.append(obj)
         selected_agent = self.rnd_gen.choice(agents)
         message_content = f"Hello, my name is {self.agent_name}"
-        self.send_message(message_content=message_content, to_id=selected_agent['agent_id'])
+        self.send_message(Message(content=message_content, from_id=self.agent_id, to_id=selected_agent['obj_id']))
 
         # Select a random action
         if self.action_set:
@@ -177,6 +177,16 @@ class AgentBrain:
                 action_kwargs['object_id'] = self.rnd_gen.choice(doors)
 
         return action, action_kwargs
+
+    def get_log_data(self):
+        """
+        Method that is called by the GridWorld to obtain this agent's brain specific data that is send towards all the
+        loggers.
+
+        :return:
+            A dictionary with the keys as columns and values as the data to be logged.
+        """
+        return {}
 
     def send_message(self, message):
         """
@@ -280,6 +290,9 @@ class AgentBrain:
         # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
         # action if needed.
         return filtered_state, self.agent_properties, action, action_kwargs
+
+    def _get_log_data(self):
+        return self.get_log_data()
 
     def _set_action_result(self, action_result):
         """
