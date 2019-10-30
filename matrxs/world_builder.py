@@ -86,6 +86,10 @@ class WorldBuilder:
         if not isinstance(shape, list) and not isinstance(shape, tuple) and len(shape) != 2:
             raise ValueError(f"The given grid shape {shape} is not of type List, Tuple or of length two.")
 
+        # convert int to float
+        if isinstance(tick_duration, int):
+            tick_duration = float(tick_duration)
+
         # Check that tick duration is of float and a positive number.
         if not isinstance(tick_duration, float) and tick_duration >= 0.0:
             raise ValueError(f"The given tick_duration {tick_duration} should be a Float and larger or equal than 0.0.")
@@ -984,9 +988,12 @@ class WorldBuilder:
 
         else:  # else we need to check what this object's constructor requires and obtain those properties only
             # Get all variables required by constructor
-            argspecs = inspect.getargspec(callable_class)
+            argspecs = inspect.getfullargspec(callable_class)
             args = argspecs.args  # does not give *args or **kwargs names
             defaults = argspecs.defaults  # defaults (if any) of the last n elements in args
+            varkw = argspecs.varkw # **kwargs names
+
+            argspecsv2 = inspect.getfullargspec(callable_class)
 
             # Now assign the default values to kwargs dictionary
             args = OrderedDict({arg: "not_set" for arg in reversed(args[1:])})
@@ -1009,12 +1016,20 @@ class WorldBuilder:
                     args[arg] = mandatory_props[arg]
 
             # We provide a warning if some custom properties are given which are not used for this class
-            not_used = [prop_name for prop_name in custom_props.keys() if prop_name not in args.keys()]
-            if len(not_used) > 0:
+            kwargs = [prop_name for prop_name in custom_props.keys() if prop_name not in args.keys()]
+            if varkw is None and len(kwargs) > 0:
                 warnings.warn(f"The following properties are not used in the creation of environment object of type "
-                              f"{callable_class.__name__} with name {mandatory_props['name']}; {not_used}")
+                              f"{callable_class.__name__} with name {mandatory_props['name']}; {kwargs}, because "
+                              f"the class does nto have a **kwargs argument in the constructor.")
+
+            # if a **kwargs argument was defined in the object constructor, pass all custom properties to the object
+            elif varkw is not None and len(kwargs) > 0:
+                for arg in kwargs:
+                    args[arg] = custom_props[arg]
+
 
         args = self.__instantiate_random_properties(args)
+
         env_object = callable_class(**args)
 
         return env_object
