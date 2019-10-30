@@ -32,7 +32,7 @@ class Navigator:
         self.__nr_waypoints = 0
 
         # Track which waypoint we are currently navigating to (if any)
-        self.__current_waypoint = None
+        self.__current_waypoint_idx = None
 
         # An ordered dict to store the entire route through all waypoints
         self.__route = OrderedDict()
@@ -65,7 +65,7 @@ class Navigator:
         return [(k, wp.location) for k, wp in self.__waypoints.items() if not wp.is_visited()]
 
     def get_current_waypoint(self):
-        wp = self.__current_waypoint()
+        wp = self.__waypoints[self.__current_waypoint_idx]
         return wp.location
 
     def get_move_action(self, state_tracker: StateTracker):
@@ -93,7 +93,7 @@ class Navigator:
 
     def reset(self):
         self.is_done = False
-        self.__current_waypoint = 0
+        self.__current_waypoint_idx = 0
         for wp in self.__waypoints.values():
             wp.reset()
 
@@ -102,10 +102,10 @@ class Navigator:
         self.__init__(self.__agent_id, self.__action_set, self.__algorithm, self.is_circular)
 
     def __get_current_waypoint(self):
-        if self.__current_waypoint is None:
-            self.__current_waypoint = 0
+        if self.__current_waypoint_idx is None:
+            self.__current_waypoint_idx = 0
 
-        wp = self.__waypoints[self.__current_waypoint]
+        wp = self.__waypoints[self.__current_waypoint_idx]
 
         return wp
 
@@ -118,9 +118,9 @@ class Navigator:
     def __update_waypoints(self, agent_loc):
         wp = self.__get_current_waypoint()
         if wp.is_visited(agent_loc):
-            self.__current_waypoint += 1
+            self.__current_waypoint_idx += 1
 
-        if self.__current_waypoint >= self.__nr_waypoints:
+        if self.__current_waypoint_idx >= self.__nr_waypoints:
             self.is_done = True
 
     def __get_route(self, state_tracker: StateTracker):
