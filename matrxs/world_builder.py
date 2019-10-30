@@ -23,8 +23,8 @@ from matrxs.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
 
 class WorldBuilder:
 
-    def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=1000, run_sail_api=False,
-                 run_visualization_server=True, visualization_bg_clr="#C2C2C2", visualization_bg_img=None,
+    def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=1000, run_matrxs_api=False,
+                 run_visualization_server=False, visualization_bg_clr="#C2C2C2", visualization_bg_img=None,
                  verbose=False):
         """
         A builder to create one or more worlds.
@@ -44,8 +44,8 @@ class WorldBuilder:
         simulation_goal : int, SimulationGoal, list of SimulationGoal, optional
             The goal or goals of the world, either a single SimulationGoal, a list of such or a positive non-zero
             integer to denote the maximum number of 'ticks' the world(s) have to run. Defaults to 1000.
-        run_sail_api : bool, optional
-            Not Yet Implemented.
+        run_matrxs_api : bool, optional
+            ToDocument
         run_visualization_server : bool, optional
             Not Yet Implemented.
         visualization_bg_clr : str, optional
@@ -106,8 +106,9 @@ class WorldBuilder:
                              f"number of ticks the world should run (negative for infinite).")
 
         # Check if the sail api is set to True and raise a NotImplementedError.
-        if run_sail_api is True:
-            raise NotImplementedError("You set the boolean run_sail_api to True. This setting is not implemented yet.")
+        if run_matrxs_api is True:
+            # raise NotImplementedError("You set the boolean run_sail_api to True. This setting is not implemented yet.")
+            pass
 
         # Check the background color
         if not isinstance(visualization_bg_clr, str) and len(visualization_bg_clr) != 7 and \
@@ -139,7 +140,7 @@ class WorldBuilder:
         self.world_settings = self.__set_world_settings(shape=shape,
                                                         tick_duration=tick_duration,
                                                         simulation_goal=simulation_goal,
-                                                        run_sail_api=run_sail_api,
+                                                        run_matrxs_api=run_matrxs_api,
                                                         run_visualization_server=run_visualization_server,
                                                         visualization_bg_clr=visualization_bg_clr,
                                                         visualization_bg_img=visualization_bg_img,
@@ -213,7 +214,7 @@ class WorldBuilder:
         self.__reset_random()
         return world
 
-    def __set_world_settings(self, shape, tick_duration, simulation_goal, run_sail_api,
+    def __set_world_settings(self, shape, tick_duration, simulation_goal, run_matrxs_api,
                              run_visualization_server, rnd_seed, visualization_bg_clr, visualization_bg_img, verbose):
 
         if rnd_seed is None:
@@ -222,7 +223,7 @@ class WorldBuilder:
         world_settings = {"shape": shape,
                           "tick_duration": tick_duration,
                           "simulation_goal": simulation_goal,
-                          "run_sail_api": run_sail_api,
+                          "run_matrxs_api": run_matrxs_api,
                           "run_visualization_server": run_visualization_server,
                           "rnd_seed": rnd_seed,
                           "visualization_bg_clr": visualization_bg_clr,

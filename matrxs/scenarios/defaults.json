@@ -6,7 +6,7 @@
     "step_duration" : 0.1,
     "time_focus": "step",
     "run_visualisation_server" : false,
-    "run_sail_api": false,
+    "run_matrxs_api": false,
     "simulation_goal": {
       "goal_class": "LimitedTimeGoal",
       "arguments":

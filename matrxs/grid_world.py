@@ -2,29 +2,29 @@ import datetime
 import os.path
 import warnings
 import gevent
-import threading
 from collections import OrderedDict
 
 from matrxs.logger.logger import GridWorldLogger
-from matrxs.visualization import logMatrx
 from matrxs.actions.object_actions import *
 from matrxs.utils.utils import get_all_classes
 from matrxs.objects.simple_objects import AreaTile
-from matrxs.visualization import server
-from matrxs.visualization.visualizer import Visualizer
+from matrxs.API import server
+from matrxs.API.visualizer import Visualizer
 from matrxs.objects.env_object import EnvObject
+from matrxs.API import api
 
 
 class GridWorld:
 
-    def __init__(self, shape, tick_duration, simulation_goal, run_sail_api=True, run_visualization_server=True,
+    def __init__(self, shape, tick_duration, simulation_goal, run_matrxs_api=True, run_visualization_server=True,
                  rnd_seed=1, visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False):
         self.__tick_duration = tick_duration  # How long each tick should take (process sleeps until thatr time is passed)
         self.__simulation_goal = simulation_goal  # The simulation goal, the simulation end when this/these are reached
         self.__shape = shape  # The width and height of the GridWorld
-        self.__run_sail_api = run_sail_api  # Whether we should run the (SAIL) API
-        self.__run_visualization_server = run_visualization_server  # Whether we should run the (Visualisation) API
+        self.__run_matrxs_api = run_matrxs_api  # Whether we should run the MATRXS API
+        self.__run_visualization_server = run_visualization_server  # Whether we should run the visualization server
         self.__visualisation_process = None  # placeholder for the visualisation server process
+        self.__api_process = None # placeholder for the API server process
         self.__visualization_bg_clr = visualization_bg_clr  # The background color of the visualisation
         self.__visualization_bg_img = visualization_bg_img  # The background image of the visualisation
         self.__verbose = verbose  # Set whether we should print anything or not
@@ -73,6 +73,15 @@ class GridWorld:
 
             # thread = threading.Thread(target=logMatrx.log_object_complete, args=(self,))
             # thread.start()
+
+
+            # start the MATRXS API server if we need to
+            started_API = False
+            if self.__run_matrxs_api and self.__api_process is None:
+
+                # start the MATRXS API server
+                started_API = self.__start_API()
+
 
             # Set initialisation boolean
             self.__is_initialized = True
@@ -681,6 +690,19 @@ class GridWorld:
         self.__visualisation_process = True
 
         return succeeded
+
+    def __start_API(self):
+        # bool to denote whether we succeeded in starting the API server
+        succeeded = True
+
+        # Set the server to debug mode if we are verbose
+        # TODO Enable this when the debugging of the API is correct)
+        # server.debug = self.__verbose
+
+        # Create the process and run it
+        api.run_api()
+        self.__api_process = True
+
 
     @property
     def messages_send_previous_tick(self):
