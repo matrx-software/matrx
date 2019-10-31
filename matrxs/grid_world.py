@@ -318,7 +318,15 @@ class GridWorld:
         if self.__is_done:
             return self.__is_done, 0.
 
-        # Go over all agents, detect what each can detect, figure out what actions are possible and send these to
+        # initialize the saved states for this tick
+        if self.__run_matrxs_api:
+            # add new dictionary that will contain all states of this tick to the states list
+            api.states.append({})
+            # set tick
+            api.current_tick = self.__current_nr_ticks
+
+
+            # Go over all agents, detect what each can detect, figure out what actions are possible and send these to
         # that agent. Then receive the action back and store the action in a buffer.
         # Also, update the local copy of the agent properties, and save the agent's state for the GUI.
         # Then go to the next agent.
@@ -335,8 +343,13 @@ class GridWorld:
 
                 # only do the filter observation method to be able to update the agent's state to the API
                 filtered_agent_state = agent_obj.filter_observations(state)
-                self.__visualizer._save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
-                                              state=filtered_agent_state)
+                # self.__visualizer._save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
+                #                               state=filtered_agent_state)
+
+                # save the current agent's state for the visualizer
+                if self.__run_matrxs_api:
+                    api.states[self.__current_nr_ticks][agent_id] = {'state': filtered_agent_state,
+                                                                     'agent_inheritence_chain': agent_obj.class_inheritance}
 
                 # if this busy agent is at its last tick of waiting, we want to actually perform the action
                 if agent_obj._at_last_action_duration_tick(curr_tick=self.__current_nr_ticks):
@@ -349,8 +362,9 @@ class GridWorld:
 
                 # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
                 if agent_obj.is_human_agent:
-                    usrinp = self.__visualizer._userinputs[agent_id.lower()] if \
-                        agent_id.lower() in self.__visualizer._userinputs else None
+                    # usrinp = self.__visualizer._userinputs[agent_id.lower()] if \
+                    #     agent_id.lower() in self.__visualizer._userinputs else None
+                    usrinp = None
                     filtered_agent_state, agent_properties, action_class_name, action_kwargs = \
                         agent_obj.get_action_func(state=state, agent_properties=agent_obj.properties, agent_id=agent_id,
                                                   userinput=usrinp)
@@ -387,14 +401,24 @@ class GridWorld:
                             self.__message_buffer[mssg.to_id].append(mssg)
 
             # save what the agent observed to the visualizer
-            self.__visualizer._save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
-                                          state=filtered_agent_state)
+            # self.__visualizer._save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
+            #                               state=filtered_agent_state).
+
+            # save the current agent's state for the visualizer
+            if self.__run_matrxs_api:
+                api.states[self.__current_nr_ticks][agent_id] = {'state': filtered_agent_state,
+                                                                 'agent_inheritence_chain': agent_obj.class_inheritance}
 
         # save the state of the god view in the visualizer
-        self.__visualizer._save_state(inheritance_chain="god", id="god", state=self.__get_complete_state())
+        # self.__visualizer._save_state(inheritance_chain="god", id="god", state=self.__get_complete_state())
+
+        # save the god view state
+        if self.__run_matrxs_api:
+            api.states[self.__current_nr_ticks]['god'] = {'state': self.__get_complete_state(),
+                                                             'agent_inheritence_chain': "god"}
 
         # update the visualizations of all (human)agents and god
-        self.__visualizer._update_guis(tick=self.__current_nr_ticks)
+        # self.__visualizer._update_guis(tick=self.__current_nr_ticks)
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
         for agent_id, action in action_buffer.items():

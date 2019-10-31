@@ -21,40 +21,30 @@ app = Flask(__name__, template_folder='static/templates')
 async_mode = "gevent"  # gevent (preferred) or eventlet.
 
 # variables to be read and set by MATRXS
-states = {}  # TODO Gridworld needs to fill this dict
+# states is a list of length 'current_tick' with a dictionary containing all states of that tick, indexed by agent_id
+states = []
 current_tick = 0
 
-
-def flask_thread():
-    app.run(host='0.0.0.0', port=3000, debug=False, use_reloader=False)
+userinput = {}
 
 
 
-def run_api():
-    print("Starting background API server")
-    global runs
-    runs = True
+#########################################################################
+# API connection methods
+#########################################################################
 
-    print("Initialized app:", app)
-    API_thread = threading.Thread(target=flask_thread)
-    API_thread.start()
-
-if __name__ == "__main__":
-    run_api()
-
-
-# @app.route('/get_states', methods=['GET', 'POST'])
-# def get_states():
-#     return "blabla"
-#
-#
-# @app.errorhandler(400)
-# def custom400(error):
-#     response = {'message': error.description['message']}
-
+@app.route('/get_tick', methods=['GET', 'POST'])
+def get_tick():
+    print(f"Returning tick {current_tick}")
+    return current_tick
 
 @app.route('/get_states/<tick>', methods=['GET', 'POST'])
 def get_states(tick):
+    """
+    Returns the states of all agents and the god view from tick 'tick' onwards.
+    :param tick: integer indicating from which tick onwards to send the states.
+    :return: States from tick 'tick' onwards of all agents.
+    """
     print(f"Sending states from tick {tick} onwards")
 
     if tick not in states:
@@ -65,11 +55,156 @@ def get_states(tick):
 
     return "blabla"
 
-@app.route('/get_tick', methods=['GET', 'POST'])
-def get_tick():
-    print(f"Sending latest tick")
-    return "blabla"
 
+@app.route('/get_states/<tick>/<agent_ids>', methods=['GET', 'POST'])
+def get_states_specific_agents(tick, agent_ids):
+    """
+    Returns the states starting from tick 'tick' for agent 'agent_id'.
+    :param tick: integer indicating from which tick onwards to send the states.
+    :param agent_ids: integer for indicating a specific agent_id, or a list of agent_ids for returning the states of
+    multiple agents
+    :return: States from tick 'tick' onwards for agent_ids 'agent_ids'
+    """
+    print(f"Sending states from tick {tick} onwards for agents IDs {agent_ids}")
+
+    if tick not in states:
+        # response = jsonify({'message': f"Tick has not occured yet, current tick is {current_tick}"})
+        # response.status_code = 400
+        # return response
+        return {}
+
+    return "States of multiple agents"
+
+
+@app.route('/get_god_state/<tick>', methods=['GET', 'POST'])
+def get_god_state(tick):
+    """
+    Returns the god states starting from tick 'tick'
+    :param tick: integer indicating from which tick onwards to send the states.
+    :return: States from tick 'tick' onwards for the god view
+    """
+    # check for validity and return an error if not valid
+    API_call_valid, error = check_API_request(tick)
+    if not API_call_valid:
+        return create_error_response(error.error_code, error.error_message)
+
+    print(f"Sending states from tick {tick} onwards for the god view")
+
+
+    if tick not in states:
+        # response = jsonify({'message': f"Tick has not occured yet, current tick is {current_tick}"})
+        # response.status_code = 400
+        # return response
+        return {}
+    return "States of multiple agents"
+
+
+
+#########################################################################
+# API helper methods
+#########################################################################
+
+def check_API_request(tick=None, ids=None, ids_required=False):
+    """
+    Checks if the API request is in valid format, and the targeted values exist
+    :param tick: MATRXS tick
+    :param ids: string with 1 agent ID, or list of agent IDS
+    :return: Success (Boolean indicating whether it is valid or not), Error (if any, prodiving the type and a message)
+    See for the error codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.0/com.ibm.qradar.doc/c_rest_api_errors.html
+    """
+    # check if tick is a valid format
+    if not isinstance(tick, int):
+        return False, {'error_code': 400, 'error_message': f'Tick has to be an integer, but is of type {type(tick)}'}
+
+    # check if the tick has actually occured
+    if not tick in range(0, current_tick):
+        return False, {'error_code': 400, 'error_message': f'Indicated tick does not exist, has to be in range 0 - {current_tick}, but is {tick}'}
+
+    # if this API call requires ids, check this variable on validity as well
+    if ids_required:
+
+        # check if ids variable is of a valid type
+        if not (isinstance(ids, str) or isinstance(ids, list)):
+            return False, {'error_code': 400, 'error_message': f'Provided IDs are not of valid format. Provides IDs is of '
+                                                               f'type {type(ids)} but should be either of type string for '
+                                                               f'requesting states of 1 agent (e.g. "god"), or a list of '
+                                                               f'IDs(string) for requesting states of multiple agents'}
+
+        # check if the provided ids exist for all requested ticks
+        ids = [ids] if isinstance(ids, str) else ids
+        for t in range(tick, current_tick):
+            for id in ids:
+                if id not in states[t]:
+                    return False, {'error_code': 400,
+                                   'error_message': f'Trying to fetch the state for agent with ID {id} for tick {t}, but '
+                                                    f'does not exist.'}
+
+    # all checks cleared, so return with success and no error message
+    return True, None
+
+def fetch_states(tick, ids=None):
+    """
+    This function filters the states desired by the user, as specified by the tick and (agent)ids.
+    :param tick: Tick from which onwards to return the states. Thus will return [tick:current_tick]
+    :param ids: Id(s) from agents/god for which to return the states. Can be a string (1 id, e.g. 'god'), or a list of
+    strings.
+    :return: Returns the filtered states from tick 'tick' onwards to 'current_tick', containing the states for the agents
+    as specified in 'ids'.
+    """
+    # return all states
+    if ids is None:
+        return states[tick:]
+
+    # convert ints to lists so we can use 1 uniform approach
+    elif isinstance(ids, str):
+        ids = [ids]
+
+    # create a list containing the states from tick to current_tick containing the states of all desired agents/god
+    filtered_states = []
+    for t in range(tick, current_tick):
+        states_this_tick = {}
+
+        # add each agent's state for this tick
+        for id in ids:
+            states_this_tick[id] = states[t][id]
+
+        # save the states of all filtered agents for this tick
+        filtered_states.append(states_this_tick)
+
+    return filtered_states
+
+
+def create_error_response(code, message):
+    response = jsonify({'message': message})
+    response.status_code = code
+    return response
+
+#########################################################################
+# API Flask methods
+#########################################################################
+
+def flask_thread():
+    """
+    Starts the Flask server on localhost:3000
+    """
+    app.run(host='0.0.0.0', port=3000, debug=False, use_reloader=False)
+
+def run_api():
+    """
+    Creates a seperate Python thread in which the API (Flask) is started
+    :return: MATRXS API Python thread
+    """
+    print("Starting background API server")
+    global runs
+    runs = True
+
+    print("Initialized app:", app)
+    API_thread = threading.Thread(target=flask_thread)
+    API_thread.start()
+    return API_thread
+
+if __name__ == "__main__":
+    run_api()
 
 
 
