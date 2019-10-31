@@ -1,8 +1,7 @@
 import threading
-from gevent import sleep
 
-from flask import Flask, render_template, jsonify, abort
-from flask_socketio import SocketIO
+from flask import Flask, jsonify, abort
+from flask_cors import CORS
 
 '''
 This file holds the code for the MATRXS RESTful API. 
@@ -15,16 +14,16 @@ For visualization, see the seperate MATRXS visualization folder / package.
 debug = True
 runs = True  # TODO : bool to stop the API during runtime
 
-app = Flask(__name__, template_folder='static/templates')
-# app = None
-# io_socket = None
-async_mode = "gevent"  # gevent (preferred) or eventlet.
+app = Flask(__name__)
+CORS(app)
 
-# variables to be read and set by MATRXS
+# variables to be set by MATRXS
 # states is a list of length 'current_tick' with a dictionary containing all states of that tick, indexed by agent_id
 states = []
 current_tick = 0
+tick_duration = 0.0
 
+# variables to be read (only!) by MATRXS and set (only!) through API calls
 userinput = {}
 
 
@@ -33,10 +32,12 @@ userinput = {}
 # API connection methods
 #########################################################################
 
-@app.route('/get_tick', methods=['GET', 'POST'])
+
+
+@app.route('/get_info', methods=['GET', 'POST'])
 def get_tick():
     print(f"Returning tick {current_tick}")
-    return jsonify(current_tick)
+    return jsonify({"tick": current_tick, "tick_duration": tick_duration})
 
 @app.route('/get_states/<tick>', methods=['GET', 'POST'])
 def get_states(tick):
@@ -100,6 +101,7 @@ def get_god_state(tick):
 def bad_request(e):
     print("Throwing error", e)
     return jsonify(error=str(e)), 400
+
 
 #########################################################################
 # API helper methods
@@ -219,87 +221,3 @@ if __name__ == "__main__":
     run_api()
 
 
-
-# def do_stuff():
-#     while True:
-#         print("API running in bg thread")
-#         sleep(1)
-
-
-
-#
-# @app.route('/update_states', methods=['POST'])
-# def update_states():
-#     pass
-#
-# @app.route('/settings/tick_duration')
-# def set_tick_duration():
-#     pass
-#
-#
-# @app.route('/human-agent/<id>')
-# def human_agent_view(id):
-#     """
-#     Route for HumanAgentBrain
-#
-#     Parameters
-#     ----------
-#     id
-#         The human agent ID. Is obtained from the URL.
-#
-#     Returns
-#     -------
-#     str
-#         The template for this agent's view.
-#
-#     """
-#     return render_template('human_agent.html', id=id)
-#
-#
-# # route for agent, get the ID from the URL
-# @app.route('/agent/<id>')
-# def agent_view(id):
-#     """
-#     Route for AgentBrain
-#
-#     Parameters
-#     ----------
-#     id
-#         The agent ID. Is obtained from the URL.
-#
-#     Returns
-#     -------
-#     str
-#         The template for this agent's view.
-#
-#     """
-#     return render_template('agent.html', id=id)
-#
-#
-# @app.route('/god')
-# def god_view():
-#     """
-#     Route for the 'god' view which contains the ground truth of the world without restrictions.
-#
-#     Returns
-#     -------
-#     str
-#         The template for this view.
-#
-#     """
-#     return render_template('god.html')
-#
-#
-# @app.route('/avatars')
-# # route for agent picture
-# def image():
-#     """
-#     Rout for the images for agents.
-#
-#     Returns
-#     -------
-#     str
-#         The image template.
-#
-#     """
-#     return render_template('avatars.html')

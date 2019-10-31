@@ -8,8 +8,8 @@ from matrxs.logger.logger import GridWorldLogger
 from matrxs.actions.object_actions import *
 from matrxs.utils.utils import get_all_classes
 from matrxs.objects.simple_objects import AreaTile
-from matrxs.API import server
-from matrxs.API.visualizer import Visualizer
+from visualization import server
+from visualization.visualizer import Visualizer
 from matrxs.objects.env_object import EnvObject
 from matrxs.API import api
 
@@ -324,6 +324,7 @@ class GridWorld:
             api.states.append({})
             # set tick
             api.current_tick = self.__current_nr_ticks
+            api.tick_duration = self.__tick_duration
 
 
             # Go over all agents, detect what each can detect, figure out what actions are possible and send these to
