@@ -52,8 +52,6 @@ def join(message):
 # User input handling for human agent
 ###############################################
 
-#
-
 def handle_usr_inp(input):
     """
     Fetch user input messages sent from human agents

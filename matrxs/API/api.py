@@ -1,7 +1,7 @@
 import threading
 from gevent import sleep
 
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, abort
 from flask_socketio import SocketIO
 
 '''
@@ -36,7 +36,7 @@ userinput = {}
 @app.route('/get_tick', methods=['GET', 'POST'])
 def get_tick():
     print(f"Returning tick {current_tick}")
-    return current_tick
+    return jsonify(current_tick)
 
 @app.route('/get_states/<tick>', methods=['GET', 'POST'])
 def get_states(tick):
@@ -45,15 +45,14 @@ def get_states(tick):
     :param tick: integer indicating from which tick onwards to send the states.
     :return: States from tick 'tick' onwards of all agents.
     """
+    # check for validity and return an error if not valid
+    API_call_valid, error = check_API_request(tick)
+    if not API_call_valid:
+        print("API request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
     print(f"Sending states from tick {tick} onwards")
-
-    if tick not in states:
-        # response = jsonify({'message': f"Tick has not occured yet, current tick is {current_tick}"})
-        # response.status_code = 400
-        # return response
-        return {}
-
-    return "blabla"
+    return jsonify(fetch_states(tick))
 
 
 @app.route('/get_states/<tick>/<agent_ids>', methods=['GET', 'POST'])
@@ -65,15 +64,14 @@ def get_states_specific_agents(tick, agent_ids):
     multiple agents
     :return: States from tick 'tick' onwards for agent_ids 'agent_ids'
     """
+    # check for validity and return an error if not valid
+    API_call_valid, error = check_API_request(tick)
+    if not API_call_valid:
+        print("API request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
     print(f"Sending states from tick {tick} onwards for agents IDs {agent_ids}")
-
-    if tick not in states:
-        # response = jsonify({'message': f"Tick has not occured yet, current tick is {current_tick}"})
-        # response.status_code = 400
-        # return response
-        return {}
-
-    return "States of multiple agents"
+    return jsonify(fetch_states(tick, agent_ids))
 
 
 @app.route('/get_god_state/<tick>', methods=['GET', 'POST'])
@@ -86,19 +84,22 @@ def get_god_state(tick):
     # check for validity and return an error if not valid
     API_call_valid, error = check_API_request(tick)
     if not API_call_valid:
-        return create_error_response(error.error_code, error.error_message)
+        print("API request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
 
     print(f"Sending states from tick {tick} onwards for the god view")
+    return jsonify(fetch_states(tick))
 
 
-    if tick not in states:
-        # response = jsonify({'message': f"Tick has not occured yet, current tick is {current_tick}"})
-        # response.status_code = 400
-        # return response
-        return {}
-    return "States of multiple agents"
 
+#########################################################################
+# Errors
+#########################################################################
 
+@app.errorhandler(400)
+def bad_request(e):
+    print("Throwing error", e)
+    return jsonify(error=str(e)), 400
 
 #########################################################################
 # API helper methods
@@ -113,7 +114,10 @@ def check_API_request(tick=None, ids=None, ids_required=False):
     See for the error codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.0/com.ibm.qradar.doc/c_rest_api_errors.html
     """
     # check if tick is a valid format
-    if not isinstance(tick, int):
+    # if not isinstance(tick, int):
+    try:
+        tick = int(tick)
+    except:
         return False, {'error_code': 400, 'error_message': f'Tick has to be an integer, but is of type {type(tick)}'}
 
     # check if the tick has actually occured
@@ -124,11 +128,14 @@ def check_API_request(tick=None, ids=None, ids_required=False):
     if ids_required:
 
         # check if ids variable is of a valid type
-        if not (isinstance(ids, str) or isinstance(ids, list)):
-            return False, {'error_code': 400, 'error_message': f'Provided IDs are not of valid format. Provides IDs is of '
-                                                               f'type {type(ids)} but should be either of type string for '
-                                                               f'requesting states of 1 agent (e.g. "god"), or a list of '
-                                                               f'IDs(string) for requesting states of multiple agents'}
+        if not isinstance(ids, str):
+            try:
+                ids = eval(ids)
+            except:
+                return False, {'error_code': 400, 'error_message': f'Provided IDs are not of valid format. Provides IDs is of '
+                                                                   f'type {type(ids)} but should be either of type string for '
+                                                                   f'requesting states of 1 agent (e.g. "god"), or a list of '
+                                                                   f'IDs(string) for requesting states of multiple agents'}
 
         # check if the provided ids exist for all requested ticks
         ids = [ids] if isinstance(ids, str) else ids
@@ -151,12 +158,16 @@ def fetch_states(tick, ids=None):
     :return: Returns the filtered states from tick 'tick' onwards to 'current_tick', containing the states for the agents
     as specified in 'ids'.
     """
+    tick = int(tick)
+
     # return all states
     if ids is None:
         return states[tick:]
 
     # convert ints to lists so we can use 1 uniform approach
-    elif isinstance(ids, str):
+    try:
+        ids = eval(ids)
+    except:
         ids = [ids]
 
     # create a list containing the states from tick to current_tick containing the states of all desired agents/god
@@ -178,6 +189,7 @@ def create_error_response(code, message):
     response = jsonify({'message': message})
     response.status_code = code
     return response
+
 
 #########################################################################
 # API Flask methods

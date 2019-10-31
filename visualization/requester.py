@@ -7,7 +7,7 @@ import numpy as np
 def send_data(data, print_response=False):
     """ Sends some data to the Flask server """
 
-    url = 'http://localhost:3000/get_states/1'
+    url = 'http://localhost:3000/get_states/6/["god"]'
     tick_start_time = datetime.datetime.now()
 
     # send the data as json to the url with a max timeout of 5 seconds
@@ -25,7 +25,7 @@ def send_data(data, print_response=False):
 
     # check for errors in the response
     if r.status_code != requests.codes.ok:
-        raise Exception("Error received from server", r.status_code)
+        raise Exception(f"API returned HTTP code {r.status_code}", r.content)
 
     return tick_duration.total_seconds()
 
