@@ -325,6 +325,7 @@ class GridWorld:
             # set tick
             api.current_tick = self.__current_nr_ticks
             api.tick_duration = self.__tick_duration
+            api.grid_size = self.shape
 
 
             # Go over all agents, detect what each can detect, figure out what actions are possible and send these to

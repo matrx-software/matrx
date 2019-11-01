@@ -22,6 +22,7 @@ CORS(app)
 states = []
 current_tick = 0
 tick_duration = 0.0
+grid_size = [1,1]
 
 # variables to be read (only!) by MATRXS and set (only!) through API calls
 userinput = {}
@@ -37,7 +38,7 @@ userinput = {}
 @app.route('/get_info', methods=['GET', 'POST'])
 def get_tick():
     print(f"Returning tick {current_tick}")
-    return jsonify({"tick": current_tick, "tick_duration": tick_duration})
+    return jsonify({"tick": current_tick, "tick_duration": tick_duration, "grid_size": grid_size})
 
 @app.route('/get_states/<tick>', methods=['GET', 'POST'])
 def get_states(tick):
