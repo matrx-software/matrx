@@ -5,16 +5,16 @@
  */
 
 var doVisualUpdates = true;
-var isFirstCall=true;
+var isFirstCall = true;
 
 /**
  * Check if the current tab is in focus or not
  */
-document.addEventListener('visibilitychange', function(){
-  doVisualUpdates = !document.hidden;
+document.addEventListener('visibilitychange', function() {
+    doVisualUpdates = !document.hidden;
 });
 
-$(document).ready(function(){
+$(document).ready(function() {
 
     var id = document.getElementById('id').innerHTML;
 
@@ -34,13 +34,15 @@ $(document).ready(function(){
 
         // request to be added to room so the server can send messages specific to this human agent
         console.log("Requesting to be added to room:", room)
-        socket.emit('join', {room: room});
+        socket.emit('join', {
+            room: room
+        });
     });
 
     /**
      * receive an update from the python server
      */
-    socket.on('update', function(data){
+    socket.on('update', function(data) {
         if (!doVisualUpdates) {
             console.log("Chrome in background, skipping");
             return;
@@ -52,11 +54,11 @@ $(document).ready(function(){
         tick = data.params.tick;
         vis_bg_clr = data.params.vis_bg_clr;
         vis_bg_img = data.params.vis_bg_img;
-        if(isFirstCall){
-            isFirstCall=false;
+        if (isFirstCall) {
+            isFirstCall = false;
             populateMenu(state, id);
             parseGifs(state);
-            }
+        }
         // draw the grid again
         requestAnimationFrame(function() {
             doTick(grid_size, state, tick, vis_bg_clr, vis_bg_img);
@@ -83,6 +85,9 @@ $(document).ready(function(){
         e = e || window.event;
 
         // send an update for every key pressed
-        socket.emit("userinput", {"key": e.key, 'id': id});
+        socket.emit("userinput", {
+            "key": e.key,
+            'id': id
+        });
     }
 });

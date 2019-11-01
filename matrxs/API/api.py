@@ -4,8 +4,8 @@ from flask import Flask, jsonify, abort
 from flask_cors import CORS
 
 '''
-This file holds the code for the MATRXS RESTful API. 
-External scripts can send POST and/or GET requests to retrieve state, tick and other information, and send 
+This file holds the code for the MATRXS RESTful API.
+External scripts can send POST and/or GET requests to retrieve state, tick and other information, and send
 userinput or other information to MATRXS. The API is a Flask (Python) webserver.
 
 For visualization, see the seperate MATRXS visualization folder / package.
@@ -123,7 +123,7 @@ def check_API_request(tick=None, ids=None, ids_required=False):
         return False, {'error_code': 400, 'error_message': f'Tick has to be an integer, but is of type {type(tick)}'}
 
     # check if the tick has actually occured
-    if not tick in range(0, current_tick):
+    if not tick in range(0, current_tick+1):
         return False, {'error_code': 400, 'error_message': f'Indicated tick does not exist, has to be in range 0 - {current_tick}, but is {tick}'}
 
     # if this API call requires ids, check this variable on validity as well
@@ -219,5 +219,3 @@ def run_api():
 
 if __name__ == "__main__":
     run_api()
-
-

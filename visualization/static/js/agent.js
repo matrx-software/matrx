@@ -3,17 +3,17 @@
  * requesting a redraw of the grid when a socketIO update has been received.
  */
 
- var doVisualUpdates = true;
- var isFirstCall=true;
+var doVisualUpdates = true;
+var isFirstCall = true;
 
 /**
  * Check if the current tab is in focus or not
  */
-document.addEventListener('visibilitychange', function(){
-  doVisualUpdates = !document.hidden;
+document.addEventListener('visibilitychange', function() {
+    doVisualUpdates = !document.hidden;
 });
 
-$(document).ready(function(){
+$(document).ready(function() {
 
     var id = document.getElementById('id').innerHTML;
 
@@ -33,13 +33,15 @@ $(document).ready(function(){
 
         // request to be added to room
         console.log("Requesting to be added to room:", room)
-        socket.emit('join', {room: room});
+        socket.emit('join', {
+            room: room
+        });
     });
 
     /**
      * receive an update from the python server
      */
-    socket.on('update', function(data){
+    socket.on('update', function(data) {
         console.log("Received an update from the server:", data);
 
         if (!doVisualUpdates) {
@@ -53,13 +55,14 @@ $(document).ready(function(){
         tick = data.params.tick;
         vis_bg_clr = data.params.vis_bg_clr;
         vis_bg_img = data.params.vis_bg_img;
-        if(isFirstCall){
-            isFirstCall=false;
+        if (isFirstCall) {
+            isFirstCall = false;
             populateMenu(state, id);
-            parseGifs(state);}
+            parseGifs(state);
+        }
         // draw the grid again
         requestAnimationFrame(function() {
-            doTick(grid_size, state, tick, vis_bg_clr,vis_bg_img);
+            doTick(grid_size, state, tick, vis_bg_clr, vis_bg_img);
         });
     });
 
@@ -69,6 +72,6 @@ $(document).ready(function(){
     socket.on('disconnect', function() {
         console.log('Got disconnected!');
         disconnected = true;
-   });
+    });
 
 });

@@ -3,69 +3,124 @@
  * requesting a redraw of the grid when a socketIO update has been received.
  */
 
- var doVisualUpdates = true;
+var doVisualUpdates = true;
 // var isFirstCall=true;
 
 /**
  * Check if the current tab is in focus or not
  */
-document.addEventListener('visibilitychange', function(){
-  doVisualUpdates = !document.hidden;
+document.addEventListener('visibilitychange', function() {
+    doVisualUpdates = !document.hidden;
 });
 
-//
-//function update(progress) {
-//  // Update the state of the world for the elapsed time since last render
-//}
-//
-//function draw() {
-//  // Draw the state of the world
-//}
-//
-//function loop(timestamp) {
-//  var progress = timestamp - lastRender
-//
-//  update(progress)
-//  draw()
-//
-//  lastRender = timestamp
-//  window.requestAnimationFrame(loop)
-//}
-//var lastRender = 0
-//window.requestAnimationFrame(loop)
+
+var initialized = false;
+var tick_duration = 0.5;
+var current_tick = 0;
+var rendered_update = true;
+
+var frames = 0;
+
+var lastRender = 0;
+var last_update = 0;
+
+var init_url = 'http://localhost:3000/get_info'
+var update_url = 'http://localhost:3000/get_god_state/'
 
 
 
+/*
+ * Update the state of the world for the elapsed time since last render
+ */
+function update(progress) {
+    console.log("Update with progress:", progress)
 
-function init() {
-    var url = 'http://localhost:3000/get_info'
-
-    var resp = $.ajax({
-        type: "GET",
-        url: url,
-        dataType: "json",
-        async: false
-    });
-
-    console.log("Complete response:", resp.status);
-
-    if (resp.status != 200) {
-        console.log("Oh no, an error");
-        return false
+    // check if there is a new tick available yet based on the tick_duration
+    if ((new Date()).getTime() > last_update + (tick_duration * 1000) ) {
+        get_MATRXS_update();
     }
 
-    var settings = resp.responseText;
+    console.log("Updating object locations etc.");
+}
+
+/*
+ * Draw all objects on the canvas
+ */
+function draw() {
+    // Draw the state of the world
+    console.log("drawing the world, frame:", frames);
+    frames++;
+}
+
+/*
+ * The main visualization loop
+ */
+function loop() {
+    var timestamp = (new Date()).getTime();
+    var progress = timestamp - lastRender
+
+    update(progress)
+    draw()
+
+    lastRender = timestamp
+    window.requestAnimationFrame(loop)
 }
 
 
-function success(data) {
-    console.log("Success");
+/*
+ * Fetch an update from MATRXS, based on tick duration speed
+ */
+function get_MATRXS_update() {
+    console.log("Fetching update..");
+
+    // the get request is async, meaning the function is only executed when
+    // the response has been received
+    jQuery.getJSON(update_url + current_tick, function(data) {
+        rendered_changes = false;
+        last_update = (new Date()).getTime();
+        console.log("Fetched update, received data:", data)
+
+        current_tick = data[data.length-1]['god']['state']['World']['nr_ticks'];
+        console.log("Latest tick set to:", current_tick);
+    });
 }
 
 
-$(document).ready(function(){
 
+/*
+ * Initialize the visualization by requesting the MATRXS scenario info.
+ * If succesful, the main visualization loop is called
+ */
+function init() {
+    console.log("initializing")
+
+    // fetch settings
+    var resp = jQuery.getJSON(init_url, function(data) {
+        initialized = true;
+        tick_duration = data.tick_duration;
+        current_tick = data.tick;
+        console.log("MATRXS settings:", data);
+
+        // start the visualization loop
+        loop();
+    });
+
+    // if the request gave an error, print to console and try again
+    resp.fail(function() {
+        console.log("could not fetch MATRXS information, retrying in 0.5s");
+        setTimeout(function(){
+            init();
+        }, 500);
+    })
+
+}
+
+
+$(document).ready(function() {
     init();
+});
+
+
 
 //
 //    /**
@@ -98,4 +153,3 @@ $(document).ready(function(){
 //            doTick(grid_size, state, tick, vis_bg_clr,vis_bg_img, parsedGifs);
 //        });
 //    });
-});

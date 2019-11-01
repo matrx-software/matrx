@@ -9,12 +9,17 @@ var disconnected = false;
 // width and height of 1 cell = square
 var px_per_cell = 40;
 // number of cells in width and height of map
-var mapW = 10, mapH = 10;
-var currentSecondTicks = 0, tpsCount = 0, ticksLastSecond = 0;
-var currentSecondFrames = 0, fpsCount = 0, framesListSecond = 0;
+var mapW = 10,
+    mapH = 10;
+var currentSecondTicks = 0,
+    tpsCount = 0,
+    ticksLastSecond = 0;
+var currentSecondFrames = 0,
+    fpsCount = 0,
+    framesListSecond = 0;
 var lastTickSecond = 0;
 var firstDraw = true;
-var parsedGifs=[];
+var parsedGifs = [];
 
 
 // Colour of the default BG tile
@@ -29,18 +34,18 @@ var targetFPS = 60;
 var animationDurationPerc = 1;
 
 
-window.onload = function()
-{
+window.onload = function() {
     canvas = document.getElementById('grid');
-	ctx = canvas.getContext("2d");
+    ctx = canvas.getContext("2d");
 
-	ctx.font = "bold 10pt sans-serif";
+    ctx.font = "bold 10pt sans-serif";
 };
 
 /**
  * Changes the size of the canvas on a window resize such that it is always fullscreen
  */
-window.addEventListener("resize", fixCanvasSize );
+window.addEventListener("resize", fixCanvasSize);
+
 function fixCanvasSize() {
 
     // get canvas element from html
@@ -73,28 +78,28 @@ function fixTileSize(canvasW, canvasH) {
  * Keep track of how many ticks per second are received
  */
 function calc_fps() {
-	var sec = Math.floor(Date.now()/1000);
-	if(sec != currentSecondFrames)
-	{
-		currentSecondFrames = sec;
-		framesLastSecond = fpsCount;
-		fpsCount = 1;
-	}
-	else { fpsCount++; }
+    var sec = Math.floor(Date.now() / 1000);
+    if (sec != currentSecondFrames) {
+        currentSecondFrames = sec;
+        framesLastSecond = fpsCount;
+        fpsCount = 1;
+    } else {
+        fpsCount++;
+    }
 }
 
 /**
  * Calculate how many frames per second are visualized
  */
 function calc_tps() {
-    var sec = Math.floor(Date.now()/1000);
-	if(sec != currentSecondTicks)
-	{
-		currentSecondTicks = sec;
-		ticksLastSecond = tpsCount;
-		tpsCount = 1;
-	}
-	else { tpsCount++; }
+    var sec = Math.floor(Date.now() / 1000);
+    if (sec != currentSecondTicks) {
+        currentSecondTicks = sec;
+        ticksLastSecond = tpsCount;
+        tpsCount = 1;
+    } else {
+        tpsCount++;
+    }
 }
 
 /**
@@ -106,7 +111,7 @@ function checkDisconnected() {
     }
 
     // if we haven't received a new tick for a while (3x the normal duration), quit the animation loop
-    if((lastTickSecond + ((1.0 / ticksLastSecond) * 1000 * 3)) < Date.now()) {
+    if ((lastTickSecond + ((1.0 / ticksLastSecond) * 1000 * 3)) < Date.now()) {
         console.log("Haven't received a new tick in a long while, stopping animated movement updates");
         disconnected = true;
     }
@@ -128,37 +133,38 @@ function updateGridSize(grid_size) {
 }
 
 //Used to parse Gifs(in case they exist) into the frames they are made out of on the first load of the screen.
-function parseGifs(state){
+function parseGifs(state) {
     var vis_depths = Object.keys(state);
     vis_depths.forEach(function(vis_depth) {
 
-    // Loop through the objects at this depth and visualize them
-    var objects = Object.keys(state[vis_depth]);
-    objects.forEach(function(objID) {
+        // Loop through the objects at this depth and visualize them
+        var objects = Object.keys(state[vis_depth]);
+        objects.forEach(function(objID) {
 
-        // fetch object
-        obj = state[vis_depth][objID]
-        if (obj['visualization']['shape'] == 'img') {
-        if (/^.+\.gif$/.test(obj['img_name'])) {
-            var img = new Image();
-            img.src = window.location.origin + '/static/avatars/'+obj['img_name'];
-            if(!parsedGifs.hasOwnProperty(img.src))
-                {
-                parsedGifs[img.src]=[]
-                var gif = new SuperGif({ gif: img } );
-                gif.load(function(){
-                for (var i = 0; i < gif.get_length(); i++)
-                      {
-                        gif.move_to(i);
-                        parsedGifs[img.src][i]=gif.get_canvas();
-                        }
-                 parsedGifs[img.src]["currFrame"]=0;
+            // fetch object
+            obj = state[vis_depth][objID]
+            if (obj['visualization']['shape'] == 'img') {
+                if (/^.+\.gif$/.test(obj['img_name'])) {
+                    var img = new Image();
+                    img.src = window.location.origin + '/static/avatars/' + obj['img_name'];
+                    if (!parsedGifs.hasOwnProperty(img.src)) {
+                        parsedGifs[img.src] = []
+                        var gif = new SuperGif({
+                            gif: img
+                        });
+                        gif.load(function() {
+                            for (var i = 0; i < gif.get_length(); i++) {
+                                gif.move_to(i);
+                                parsedGifs[img.src][i] = gif.get_canvas();
+                            }
+                            parsedGifs[img.src]["currFrame"] = 0;
 
-                    });
+                        });
+                    }
                 }
-        }
-        }})
-            })
+            }
+        })
+    })
 }
 /**
  * called when a new tick is received by the agent
@@ -171,7 +177,7 @@ function doTick(grid_size, state, curr_tick, vis_bg_clr, vis_bg_img) {
         fixCanvasSize();
         firstDraw = false;
         bgTileColour = vis_bg_clr;
-        bgImage=vis_bg_img;
+        bgImage = vis_bg_img;
     }
 
     // console.log("\n#####################################\nNew tick #", curr_tick);
@@ -189,8 +195,7 @@ function doTick(grid_size, state, curr_tick, vis_bg_clr, vis_bg_img) {
     // if we have less than X ticks per second (by default 60), animate the movement
     if (ticksLastSecond < targetFPS && ticksLastSecond > 0) {
         drawSim(grid_size, state, curr_tick, true);
-    }
-    else {
+    } else {
         drawSim(grid_size, state, curr_tick, false);
     }
 }
@@ -201,7 +206,9 @@ function doTick(grid_size, state, curr_tick, vis_bg_clr, vis_bg_img) {
 function drawSim(grid_size, state, curr_tick, animateMovement) {
 
     // return in the case that the canvas has disappeared
-	if(ctx==null) { return; }
+    if (ctx == null) {
+        return;
+    }
 
     // console.log("Tick:", curr_tick, "highest tick:", highestTickSoFar);
 
@@ -220,7 +227,7 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
     var obj_keys = Object.keys(state);
 
     // calculate a number of necessary variables for timing the movement animation
-    if( true ) {
+    if (true) {
         // how many milliseconds should 1 frame take
         var msPerFrame = (1.0 / targetFPS) * 1000;
 
@@ -257,20 +264,25 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
             if (true) {
 
                 // fetch the previous location of the object from last iteration
-                if ( !(objID in animatedObjects) && objID in prevAnimatedObjects) {
+                if (!(objID in animatedObjects) && objID in prevAnimatedObjects) {
                     // console.log("Fetching", objID, " from prevAnimatedObjects");
-                    animatedObjects[objID] = {"loc_from": prevAnimatedObjects[objID]["loc_to"], "loc_to": obj['location'], "position": cellsToPxs(prevAnimatedObjects[objID]["loc_to"]), "timeStarted": Date.now()};
+                    animatedObjects[objID] = {
+                        "loc_from": prevAnimatedObjects[objID]["loc_to"],
+                        "loc_to": obj['location'],
+                        "position": cellsToPxs(prevAnimatedObjects[objID]["loc_to"]),
+                        "timeStarted": Date.now()
+                    };
                 }
 
                 // check if we need to animate this movement, which is the case if:
                 // it it is our first encounter with this object, or it moves to a new position
-                if ( !(objID in animatedObjects && animatedObjects[objID]['loc_from'] == obj['location']) ) {
+                if (!(objID in animatedObjects && animatedObjects[objID]['loc_from'] == obj['location'])) {
                     // console.log("This is a moving agent", obj);
                     // console.log("From ", obj["prev_location"][0], obj["prev_location"][1], "(",cellsToPxs(obj["prev_location"])[0], cellsToPxs(obj["prev_location"])[1], ") to", obj["location"][0], obj["location"][1], "(",cellsToPxs(obj["location"])[0], cellsToPxs(obj["location"])[1], ")");
                     var pos = processMovement(objID, obj['location'], animatedObjects, animationDurationMs);
                     // round the location to round pixel values
-                    x =  Math.round(pos[0]);
-                    y =  Math.round(pos[1]);
+                    x = Math.round(pos[0]);
+                    y = Math.round(pos[1]);
                     // console.log("Agent new coordinates:", x, y);
                 }
             }
@@ -285,29 +297,28 @@ function drawSim(grid_size, state, curr_tick, animateMovement) {
             // draw the object with the correct shape, size and colour
             if (obj['visualization']['shape'] == 0) {
                 drawRectangle(x, y, px_per_cell, px_per_cell, clr, sz)
-            }
-            else if (obj['visualization']['shape'] == 1) {
+            } else if (obj['visualization']['shape'] == 1) {
                 drawTriangle(x, y, px_per_cell, px_per_cell, clr, sz);
-            }
-            else if (obj['visualization']['shape'] == 2) {
+            } else if (obj['visualization']['shape'] == 2) {
                 drawCircle(x, y, px_per_cell, px_per_cell, clr, sz);
-            }
-            else if (obj['visualization']['shape'] == 'img') {
-                drawImage(obj['img_name'],x, y, px_per_cell, px_per_cell, sz);
+            } else if (obj['visualization']['shape'] == 'img') {
+                drawImage(obj['img_name'], x, y, px_per_cell, px_per_cell, sz);
             }
         })
     });
 
     // Draw the FPS to the canvas as last so it's drawn on top
-	ctx.fillStyle = "#ff0000";
-	ctx.fillText("FPS: " + framesLastSecond, 10, 20);
-	ctx.fillText("TPS: " + ticksLastSecond, 65, 20);
+    ctx.fillStyle = "#ff0000";
+    ctx.fillText("FPS: " + framesLastSecond, 10, 20);
+    ctx.fillText("TPS: " + ticksLastSecond, 65, 20);
 
     if (animateMovement) {
         // console.log("Calling draw recursively at:", Date.now(), " with delay in ms: ", msPerFrame);
 
         // call the draw function again after a short sleep to get to desired number of fps in milliseconds
-        setTimeout(function() { drawSim(grid_size, state, curr_tick, animateMovement); }, msPerFrame);
+        setTimeout(function() {
+            drawSim(grid_size, state, curr_tick, animateMovement);
+        }, msPerFrame);
     }
 }
 
@@ -323,10 +334,15 @@ function cellsToPxs(coords) {
  * Animate the movement from one cell to the target cell for an object, by covering
  * the distance in smaller steps
  */
-function processMovement(key, targetLocation, animatedObjects, timePerMove){
+function processMovement(key, targetLocation, animatedObjects, timePerMove) {
     // add the object if this is our first iteration animating its movement
-    if ( !(key in prevAnimatedObjects) ) {
-        animatedObjects[key] = {"loc_from": targetLocation, "loc_to": targetLocation, "position": cellsToPxs(targetLocation), "timeStarted": Date.now()};
+    if (!(key in prevAnimatedObjects)) {
+        animatedObjects[key] = {
+            "loc_from": targetLocation,
+            "loc_to": targetLocation,
+            "position": cellsToPxs(targetLocation),
+            "timeStarted": Date.now()
+        };
         // console.log("New agent, adding to array, new array", animatedObjects);
         return animatedObjects[key]["position"];
     }
@@ -335,10 +351,10 @@ function processMovement(key, targetLocation, animatedObjects, timePerMove){
     // console.log("Fetched agent from array:", obj);
 
     // check if we have completed animating the movement
-    if((Date.now() - obj["timeStarted"] >= timePerMove)) {
+    if ((Date.now() - obj["timeStarted"] >= timePerMove)) {
         animatedObjects[key]["position"] = cellsToPxs(animatedObjects[key]["loc_to"]);
 
-    // otherwise, we move the object a little to the target location
+        // otherwise, we move the object a little to the target location
     } else {
         // calc and set the new coordinates for the object
         animatedObjects[key]["position"][0] = calcNewAnimatedCoord(animatedObjects[key], 0, timePerMove);
@@ -356,7 +372,7 @@ function processMovement(key, targetLocation, animatedObjects, timePerMove){
  * @param timePerMove = milliseconds available for the animated motion from loc_from to loc_to
  */
 function calcNewAnimatedCoord(obj, coord, timePerMove) {
-    if(obj["loc_to"][coord] != obj["loc_from"][coord]) {
+    if (obj["loc_to"][coord] != obj["loc_from"][coord]) {
         // calc how many blocks our target is
         var numberOfCellsToMove = Math.abs(obj["loc_to"][coord] - obj["loc_from"][coord]);
         // how many px per ms we should traverse to get to our destination
@@ -366,7 +382,7 @@ function calcNewAnimatedCoord(obj, coord, timePerMove) {
         // calc our new position
         var diff = msUnderway * pxPerMs;
         // make sure movement is in the correct direction
-        diff = (obj["loc_to"][coord] < obj["loc_from"][coord] ? - diff : diff);
+        diff = (obj["loc_to"][coord] < obj["loc_from"][coord] ? -diff : diff);
         // move in the correct direction from the old position
         obj["position"][coord] = (obj["loc_from"][coord] * px_per_cell) + diff
 
@@ -382,16 +398,14 @@ function calcNewAnimatedCoord(obj, coord, timePerMove) {
  */
 function drawBg() {
     // full size rect
-    if(bgImage!=null){
+    if (bgImage != null) {
         var img = new Image();
-	    img.src = window.location.origin + '/static/backgrounds/'+bgImage;
-	    ctx.drawImage(img, 0, 0, mapW * px_per_cell, mapH * px_per_cell);  // DRAW THE IMAGE TO THE CANVAS.
-    }
-    else
-    {
+        img.src = window.location.origin + '/static/backgrounds/' + bgImage;
+        ctx.drawImage(img, 0, 0, mapW * px_per_cell, mapH * px_per_cell); // DRAW THE IMAGE TO THE CANVAS.
+    } else {
         ctx.fillStyle = bgTileColour;
-        ctx.fillRect( 0, 0, mapW * px_per_cell, mapH * px_per_cell);
-        }
+        ctx.fillRect(0, 0, mapW * px_per_cell, mapH * px_per_cell);
+    }
 }
 
 /**
@@ -415,7 +429,7 @@ function drawRectangle(x, y, tileW, tileH, clr, size) {
 
     // draw the rectangle
     ctx.fillStyle = clr;
-    ctx.fillRect( top_left_x, top_left_y, w, h);
+    ctx.fillRect(top_left_x, top_left_y, w, h);
 }
 
 /**
@@ -448,26 +462,25 @@ function drawCircle(x, y, tileW, tileH, clr, size) {
     ctx.fill();
 }
 
-function drawImage(imgName, x, y, tileW, tileH, size)
-{
+function drawImage(imgName, x, y, tileW, tileH, size) {
     var img = new Image();
-	var src=img.src = window.location.origin + '/static/avatars/'+imgName;
-	top_left_x = x + ((1 - size) * 0.5 * tileW);
+    var src = img.src = window.location.origin + '/static/avatars/' + imgName;
+    top_left_x = x + ((1 - size) * 0.5 * tileW);
     top_left_y = y + ((1 - size) * 0.5 * tileH);
 
     // width and height of rectangle
     w = size * tileW;
     h = size * tileH;
-    if (parsedGifs.hasOwnProperty(img.src) && parsedGifs[img.src].hasOwnProperty("currFrame"))
-    {
-        var currFrame=parsedGifs[src]["currFrame"];
-        img=parsedGifs[src][currFrame];
+    if (parsedGifs.hasOwnProperty(img.src) && parsedGifs[img.src].hasOwnProperty("currFrame")) {
+        var currFrame = parsedGifs[src]["currFrame"];
+        img = parsedGifs[src][currFrame];
         currFrame++;
-        if (currFrame>= parsedGifs[src].length){
-            currFrame=0;}
-         parsedGifs[src]["currFrame"]=currFrame;
+        if (currFrame >= parsedGifs[src].length) {
+            currFrame = 0;
+        }
+        parsedGifs[src]["currFrame"] = currFrame;
     }
-    ctx.drawImage(img, top_left_x, top_left_y, w, h);  // DRAW THE IMAGE TO THE CANVAS.
+    ctx.drawImage(img, top_left_x, top_left_y, w, h); // DRAW THE IMAGE TO THE CANVAS.
 }
 
 /**
@@ -510,6 +523,6 @@ function drawTriangle(x, y, tileW, tileH, clr, size) {
  */
 function hexToRgba(hex, opacity) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? "rgba(" + parseInt(result[1], 16) + "," + parseInt(result[2], 16)
-                        + "," + parseInt(result[3], 16) + "," + opacity + ")" : null;
+    return result ? "rgba(" + parseInt(result[1], 16) + "," + parseInt(result[2], 16) +
+        "," + parseInt(result[3], 16) + "," + opacity + ")" : null;
 }
