@@ -24,6 +24,7 @@ var parsedGifs = [];
 
 // Colour of the default BG tile
 var bgTileColour = "#C2C2C2";
+var bgImage = null;
 var highestTickSoFar = 0;
 
 var prevAnimatedObjects = {};
@@ -91,16 +92,16 @@ function calc_fps() {
 /**
  * Calculate how many frames per second are visualized
  */
-function calc_tps() {
-    var sec = Math.floor(Date.now() / 1000);
-    if (sec != currentSecondTicks) {
-        currentSecondTicks = sec;
-        ticksLastSecond = tpsCount;
-        tpsCount = 1;
-    } else {
-        tpsCount++;
-    }
-}
+// function calc_tps() {
+//     var sec = Math.floor(Date.now() / 1000);
+//     if (sec != currentSecondTicks) {
+//         currentSecondTicks = sec;
+//         ticksLastSecond = tpsCount;
+//         tpsCount = 1;
+//     } else {
+//         tpsCount++;
+//     }
+// }
 
 /**
  * Stop the GUI if we haven't received a new update for a long while
@@ -243,6 +244,9 @@ function calcNewAnimatedCoord(obj, coord, timePerMove) {
  * Draw a background with the default colour
  */
 function drawBg() {
+    // clear the rectangle
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     // full size rect
     if (bgImage != null) {
         var img = new Image();

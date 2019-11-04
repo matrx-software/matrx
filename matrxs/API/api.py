@@ -24,6 +24,10 @@ current_tick = 0
 tick_duration = 0.0
 grid_size = [1,1]
 
+# a temporary state for the current tick, which will be written to states after all
+# agents have been updated
+temp_state = []
+
 # variables to be read (only!) by MATRXS and set (only!) through API calls
 userinput = {}
 
@@ -76,21 +80,20 @@ def get_states_specific_agents(tick, agent_ids):
     return jsonify(fetch_states(tick, agent_ids))
 
 
-@app.route('/get_god_state/<tick>', methods=['GET', 'POST'])
-def get_god_state(tick):
+@app.route('/get_latest_state/<agent_ids>', methods=['GET', 'POST'])
+def get_god_state(agent_ids):
     """
-    Returns the god states starting from tick 'tick'
+    Returns the latest states for agents 'agent_ids'
     :param tick: integer indicating from which tick onwards to send the states.
     :return: States from tick 'tick' onwards for the god view
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_API_request(tick)
+    API_call_valid, error = check_API_request(current_tick, agent_ids, ids_required=True)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    print(f"Sending states from tick {tick} onwards for the god view")
-    return jsonify(fetch_states(tick))
+    return jsonify(fetch_states(current_tick, agent_ids))
 
 
 
@@ -131,22 +134,22 @@ def check_API_request(tick=None, ids=None, ids_required=False):
     if ids_required:
 
         # check if ids variable is of a valid type
-        if not isinstance(ids, str):
-            try:
-                ids = eval(ids)
-            except:
-                return False, {'error_code': 400, 'error_message': f'Provided IDs are not of valid format. Provides IDs is of '
-                                                                   f'type {type(ids)} but should be either of type string for '
-                                                                   f'requesting states of 1 agent (e.g. "god"), or a list of '
-                                                                   f'IDs(string) for requesting states of multiple agents'}
+        try:
+            ids = eval(ids)
+        except:
+            pass
+            # return False, {'error_code': 400, 'error_message': f'Provided IDs are not of valid format. Provides IDs is of '
+            #                                                    f'type {type(ids)} but should be either of type string for '
+            #                                                        f'requesting states of 1 agent (e.g. "god"), or a list of '
+            #                                                        f'IDs(string) for requesting states of multiple agents'}
 
         # check if the provided ids exist for all requested ticks
         ids = [ids] if isinstance(ids, str) else ids
-        for t in range(tick, current_tick):
+        for t in range(tick, current_tick+1):
             for id in ids:
                 if id not in states[t]:
                     return False, {'error_code': 400,
-                                   'error_message': f'Trying to fetch the state for agent with ID {id} for tick {t}, but '
+                                   'error_message': f'Trying to fetch the state for agent with ID "{id}" for tick {t}, but '
                                                     f'does not exist.'}
 
     # all checks cleared, so return with success and no error message
@@ -175,7 +178,7 @@ def fetch_states(tick, ids=None):
 
     # create a list containing the states from tick to current_tick containing the states of all desired agents/god
     filtered_states = []
-    for t in range(tick, current_tick):
+    for t in range(tick, current_tick+1):
         states_this_tick = {}
 
         # add each agent's state for this tick
@@ -184,14 +187,69 @@ def fetch_states(tick, ids=None):
 
         # save the states of all filtered agents for this tick
         filtered_states.append(states_this_tick)
-
     return filtered_states
 
 
 def create_error_response(code, message):
+    """
+    Creates an error code with a custom message
+    """
     response = jsonify({'message': message})
     response.status_code = code
     return response
+
+
+
+def __reorder_state(state):
+    """
+    Convert the state, which is a dictionary of objects with object ID as key,
+    into a new dictionary with as key the visualization depth, and as value
+    the objects which are to be displayed at that depth
+    :param state: The world state, a dictionary with object IDs as keys
+    :return sorted_state: The world state, but sorted on visualization depth
+    """
+    new_state = {}
+
+    # loop through all objects in the state
+    for objID, obj in state.items():
+
+        if objID is "World":
+            continue
+
+        # fetch the visualization depth
+        vis_depth = state[objID]["visualization"]['depth']
+
+        if "sense_capability" in obj:
+            obj["sense_capability"] = str(obj["sense_capability"])
+
+        # save the object in the new_state dict at its visualization_depth
+        if vis_depth not in new_state:
+            new_state[vis_depth] = {}
+
+        # add the object or agent to the list at the (x,y) location in the dict
+        new_state[vis_depth][objID] = obj
+
+    # sort dict on depth
+    sorted_state = {}
+    for depth in sorted(new_state.keys()):
+        sorted_state[depth] = new_state[depth]
+
+    return sorted_state
+
+
+def add_state(agent_id, state, agent_inheritence_chain):
+    """
+    Saves the state of an agent for use via the API
+    :param agent_id: ID of the agent of who the state is
+    :param state: state of the agent
+    :param agent_inheritence_chain: inheritance_chain of classes, can be used
+    to figure out type of agent
+    """
+    temp_state[agent_id] = {'state': __reorder_state(state),
+                                          "tick": current_tick,
+                                          'agent_inheritence_chain': agent_inheritence_chain}
+
+    # print("States saved:", len(states), "last item:", states[-1])
 
 
 #########################################################################

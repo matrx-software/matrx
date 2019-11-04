@@ -3,6 +3,7 @@ import os.path
 import warnings
 import gevent
 from collections import OrderedDict
+import copy
 
 from matrxs.logger.logger import GridWorldLogger
 from matrxs.actions.object_actions import *
@@ -78,9 +79,9 @@ class GridWorld:
             # start the MATRXS API server if we need to
             started_API = False
             if self.__run_matrxs_api and self.__api_process is None:
-
                 # start the MATRXS API server
                 started_API = self.__start_API()
+
 
 
             # Set initialisation boolean
@@ -318,17 +319,13 @@ class GridWorld:
         if self.__is_done:
             return self.__is_done, 0.
 
-        # initialize the saved states for this tick
+        # initialize a temporary dictionary in which all states of this tick
+        # will be saved. After all agents have been updated, the new tick info
+        # will be made accessible via the API.
         if self.__run_matrxs_api:
-            # add new dictionary that will contain all states of this tick to the states list
-            api.states.append({})
-            # set tick
-            api.current_tick = self.__current_nr_ticks
-            api.tick_duration = self.__tick_duration
-            api.grid_size = self.shape
+            api.temp_state = {}
 
-
-            # Go over all agents, detect what each can detect, figure out what actions are possible and send these to
+        # Go over all agents, detect what each can detect, figure out what actions are possible and send these to
         # that agent. Then receive the action back and store the action in a buffer.
         # Also, update the local copy of the agent properties, and save the agent's state for the GUI.
         # Then go to the next agent.
@@ -350,8 +347,7 @@ class GridWorld:
 
                 # save the current agent's state for the visualizer
                 if self.__run_matrxs_api:
-                    api.states[self.__current_nr_ticks][agent_id] = {'state': filtered_agent_state,
-                                                                     'agent_inheritence_chain': agent_obj.class_inheritance}
+                    api.add_state(agent_id=agent_id, state=filtered_agent_state, agent_inheritence_chain=agent_obj.class_inheritance)
 
                 # if this busy agent is at its last tick of waiting, we want to actually perform the action
                 if agent_obj._at_last_action_duration_tick(curr_tick=self.__current_nr_ticks):
@@ -408,19 +404,22 @@ class GridWorld:
 
             # save the current agent's state for the visualizer
             if self.__run_matrxs_api:
-                api.states[self.__current_nr_ticks][agent_id] = {'state': filtered_agent_state,
-                                                                 'agent_inheritence_chain': agent_obj.class_inheritance}
+                api.add_state(agent_id=agent_id, state=filtered_agent_state, agent_inheritence_chain=agent_obj.class_inheritance)
+
 
         # save the state of the god view in the visualizer
         # self.__visualizer._save_state(inheritance_chain="god", id="god", state=self.__get_complete_state())
 
         # save the god view state
         if self.__run_matrxs_api:
-            api.states[self.__current_nr_ticks]['god'] = {'state': self.__get_complete_state(),
-                                                             'agent_inheritence_chain': "god"}
+            api.add_state(agent_id="god", state=self.__get_complete_state(), agent_inheritence_chain="god")
 
-        # update the visualizations of all (human)agents and god
-        # self.__visualizer._update_guis(tick=self.__current_nr_ticks)
+            # make the information of this tick available via the API, after all
+            # agents have been updated
+            api.states.append(copy.copy(api.temp_state))
+            api.current_tick = self.__current_nr_ticks
+            api.tick_duration = self.__tick_duration
+            api.grid_size = self.shape
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
         for agent_id, action in action_buffer.items():

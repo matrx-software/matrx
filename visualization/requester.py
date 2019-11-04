@@ -7,7 +7,7 @@ import numpy as np
 def send_data(data, print_response=False):
     """ Sends some data to the Flask server """
 
-    url = 'http://localhost:3000/get_states/6/["god"]'
+    url = 'http://localhost:3000/get_latest_state/["god"]'
     tick_start_time = datetime.datetime.now()
 
     # send the data as json to the url with a max timeout of 5 seconds

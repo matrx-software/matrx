@@ -797,7 +797,7 @@ class WorldBuilder:
                 opacity = np.clip(opacity * smoke_thickness_multiplier, 0, 1)
 
                 # add the smokeTile
-                self.add_object(location=[x, y], name=name, callable_class=SmokeTile, is_traversable=True,
+                self.add_object(location=[x, y], name=name, callable_class=SmokeTile,
                                 visualize_colour=visualize_colour, visualize_opacity=opacity,
                                 visualize_depth=visualize_depth, **custom_properties)
 

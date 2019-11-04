@@ -20,12 +20,13 @@ var current_tick = 0;
 var grid_size = [1,1]
 var rendered_update = true;
 
+var tps = 1;
 var frames = 0;
 var lastRender = 0;
 var last_update = 0;
 
 var init_url = 'http://localhost:3000/get_info'
-var update_url = 'http://localhost:3000/get_god_state/'
+var update_url = 'http://localhost:3000/get_latest_state/'
 
 var state = {}
 
@@ -33,27 +34,15 @@ var state = {}
  * Update the state of the world for the elapsed time since last render
  */
 function update(progress) {
-    console.log("Update with progress:", progress)
+    // console.log("Update with progress:", progress)
 
     // check if there is a new tick available yet based on the tick_duration
     if ((new Date()).getTime() > last_update + (tick_duration * 1000) ) {
-        get_MATRXS_update();
+        return get_MATRXS_update();
     }
 
-    console.log("Updating object locations etc.");
-
-    // for the first time drawing the visualization, calculate the optimal
-    // screen size based on the grid size
-    if (firstDraw) {
-        console.log("First draw, resetting canvas and tile sizes");
-        fixCanvasSize();
-        firstDraw = false;
-        // bgTileColour = vis_bg_clr;
-        // bgImage = vis_bg_img;
-        bgImage = null;
-        bgTileColour = "#ffffff";
-    }
-
+    return false;
+    // console.log("Updating object locations etc.");
 }
 
 
@@ -64,32 +53,53 @@ function loop() {
     var timestamp = (new Date()).getTime();
     var progress = timestamp - lastRender
 
-    update(progress)
-    // drawSim(grid_size, state, curr_tick, false);
-    draw()
+    var update_request = update(progress)
 
-    lastRender = timestamp
-    window.requestAnimationFrame(loop)
+    // if we didn't get an update yet, redraw the screen
+    if (! update_request) {
+        draw()
+        lastRender = timestamp
+        window.requestAnimationFrame(loop)
+
+    // if we requested an update check if it was succesful
+    } else {
+        // after a succesful update redraw the screen and go to the next frame
+        update_request.done(function(data) {
+            draw(new_tick=true);
+            lastRender = timestamp
+            window.requestAnimationFrame(loop)
+        })
+
+        // if the request gave an error, print to console and try again after a delay
+        update_request.fail(function() {
+            console.log("Could not connect to MATRXS API, retrying in 0.5s");
+            setTimeout(function(){
+                lastRender = timestamp
+                window.requestAnimationFrame(loop)
+            }, 500);
+        })
+    }
 }
 
 
 /*
- * Fetch an update from MATRXS, based on tick duration speed
+ * Fetch an update from MATRXS when a new tick has occured (based on tick duration speed)
  */
 function get_MATRXS_update() {
-    console.log("Fetching update..");
-
     // the get request is async, meaning the function is only executed when
     // the response has been received
-    jQuery.getJSON(update_url + current_tick, function(data) {
+    var update_request = jQuery.getJSON(update_url + "['god']", function(data) {
+        // console.log("Fetched update, received data:", data)
         rendered_changes = false;
         last_update = (new Date()).getTime();
-        state = data[data.length-1]['god']
-        console.log("Fetched update, received data:", data)
+        state = data[data.length-1]['god']['state']
+        // console.log("State:", state);
 
-        current_tick = data[data.length-1]['god']['state']['World']['nr_ticks'];
-        console.log("Latest tick set to:", current_tick);
+        current_tick = data[data.length-1]['god']['tick'];
+        // console.log("Latest tick set to:", current_tick);
     });
+
+    return update_request;
 }
 
 
@@ -116,7 +126,7 @@ function init() {
 
     // if the request gave an error, print to console and try again
     resp.fail(function() {
-        console.log("could not fetch MATRXS information, retrying in 0.5s");
+        console.log("Could not connect to MATRXS API, retrying in 0.5s");
         setTimeout(function(){
             init();
         }, 500);
@@ -204,29 +214,34 @@ $(document).ready(function() {
 
 
 /**
-* Draw all objects on the canvas
+ * Draw all objects on the canvas
+ * @param new_tick = whether this is the first draw after a new tick/update
  */
-function draw(grid_size, state, curr_tick, animateMovement) {
+function draw(new_tick) {
+    // for the first time drawing the visualization, calculate the optimal
+    // screen size based on the grid size
+    if (firstDraw) {
+        isFirstCall=false;
+        populateMenu(state);
+        parseGifs(state);
+
+
+        console.log("First draw, resetting canvas and tile sizes");
+        fixCanvasSize();
+        firstDraw = false;
+        updateGridSize(grid_size); // save the number of cells in x and y direction of the map
+        tps = Math.floor(1.0 / tick_duration);
+    }
+
+    if (new_tick) {
+        // the tracked objects from last iteration are moved to a seperate list
+        prevAnimatedObjects = animatedObjects;
+        animatedObjects = {};
+    }
 
     // Draw the state of the world
-    console.log("drawing the world, frame:", frames);
+    // console.log("drawing the world, frame:", frames);
     frames++;
-
-    // return in the case that the canvas has disappeared
-    // if (ctx == null) {
-    //     return;
-    // }
-
-    // console.log("Tick:", curr_tick, "highest tick:", highestTickSoFar);
-
-    // return in case there is a new tick, and we are still updating the old tick
-    // if (curr_tick != highestTickSoFar) {
-    //     // console.log("Updating old tick, return");
-    //     return;
-    // }
-    // console.log("Drawing grid");
-
-
 
     calc_fps();
     updateGridSize(grid_size); // save the number of cells in x and y direction of the map
@@ -244,8 +259,6 @@ function draw(grid_size, state, curr_tick, animateMovement) {
 
     // how many milliseconds the animation of movement should take
     var animationDurationMs = animationDurationFrames * msPerFrame;
-
-    // console.log("Animated objects:", animatedObjects);
 
     // Loop through the visualization depths
     var vis_depths = Object.keys(state);
@@ -310,7 +323,7 @@ function draw(grid_size, state, curr_tick, animateMovement) {
     // Draw the FPS to the canvas as last so it's drawn on top
     ctx.fillStyle = "#ff0000";
     ctx.fillText("FPS: " + framesLastSecond, 10, 20);
-    ctx.fillText("TPS: " + ticksLastSecond, 65, 20);
+    ctx.fillText("TPS: " + tps, 65, 20);
 
     // if (animateMovement) {
     //     // console.log("Calling draw recursively at:", Date.now(), " with delay in ms: ", msPerFrame);

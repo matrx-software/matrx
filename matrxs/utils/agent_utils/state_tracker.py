@@ -88,6 +88,13 @@ class StateTracker:
                 continue
 
             loc = properties['location']
+
+            # if another object on that location is intraversable, don't overwrite it
+            if (traverse_map[loc[0], loc[1]] == 0 and not inverted) or \
+                (traverse_map[loc[0], loc[1]] == 1 and inverted):
+                continue
+
+            # add the traversability to the map
             traverse_map[loc[0], loc[1]] = int(properties['is_traversable']) \
                 if not inverted else int(not(properties['is_traversable']))
 
