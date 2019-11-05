@@ -11,7 +11,6 @@ For documentation see the wiki at [https://ci.tno.nl/gitlab/SAIL-framework/testb
 
 
 # Todo:
-- fix smooth movement
 - fix agent / human views
 - fix userinput
 - fix bg colour

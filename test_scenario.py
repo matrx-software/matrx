@@ -19,7 +19,7 @@ def create_factory():
         if even:
             even = False
             start = [x, 0]
-            factory.add_agent(start, navigating_agent, name="navigate " + str(x), visualize_shape=0, has_menu=True)
+            factory.add_agent(start, navigating_agent, name="navigate_" + str(x), visualize_shape=0, has_menu=True)
         else:
             even = True
             start = [x, 5]
@@ -29,7 +29,7 @@ def create_factory():
                 's': MoveSouth.__name__,
                 'a': MoveWest.__name__
             }
-            factory.add_human_agent(start, human_agent, name="human " + str(x),
+            factory.add_human_agent(start, human_agent, name="human_" + str(x),
                                     usrinp_action_map=usrinp_action_map, visualize_shape='img',
                                     img_name="transparent.png")
 

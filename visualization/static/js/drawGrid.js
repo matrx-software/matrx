@@ -5,7 +5,6 @@
 
 var canvas = null;
 var ctx = null;
-var disconnected = false;
 // width and height of 1 cell = square
 var px_per_cell = 40;
 // number of cells in width and height of map
@@ -280,6 +279,7 @@ function drawCircle(x, y, tileW, tileH, clr, size) {
     ctx.fill();
 }
 
+
 function drawImage(imgName, x, y, tileW, tileH, size) {
     var img = new Image();
     var src = img.src = window.location.origin + '/static/avatars/' + imgName;
@@ -343,4 +343,118 @@ function hexToRgba(hex, opacity) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? "rgba(" + parseInt(result[1], 16) + "," + parseInt(result[2], 16) +
         "," + parseInt(result[3], 16) + "," + opacity + ")" : null;
+}
+
+
+/**
+ * Draw all objects on the canvas
+ * @param new_tick = whether this is the first draw after a new tick/update
+ */
+function draw(new_tick) {
+    // for the first time drawing the visualization, calculate the optimal
+    // screen size based on the grid size
+    if (firstDraw) {
+        isFirstCall=false;
+        populateMenu(state);
+        parseGifs(state);
+
+
+        console.log("First draw, resetting canvas and tile sizes");
+        fixCanvasSize();
+        firstDraw = false;
+        updateGridSize(grid_size); // save the number of cells in x and y direction of the map
+        // calc ticks per second
+        tps = Math.floor(1.0 / tick_duration);
+    }
+
+    // calculate how many milliseconds 1 frame should take based on our framerate last second
+    msPerFrame = (1.0 / framesLastSecond) * 1000;
+
+    if (new_tick) {
+        // the tracked objects from last iteration are moved to a separate list
+        prevAnimatedObjects = animatedObjects;
+        animatedObjects = {};
+    }
+
+    // Draw the state of the world
+    frames++;
+
+    calcFps();
+    updateGridSize(grid_size); // save the number of cells in x and y direction of the map
+    drawBg(); // draw a default bg tile
+
+    // identify the objects we received
+    var obj_keys = Object.keys(state);
+
+    // calculate how many frames the animation of movement should take
+    var animationDurationFrames = (framesLastSecond / tps) * animationDurationPerc;
+
+    // calculate how many milliseconds the movement animation should take
+    var animationDurationMs = animationDurationFrames * msPerFrame;
+
+    // Loop through the visualization depths
+    var vis_depths = Object.keys(state);
+    vis_depths.forEach(function(vis_depth) {
+
+        // Loop through the objects at this depth and visualize them
+        var objects = Object.keys(state[vis_depth]);
+        objects.forEach(function(objID) {
+
+            // fetch object
+            obj = state[vis_depth][objID]
+
+            // fetch location of object in pixel values
+            var x = obj['location'][0] * px_per_cell;
+            var y = obj['location'][1] * px_per_cell;
+
+            // keep track of objects which need to be animated
+
+            // fetch the previous location of the object from last iteration
+            if (!(objID in animatedObjects) && objID in prevAnimatedObjects) {
+                // console.log("Fetching", objID, " from prevAnimatedObjects");
+                animatedObjects[objID] = {
+                    "loc_from": prevAnimatedObjects[objID]["loc_to"],
+                    "loc_to": obj['location'],
+                    "position": cellsToPxs(prevAnimatedObjects[objID]["loc_to"]),
+                    "timeStarted": Date.now()
+                };
+            }
+
+            // check if we need to animate this movement, which is the case if:
+            // it it is our first encounter with this object, or it moves to a new position
+            if (!(objID in animatedObjects && animatedObjects[objID]['loc_from'] == obj['location'])) {
+                // console.log("This is a moving agent", obj);
+                // console.log("From ", obj["prev_location"][0], obj["prev_location"][1], "(",cellsToPxs(obj["prev_location"])[0], cellsToPxs(obj["prev_location"])[1], ") to", obj["location"][0], obj["location"][1], "(",cellsToPxs(obj["location"])[0], cellsToPxs(obj["location"])[1], ")");
+                var pos = processMovement(objID, obj['location'], animatedObjects, animationDurationMs);
+                // round the location to round pixel values
+                x = Math.round(pos[0]);
+                y = Math.round(pos[1]);
+                // console.log("Agent new coordinates:", x, y);
+            }
+
+            // get the object  size
+            sz = obj['visualization']['size'];
+            // get and convert the colour from hex to rgba
+            clr = obj['visualization']['colour'];
+            opacity = obj['visualization']['opacity'];
+            clr = hexToRgba(clr, opacity);
+
+            // draw the object with the correct shape, size and colour
+            if (obj['visualization']['shape'] == 0) {
+                drawRectangle(x, y, px_per_cell, px_per_cell, clr, sz)
+            } else if (obj['visualization']['shape'] == 1) {
+                drawTriangle(x, y, px_per_cell, px_per_cell, clr, sz);
+            } else if (obj['visualization']['shape'] == 2) {
+                drawCircle(x, y, px_per_cell, px_per_cell, clr, sz);
+            } else if (obj['visualization']['shape'] == 'img') {
+                drawImage(obj['img_name'], x, y, px_per_cell, px_per_cell, sz);
+            }
+        })
+    });
+
+    // Draw the FPS to the canvas as last so it's drawn on top
+    ctx.fillStyle = "#ff0000";
+    ctx.fillText("FPS: " + framesLastSecond, 10, 20);
+    ctx.fillText("TPS: " + tps, 65, 20);
+
 }

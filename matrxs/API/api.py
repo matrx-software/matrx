@@ -16,7 +16,6 @@ debug = True
 runs = True  # TODO : bool to stop the API during runtime
 
 app = Flask(__name__)
-app.config['TESTING'] = True
 CORS(app)
 
 # variables to be set by MATRXS
@@ -264,7 +263,7 @@ def flask_thread():
     """
     Starts the Flask server on localhost:3001
     """
-    app.run(host='127.0.0.1', port=3001, debug=False, use_reloader=False)
+    app.run(host='0.0.0.0', port=3001, debug=False, use_reloader=False)
 
 def run_api():
     """
