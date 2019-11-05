@@ -688,7 +688,7 @@ class WorldBuilder:
                         is_traversable=None, team=None, possible_actions=None,
                         is_movable=None,
                         visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                        visualize_opacity=None, usrinp_action_map=None, **custom_properties):
+                        visualize_opacity=None, key_action_map=None, **custom_properties):
 
         # Check if location and agent are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
@@ -733,7 +733,7 @@ class WorldBuilder:
                       f"factory.add_agent to add autonomous agents.")
 
         # Append the user input map to the custom properties
-        custom_properties["usrinp_action_map"] = usrinp_action_map
+        custom_properties["key_action_map"] = key_action_map
 
         # Define a settings dictionary with all we need to register and add an agent to the GridWorld
         hu_ag_setting = {"agent": agent,

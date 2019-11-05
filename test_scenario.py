@@ -6,7 +6,7 @@ from matrxs.actions.move_actions import *
 
 
 def create_factory():
-    factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.5, verbose=True, run_matrxs_api=True,
+    factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.1, verbose=True, run_matrxs_api=True,
                            run_visualization_server=False)
 
     factory.add_logger(logger_class=LogActions, save_path="log_data/")
@@ -23,14 +23,14 @@ def create_factory():
         else:
             even = True
             start = [x, 5]
-            usrinp_action_map = {
+            key_action_map = {
                 'w': MoveNorth.__name__,
                 'd': MoveEast.__name__,
                 's': MoveSouth.__name__,
                 'a': MoveWest.__name__
             }
             factory.add_human_agent(start, human_agent, name="human_" + str(x),
-                                    usrinp_action_map=usrinp_action_map, visualize_shape='img',
+                                    key_action_map=key_action_map, visualize_shape='img',
                                     img_name="transparent.png")
 
     factory.add_line(start=[1, 1], end=[3, 1], name="T")

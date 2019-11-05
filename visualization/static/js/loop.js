@@ -14,10 +14,11 @@ var msPerFrame = (1.0 / 60) * 1000; // placeholder
 var tps = 1; // placeholder
 var frames = 0;
 var lastRender = 0;
-var last_update = (new Date()).getTime();
+var last_update = Date.now();
 
 var init_url = 'http://127.0.0.1:3001/get_info'
 var update_url = 'http://127.0.0.1:3001/get_latest_state/';
+var send_data_to_MATRXS_url = 'http://127.0.0.1:3001/send_data/';
 var agent_id = "";
 
 
@@ -45,15 +46,14 @@ function init() {
     if (type != "") {type = type.substring(1)};
     // Get the agent ID from the url (e.g. "god", "agent_0123", etc.)
     var ID = path.substring(path.lastIndexOf('/') + 1).toLowerCase();
+    agent_id = ID;
 
     // check if this view is for the god view, agent, or human-agent, and get the correct urls
     if (type == "" && ID == "god") {
         console.log("This is the god view");
     } else if (type == "agent") {
-        agent_id = ID;
         console.log("This view is for an Agent with ID:", agent_id);
     } else if (type == "human-agent") {
-        agent_id = ID;
         console.log("This view is for a Human Agent with ID:", agent_id);
     }
 
@@ -66,6 +66,9 @@ function init() {
         current_tick = data.tick;
         grid_size = data.grid_size;
 
+        // calc ticks per second
+        tps = Math.floor(1.0 / tick_duration);
+
         console.log("Fetched MATRXS settings:", data);
 
         // start the visualization loop
@@ -73,8 +76,9 @@ function init() {
     });
 
     // if the request gave an error, print to console and try again
-    resp.fail(function() {
+    resp.fail(function(data) {
         console.log("Could not connect to MATRXS API, retrying in 0.5s");
+        console.log(data);
         setTimeout(function(){
             init();
         }, 500);
@@ -87,7 +91,7 @@ function init() {
  * The main visualization loop
  */
 function loop() {
-    var timestamp = (new Date()).getTime();
+    var timestamp = Date.now();
     var progress = timestamp - lastRender;
     lastRender = timestamp;
 //    console.log("Last frame took:", progress , " while it should take:", msPerFrame);
@@ -104,6 +108,7 @@ function loop() {
     } else {
         // after a successful update redraw the screen and go to the next frame
         update_request.done(function(data) {
+            open_update_request = false;
 //            console.log("update was successful, drawing and requesting a new animation frame");
             draw(new_tick=true);
             lastRender = timestamp
@@ -111,10 +116,13 @@ function loop() {
         })
 
         // if the request gave an error, print to console and try again after a delay (to prevent infinite loops)
-        update_request.fail(function() {
-            console.log("Could not connect to MATRXS API, retrying in 0.5s");
+        update_request.fail(function(data) {
+            console.log("Could not connect to MATRXS API.");
+            console.log("Provided error message:", data.responseJSON);
+            console.log("Retrying in 0.5s");
+            lastRender = timestamp;
+            open_update_request = false;
             setTimeout(function(){
-                lastRender = timestamp
                 window.requestAnimationFrame(loop)
             }, 500);
         })
@@ -127,9 +135,9 @@ function loop() {
 function update(progress) {
 
     // check if there is a new tick available yet based on the tick_duration
-    if ((new Date()).getTime() > last_update + (tick_duration * 1000) && !open_update_request) {
+    if ( Date.now() > last_update + (tick_duration * 1000) && !open_update_request) {
         // save that we requested an update at this time
-        last_update = (new Date()).getTime();
+        last_update = Date.now();
         open_update_request = true;
         return get_MATRXS_update();
     }
@@ -141,23 +149,31 @@ function update(progress) {
  * Fetch an update from MATRXS when a new tick has occurred (based on tick duration speed)
  */
 function get_MATRXS_update() {
-    var a = performance.now();
-    // the get request is async, meaning the function is only executed when
+    // the get request is async, meaning the (success) function is only executed when
     // the response has been received
-
-    var update_request = $.ajax({
-        method: 'GET',
-        url: update_url + "['god']",
-        dataType: "json",
-        success: function(data) {
-            open_update_request = false;
-            state = data[data.length-1]['god']['state']
-            current_tick = data[data.length-1]['god']['tick'];
-        }
+    var update_request = jQuery.getJSON(update_url + "['" + agent_id + "']", function(data) {
+        state = data[data.length-1][agent_id]['state']
+        current_tick = data[data.length-1][agent_id]['tick'];
     });
 
     return update_request;
 }
 
 
-
+/*
+ * Send the object "data" to MATRXS as JSON data. The agent ID is automatically appended.
+ */
+function send_data_to_MATRXS(data) {
+    // send an update for every key pressed
+    var resp = $.ajax({
+        method: "POST",
+        url: send_data_to_MATRXS_url + agent_id,
+        contentType:"application/json; charset=utf-8",
+        dataType: 'json',
+        data: JSON.stringify(data),
+        success: function () {
+            //console.log("Data sent to MATRXS");
+        },
+    });
+    return resp;
+}

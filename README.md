@@ -11,12 +11,9 @@ For documentation see the wiki at [https://ci.tno.nl/gitlab/SAIL-framework/testb
 
 
 # Todo:
-- fix agent / human views
-- fix userinput
+- check userinput
 - fix bg colour
 - fix bg img
-- issue: how to make settings available via the API (e.g. bg_img), such that users / agents can edit it, and users / agents can also add extra info.
-- function 
 - extend World object to: 
 ```
 state["World"] = {

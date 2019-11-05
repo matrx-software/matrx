@@ -363,8 +363,6 @@ function draw(new_tick) {
         fixCanvasSize();
         firstDraw = false;
         updateGridSize(grid_size); // save the number of cells in x and y direction of the map
-        // calc ticks per second
-        tps = Math.floor(1.0 / tick_duration);
     }
 
     // calculate how many milliseconds 1 frame should take based on our framerate last second

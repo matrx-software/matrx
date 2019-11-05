@@ -249,7 +249,7 @@ class GridWorld:
                                       customizable_properties=agent_avatar.customizable_properties,
                                       callback_is_action_possible=self.__check_action_is_possible,
                                       rnd_seed=agent_seed,
-                                      usrinp_action_map=agent_avatar.properties["usrinp_action_map"])
+                                      key_action_map=agent_avatar.properties["key_action_map"])
 
         return agent_avatar.obj_id
 
@@ -358,11 +358,12 @@ class GridWorld:
 
             else:  # agent is not busy
 
-                # For a HumanAgent any user inputs from the GUI for this HumanAgent are send along
+                # For a HumanAgent any received data from the API for this HumanAgent is send along
                 if agent_obj.is_human_agent:
-                    # usrinp = self.__visualizer._userinputs[agent_id.lower()] if \
-                    #     agent_id.lower() in self.__visualizer._userinputs else None
                     usrinp = None
+                    if self.__run_matrxs_api and agent_id in api.received_data:
+                        usrinp = api.received_data[agent_id]
+
                     filtered_agent_state, agent_properties, action_class_name, action_kwargs = \
                         agent_obj.get_action_func(state=state, agent_properties=agent_obj.properties, agent_id=agent_id,
                                                   userinput=usrinp)
@@ -416,7 +417,7 @@ class GridWorld:
 
             # make the information of this tick available via the API, after all
             # agents have been updated
-            api.states.append(copy.copy(api.temp_state))
+            api.next_tick()
             api.current_tick = self.__current_nr_ticks
             api.tick_duration = self.__tick_duration
             api.grid_size = self.shape

@@ -14,7 +14,7 @@ class HumanAgentBrain(AgentBrain):
         super().__init__()
 
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
-                            customizable_properties, rnd_seed, callback_is_action_possible, usrinp_action_map=None):
+                            customizable_properties, rnd_seed, callback_is_action_possible, key_action_map=None):
         """
         Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
         properties. This also sets the random number generator with a seed generated based on the random seed of the
@@ -29,7 +29,7 @@ class HumanAgentBrain(AgentBrain):
         :param agent_properties: The dictionary of properties containing all mandatory and custom properties.
         :param customizable_properties: A list of keys in agent_properties that this agent is allowed to change.
         :param rnd_seed: The random seed used to set the random number generator self.rng
-        :param usrinp_action_map: maps userinputs (e.g. arrow key up) to a specific action
+        :param key_action_map: maps user pressed keys (e.g. arrow key up) to a specific action
         """
 
         # The name of the agent with which it is also known in the world
@@ -62,10 +62,10 @@ class HumanAgentBrain(AgentBrain):
         self.__callback_is_action_possible = callback_is_action_possible
 
         # a list which maps user inputs to actions, defined in the scenario manager
-        if usrinp_action_map is None:
-            self.usrinp_action_map = {}
+        if key_action_map is None:
+            self.key_action_map = {}
         else:
-            self.usrinp_action_map = usrinp_action_map
+            self.key_action_map = key_action_map
 
     def _get_action(self, state, agent_properties, agent_id, userinput):
         """
@@ -81,7 +81,7 @@ class HumanAgentBrain(AgentBrain):
         :param agent_properties: The properties of the agent, which might have been changed by the
         environment as a result of actions of this or other agents.
         :param agent_id: the ID of this agent
-        :param userinput: any userinput given by the user for this human agent via the GUI
+        :param userinput: any userinput given by the user for this human agent via the API
         :return: The filtered state of this agent, the agent properties which the agent might have changed,
         and an action string, which is the class name of one of the actions in the Action package.
         """
@@ -92,18 +92,24 @@ class HumanAgentBrain(AgentBrain):
         # first filter the state to only show things this particular agent can see
         state = self.filter_observations(state)
 
+        # userinput is any input sent via the API to MATRXS. In specific any keys pressed by the user are sent along
+        # under the name 'pressed_keys', and can be used for instance to control the agent's behaviour
+        pressed_keys = None
+        if userinput is not None and 'pressed_keys' in userinput:
+            pressed_keys = userinput['pressed_keys']
+
         # only keep userinput which is actually connected to an agent action
-        userinput = self.filter_userinputs(userinput)
+        pressed_keys = self.filter_pressed_keys(pressed_keys)
 
         action_kwargs = {}
 
-        # if there was no userinput do nothing
-        if userinput is None or userinput == []:
+        # if no keys were pressed, do nothing
+        if pressed_keys is None or pressed_keys == []:
             return state, self.agent_properties, None, {}
 
-        # take the last userinput (for now), and fetch the action associated with that key
-        userinput = userinput[-1]
-        action = self.usrinp_action_map[userinput]
+        # take the latest pressed key (for now), and fetch the action associated with that key
+        pressed_keys = pressed_keys[-1]
+        action = self.key_action_map[pressed_keys]
 
         # if the user chose a grab action, choose an object with a grab_range of 1
         if action == GrabObject.__name__:
@@ -181,12 +187,12 @@ class HumanAgentBrain(AgentBrain):
         """
         return state
 
-    def filter_userinputs(self, userinputs):
+    def filter_pressed_keys(self, pressed_keys):
         """
         From the received userinput, only keep those which are actually Connected
         to a specific agent action
         """
-        if userinputs is None:
+        if pressed_keys is None:
             return []
-        possible_usrinpts = list(self.usrinp_action_map.keys())
-        return list(set(possible_usrinpts) & set(userinputs))
+        possible_key_presses = list(self.key_action_map.keys())
+        return list(set(possible_key_presses) & set(pressed_keys))

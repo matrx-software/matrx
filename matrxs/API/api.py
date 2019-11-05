@@ -1,7 +1,8 @@
 import threading
 import time
+import copy
 
-from flask import Flask, jsonify, abort
+from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
 '''
@@ -23,14 +24,14 @@ CORS(app)
 states = []
 current_tick = 0
 tick_duration = 0.0
-grid_size = [1,1]
+grid_size = [1, 1]
 
 # a temporary state for the current tick, which will be written to states after all
 # agents have been updated
 temp_state = []
 
 # variables to be read (only!) by MATRXS and set (only!) through API calls
-userinput = {}
+received_data = {}
 
 
 
@@ -82,7 +83,7 @@ def get_states_specific_agents(tick, agent_ids):
 
 
 @app.route('/get_latest_state/<agent_ids>', methods=['GET', 'POST'])
-def get_god_state(agent_ids):
+def get_latest_state(agent_ids):
     """
     Returns the latest states for agents 'agent_ids'
     :param tick: integer indicating from which tick onwards to send the states.
@@ -97,6 +98,47 @@ def get_god_state(agent_ids):
         return abort(error['error_code'], description=error['error_message'])
 
     return jsonify(fetch_states(current_tick, agent_ids))
+
+
+@app.route('/send_data/<agent_ids>', methods=['POST'])
+def send_data(agent_ids):
+    """
+    :param agent_id: ID of the agent which sent the data
+    :return: returns True if the data was valid (right now always)
+    """
+    global received_data
+
+    API_call_valid, error = check_API_request(current_tick, agent_ids, ids_required=True)
+    if not API_call_valid:
+        print("API request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
+    # make sure the ids are a list
+    try:
+        agent_ids = eval(agent_ids)
+    except:
+        agent_ids = [agent_ids]
+
+    data = request.json
+
+    for agent_id in agent_ids:
+        # add all received data to the received_data dictionary
+        for received_data_type in data:
+            # add  the agent_id if not existing yet
+            if agent_id not in received_data:
+                received_data[agent_id] = {}
+
+            # add the type of received data if not existing yet (e.g. 'pressed_keys')
+            if received_data_type not in received_data[agent_id]:
+                received_data[agent_id][received_data_type] = []
+
+            # add the data
+            print(f"Adding to {agent_id} and data type {received_data_type}: {data[received_data_type]}")
+            print("Before received data:", received_data)
+            received_data[agent_id][received_data_type].append(data[received_data_type])
+            print("After received data:", received_data)
+
+    return jsonify(True)
 
 
 
@@ -129,7 +171,7 @@ def check_API_request(tick=None, ids=None, ids_required=False):
     except:
         return False, {'error_code': 400, 'error_message': f'Tick has to be an integer, but is of type {type(tick)}'}
 
-    # check if the tick has actually occured
+    # check if the tick has actually occurred
     if not tick in range(0, current_tick+1):
         return False, {'error_code': 400, 'error_message': f'Indicated tick does not exist, has to be in range 0 - {current_tick}, but is {tick}'}
 
@@ -153,7 +195,7 @@ def check_API_request(tick=None, ids=None, ids_required=False):
                 if id not in states[t]:
                     return False, {'error_code': 400,
                                    'error_message': f'Trying to fetch the state for agent with ID "{id}" for tick {t}, but '
-                                                    f'does not exist.'}
+                                                    f'no data on that agent exists for that tick. Is the agent ID correct?'}
 
     # all checks cleared, so return with success and no error message
     return True, None
@@ -252,7 +294,20 @@ def add_state(agent_id, state, agent_inheritence_chain):
                                           "tick": current_tick,
                                           'agent_inheritence_chain': agent_inheritence_chain}
 
-    # print("States saved:", len(states), "last item:", states[-1])
+
+
+def next_tick():
+    """
+    Proceed to the next tick, publizing data via the API (the new states), and refreshing received data (e.g. userinputs)
+    :return:
+    """
+    # publicize the states of the previous tick
+    states.append(copy.copy(temp_state))
+
+    # refresh the received data
+    global received_data
+    received_data = {}
+
 
 
 #########################################################################
