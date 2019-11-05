@@ -1,4 +1,5 @@
 import threading
+import time
 
 from flask import Flask, jsonify, abort
 from flask_cors import CORS
@@ -15,6 +16,7 @@ debug = True
 runs = True  # TODO : bool to stop the API during runtime
 
 app = Flask(__name__)
+app.config['TESTING'] = True
 CORS(app)
 
 # variables to be set by MATRXS
@@ -40,7 +42,7 @@ userinput = {}
 
 
 @app.route('/get_info', methods=['GET', 'POST'])
-def get_tick():
+def get_info():
     print(f"Returning tick {current_tick}")
     return jsonify({"tick": current_tick, "tick_duration": tick_duration, "grid_size": grid_size})
 
@@ -87,6 +89,8 @@ def get_god_state(agent_ids):
     :param tick: integer indicating from which tick onwards to send the states.
     :return: States from tick 'tick' onwards for the god view
     """
+
+    a = time.time()
     # check for validity and return an error if not valid
     API_call_valid, error = check_API_request(current_tick, agent_ids, ids_required=True)
     if not API_call_valid:
@@ -258,9 +262,9 @@ def add_state(agent_id, state, agent_inheritence_chain):
 
 def flask_thread():
     """
-    Starts the Flask server on localhost:3000
+    Starts the Flask server on localhost:3001
     """
-    app.run(host='0.0.0.0', port=3000, debug=False, use_reloader=False)
+    app.run(host='127.0.0.1', port=3001, debug=False, use_reloader=False)
 
 def run_api():
     """

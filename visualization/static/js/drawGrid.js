@@ -11,16 +11,12 @@ var px_per_cell = 40;
 // number of cells in width and height of map
 var mapW = 10,
     mapH = 10;
-var currentSecondTicks = 0,
-    tpsCount = 0,
-    ticksLastSecond = 0;
 var currentSecondFrames = 0,
-    fpsCount = 0,
-    framesListSecond = 0;
+    fpsCount = 60, // placeholder
+    framesLastSecond = 60; //placeholder
 var lastTickSecond = 0;
 var firstDraw = true;
 var parsedGifs = [];
-
 
 // Colour of the default BG tile
 var bgTileColour = "#C2C2C2";
@@ -29,7 +25,6 @@ var highestTickSoFar = 0;
 
 var prevAnimatedObjects = {};
 var animatedObjects = {};
-var targetFPS = 60;
 // how long should the animation of the movement be, in percentage with respect to
 // the maximum number of time available between ticks 1 = max duration between ticks, 0.001 min (no animation)
 var animationDurationPerc = 1;
@@ -78,7 +73,7 @@ function fixTileSize(canvasW, canvasH) {
 /**
  * Keep track of how many ticks per second are received
  */
-function calc_fps() {
+function calcFps() {
     var sec = Math.floor(Date.now() / 1000);
     if (sec != currentSecondFrames) {
         currentSecondFrames = sec;
@@ -86,35 +81,6 @@ function calc_fps() {
         fpsCount = 1;
     } else {
         fpsCount++;
-    }
-}
-
-/**
- * Calculate how many frames per second are visualized
- */
-// function calc_tps() {
-//     var sec = Math.floor(Date.now() / 1000);
-//     if (sec != currentSecondTicks) {
-//         currentSecondTicks = sec;
-//         ticksLastSecond = tpsCount;
-//         tpsCount = 1;
-//     } else {
-//         tpsCount++;
-//     }
-// }
-
-/**
- * Stop the GUI if we haven't received a new update for a long while
- */
-function checkDisconnected() {
-    if (ticksLastSecond == 0 || lastTickSecond == 0) {
-        return;
-    }
-
-    // if we haven't received a new tick for a while (3x the normal duration), quit the animation loop
-    if ((lastTickSecond + ((1.0 / ticksLastSecond) * 1000 * 3)) < Date.now()) {
-        console.log("Haven't received a new tick in a long while, stopping animated movement updates");
-        disconnected = true;
     }
 }
 
@@ -133,7 +99,9 @@ function updateGridSize(grid_size) {
     }
 }
 
-//Used to parse Gifs(in case they exist) into the frames they are made out of on the first load of the screen.
+/*
+ * Used to parse Gifs(in case they exist) into the frames they are made out of on the first load of the screen.
+ */
 function parseGifs(state) {
     var vis_depths = Object.keys(state);
     vis_depths.forEach(function(vis_depth) {

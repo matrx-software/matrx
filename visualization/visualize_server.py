@@ -82,7 +82,7 @@ def flask_thread():
     """
     Starts the Flask server on localhost:3000
     """
-    app.run(host='0.0.0.0', port=3001, debug=False, use_reloader=False)
+    app.run(host='0.0.0.0', port=3000, debug=False, use_reloader=False)
 
 def run_api():
     """

@@ -11,9 +11,23 @@ For documentation see the wiki at [https://ci.tno.nl/gitlab/SAIL-framework/testb
 
 
 # Todo:
+- fix smooth movement
+- fix agent / human views
+- fix userinput
 - fix bg colour
 - fix bg img
-- fix userinput
-- fix agent / human views
-- issue: how to make settings available via the API (e.g. bg_img), such that
-- users / agents can edit it, and users / agents can also add extra info.
+- issue: how to make settings available via the API (e.g. bg_img), such that users / agents can edit it, and users / agents can also add extra info.
+- function 
+- extend World object to: 
+```
+state["World"] = {
+    "nr_ticks": self.__current_nr_ticks,
+    "grid_shape": self.__shape,
+    "vis_settings": { 
+        "visualization_bg_clr": self.visualization_bg_clr,
+        "visualization_bg_img": self.visualization_bg_img    
+    }
+} 
+```
+Advantage is that agents can change it (using actions) and also read it. 
+Settings are also passed automatically via the API, which is required for the visualization. 

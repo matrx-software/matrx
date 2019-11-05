@@ -3,30 +3,21 @@
  * requesting a redraw of the grid when a socketIO update has been received.
  */
 
-var doVisualUpdates = true;
-// var isFirstCall=true;
-
-/**
- * Check if the current tab is in focus or not
- */
-document.addEventListener('visibilitychange', function() {
-    doVisualUpdates = !document.hidden;
-});
-
-
 var initialized = false;
 var tick_duration = 0.5;
 var current_tick = 0;
 var grid_size = [1,1]
 var rendered_update = true;
+var open_update_request = false;
 
-var tps = 1;
+var msPerFrame = (1.0 / 60) * 1000; // placeholder
+var tps = 1; // placeholder
 var frames = 0;
 var lastRender = 0;
-var last_update = 0;
+var last_update = (new Date()).getTime();
 
-var init_url = 'http://localhost:3000/get_info'
-var update_url = 'http://localhost:3000/get_latest_state/'
+var init_url = 'http://127.0.0.1:3001/get_info'
+var update_url = 'http://127.0.0.1:3001/get_latest_state/';
 
 var state = {}
 
@@ -34,15 +25,16 @@ var state = {}
  * Update the state of the world for the elapsed time since last render
  */
 function update(progress) {
-    // console.log("Update with progress:", progress)
 
     // check if there is a new tick available yet based on the tick_duration
-    if ((new Date()).getTime() > last_update + (tick_duration * 1000) ) {
+    if ((new Date()).getTime() > last_update + (tick_duration * 1000) && !open_update_request) {
+        // save that we requested an update at this time
+        last_update = (new Date()).getTime();
+        open_update_request = true;
         return get_MATRXS_update();
     }
 
     return false;
-    // console.log("Updating object locations etc.");
 }
 
 
@@ -51,26 +43,29 @@ function update(progress) {
  */
 function loop() {
     var timestamp = (new Date()).getTime();
-    var progress = timestamp - lastRender
+    var progress = timestamp - lastRender;
+    lastRender = timestamp;
+//    console.log("Last frame took:", progress , " while it should take:", msPerFrame);
 
-    var update_request = update(progress)
+//     Fetch an update from the server
+    var update_request = update(progress);
 
     // if we didn't get an update yet, redraw the screen
     if (! update_request) {
         draw()
-        lastRender = timestamp
         window.requestAnimationFrame(loop)
 
-    // if we requested an update check if it was succesful
+    // if we requested an update check if it was successful
     } else {
-        // after a succesful update redraw the screen and go to the next frame
+        // after a successful update redraw the screen and go to the next frame
         update_request.done(function(data) {
+//            console.log("update was successful, drawing and requesting a new animation frame");
             draw(new_tick=true);
             lastRender = timestamp
             window.requestAnimationFrame(loop)
         })
 
-        // if the request gave an error, print to console and try again after a delay
+        // if the request gave an error, print to console and try again after a delay (to prevent infinite loops)
         update_request.fail(function() {
             console.log("Could not connect to MATRXS API, retrying in 0.5s");
             setTimeout(function(){
@@ -81,22 +76,23 @@ function loop() {
     }
 }
 
-
 /*
- * Fetch an update from MATRXS when a new tick has occured (based on tick duration speed)
+ * Fetch an update from MATRXS when a new tick has occurred (based on tick duration speed)
  */
 function get_MATRXS_update() {
+    var a = performance.now();
     // the get request is async, meaning the function is only executed when
     // the response has been received
-    var update_request = jQuery.getJSON(update_url + "['god']", function(data) {
-        // console.log("Fetched update, received data:", data)
-        rendered_changes = false;
-        last_update = (new Date()).getTime();
-        state = data[data.length-1]['god']['state']
-        // console.log("State:", state);
 
-        current_tick = data[data.length-1]['god']['tick'];
-        // console.log("Latest tick set to:", current_tick);
+    var update_request = $.ajax({
+        method: 'GET',
+        url: update_url + "['god']",
+        dataType: "json",
+        success: function(data) {
+            open_update_request = false;
+            state = data[data.length-1]['god']['state']
+            current_tick = data[data.length-1]['god']['tick'];
+        }
     });
 
     return update_request;
@@ -106,11 +102,12 @@ function get_MATRXS_update() {
 
 /*
  * Initialize the visualization by requesting the MATRXS scenario info.
- * If succesful, the main visualization loop is called
+ * If successful, the main visualization loop is called
  */
 function init() {
     console.log("initializing")
 
+    var a = performance.now();
     // fetch settings
     var resp = jQuery.getJSON(init_url, function(data) {
         initialized = true;
@@ -118,6 +115,7 @@ function init() {
         current_tick = data.tick;
         grid_size = data.grid_size;
 
+        console.log("Fetched initial MATRXS update in ", performance.now() - a, "ms");
         console.log("MATRXS settings:", data);
 
         // start the visualization loop
@@ -130,88 +128,10 @@ function init() {
         setTimeout(function(){
             init();
         }, 500);
-    })
+    });
+
 
 }
-
-
-$(document).ready(function() {
-    init();
-});
-
-
-
-//
-//    /**
-//     * receive an update from the python server
-//     */
-//    socket.on('update', function(data){
-//         console.log("Received an update from the server:", data);
-//
-//        // Only perform the GUI update if it is in the foreground, as the
-//        // background tabs are often throttled after which the browser cannot
-//        // keepup
-//        if (!doVisualUpdates) {
-//            console.log("Chrome in background, skipping");
-//            return;
-//        }
-//
-//        // unpack received data
-//        grid_size = data.params.grid_size;
-//        state = data.state;
-//        tick = data.params.tick;
-//        vis_bg_clr = data.params.vis_bg_clr;
-//        vis_bg_img = data.params.vis_bg_img;
-//        //draw the menu if it is the first call
-//        if(isFirstCall){
-//            isFirstCall=false;
-//            populateMenu(state);
-//            parseGifs(state);}
-//        // draw the grid again
-//        requestAnimationFrame(function() {
-//            doTick(grid_size, state, tick, vis_bg_clr,vis_bg_img, parsedGifs);
-//        });
-//    });
-
-
-
-
-
-
-/**
- * called when a new tick is received by the agent
- */
-// function doTick(state, curr_tick, vis_bg_clr=None, vis_bg_img=None) {
-//     // for the first time drawing the visualization, calculate the optimal
-//     // screen size based on the grid size
-//     if (firstDraw) {
-//         // console.log("First draw, resetting canvas and tile sizes");
-//         fixCanvasSize();
-//         firstDraw = false;
-//         bgTileColour = vis_bg_clr;
-//         bgImage = vis_bg_img;
-//     }
-//
-//     // console.log("\n#####################################\nNew tick #", curr_tick);
-//
-//     // calc the ticks per second
-//     highestTickSoFar = curr_tick;
-//     lastTickSecond = Date.now();
-//     calc_tps();
-//     // the tracked objects from last iteration are moved to a seperate list
-//     prevAnimatedObjects = animatedObjects;
-//     animatedObjects = {};
-//
-//     // console.log("Received state:", state);
-//
-//     // if we have less than X ticks per second (by default 60), animate the movement
-//     if (ticksLastSecond < targetFPS && ticksLastSecond > 0) {
-//         drawSim(grid_size, state, curr_tick, true);
-//     } else {
-//         drawSim(grid_size, state, curr_tick, false);
-//     }
-// }
-
 
 /**
  * Draw all objects on the canvas
@@ -230,34 +150,33 @@ function draw(new_tick) {
         fixCanvasSize();
         firstDraw = false;
         updateGridSize(grid_size); // save the number of cells in x and y direction of the map
+        // calc ticks per second
         tps = Math.floor(1.0 / tick_duration);
     }
 
+    // calculate how many milliseconds 1 frame should take based on our framerate last second
+    msPerFrame = (1.0 / framesLastSecond) * 1000;
+
     if (new_tick) {
-        // the tracked objects from last iteration are moved to a seperate list
+        // the tracked objects from last iteration are moved to a separate list
         prevAnimatedObjects = animatedObjects;
         animatedObjects = {};
     }
 
     // Draw the state of the world
-    // console.log("drawing the world, frame:", frames);
     frames++;
 
-    calc_fps();
+    calcFps();
     updateGridSize(grid_size); // save the number of cells in x and y direction of the map
     drawBg(); // draw a default bg tile
 
     // identify the objects we received
     var obj_keys = Object.keys(state);
 
-    // calculate a number of necessary variables for timing the movement animation
-    // how many milliseconds should 1 frame take
-    var msPerFrame = (1.0 / targetFPS) * 1000;
+    // calculate how many frames the animation of movement should take
+    var animationDurationFrames = (framesLastSecond / tps) * animationDurationPerc;
 
-    // how many frames should the animation of movement take
-    var animationDurationFrames = (targetFPS / ticksLastSecond) * animationDurationPerc;
-
-    // how many milliseconds the animation of movement should take
+    // calculate how many milliseconds the movement animation should take
     var animationDurationMs = animationDurationFrames * msPerFrame;
 
     // Loop through the visualization depths
@@ -325,12 +244,9 @@ function draw(new_tick) {
     ctx.fillText("FPS: " + framesLastSecond, 10, 20);
     ctx.fillText("TPS: " + tps, 65, 20);
 
-    // if (animateMovement) {
-    //     // console.log("Calling draw recursively at:", Date.now(), " with delay in ms: ", msPerFrame);
-    //
-    //     // call the draw function again after a short sleep to get to desired number of fps in milliseconds
-    //     setTimeout(function() {
-    //         drawSim(grid_size, state, curr_tick, animateMovement);
-    //     }, msPerFrame);
-    // }
 }
+
+
+$(document).ready(function() {
+    init();
+});
