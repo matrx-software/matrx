@@ -1,6 +1,7 @@
 import threading
 import time
 import copy
+import warnings
 
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
@@ -128,15 +129,16 @@ def send_data(agent_ids):
             if agent_id not in received_data:
                 received_data[agent_id] = {}
 
-            # add the type of received data if not existing yet (e.g. 'pressed_keys')
-            if received_data_type not in received_data[agent_id]:
-                received_data[agent_id][received_data_type] = []
+            try:
+                # add the type of received data if not existing yet (e.g. 'pressed_keys')
+                if received_data_type not in received_data[agent_id]:
+                    received_data[agent_id][received_data_type] = []
 
-            # add the data
-            print(f"Adding to {agent_id} and data type {received_data_type}: {data[received_data_type]}")
-            print("Before received data:", received_data)
-            received_data[agent_id][received_data_type].append(data[received_data_type])
-            print("After received data:", received_data)
+                # add the data
+                received_data[agent_id][received_data_type].append(data[received_data_type])
+            except:
+                warnings.warn("API userinputs list was emptied while adding user input, skipping")
+
 
     return jsonify(True)
 
@@ -232,6 +234,7 @@ def fetch_states(tick, ids=None):
 
         # save the states of all filtered agents for this tick
         filtered_states.append(states_this_tick)
+
     return filtered_states
 
 
@@ -304,9 +307,15 @@ def next_tick():
     # publicize the states of the previous tick
     states.append(copy.copy(temp_state))
 
-    # refresh the received data
+def pop_received_data(agent_id):
+    """
+    Pop the user input for an agent from the received_data dictionary and return it
+    :param agent_id: ID of the agent for which to return the userinput
+    :return: received data / userinput
+    """
     global received_data
-    received_data = {}
+    return received_data.pop(agent_id, None)
+
 
 
 

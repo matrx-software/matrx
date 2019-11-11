@@ -342,8 +342,6 @@ class GridWorld:
 
                 # only do the filter observation method to be able to update the agent's state to the API
                 filtered_agent_state = agent_obj.filter_observations(state)
-                # self.__visualizer._save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
-                #                               state=filtered_agent_state)
 
                 # save the current agent's state for the visualizer
                 if self.__run_matrxs_api:
@@ -362,7 +360,7 @@ class GridWorld:
                 if agent_obj.is_human_agent:
                     usrinp = None
                     if self.__run_matrxs_api and agent_id in api.received_data:
-                        usrinp = api.received_data[agent_id]
+                        usrinp = api.pop_received_data(agent_id)
 
                     filtered_agent_state, agent_properties, action_class_name, action_kwargs = \
                         agent_obj.get_action_func(state=state, agent_properties=agent_obj.properties, agent_id=agent_id,
@@ -399,17 +397,9 @@ class GridWorld:
                         else:
                             self.__message_buffer[mssg.to_id].append(mssg)
 
-            # save what the agent observed to the visualizer
-            # self.__visualizer._save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
-            #                               state=filtered_agent_state).
-
             # save the current agent's state for the visualizer
             if self.__run_matrxs_api:
                 api.add_state(agent_id=agent_id, state=filtered_agent_state, agent_inheritence_chain=agent_obj.class_inheritance)
-
-
-        # save the state of the god view in the visualizer
-        # self.__visualizer._save_state(inheritance_chain="god", id="god", state=self.__get_complete_state())
 
         # save the god view state
         if self.__run_matrxs_api:
@@ -437,10 +427,6 @@ class GridWorld:
 
             # Update the grid
             self.__update_grid()
-
-        # Clear previously send messages
-        # for receiver_id in self.__registered_agents.keys():
-        #   self.__registered_agents[receiver_id].set_messages_func()
 
         # Send all messages between agents
         for receiver_id, messages in self.__message_buffer.items():

@@ -25,5 +25,6 @@ state["World"] = {
     }
 } 
 ```
+- Jasper: property maken van global variable -> issue. 
 Advantage is that agents can change it (using actions) and also read it. 
 Settings are also passed automatically via the API, which is required for the visualization. 
