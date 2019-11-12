@@ -16,7 +16,15 @@ function checkArrowKey(e) {
 
     console.log("Arrow pressed:", e);
 
-    data = { "pressed_keys": e.key  };
+    data = [ e.key ];
 
     send_data_to_MATRXS(data);
+
+    // send an update for every key pressed
+//    var resp = $.ajax({
+//        method: "GET",
+//        url: "http://127.0.0.1:3001/pause_MATRXS",
+//        contentType:"application/json; charset=utf-8",
+//        dataType: 'json'
+//    });
 }

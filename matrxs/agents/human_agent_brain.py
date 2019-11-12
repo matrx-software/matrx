@@ -92,14 +92,8 @@ class HumanAgentBrain(AgentBrain):
         # first filter the state to only show things this particular agent can see
         state = self.filter_observations(state)
 
-        # userinput is any input sent via the API to MATRXS. In specific any keys pressed by the user are sent along
-        # under the name 'pressed_keys', and can be used for instance to control the agent's behaviour
-        pressed_keys = None
-        if userinput is not None and 'pressed_keys' in userinput:
-            pressed_keys = userinput['pressed_keys']
-
         # only keep userinput which is actually connected to an agent action
-        pressed_keys = self.filter_pressed_keys(pressed_keys)
+        pressed_keys = self.filter_userinput(userinput)
 
         action_kwargs = {}
 
@@ -187,12 +181,12 @@ class HumanAgentBrain(AgentBrain):
         """
         return state
 
-    def filter_pressed_keys(self, pressed_keys):
+    def filter_userinput(self, userinput):
         """
         From the received userinput, only keep those which are actually Connected
         to a specific agent action
         """
-        if pressed_keys is None:
+        if userinput is None:
             return []
         possible_key_presses = list(self.key_action_map.keys())
-        return list(set(possible_key_presses) & set(pressed_keys))
+        return list(set(possible_key_presses) & set(userinput))

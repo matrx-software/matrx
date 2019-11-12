@@ -35,9 +35,9 @@ next_tick_info = {}
 temp_state = []
 
 # variables to be read (only!) by MATRXS and set (only!) through API calls
-received_data = {}
-
-
+userinput = {}
+matrxs_paused = False
+matrxs_done = False
 
 #########################################################################
 # API connection methods
@@ -133,51 +133,21 @@ def get_latest_state(agent_ids):
     return jsonify(__fetch_states(current_tick, agent_ids))
 
 
+@app.route('/send_userinput/<agent_ids>', methods=['GET', 'POST'])
+def send_userinput(agent_ids):
+    """ Can be used to send user input from the user (pressed keys) to the specified human agent(s) in MATRXS
 
-# def send_user_pressed_keys(agent_id):
-#     pass
-#
-# def send_message(agent_id):
-#     agent_id(s)
-#     None = all
-#     team = team
-#     pass
-#
-#
-# def send_custom_data():
-#     pass
-#
-
-
-@app.route('/send_data/<agent_ids>', methods=['POST'])
-def send_data(agent_ids):
-    """ Sends data to MATRXS via the API, to be passed on to a specific (set of) agent(s).
-
-    The data should be sent in JSON format using a POST request. It is recommended to use the first-level keys to signify
-    different types of information. E.g.: `{"pressed_keys": ..., "chat_messages": ....}`.
-    Multiple instances received within 1 tick of these top-level keys are pooled together in a list and sent to the agent.
-    
-    Thus, if the following data is received within 1 tick:
-    JSON array 1: `{ "pressed_keys":  "ArrowDown"}`
-    JSON array 2: `{ "pressed_keys":  "ArrowUp"}`
-    JSON array 3: `{ "pressed_keys":  {"some subdict"}, "chat_messages": .. }`
-    The information is pooled together and passed to the agents get_action() function as such: 
-    `{"pressed_keys" ["ArrowDown", "ArrowUp", {"some subdict"}], "chat_messages": ..}`
-
-    Each tick the received data will be sent to the corresponding agent during the get_action() function, after which 
-    the received data of that agent for that tick is removed.
-    
     Parameters
     ----------
     agent_ids
-        ID(s) of the agent(s) to which the data should be passed.
+        ID(s) of the human agent(s) to which the data should be passed.
 
     Returns
         returns True if the data was valid (right now always)
     -------
 
     """
-    global received_data
+    global userinput
 
     API_call_valid, error = check_API_request(current_tick, agent_ids, ids_required=True)
     if not API_call_valid:
@@ -190,29 +160,80 @@ def send_data(agent_ids):
     except:
         agent_ids = [agent_ids]
 
+    # fetch the data from the request object
     data = request.json
 
+    # add each pressed key as userinput for each specified human agent
     for agent_id in agent_ids:
-        # add all received data to the received_data dictionary
-        for received_data_type in data:
+        for pressed_key in data:
+
             # add  the agent_id if not existing yet
-            if agent_id not in received_data:
-                received_data[agent_id] = {}
+            if agent_id not in userinput:
+                userinput[agent_id] = []
 
-            try:
-                # add the type of received data if not existing yet (e.g. 'pressed_keys')
-                if received_data_type not in received_data[agent_id]:
-                    received_data[agent_id][received_data_type] = []
-
-                # add the data
-                received_data[agent_id][received_data_type].append(data[received_data_type])
-            except:
-                warnings.warn("API userinputs list was emptied while adding user input, skipping")
-
+            # save the pressed key of the agent
+            userinput[agent_id].append(pressed_key)
+            # try:
+            #
+            #     userinput[agent_id].append(pressed_key)
+            #
+            # except:
+            #     warnings.warn("API userinputs list was emptied while adding user input, skipping")
 
     return jsonify(True)
 
 
+def send_message(agent_ids):
+    pass
+
+
+
+@app.route('/pause', methods=['GET', 'POST'])
+def pause_MATRXS():
+    """ Pause the MATRXS simulation
+
+    Returns
+        True if paused, False if already paused
+    -------
+    """
+    global matrxs_paused
+    if not matrxs_paused:
+        matrxs_paused = True
+        return jsonify(True)
+    else:
+        return jsonify(False)
+
+@app.route('/start', methods=['GET', 'POST'])
+def start_MATRXS():
+    """ Starts / unpauses the MATRXS simulation
+
+    Returns
+        True if it has been started, False if it is already running
+    -------
+
+    """
+    global matrxs_paused
+    if matrxs_paused:
+        matrxs_paused = False
+        return jsonify(True)
+    else:
+        return jsonify(False)
+
+@app.route('/stop', methods=['GET', 'POST'])
+def stop_MATRXS():
+    """ Stops MATRXS scenario
+
+    Returns
+        True
+    -------
+    """
+    global matrxs_done
+    matrxs_done = True
+    return jsonify(True)
+
+@app.route('/change_speed/<speed>', methods=['GET', 'POST'])
+def change_MATRXS_speed(speed):
+    pass
 
 #########################################################################
 # Errors
@@ -410,25 +431,46 @@ def next_tick():
     # publicize the states of the previous tick
     states.append(copy.copy(temp_state))
 
-def pop_received_data(agent_id):
-    """ Pop the user input for an agent from the received_data dictionary and return it
+# def pop_received_data(agent_id):
+#     """ Pop the user input for an agent from the received_data dictionary and return it
+#
+#     Parameters
+#     ----------
+#     agent_id
+#         ID of the agent for which to return the received input
+#
+#     Returns
+#         A dictionary containing the type of input (e.g. "pressed_keys" or "chat_messages"), and their value (or a list
+#         of values if multiple inputs of the same type were received within 1 tick). See the `send_data()` function for
+#         more information.
+#     -------
+#     """
+#     global received_data
+#     return received_data.pop(agent_id, None)
+
+def pop_userinput(agent_id):
+    """ Pop the user input for an agent from the userinput dictionary and return it
 
     Parameters
     ----------
     agent_id
-        ID of the agent for which to return the received input
+        ID of the agent for which to return the userinput
 
     Returns
-        A dictionary containing the type of input (e.g. "pressed_keys" or "chat_messages"), and their value (or a list
-        of values if multiple inputs of the same type were received within 1 tick). See the `send_data()` function for
-        more information.
+        A list of keys pressed. See this link for the encoding of keys: https://developer.mozilla.org/nl/docs/Web/API/KeyboardEvent/key/Key_Values
     -------
     """
-    global received_data
-    return received_data.pop(agent_id, None)
+    global userinput
+    return userinput.pop(agent_id, None)
 
 
-
+def reset_api():
+    """ Reset the api MATRXS variables """
+    global temp_state, userinput, matrxs_paused, matrxs_done
+    temp_state = []
+    userinput = {}
+    matrxs_paused = False
+    matrxs_done = False
 
 #########################################################################
 # API Flask methods

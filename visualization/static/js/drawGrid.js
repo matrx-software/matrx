@@ -30,7 +30,7 @@ var animationDurationPerc = 1;
 
 // list with the images (string to path) preloaded into the page as (invisible) html elements
 var preloaded_imgs = [];
-// gifs are parsed seperatly to ensure they work 
+// gifs are parsed seperatly to ensure they work
 var parsedGifs = [];
 
 
@@ -102,44 +102,6 @@ function updateGridSize(grid_size) {
         fixTileSize(canvas.width, canvas.height);
     }
 }
-
-/*
- * Used to parse Gifs(in case they exist) into the frames they are made out of on the first load of the screen.
- */
-function parseGifs(state) {
-    var vis_depths = Object.keys(state);
-    vis_depths.forEach(function(vis_depth) {
-
-        // Loop through the objects at this depth and visualize them
-        var objects = Object.keys(state[vis_depth]);
-        objects.forEach(function(objID) {
-
-            // fetch object
-            obj = state[vis_depth][objID]
-            if (obj['visualization']['shape'] == 'img') {
-                if (/^.+\.gif$/.test(obj['img_name'])) {
-                    var img = new Image();
-                    img.src = window.location.origin + '/static/avatars/' + obj['img_name'];
-                    if (!parsedGifs.hasOwnProperty(img.src)) {
-                        parsedGifs[img.src] = []
-                        var gif = new SuperGif({
-                            gif: img
-                        });
-                        gif.load(function() {
-                            for (var i = 0; i < gif.get_length(); i++) {
-                                gif.move_to(i);
-                                parsedGifs[img.src][i] = gif.get_canvas();
-                            }
-                            parsedGifs[img.src]["currFrame"] = 0;
-
-                        });
-                    }
-                }
-            }
-        })
-    })
-}
-
 
 
 /**
@@ -408,8 +370,6 @@ function draw(new_tick) {
     if (firstDraw) {
         isFirstCall=false;
         populateMenu(state);
-//        parseGifs(state);
-
 
         console.log("First draw, resetting canvas and tile sizes");
         fixCanvasSize();

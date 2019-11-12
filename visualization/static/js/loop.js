@@ -13,12 +13,11 @@ var open_update_request = false;
 var msPerFrame = (1.0 / 60) * 1000; // placeholder
 var tps = 1; // placeholder
 var frames = 0;
-var lastRender = 0;
 var last_update = Date.now();
 
 var init_url = 'http://127.0.0.1:3001/get_info'
 var update_url = 'http://127.0.0.1:3001/get_latest_state/';
-var send_data_to_MATRXS_url = 'http://127.0.0.1:3001/send_data/';
+var send_userinput_url = 'http://127.0.0.1:3001/send_userinput/';
 var agent_id = "";
 
 
@@ -197,7 +196,7 @@ function send_data_to_MATRXS(data) {
     // send an update for every key pressed
     var resp = $.ajax({
         method: "POST",
-        url: send_data_to_MATRXS_url + agent_id,
+        url: send_userinput_url + agent_id,
         contentType:"application/json; charset=utf-8",
         dataType: 'json',
         data: JSON.stringify(data),

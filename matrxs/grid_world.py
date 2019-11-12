@@ -59,6 +59,11 @@ class GridWorld:
             for agent_body in self.__registered_agents.values():
                 agent_body.brain_initialize_func()
 
+            # reset the API variables
+            if self.__run_matrxs_api:
+                api.reset_api()
+
+
             # Start the visualisation server process if we need to
             # started_visualisation = False  # tracks if the server is running successfully
             # if self.__run_visualization_server and self.__visualisation_process is None:
@@ -82,8 +87,6 @@ class GridWorld:
                 # start the MATRXS API server
                 started_API = self.__start_API()
 
-
-
             # Set initialisation boolean
             self.__is_initialized = True
 
@@ -97,7 +100,18 @@ class GridWorld:
             print(f"@{os.path.basename(__file__)}: Starting game loop...")
         is_done = False
         while not is_done:
-            is_done, tick_duration = self.__step()
+
+            if self.__run_matrxs_api and api.matrxs_paused:
+                print("MATRXS paused through API")
+                gevent.sleep(1)
+            else:
+                is_done, tick_duration = self.__step()
+
+            if self.__run_matrxs_api and api.matrxs_done:
+                print("Scenario stopped through API")
+                break
+
+
 
     def get_env_object(self, requested_id, obj_type=None):
         obj = None
@@ -359,8 +373,8 @@ class GridWorld:
                 # For a HumanAgent any received data from the API for this HumanAgent is send along
                 if agent_obj.is_human_agent:
                     usrinp = None
-                    if self.__run_matrxs_api and agent_id in api.received_data:
-                        usrinp = api.pop_received_data(agent_id)
+                    if self.__run_matrxs_api and agent_id in api.userinput:
+                        usrinp = api.pop_userinput(agent_id)
 
                     filtered_agent_state, agent_properties, action_class_name, action_kwargs = \
                         agent_obj.get_action_func(state=state, agent_properties=agent_obj.properties, agent_id=agent_id,
