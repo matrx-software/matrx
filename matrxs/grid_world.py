@@ -60,17 +60,17 @@ class GridWorld:
                 agent_body.brain_initialize_func()
 
             # Start the visualisation server process if we need to
-            started_visualisation = False  # tracks if the server is running successfully
-            if self.__run_visualization_server and self.__visualisation_process is None:
-                # Start the visualisation server
-                started_visualisation = self.__start_visualisation_server()
-
-            # Initialize the visualizer
-            self.__visualizer = Visualizer(self.__shape, self.__visualization_bg_clr, self.__visualization_bg_img,
-                                           verbose=self.__verbose, server_running=started_visualisation)
+            # started_visualisation = False  # tracks if the server is running successfully
+            # if self.__run_visualization_server and self.__visualisation_process is None:
+            #     # Start the visualisation server
+            #     started_visualisation = self.__start_visualisation_server()
+            #
+            # # Initialize the visualizer
+            # self.__visualizer = Visualizer(self.__shape, self.__visualization_bg_clr, self.__visualization_bg_img,
+            #                                verbose=self.__verbose, server_running=started_visualisation)
 
             # Visualize already
-            self.__initial_visualisation()
+            # self.__initial_visualisation()
 
             # thread = threading.Thread(target=logMatrx.log_object_complete, args=(self,))
             # thread.start()
@@ -522,7 +522,12 @@ class GridWorld:
         # Append generic properties (e.g. number of ticks, size of grid, etc.}
         state["World"] = {
             "nr_ticks": self.__current_nr_ticks,
-            "grid_shape": self.__shape
+            "grid_shape": self.__shape,
+            "tick_duration": self.tick_duration,
+            "vis_settings": {
+                "vis_bg_clr": self.__visualization_bg_clr,
+                "vis_bg_img": self.__visualization_bg_img
+            }
         }
 
         return state
@@ -549,7 +554,12 @@ class GridWorld:
         state["World"] = {
             "nr_ticks": self.__current_nr_ticks,
             "grid_shape": self.__shape,
-            "team_members": team_members
+            "tick_duration": self.tick_duration,
+            "team_members": team_members,
+            "vis_settings": {
+                "vis_bg_clr": self.__visualization_bg_clr,
+                "vis_bg_img": self.__visualization_bg_img
+            }
         }
 
         return state

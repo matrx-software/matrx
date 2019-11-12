@@ -7,7 +7,7 @@ from matrxs.actions.move_actions import *
 
 def create_factory():
     factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.2, verbose=True, run_matrxs_api=True,
-                           run_visualization_server=False)
+                           run_visualization_server=False, visualization_bg_clr="#000000", visualization_bg_img="/static/backgrounds/soesterberg_luchtfoto.jpg")
 
     factory.add_logger(logger_class=LogActions, save_path="log_data/")
 
@@ -31,7 +31,7 @@ def create_factory():
             }
             factory.add_human_agent(start, human_agent, name="human_" + str(x),
                                     key_action_map=key_action_map, visualize_shape='img',
-                                    img_name="transparent.png")
+                                    img_name="/static/avatars/transparent.png")
 
     factory.add_line(start=[1, 1], end=[3, 1], name="T")
     factory.add_line(start=[2, 2], end=[2, 4], name="T")
@@ -44,7 +44,7 @@ def create_factory():
     factory.add_line(start=[10, 2], end=[10, 3], name="O")
     factory.add_line(start=[11, 4], end=[12, 4], name="O")
     factory.add_line(start=[13, 2], end=[13, 3], name="O")
-    factory.add_object((4, 3), "Object", visualize_shape='img', img_name="fire.gif")
+    factory.add_object((4, 3), "Object", visualize_shape='img', img_name="/static/avatars/fire.gif")
 
     factory.add_smoke_area([0, 0], width=15, height=6, name="smoke", smoke_thickness_multiplier=0.5)
     return factory

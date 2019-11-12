@@ -26,6 +26,9 @@ states = []
 current_tick = 0
 tick_duration = 0.0
 grid_size = [1, 1]
+MATRXS_info = {}
+next_tick_info = {}
+
 
 # a temporary state for the current tick, which will be written to states after all
 # agents have been updated
@@ -44,16 +47,30 @@ received_data = {}
 
 @app.route('/get_info', methods=['GET', 'POST'])
 def get_info():
+    """ Provides the general information on the world, contained in the world object.
+
+    Returns
+        MATRXS world object, contianing general information on the world and scenario.
+    -------
+    """
     print(f"Returning tick {current_tick}")
-    return jsonify({"tick": current_tick, "tick_duration": tick_duration, "grid_size": grid_size})
+    # return jsonify({"tick": current_tick, "tick_duration": tick_duration, "grid_size": grid_size})
+    return jsonify(MATRXS_info)
 
 @app.route('/get_states/<tick>', methods=['GET', 'POST'])
 def get_states(tick):
+    """ Provides the states of all agents (including the god view) from tick 'tick' onwards to current tick.
+
+    Parameters
+    ----------
+    tick
+        integer indicating from which tick onwards to send the states.
+    Returns
+        Returns a list of length 'tick' to current_tick. For each tick (item in the list), a dictionary contains the
+        state for each agent existing in the simulation, indexed by their agent ID.
+    -------
     """
-    Returns the states of all agents and the god view from tick 'tick' onwards.
-    :param tick: integer indicating from which tick onwards to send the states.
-    :return: States from tick 'tick' onwards of all agents.
-    """
+
     # check for validity and return an error if not valid
     API_call_valid, error = check_API_request(tick)
     if not API_call_valid:
@@ -61,17 +78,24 @@ def get_states(tick):
         return abort(error['error_code'], description=error['error_message'])
 
     print(f"Sending states from tick {tick} onwards")
-    return jsonify(fetch_states(tick))
+    return jsonify(__fetch_states(tick))
 
 
 @app.route('/get_states/<tick>/<agent_ids>', methods=['GET', 'POST'])
 def get_states_specific_agents(tick, agent_ids):
-    """
-    Returns the states starting from tick 'tick' for agent 'agent_id'.
-    :param tick: integer indicating from which tick onwards to send the states.
-    :param agent_ids: integer for indicating a specific agent_id, or a list of agent_ids for returning the states of
-    multiple agents
-    :return: States from tick 'tick' onwards for agent_ids 'agent_ids'
+    """ Provides the states starting from tick 'tick' to current_tick, for the agents specified in 'agent_ids'.
+
+    Parameters
+    ----------
+    tick
+        integer indicating from which tick onwards to send the states.
+    agent_ids
+        One agent ID, or a List of agent IDs for which the states should be returned. God view = "god"
+
+    Returns
+        Returns a list of length 'tick' to current_tick. For each tick (item in the list), a dictionary contains the
+        state for each agent as specified in 'agent_ids', indexed by their agent ID.
+    -------
     """
     # check for validity and return an error if not valid
     API_call_valid, error = check_API_request(tick)
@@ -80,15 +104,23 @@ def get_states_specific_agents(tick, agent_ids):
         return abort(error['error_code'], description=error['error_message'])
 
     print(f"Sending states from tick {tick} onwards for agents IDs {agent_ids}")
-    return jsonify(fetch_states(tick, agent_ids))
+    return jsonify(__fetch_states(tick, agent_ids))
 
 
 @app.route('/get_latest_state/<agent_ids>', methods=['GET', 'POST'])
 def get_latest_state(agent_ids):
-    """
-    Returns the latest states for agents 'agent_ids'
-    :param tick: integer indicating from which tick onwards to send the states.
-    :return: States from tick 'tick' onwards for the god view
+    """ Provides the latest state of one or multiple agents
+
+    Parameters
+    ----------
+    agent_ids
+        IDs of agents for which to send the latest state. Either a single agent ID, or a list of agent IDs.
+        God view = "god"
+
+    Returns
+        Returns a list of length 'tick' to current_tick. For each tick, a dictionary contains the states for each
+        agent as specified in 'agent_ids', indexed by their agent ID.
+    -------
     """
 
     a = time.time()
@@ -98,14 +130,52 @@ def get_latest_state(agent_ids):
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    return jsonify(fetch_states(current_tick, agent_ids))
+    return jsonify(__fetch_states(current_tick, agent_ids))
+
+
+
+# def send_user_pressed_keys(agent_id):
+#     pass
+#
+# def send_message(agent_id):
+#     agent_id(s)
+#     None = all
+#     team = team
+#     pass
+#
+#
+# def send_custom_data():
+#     pass
+#
 
 
 @app.route('/send_data/<agent_ids>', methods=['POST'])
 def send_data(agent_ids):
-    """
-    :param agent_id: ID of the agent which sent the data
-    :return: returns True if the data was valid (right now always)
+    """ Sends data to MATRXS via the API, to be passed on to a specific (set of) agent(s).
+
+    The data should be sent in JSON format using a POST request. It is recommended to use the first-level keys to signify
+    different types of information. E.g.: `{"pressed_keys": ..., "chat_messages": ....}`.
+    Multiple instances received within 1 tick of these top-level keys are pooled together in a list and sent to the agent.
+    
+    Thus, if the following data is received within 1 tick:
+    JSON array 1: `{ "pressed_keys":  "ArrowDown"}`
+    JSON array 2: `{ "pressed_keys":  "ArrowUp"}`
+    JSON array 3: `{ "pressed_keys":  {"some subdict"}, "chat_messages": .. }`
+    The information is pooled together and passed to the agents get_action() function as such: 
+    `{"pressed_keys" ["ArrowDown", "ArrowUp", {"some subdict"}], "chat_messages": ..}`
+
+    Each tick the received data will be sent to the corresponding agent during the get_action() function, after which 
+    the received data of that agent for that tick is removed.
+    
+    Parameters
+    ----------
+    agent_ids
+        ID(s) of the agent(s) to which the data should be passed.
+
+    Returns
+        returns True if the data was valid (right now always)
+    -------
+
     """
     global received_data
 
@@ -159,12 +229,21 @@ def bad_request(e):
 #########################################################################
 
 def check_API_request(tick=None, ids=None, ids_required=False):
-    """
-    Checks if the API request is in valid format, and the targeted values exist
-    :param tick: MATRXS tick
-    :param ids: string with 1 agent ID, or list of agent IDS
-    :return: Success (Boolean indicating whether it is valid or not), Error (if any, prodiving the type and a message)
-    See for the error codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.0/com.ibm.qradar.doc/c_rest_api_errors.html
+    """ Checks if the variables of the API request are valid, and if the requested information exists
+
+    Parameters
+    ----------
+    tick
+        MATRXS tick
+    ids
+        string with 1 agent ID, or list of agent IDS
+    ids_required
+        Whether IDS are required
+    Returns
+        Success (Boolean indicating whether it is valid or not), Error (if any, prodiving the type and a message)
+        See for the error codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.0/com.ibm.qradar.doc/c_rest_api_errors.html
+    -------
+
     """
     # check if tick is a valid format
     # if not isinstance(tick, int):
@@ -202,14 +281,20 @@ def check_API_request(tick=None, ids=None, ids_required=False):
     # all checks cleared, so return with success and no error message
     return True, None
 
-def fetch_states(tick, ids=None):
-    """
-    This function filters the states desired by the user, as specified by the tick and (agent)ids.
-    :param tick: Tick from which onwards to return the states. Thus will return [tick:current_tick]
-    :param ids: Id(s) from agents/god for which to return the states. Can be a string (1 id, e.g. 'god'), or a list of
-    strings.
-    :return: Returns the filtered states from tick 'tick' onwards to 'current_tick', containing the states for the agents
-    as specified in 'ids'.
+def __fetch_states(tick, ids=None):
+    """ This private function fetches, filters and orders the states as specified by the tick and agent ids.
+    
+    Parameters
+    ----------
+    tick
+        Tick from which onwards to return the states. Thus will return a list of length [tick:current_tick]
+    ids
+        Id(s) from agents/god for which to return the states. Either a single agent ID or a list of agent IDs.
+        God view = "god"
+    Returns
+        Returns a list of length [tick:current_tick]. For each tick, a dictionary contains the states for each agent as
+        specified in 'agent_ids', indexed by their agent ID.
+    -------
     """
     tick = int(tick)
 
@@ -239,9 +324,7 @@ def fetch_states(tick, ids=None):
 
 
 def create_error_response(code, message):
-    """
-    Creates an error code with a custom message
-    """
+    """ Creates an error code with a custom message """
     response = jsonify({'message': message})
     response.status_code = code
     return response
@@ -249,26 +332,31 @@ def create_error_response(code, message):
 
 
 def __reorder_state(state):
-    """
-    Convert the state, which is a dictionary of objects with object ID as key,
-    into a new dictionary with as key the visualization depth, and as value
-    the objects which are to be displayed at that depth
-    :param state: The world state, a dictionary with object IDs as keys
-    :return sorted_state: The world state, but sorted on visualization depth
+    """ This private function converts the MATRXS state from indexing based on object ID, to indexing based on visualization
+    depth.
+
+    Parameters
+    ----------
+    state
+         The world state, a dictionary with object IDs as keys
+    Returns
+        The world state, but sorted on visualization depth
+    -------
     """
     new_state = {}
 
     # loop through all objects in the state
     for objID, obj in state.items():
 
-        if objID is "World":
-            continue
+        # add the World object at depth 0, and the others at their own respective visualization depth
+        vis_depth = 0
+        if not objID is "World":
+            # fetch the visualization depth
+            vis_depth = state[objID]["visualization"]['depth']
 
-        # fetch the visualization depth
-        vis_depth = state[objID]["visualization"]['depth']
+            if "sense_capability" in obj:
+                obj["sense_capability"] = str(obj["sense_capability"])
 
-        if "sense_capability" in obj:
-            obj["sense_capability"] = str(obj["sense_capability"])
 
         # save the object in the new_state dict at its visualization_depth
         if vis_depth not in new_state:
@@ -286,13 +374,24 @@ def __reorder_state(state):
 
 
 def add_state(agent_id, state, agent_inheritence_chain):
+    """ aves the state of an agent for use via the API
+
+    Parameters
+    ----------
+    agent_id
+         ID of the agent of who the state is
+    state
+        state as filtered by the agent
+    agent_inheritence_chain
+         inheritance_chain of classes, can be used to figure out type of agent
+    -------
     """
-    Saves the state of an agent for use via the API
-    :param agent_id: ID of the agent of who the state is
-    :param state: state of the agent
-    :param agent_inheritence_chain: inheritance_chain of classes, can be used
-    to figure out type of agent
-    """
+    # save the new general info on the MATRXS World (once)
+    global next_tick_info
+    if next_tick_info == {}:
+        next_tick_info = state["World"]
+
+    # reorder and save the new state along with some meta information
     temp_state[agent_id] = {'state': __reorder_state(state),
                                           "tick": current_tick,
                                           'agent_inheritence_chain': agent_inheritence_chain}
@@ -300,18 +399,30 @@ def add_state(agent_id, state, agent_inheritence_chain):
 
 
 def next_tick():
+    """ Proceed to the next tick, publicizing data of the new tick via the API (the new states).
+    -------
     """
-    Proceed to the next tick, publizing data via the API (the new states), and refreshing received data (e.g. userinputs)
-    :return:
-    """
+    # save the new general info
+    global MATRXS_info, next_tick_info
+    MATRXS_info = copy.copy(next_tick_info)
+    next_tick_info = {}
+
     # publicize the states of the previous tick
     states.append(copy.copy(temp_state))
 
 def pop_received_data(agent_id):
-    """
-    Pop the user input for an agent from the received_data dictionary and return it
-    :param agent_id: ID of the agent for which to return the userinput
-    :return: received data / userinput
+    """ Pop the user input for an agent from the received_data dictionary and return it
+
+    Parameters
+    ----------
+    agent_id
+        ID of the agent for which to return the received input
+
+    Returns
+        A dictionary containing the type of input (e.g. "pressed_keys" or "chat_messages"), and their value (or a list
+        of values if multiple inputs of the same type were received within 1 tick). See the `send_data()` function for
+        more information.
+    -------
     """
     global received_data
     return received_data.pop(agent_id, None)
@@ -324,15 +435,16 @@ def pop_received_data(agent_id):
 #########################################################################
 
 def flask_thread():
-    """
-    Starts the Flask server on localhost:3001
+    """ Starts the Flask server on localhost:3001
+    -------
     """
     app.run(host='0.0.0.0', port=3001, debug=False, use_reloader=False)
 
 def run_api():
-    """
-    Creates a seperate Python thread in which the API (Flask) is started
-    :return: MATRXS API Python thread
+    """ Creates a seperate Python thread in which the API (Flask) is started
+    Returns
+        MATRXS API Python thread
+    -------
     """
     print("Starting background API server")
     global runs

@@ -27,17 +27,46 @@ var state = {}
 
 
 /*
- * Once the page has loaded, call the initialization function
+ * Once the page has loaded, call the initialization functions
  */
 $(document).ready(function() {
-    init();
+    // fetch the canvas element from the html
+    initializeCanvas();
+
+    // get the general MATRXS information to intialize the visualization
+    var resp = initialConnect();
+
+    // if we succesfully connected  to MATRXS, parse the general MATRXS info, preload the images and start the visualization
+    resp.done(function(data) {
+        parseInitialState(data);
+
+        // add a hidden container to the html in which preloaded images can be added
+        $('body').append("<div id='preloaded_imgs' style='display:none;'></div>");
+
+        // preload the background
+        preload_image(bgImage);
+        console.log("BGimage:", bgImage);
+
+        // start the visualization loop
+        loop();
+    });
+
+     // if the request gave an error, print to console and try again
+    resp.fail(function(data) {
+        console.log("Could not connect to MATRXS API, retrying in 0.5s");
+        console.log(data);
+        setTimeout(function(){
+            init();
+        }, 500);
+    });
+
 });
 
 /*
  * Initialize the visualization by requesting the MATRXS scenario info.
  * If successful, the main visualization loop is called
  */
-function init() {
+function initialConnect() {
     console.log("initializing");
 
     var path = window.location.pathname;
@@ -57,34 +86,27 @@ function init() {
         console.log("This view is for a Human Agent with ID:", agent_id);
     }
 
-
     // fetch settings
-    var resp = jQuery.getJSON(init_url, function(data) {
-        // on success, start the visualization loop
-        initialized = true;
-        tick_duration = data.tick_duration;
-        current_tick = data.tick;
-        grid_size = data.grid_size;
-
-        // calc ticks per second
-        tps = Math.floor(1.0 / tick_duration);
-
-        console.log("Fetched MATRXS settings:", data);
-
-        // start the visualization loop
-        loop();
-    });
-
-    // if the request gave an error, print to console and try again
-    resp.fail(function(data) {
-        console.log("Could not connect to MATRXS API, retrying in 0.5s");
-        console.log(data);
-        setTimeout(function(){
-            init();
-        }, 500);
-    });
+    return jQuery.getJSON(init_url);
 }
 
+/*
+ * Parse the initial MATRXS World state info
+ */
+function parseInitialState(data) {
+    // on success, start the visualization loop
+    initialized = true;
+    tick_duration = data.tick_duration;
+    current_tick = data.nr_ticks;
+    grid_size = data.grid_shape;
+    bgTileColour = data.vis_settings.visualization_bg_clr;
+    bgImage = data.vis_settings.vis_bg_img;
+
+    // calc ticks per second
+    tps = Math.floor(1.0 / tick_duration);
+
+    console.log("Fetched MATRXS settings:", data);
+}
 
 
 /*
@@ -153,7 +175,15 @@ function get_MATRXS_update() {
     // the response has been received
     var update_request = jQuery.getJSON(update_url + "['" + agent_id + "']", function(data) {
         state = data[data.length-1][agent_id]['state']
-        current_tick = data[data.length-1][agent_id]['tick'];
+        current_tick = data[data.length-1][agent_id]['nr_ticks'];
+        console.log("State:", state);
+
+        var world_obj = state[0]['World'];
+
+        // the World object can be found at visualization depth 0
+        bgTileColour = world_obj['vis_settings']['vis_bg_clr'];
+        bgImage = world_obj['vis_settings']['vis_bg_img'];
+
     });
 
     return update_request;

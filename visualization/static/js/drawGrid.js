@@ -15,11 +15,11 @@ var currentSecondFrames = 0,
     framesLastSecond = 60; //placeholder
 var lastTickSecond = 0;
 var firstDraw = true;
-var parsedGifs = [];
 
 // Colour of the default BG tile
 var bgTileColour = "#C2C2C2";
 var bgImage = null;
+var bgImgChanged = false;
 var highestTickSoFar = 0;
 
 var prevAnimatedObjects = {};
@@ -28,13 +28,18 @@ var animatedObjects = {};
 // the maximum number of time available between ticks 1 = max duration between ticks, 0.001 min (no animation)
 var animationDurationPerc = 1;
 
+// list with the images (string to path) preloaded into the page as (invisible) html elements
+var preloaded_imgs = [];
+// gifs are parsed seperatly to ensure they work 
+var parsedGifs = [];
 
-window.onload = function() {
+
+function initializeCanvas() {
     canvas = document.getElementById('grid');
     ctx = canvas.getContext("2d");
 
     ctx.font = "bold 10pt sans-serif";
-};
+}
 
 /**
  * Changes the size of the canvas on a window resize such that it is always fullscreen
@@ -214,11 +219,18 @@ function drawBg() {
     // clear the rectangle
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // full size rect
+    // draw the background image if specified
     if (bgImage != null) {
-        var img = new Image();
-        img.src = window.location.origin + '/static/backgrounds/' + bgImage;
+        // this method takes 0.17 to 1.0+ seconds (!) depending on the image size
+        // img2.src = window.location.origin + '/static/backgrounds/' + bgImage;
+
+        // this method (with the image preloaded as a html element on the page) takes 0.001-0.01 seconds depending on
+        // the image size
+        var img = document.getElementById(bgImage);
+
         ctx.drawImage(img, 0, 0, mapW * px_per_cell, mapH * px_per_cell); // DRAW THE IMAGE TO THE CANVAS.
+
+    // otherwise, colour the background image
     } else {
         ctx.fillStyle = bgTileColour;
         ctx.fillRect(0, 0, mapW * px_per_cell, mapH * px_per_cell);
@@ -281,25 +293,65 @@ function drawCircle(x, y, tileW, tileH, clr, size) {
 
 
 function drawImage(imgName, x, y, tileW, tileH, size) {
-    var img = new Image();
-    var src = img.src = window.location.origin + '/static/avatars/' + imgName;
+
+    // preload image if this is the first time loading it
+    if (!preloaded_imgs.includes(imgName)) {
+        preload_image(imgName);
+    }
+
+    // load the preloaded image
+    var img = document.getElementById(imgName);
+
+    // if it is a gif and it has not been processed yet, do so
+    if (imgName.substr(imgName.length - 4) === ".gif" && !parsedGifs.hasOwnProperty(imgName)) {
+        console.log("first time gif load");
+        parsedGifs[imgName] = [];
+        var gif = new SuperGif({
+            gif: img
+        });
+        gif.load(function() {
+            for (var i = 0; i < gif.get_length(); i++) {
+                gif.move_to(i);
+                parsedGifs[imgName][i] = gif.get_canvas();
+            }
+            parsedGifs[imgName]["currFrame"] = 0;
+        });
+    }
+
+    // get the dimensions of the image
     top_left_x = x + ((1 - size) * 0.5 * tileW);
     top_left_y = y + ((1 - size) * 0.5 * tileH);
 
     // width and height of rectangle
     w = size * tileW;
     h = size * tileH;
-    if (parsedGifs.hasOwnProperty(img.src) && parsedGifs[img.src].hasOwnProperty("currFrame")) {
-        var currFrame = parsedGifs[src]["currFrame"];
-        img = parsedGifs[src][currFrame];
+
+    // continue gifs to the next frame
+    if (parsedGifs.hasOwnProperty(imgName) && parsedGifs[imgName].hasOwnProperty("currFrame")) {
+        var currFrame = parsedGifs[imgName]["currFrame"];
+        img = parsedGifs[imgName][currFrame];
         currFrame++;
-        if (currFrame >= parsedGifs[src].length) {
+        if (currFrame >= parsedGifs[imgName].length) {
             currFrame = 0;
         }
-        parsedGifs[src]["currFrame"] = currFrame;
+        parsedGifs[imgName]["currFrame"] = currFrame;
     }
     ctx.drawImage(img, top_left_x, top_left_y, w, h); // DRAW THE IMAGE TO THE CANVAS.
 }
+
+/*
+ * Preload an image by adding it as an (hidden) html element to the page
+ */
+function preload_image(img) {
+    if (img !== null) {
+        // add the image to the page
+        $('#preloaded_imgs').append('<img id="' + img + '" src="' + img + '"  alt="agent face" width="100%" height="auto">');
+
+        // save that we have preloaded this image
+        preloaded_imgs.push(img);
+    }
+}
+
 
 /**
  * Draw a triangle on screen
@@ -356,7 +408,7 @@ function draw(new_tick) {
     if (firstDraw) {
         isFirstCall=false;
         populateMenu(state);
-        parseGifs(state);
+//        parseGifs(state);
 
 
         console.log("First draw, resetting canvas and tile sizes");
@@ -397,6 +449,11 @@ function draw(new_tick) {
         // Loop through the objects at this depth and visualize them
         var objects = Object.keys(state[vis_depth]);
         objects.forEach(function(objID) {
+
+            // skip the World object
+            if (objID === "World") {
+                return;
+            }
 
             // fetch object
             obj = state[vis_depth][objID]
