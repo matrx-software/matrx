@@ -113,8 +113,9 @@ function parseInitialState(data) {
  */
 function loop() {
     var timestamp = Date.now();
-    var progress = timestamp - lastRender;
-    lastRender = timestamp;
+    var progress = 0;
+//    var progress = timestamp - lastRender;
+//    lastRender = timestamp;
 //    console.log("Last frame took:", progress , " while it should take:", msPerFrame);
 
 //     Fetch an update from the server
@@ -132,7 +133,7 @@ function loop() {
             open_update_request = false;
 //            console.log("update was successful, drawing and requesting a new animation frame");
             draw(new_tick=true);
-            lastRender = timestamp
+//            lastRender = timestamp
             window.requestAnimationFrame(loop)
         })
 
@@ -141,7 +142,7 @@ function loop() {
             console.log("Could not connect to MATRXS API.");
             console.log("Provided error message:", data.responseJSON);
             console.log("Retrying in 0.5s");
-            lastRender = timestamp;
+//            lastRender = timestamp;
             open_update_request = false;
             setTimeout(function(){
                 window.requestAnimationFrame(loop)

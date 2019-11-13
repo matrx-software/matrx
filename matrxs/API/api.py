@@ -38,6 +38,7 @@ temp_state = []
 userinput = {}
 matrxs_paused = False
 matrxs_done = False
+tick_duration = 0.5
 
 #########################################################################
 # API connection methods
@@ -231,9 +232,29 @@ def stop_MATRXS():
     matrxs_done = True
     return jsonify(True)
 
-@app.route('/change_speed/<speed>', methods=['GET', 'POST'])
-def change_MATRXS_speed(speed):
-    pass
+@app.route('/change_tick_duration/<tick_dur>', methods=['GET', 'POST'])
+def change_MATRXS_speed(tick_dur):
+    """ Change the tick duration / simulation speed of MATRXS
+
+    Parameters
+    ----------
+    tick_duration
+        The duration of 1 tick
+
+    Returns
+        True if successfully changed tick speed (400 error if tick_duration not valid)
+    -------
+    """
+    # check if the passed value is a float / int, and return an error if not
+    try:
+        float(tick_dur)
+    except:
+        return abort(400, description=f'Tick duration has to be an float, but is of type {type(tick_dur)}')
+
+    # save the new tick duration
+    global tick_duration
+    tick_duration = float(tick_dur)
+    return jsonify(True)
 
 #########################################################################
 # Errors

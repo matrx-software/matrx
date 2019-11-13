@@ -62,6 +62,7 @@ class GridWorld:
             # reset the API variables
             if self.__run_matrxs_api:
                 api.reset_api()
+                api.tick_duration = self.__tick_duration
 
 
             # Start the visualisation server process if we need to
@@ -423,7 +424,8 @@ class GridWorld:
             # agents have been updated
             api.next_tick()
             api.current_tick = self.__current_nr_ticks
-            api.tick_duration = self.__tick_duration
+            # api.tick_duration = self.__tick_duration
+            self.__tick_duration = api.tick_duration
             api.grid_size = self.shape
 
         # Perform the actions in the order of the action_buffer (which is filled in order of registered agents
