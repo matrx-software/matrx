@@ -5,11 +5,12 @@ from matrxs.utils.agent_utils.state_tracker import StateTracker
 
 class PatrollingAgentBrain(AgentBrain):
 
-    def __init__(self, waypoints):
+    def __init__(self, waypoints, move_speed=1):
         super().__init__()
         self.state_tracker = None
         self.navigator = None
         self.waypoints = waypoints
+        self.move_speed = move_speed
 
     def initialize(self):
         # Initialize this agent's state tracker
@@ -28,4 +29,4 @@ class PatrollingAgentBrain(AgentBrain):
 
         move_action = self.navigator.get_move_action(self.state_tracker)
 
-        return move_action, {}
+        return move_action, {"duration_in_ticks": self.move_speed}
