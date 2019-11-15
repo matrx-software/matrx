@@ -2,6 +2,7 @@ from matrxs.agents.capabilities.capability import SenseCapability
 from matrxs.actions.action import Action, ActionResult
 from matrxs.utils.utils import get_all_classes
 from matrxs.objects.env_object import EnvObject
+import numpy as np
 
 
 class AgentBody(EnvObject):
@@ -123,8 +124,9 @@ class AgentBody(EnvObject):
         self.__current_action = None
         self.__current_action_args = None
 
-        # Denotes the last action performed by the agent, at what tick and how long it must take
-        self.__last_action_duration_data = {"duration_in_ticks": 0, "tick": 0, "action_name": None,
+        # Denotes the last action performed by the agent, at what tick and how long it must take. Set to -infinite, such
+        # that the agent is need deemed 'busy' at tick 0.
+        self.__last_action_duration_data = {"duration_in_ticks": -np.Inf, "tick": -np.Inf, "action_name": None,
                                             "action_result": None}
 
         # We set a placeholder for the 'team' property so that it can be found in self.properties
@@ -157,12 +159,12 @@ class AgentBody(EnvObject):
         """
         check if the agent is done with executing the action
         """
-        self.__is_blocked = curr_tick < (self.current_action_tick_started + self.current_action_duration_in_ticks)
+        self.__is_blocked = curr_tick <= (self.current_action_tick_started + self.current_action_duration_in_ticks)
 
         return self.__is_blocked
 
     def _at_last_action_duration_tick(self, curr_tick):
-        """ Returns True if this agent is at its last tick of the action with an action duration. """
+        """ Returns True if this agent is at its last tick of the action's duration."""
         is_last_tick = curr_tick == (self.current_action_tick_started + self.current_action_duration_in_ticks)
         return is_last_tick
 
