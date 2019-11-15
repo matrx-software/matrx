@@ -1,18 +1,17 @@
 import datetime
 import os.path
 import warnings
-import gevent
-import threading
 from collections import OrderedDict
 
-from matrxs.logger.logger import GridWorldLogger
-from matrxs.visualization import logMatrx
+import gevent
+
 from matrxs.actions.object_actions import *
-from matrxs.utils.utils import get_all_classes
+from matrxs.logger.logger import GridWorldLogger
+from matrxs.objects.env_object import EnvObject
 from matrxs.objects.simple_objects import AreaTile
+from matrxs.utils.utils import get_all_classes
 from matrxs.visualization import server
 from matrxs.visualization.visualizer import Visualizer
-from matrxs.objects.env_object import EnvObject
 
 
 class GridWorld:
