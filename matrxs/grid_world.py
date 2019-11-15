@@ -18,7 +18,7 @@ class GridWorld:
 
     def __init__(self, shape, tick_duration, simulation_goal, run_sail_api=True, run_visualization_server=True,
                  rnd_seed=1, visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False):
-        self.__tick_duration = tick_duration  # How long each tick should take (process sleeps until thatr time is passed)
+        self.__tick_duration = tick_duration  # How long each tick should take (process sleeps until time is passed)
         self.__simulation_goal = simulation_goal  # The simulation goal, the simulation end when this/these are reached
         self.__shape = shape  # The width and height of the GridWorld
         self.__run_sail_api = run_sail_api  # Whether we should run the (SAIL) API
