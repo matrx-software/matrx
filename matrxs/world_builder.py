@@ -332,7 +332,7 @@ class WorldBuilder:
         """
 
         # Check if location and agent are of correct type
-        if not isinstance(location, list) or not isinstance(location, tuple) and len(location) != 2:
+        if not isinstance(location, list) and not isinstance(location, tuple) and len(location) != 2:
             raise ValueError(f"The given location {location} while adding the agent with name {name} is not a list, "
                              f"tuple or  of length two.")
 
