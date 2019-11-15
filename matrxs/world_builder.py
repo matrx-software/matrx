@@ -154,11 +154,9 @@ class WorldBuilder:
 
         # Based on our verbosity and debug level, we set a warning scheme
         if verbose:
-            warnings.simplefilter('always')
-        else:  # ignore all warnings, except deprecation warnings
-            # warnings.simplefilter("ignore")
-            warnings.simplefilter("always", category=DeprecationWarning)
-
+            warnings.simplefilter("always")
+        else:  # use the default (print all warnings once per location [module and line number])
+            warnings.simplefilter("default")
 
     def worlds(self, nr_of_worlds: int = 10):
         """
