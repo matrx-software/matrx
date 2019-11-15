@@ -152,17 +152,13 @@ class WorldBuilder:
         # created world)
         self.__visualisation_thread = None
 
-        # Set our custom warning method for all of MATRXS
-        def _warning(message, category, filename, lineno, file=None, line=None):
-            filename = filename.split(os.sep)[-1].split(".")[0]
-            if lineno is not None:
-                print(f"{filename}@{lineno}:: {message}", file=sys.stderr)
-            elif line is not None:
-                print(f"{filename}@{line}:: {message}", file=sys.stderr)
-            else:
-                print(f"{filename}:: {message}", file=sys.stderr)
+        # Based on our verbosity and debug level, we set a warning scheme
+        if verbose:
+            warnings.simplefilter('always')
+        else:  # ignore all warnings, except deprecation warnings
+            # warnings.simplefilter("ignore")
+            warnings.simplefilter("always", category=DeprecationWarning)
 
-        warnings.showwarning = _warning
 
     def worlds(self, nr_of_worlds: int = 10):
         """
