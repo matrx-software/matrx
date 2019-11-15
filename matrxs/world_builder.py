@@ -883,7 +883,7 @@ class WorldBuilder:
         all_ = list(set(all_))
 
         # Check if all door locations are at wall locations, if so remove those wall locations
-        door_locations = None if door_locations is None else door_locations
+        door_locations = [] if door_locations is None else door_locations
         for door_loc in door_locations:
             if door_loc in all_:
                 all_.remove(door_loc)
