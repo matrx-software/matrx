@@ -3,6 +3,7 @@ import os.path
 import warnings
 import gevent
 from collections import OrderedDict
+import time
 import copy
 
 from matrxs.logger.logger import GridWorldLogger
@@ -538,6 +539,7 @@ class GridWorld:
         # Append generic properties (e.g. number of ticks, size of grid, etc.}
         state["World"] = {
             "nr_ticks": self.__current_nr_ticks,
+            "curr_tick_timestamp": int(round(time.time() * 1000)),
             "grid_shape": self.__shape,
             "tick_duration": self.tick_duration,
             "vis_settings": {

@@ -26,7 +26,7 @@ var prevAnimatedObjects = {};
 var animatedObjects = {};
 // how long should the animation of the movement be, in percentage with respect to
 // the maximum number of time available between ticks 1 = max duration between ticks, 0.001 min (no animation)
-var animationDurationPerc = 1;
+var animationDurationPerc = 0.8;
 
 // list with the images (string to path) preloaded into the page as (invisible) html elements
 var preloaded_imgs = [];

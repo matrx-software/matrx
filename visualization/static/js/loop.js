@@ -20,9 +20,9 @@ var update_url = 'http://127.0.0.1:3001/get_latest_state/';
 var send_userinput_url = 'http://127.0.0.1:3001/send_userinput/';
 var agent_id = "";
 
-
 var state = {}
 
+var wait_for_next_tick = tick_duration;
 
 
 /*
@@ -96,10 +96,12 @@ function parseInitialState(data) {
     // on success, start the visualization loop
     initialized = true;
     tick_duration = data.tick_duration;
+
     current_tick = data.nr_ticks;
     grid_size = data.grid_shape;
     bgTileColour = data.vis_settings.visualization_bg_clr;
     bgImage = data.vis_settings.vis_bg_img;
+    wait_for_next_tick = tick_duration * 1000;
 
     // calc ticks per second
     tps = Math.floor(1.0 / tick_duration);
@@ -157,7 +159,8 @@ function loop() {
 function update(progress) {
 
     // check if there is a new tick available yet based on the tick_duration
-    if ( Date.now() > last_update + (tick_duration * 1000) && !open_update_request) {
+    // the -0.015
+    if ( Date.now() > last_update + wait_for_next_tick && !open_update_request) {
         // save that we requested an update at this time
         last_update = Date.now();
         open_update_request = true;
@@ -179,6 +182,10 @@ function get_MATRXS_update() {
         console.log("State:", state);
 
         var world_obj = state[0]['World'];
+        var curr_tick_timestamp = world_obj['curr_tick_timestamp'];
+        // calc how long we have to wait before fetching the next tick. This is calculated as
+        // tick_duration - (time_tick_requested - time_tick_started) + a small buffer (15ms)
+        wait_for_next_tick = tick_duration * 1000 - (Date.now() - curr_tick_timestamp) + 15;
 
         // the World object can be found at visualization depth 0
         bgTileColour = world_obj['vis_settings']['vis_bg_clr'];
