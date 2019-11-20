@@ -558,6 +558,7 @@ class GridWorld:
                 "vis_bg_img": self.__visualization_bg_img
             }
         }
+        print("Timestamp now:", state['World']['curr_tick_timestamp'])
 
         return state
 
@@ -591,6 +592,8 @@ class GridWorld:
                 "vis_bg_img": self.__visualization_bg_img
             }
         }
+        print("Timestamp now:", state['World']['curr_tick_timestamp'])
+
 
         return state
 

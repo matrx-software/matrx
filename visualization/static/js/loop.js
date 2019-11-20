@@ -9,6 +9,7 @@ var current_tick = 0;
 var grid_size = [1, 1]
 var rendered_update = true;
 var open_update_request = false;
+var firstTick = true;
 
 var msPerFrame = (1.0 / 60) * 1000; // placeholder
 var tps = 1; // placeholder
@@ -136,6 +137,11 @@ function loop() {
     } else {
         // after a successful update redraw the screen and go to the next frame
         update_request.done(function(data) {
+            if (firstTick) {
+                populateMenu(state, agent_id);
+                firstTick = false;
+            }
+
             open_update_request = false;
             draw(new_tick = true);
             window.requestAnimationFrame(loop)
@@ -178,15 +184,23 @@ function get_MATRXS_update() {
     // the get request is async, meaning the (success) function is only executed when
     // the response has been received
     var update_request = jQuery.getJSON(update_url + "['" + agent_id + "']", function(data) {
+//        console.log(data);
         state = data[data.length - 1][agent_id]['state']
         current_tick = data[data.length - 1][agent_id]['nr_ticks'];
-        console.log("State:", state);
+
+//        console.log("State:", state);
 
         var world_obj = state[0]['World'];
         var curr_tick_timestamp = world_obj['curr_tick_timestamp'];
+        tick_duration = world_obj['tick_duration'];
+        tps = Math.floor(1.0 / tick_duration);
+
         // calc how long we have to wait before fetching the next tick. This is calculated as
         // tick_duration - (time_tick_requested - time_tick_started) + a small buffer (15ms)
         wait_for_next_tick = tick_duration * 1000 - (Date.now() - curr_tick_timestamp) + 15;
+        if (wait_for_next_tick <= 0) { wait_for_next_tick = tick_duration * 1000;}
+
+//        console.log(wait_for_next_tick, tick_duration, Date.now(), curr_tick_timestamp);
 
         // the World object can be found at visualization depth 0
         bgTileColour = world_obj['vis_settings']['vis_bg_clr'];

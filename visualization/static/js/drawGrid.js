@@ -371,7 +371,6 @@ function draw(new_tick) {
     // screen size based on the grid size
     if (firstDraw) {
         isFirstCall = false;
-        populateMenu(state);
 
         console.log("First draw, resetting canvas and tile sizes");
         fixCanvasSize();

@@ -12,6 +12,5 @@ For documentation see the wiki at [https://ci.tno.nl/gitlab/SAIL-framework/testb
 
 # Todo:
 - check transition to next experiment
-- fix agent list 
 - Jasper: property maken van global variable -> issue. 
 - message(with from and to_id) as message content?
