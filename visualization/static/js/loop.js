@@ -186,11 +186,9 @@ function get_MATRXS_update() {
     var update_request = jQuery.getJSON(update_url + "['" + agent_id + "']", function(data) {
 //        console.log(data);
         state = data[data.length - 1][agent_id]['state']
-        current_tick = data[data.length - 1][agent_id]['nr_ticks'];
-
-//        console.log("State:", state);
 
         var world_obj = state[0]['World'];
+        var new_tick = state[0]['World']['nr_ticks'];
         var curr_tick_timestamp = world_obj['curr_tick_timestamp'];
         tick_duration = world_obj['tick_duration'];
         tps = Math.floor(1.0 / tick_duration);
@@ -200,11 +198,22 @@ function get_MATRXS_update() {
         wait_for_next_tick = tick_duration * 1000 - (Date.now() - curr_tick_timestamp) + 15;
         if (wait_for_next_tick <= 0) { wait_for_next_tick = tick_duration * 1000;}
 
-//        console.log(wait_for_next_tick, tick_duration, Date.now(), curr_tick_timestamp);
+        console.log(wait_for_next_tick, tick_duration, Date.now(), curr_tick_timestamp);
 
         // the World object can be found at visualization depth 0
         bgTileColour = world_obj['vis_settings']['vis_bg_clr'];
         bgImage = world_obj['vis_settings']['vis_bg_img'];
+
+        console.log("Current tick:", current_tick, " new_tick: ", new_tick)
+        // reinitialize the visualization if we encounter a new tick which is lower than our previous tick (server reset)
+        if (new_tick < current_tick) {
+            console.log("Reinitializing");
+            initialized = false;
+            firstTick = true;
+            init();
+        } else {
+            current_tick = new_tick;
+        }
 
     });
 

@@ -21,6 +21,7 @@ runs = True  # TODO : bool to stop the API during runtime
 
 app = Flask(__name__)
 CORS(app)
+port = 3001
 
 # variables to be set by MATRXS
 # states is a list of length 'current_tick' with a dictionary containing all states of that tick, indexed by agent_id
@@ -58,7 +59,6 @@ def get_info():
     -------
     """
     print(f"Returning tick {current_tick}")
-    # return jsonify({"tick": current_tick, "tick_duration": tick_duration, "grid_size": grid_size})
     return jsonify(MATRXS_info)
 
 @app.route('/get_states/<tick>', methods=['GET', 'POST'])
@@ -134,10 +134,15 @@ def get_latest_state(agent_ids):
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    return jsonify(__fetch_states(current_tick, agent_ids))
+    states = __fetch_states(current_tick, agent_ids)
+    if current_tick is 4:
+        print(states)
+        # raise Exception("stop")
+
+    return jsonify(states)
 
 
-@app.route('/send_userinput/<agent_ids>', methods=['GET', 'POST'])
+@app.route('/send_userinput/<agent_ids>', methods=['POST'])
 def send_userinput(agent_ids):
     """ Can be used to send user input from the user (pressed keys) to the specified human agent(s) in MATRXS
 
@@ -177,12 +182,6 @@ def send_userinput(agent_ids):
 
             # save the pressed key of the agent
             userinput[agent_id].append(pressed_key)
-            # try:
-            #
-            #     userinput[agent_id].append(pressed_key)
-            #
-            # except:
-            #     warnings.warn("API userinputs list was emptied while adding user input, skipping")
 
     return jsonify(True)
 
@@ -288,6 +287,22 @@ def change_MATRXS_speed(tick_dur):
     # save the new tick duration
     global tick_duration
     tick_duration = float(tick_dur)
+    return jsonify(True)
+
+
+@app.route('/shutdown_API', methods=['GET', 'POST'])
+def shutdown():
+    """ Shuts down the API by stopping the Flask thread
+
+    Returns
+        True
+    -------
+    """
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Unable to shutdown API server. Not running with the Werkzeug Server')
+    func()
+    print("API server shutting down...")
     return jsonify(True)
 
 #########################################################################
@@ -466,11 +481,11 @@ def add_state(agent_id, state, agent_inheritence_chain):
     global next_tick_info
     if next_tick_info == {}:
         next_tick_info = state["World"]
+        print("New world info:", next_tick_info)
+        print("Agent", agent_id , " with state:", state)
 
     # reorder and save the new state along with some meta information
-    temp_state[agent_id] = {'state': __reorder_state(state),
-                                          "tick": current_tick,
-                                          'agent_inheritence_chain': agent_inheritence_chain}
+    temp_state[agent_id] = {'state': __reorder_state(state), 'agent_inheritence_chain': agent_inheritence_chain}
 
 
 
@@ -482,6 +497,7 @@ def next_tick():
     global MATRXS_info, next_tick_info
     MATRXS_info = copy.copy(next_tick_info)
     next_tick_info = {}
+    print("Next ticK:", MATRXS_info);
 
     # publicize the states of the previous tick
     states.append(copy.copy(temp_state))
@@ -520,7 +536,9 @@ def flask_thread():
     """ Starts the Flask server on localhost:3001
     -------
     """
-    app.run(host='0.0.0.0', port=3001, debug=False, use_reloader=False)
+    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
+
+    print("After app.run")
 
 def run_api():
     """ Creates a seperate Python thread in which the API (Flask) is started

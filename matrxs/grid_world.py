@@ -6,6 +6,8 @@ from collections import OrderedDict
 import time
 import copy
 
+import requests
+
 from matrxs.logger.logger import GridWorldLogger
 from matrxs.actions.object_actions import *
 from matrxs.utils.utils import get_all_classes
@@ -115,6 +117,12 @@ class GridWorld:
             if self.__run_matrxs_api and api.matrxs_done:
                 print("Scenario stopped through API")
                 break
+
+        # stop the API thread if it was running
+        if self.__run_matrxs_api:
+            print("Shutting down API")
+            r = requests.get("http://localhost:" + str(api.port) + "/shutdown_API")
+            self.__api_process.join()
 
 
 
@@ -558,7 +566,7 @@ class GridWorld:
                 "vis_bg_img": self.__visualization_bg_img
             }
         }
-        print("Timestamp now:", state['World']['curr_tick_timestamp'])
+        # print("Timestamp now:", state['World']['curr_tick_timestamp'])
 
         return state
 
@@ -592,7 +600,7 @@ class GridWorld:
                 "vis_bg_img": self.__visualization_bg_img
             }
         }
-        print("Timestamp now:", state['World']['curr_tick_timestamp'])
+        # print("Timestamp now:", state['World']['curr_tick_timestamp'])
 
 
         return state
@@ -755,8 +763,7 @@ class GridWorld:
         # server.debug = self.__verbose
 
         # Create the process and run it
-        api.run_api()
-        self.__api_process = True
+        self.__api_process = api.run_api()
 
 
     def add_API_message_to_agent(self, message):
