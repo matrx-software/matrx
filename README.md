@@ -11,15 +11,7 @@ For documentation see the wiki at [https://ci.tno.nl/gitlab/SAIL-framework/testb
 
 
 # Todo:
-- subspecify API messages:
-    - send message 
-- agents should also be able to received data. Are there other types of input except from userinput0? Why should there be a difference between human and normal agents? 
-Advantage is that agents can change it (using actions) and also read it. API input?
-Settings are also passed automatically via the API, which is required for the visualization. 
+- check transition to next experiment
+- fix agent list 
 - Jasper: property maken van global variable -> issue. 
-
-
-message: 
-- from current (human) agent  
-- to self / other agent 
-- content 
+- message(with from and to_id) as message content?

@@ -204,7 +204,7 @@ class AgentBrain:
         None
         """
         # Check if the message is a true message
-        self.__check_message(message)
+        self.__check_message(message, self.agent_id)
         # Add the message to our list
         self.messages_to_send.append(message)
 
@@ -321,27 +321,39 @@ class AgentBrain:
         self.rnd_seed = seed
         self.rnd_gen = np.random.RandomState(self.rnd_seed)
 
-    def _get_messages(self, all_agent_ids):
-        """
-        This method is called by the GridWorld.
 
-        Retrieves all message objects the agent has made in a tick, and returns those to the GridWorld for sending.
-        It then removes all these messages!
+    @staticmethod
+    def preprocess_messages(this_agent_id, agent_ids, messages):
+        """ Preprocess messages for sending, such that they can be understood by the GridWorld.
+        For example: if the receiver=None, this means it must be sent to all agents. This function creates a message
+        directed at every agent.
+
+        This is a static method such that it can also be accessed and used outside of this thread / the GridWorld loop.
+        Such as by the API.
 
         Note; This method should NOT be overridden!
 
-        :return: A list of message objects with a generic content, the sender (this agent's id) and optionally a
-        receiver. If a receiver is not set, the message content is send to all agents including this agent.
-        """
+        Parameters
+        ----------
+        this_agent_id
+            ID of the current agent, has to be sent as this is a static method
+        agent_ids
+            IDS of all agents known
+        messages
+            Messages which are to be processed
 
+        Returns
+            Preprocessd messages ready for sending
+        -------
+        """
         # Filter out the agent itself from the agent id's
-        agent_ids = [agent_id for agent_id in all_agent_ids if agent_id != self.agent_id]
+        agent_ids = [agent_id for agent_id in agent_ids if agent_id != this_agent_id]
 
         # Loop through all Message objects and create a dict out of each and append them to a list
-        messages = []
-        for mssg in self.messages_to_send:
+        preprocessed_messages = []
+        for mssg in messages:
 
-            self.__check_message(mssg)
+            AgentBrain.__check_message(mssg, this_agent_id)
 
             # Check if the message is None (send to all agents) or single id; if so make a list out if
             if mssg.to_id is None:
@@ -353,15 +365,37 @@ class AgentBrain:
 
             # For each receiver, create a Message object that wraps the actual object
             for single_to_id in to_ids:
-                message = Message(content=mssg, from_id=self.agent_id, to_id=single_to_id)
+                message = Message(content=mssg, from_id=this_agent_id, to_id=single_to_id)
 
                 # Add the message object to the messages
-                messages.append(message)
+                preprocessed_messages.append(message)
+
+        return preprocessed_messages
+
+
+    def _get_messages(self, all_agent_ids):
+        """ Retrieves all message objects the agent has made in a tick, and returns those to the GridWorld for sending.
+        It then removes all these messages!
+
+        This method is called by the GridWorld.
+
+        Note; This method should NOT be overridden!
+        Parameters
+        ----------
+        all_agent_ids
+            IDs of all agents
+        Returns
+            A list of message objects with a generic content, the sender (this agent's id) and optionally a
+            receiver. If a receiver is not set, the message content is send to all agents including this agent.
+        -------
+        """
+        # preproccesses messages such that they can be understand by the gridworld
+        preprocessed_messages = self.preprocess_messages(this_agent_id=self.agent_id, agent_ids=all_agent_ids, messages=self.messages_to_send)
 
         # Remove all messages that need to be send, as we have send them now
         self.messages_to_send = []
 
-        return messages
+        return preprocessed_messages
 
     def _set_messages(self, messages=None):
         """
@@ -381,7 +415,7 @@ class AgentBrain:
         for mssg in messages:
 
             # Check if the message is of type Message (its content contains the actual message)
-            self.__check_message(mssg)
+            AgentBrain.__check_message(mssg, self.agent_id)
 
             # Since each message is secretly wrapped inside a Message (as its content), we unpack its content and
             # set that as the actual received message.
@@ -390,17 +424,19 @@ class AgentBrain:
             # Add the message object to the received messages
             self.received_messages.append(received_message)
 
-    def __check_message(self, mssg):
+    @staticmethod
+    def __check_message(mssg, this_agent_id):
         if not isinstance(mssg, Message):
-            raise Exception(f"A message to {self.agent_id} is not, nor inherits from, the class {Message.__name__}."
+            raise Exception(f"A message to {this_agent_id} is not, nor inherits from, the class {Message.__name__}."
                             f" This is required for agents to be able to send and receive them.")
 
 
 class Message:
     """
     A simple object representing a communication message. An agent can create such a Message object by stating the
-    content, its own id as the sender and (optinal) a receiver. If a receiver is not given it is a message to all
+    content, its own id as the sender and (optional) a receiver. If a receiver is not given it is a message to all
     agents, including the sender.
+    NOTE: this Message class is also used by the MATRXS API
     """
 
     def __init__(self, content, from_id, to_id=None):

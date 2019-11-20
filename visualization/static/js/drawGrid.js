@@ -26,6 +26,8 @@ var prevAnimatedObjects = {};
 var animatedObjects = {};
 // how long should the animation of the movement be, in percentage with respect to
 // the maximum number of time available between ticks 1 = max duration between ticks, 0.001 min (no animation)
+// Note: it is not recommended to set this value to higher than ~0.9, as the exact duration between animation frames can
+// slightly vary (between ticks), resulting in jittery movement
 var animationDurationPerc = 0.8;
 
 // list with the images (string to path) preloaded into the page as (invisible) html elements
@@ -192,7 +194,7 @@ function drawBg() {
 
         ctx.drawImage(img, 0, 0, mapW * px_per_cell, mapH * px_per_cell); // DRAW THE IMAGE TO THE CANVAS.
 
-    // otherwise, colour the background image
+        // otherwise, colour the background image
     } else {
         ctx.fillStyle = bgTileColour;
         ctx.fillRect(0, 0, mapW * px_per_cell, mapH * px_per_cell);
@@ -368,7 +370,7 @@ function draw(new_tick) {
     // for the first time drawing the visualization, calculate the optimal
     // screen size based on the grid size
     if (firstDraw) {
-        isFirstCall=false;
+        isFirstCall = false;
         populateMenu(state);
 
         console.log("First draw, resetting canvas and tile sizes");

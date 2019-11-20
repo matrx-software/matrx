@@ -14,6 +14,7 @@ from visualization import server
 from visualization.visualizer import Visualizer
 from matrxs.objects.env_object import EnvObject
 from matrxs.API import api
+from matrxs.agents.agent_brain import AgentBrain
 
 
 class GridWorld:
@@ -88,6 +89,8 @@ class GridWorld:
             if self.__run_matrxs_api and self.__api_process is None:
                 # start the MATRXS API server
                 started_API = self.__start_API()
+                # make a function available to the API for adding agent messages
+                api.add_message_to_agent = self.add_API_message_to_agent
 
             # Set initialisation boolean
             self.__is_initialized = True
@@ -405,6 +408,14 @@ class GridWorld:
                 # Obtain all communication messages if the agent has something to say to others (only comes here when
                 # the agent is NOT busy)
                 agent_messages = agent_obj.get_messages_func(all_agent_ids)
+                if self.__run_matrxs_api:
+                    if agent_id in api.messages:
+                        # preprocess the messages received via the API, and add them to the agent's messages
+                        agent_messages += AgentBrain.preprocess_messages(this_agent_id=agent_id,
+                                                                         agent_ids=all_agent_ids,
+                                                                         messages=api.messages[agent_id])
+                        # clear the messages for the next tick
+                        del api.messages[agent_id]
                 if len(agent_messages) > 0:  # there are messages
                     # go through all messages
                     for mssg in agent_messages:
@@ -571,6 +582,7 @@ class GridWorld:
                         if agent_obj.team == other_agent.team]
         state["World"] = {
             "nr_ticks": self.__current_nr_ticks,
+            "curr_tick_timestamp": int(round(time.time() * 1000)),
             "grid_shape": self.__shape,
             "tick_duration": self.tick_duration,
             "team_members": team_members,
@@ -742,6 +754,17 @@ class GridWorld:
         # Create the process and run it
         api.run_api()
         self.__api_process = True
+
+
+    def add_API_message_to_agent(self, message):
+        print(message.content, message.from_id, message.to_id)
+
+        if message.from_id in self.__registered_agents:
+            agent = self.__registered_agents[message.from_id]
+
+            msgs = agent.get_messages_func(None)
+
+            print ("Agent messages:", msgs)
 
 
     @property

@@ -6,6 +6,8 @@ import warnings
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
+from matrxs.agents.agent_brain import Message
+
 '''
 This file holds the code for the MATRXS RESTful API.
 External scripts can send POST and/or GET requests to retrieve state, tick and other information, and send
@@ -28,7 +30,8 @@ tick_duration = 0.0
 grid_size = [1, 1]
 MATRXS_info = {}
 next_tick_info = {}
-
+add_message_to_agent = None
+messages = {}
 
 # a temporary state for the current tick, which will be written to states after all
 # agents have been updated
@@ -183,9 +186,40 @@ def send_userinput(agent_ids):
 
     return jsonify(True)
 
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    """ Send a message containing information to one or multiple specific agent, the agent's team, or all agents
 
-def send_message(agent_ids):
-    pass
+    Message as defined in agent_brain.py
+
+    Parameters
+    ----------
+    message
+        Message contents to send
+    sender
+        ID of (human)agent from which sent the message
+    receiver
+        ID(s) (human)agents which will receive the message. Multiple options available:
+        ID or list of agent IDs (JS/Python) =   send to specific agent(s)
+        null (JS)       = None (Python)     =   send to all agents
+        teamname (JS / Python)              =   send to everyone in the team
+
+    Returns
+    -------
+    """
+    # fetch the data
+    data = request.json
+    msg = Message(content=data['message'], from_id=data['sender'], to_id=data['receiver'])
+
+    # check if agent IDs exist
+    # check if list or single ID
+
+    # add the messages to the API global variable
+    if data['sender'] not in messages:
+        messages[data['sender']] = []
+    messages[data['sender']].append(msg)
+
+    return jsonify(True)
 
 
 
@@ -452,22 +486,6 @@ def next_tick():
     # publicize the states of the previous tick
     states.append(copy.copy(temp_state))
 
-# def pop_received_data(agent_id):
-#     """ Pop the user input for an agent from the received_data dictionary and return it
-#
-#     Parameters
-#     ----------
-#     agent_id
-#         ID of the agent for which to return the received input
-#
-#     Returns
-#         A dictionary containing the type of input (e.g. "pressed_keys" or "chat_messages"), and their value (or a list
-#         of values if multiple inputs of the same type were received within 1 tick). See the `send_data()` function for
-#         more information.
-#     -------
-#     """
-#     global received_data
-#     return received_data.pop(agent_id, None)
 
 def pop_userinput(agent_id):
     """ Pop the user input for an agent from the userinput dictionary and return it
@@ -492,6 +510,7 @@ def reset_api():
     userinput = {}
     matrxs_paused = False
     matrxs_done = False
+
 
 #########################################################################
 # API Flask methods
