@@ -9,7 +9,11 @@ var current_tick = 0;
 var grid_size = [1, 1]
 var rendered_update = true;
 var open_update_request = false;
-var firstTick = true;
+var first_tick = true;
+
+// save the timestamp of our first tick, which we use to match the clock of MATRXS and the visualizer
+var MATRXS_timestamp_start = null;
+var vis_timestamp_start = null;
 
 var msPerFrame = (1.0 / 60) * 1000; // placeholder
 var tps = 1; // placeholder
@@ -137,9 +141,13 @@ function loop() {
     } else {
         // after a successful update redraw the screen and go to the next frame
         update_request.done(function(data) {
-            if (firstTick) {
+            if (first_tick) {
                 populateMenu(state, agent_id);
-                firstTick = false;
+                first_tick = false;
+                // save the timestamp of our first tick, which we use to match the clock of MATRXS and the visualizer
+                MATRXS_timestamp_start = curr_tick_timestamp;
+                vis_timestamp_start = curr_tick_timestamp;
+                console.log("MATRXs start:", MATRXS_timestamp_start, " vis start:", vis_timestamp_start);
             }
 
             open_update_request = false;
@@ -189,16 +197,19 @@ function get_MATRXS_update() {
 
         var world_obj = state[0]['World'];
         var new_tick = state[0]['World']['nr_ticks'];
-        var curr_tick_timestamp = world_obj['curr_tick_timestamp'];
+        curr_tick_timestamp = world_obj['curr_tick_timestamp'];
         tick_duration = world_obj['tick_duration'];
         tps = Math.floor(1.0 / tick_duration);
 
+        // Calculate the delay between when MATRXS sent the tick and the visualizer received the tick
+        // This is calculated relative from the first time (from MATRXS and vis) onwards.
+        var delay = (Date.now() - vis_timestamp_start) - (curr_tick_timestamp - MATRXS_timestamp_start);
         // calc how long we have to wait before fetching the next tick. This is calculated as
-        // tick_duration - (time_tick_requested - time_tick_started) + a small buffer (15ms)
-        wait_for_next_tick = tick_duration * 1000 - (Date.now() - curr_tick_timestamp) + 15;
+        // tick_duration - (delay) + a small buffer (15ms)
+        wait_for_next_tick = tick_duration * 1000 - (delay) + 15;
         if (wait_for_next_tick <= 0) { wait_for_next_tick = tick_duration * 1000;}
 
-        console.log(wait_for_next_tick, tick_duration, Date.now(), curr_tick_timestamp);
+        console.log("wait:", wait_for_next_tick, "tick dur:", tick_duration, "delay:", delay, " now js:", Date.now(), " MATRXS time:", curr_tick_timestamp);
 
         // the World object can be found at visualization depth 0
         bgTileColour = world_obj['vis_settings']['vis_bg_clr'];
@@ -207,9 +218,9 @@ function get_MATRXS_update() {
         console.log("Current tick:", current_tick, " new_tick: ", new_tick)
         // reinitialize the visualization if we encounter a new tick which is lower than our previous tick (server reset)
         if (new_tick < current_tick) {
-            console.log("Reinitializing");
+            console.log("MATRXS restarted");
             initialized = false;
-            firstTick = true;
+            first_tick = true;
             init();
         } else {
             current_tick = new_tick;
