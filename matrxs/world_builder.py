@@ -4,6 +4,7 @@ import sys
 import warnings
 from collections import OrderedDict
 from typing import Callable, Union, Iterable
+import requests
 
 import numpy as np
 from numpy.random.mtrand import RandomState
@@ -19,6 +20,7 @@ from matrxs.utils import utils
 from matrxs.utils.utils import get_inheritence_path, get_default_value, _get_line_coords, create_sense_capability
 from matrxs.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
 from matrxs.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
+from matrxs.API import api
 
 
 class WorldBuilder:
@@ -105,11 +107,6 @@ class WorldBuilder:
                              f"or a list/tuple of {SimulationGoal.__name__}, or it should be an int denoting the max"
                              f"number of ticks the world should run (negative for infinite).")
 
-        # Check if the sail api is set to True and raise a NotImplementedError.
-        if run_matrxs_api is True:
-            # raise NotImplementedError("You set the boolean run_sail_api to True. This setting is not implemented yet.")
-            pass
-
         # Check the background color
         if not isinstance(visualization_bg_clr, str) and len(visualization_bg_clr) != 7 and \
                 visualization_bg_clr[0] is not "#":
@@ -129,6 +126,11 @@ class WorldBuilder:
         # Set our logger place holders
         self.loggers = []
 
+        # initialize an API variable
+        self.run_matrxs_api = run_matrxs_api
+        self.api_info = {   "run_matrxs_api": run_matrxs_api,
+                            "api_thread": False }
+
         # Whether the world factory and evrything else should print stuff
         self.verbose = verbose
 
@@ -140,7 +142,6 @@ class WorldBuilder:
         self.world_settings = self.__set_world_settings(shape=shape,
                                                         tick_duration=tick_duration,
                                                         simulation_goal=simulation_goal,
-                                                        run_matrxs_api=run_matrxs_api,
                                                         run_visualization_server=run_visualization_server,
                                                         visualization_bg_clr=visualization_bg_clr,
                                                         visualization_bg_img=visualization_bg_img,
@@ -215,7 +216,7 @@ class WorldBuilder:
         self.__reset_random()
         return world
 
-    def __set_world_settings(self, shape, tick_duration, simulation_goal, run_matrxs_api,
+    def __set_world_settings(self, shape, tick_duration, simulation_goal,
                              run_visualization_server, rnd_seed, visualization_bg_clr, visualization_bg_img, verbose):
 
         if rnd_seed is None:
@@ -224,7 +225,6 @@ class WorldBuilder:
         world_settings = {"shape": shape,
                           "tick_duration": tick_duration,
                           "simulation_goal": simulation_goal,
-                          "run_matrxs_api": run_matrxs_api,
                           "run_visualization_server": run_visualization_server,
                           "rnd_seed": rnd_seed,
                           "visualization_bg_clr": visualization_bg_clr,
@@ -956,6 +956,7 @@ class WorldBuilder:
 
     def __create_grid_world(self):
         args = self.world_settings
+        args['world_ID'] = self.worlds_created
         world = GridWorld(**args)
         return world
 
@@ -1087,6 +1088,17 @@ class WorldBuilder:
         # TODO resets all RandomProperty and RandomLocation, is called after creating a world so all duplicates can be
         # TODO selected again.
         pass
+
+
+    def run_api(self):
+        self.api_info["api_process"] = api.run_api()
+
+
+    def stop_api(self):
+        print("Shutting down API")
+        r = requests.get("http://localhost:" + str(api.port) + "/shutdown_API")
+        self.api_info["api_process"].join();
+
 
 
 class RandomProperty:

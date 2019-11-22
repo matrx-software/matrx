@@ -33,6 +33,8 @@ MATRXS_info = {}
 next_tick_info = {}
 add_message_to_agent = None
 messages = {}
+# currently only one world at a time is supported
+current_world_ID = False
 
 # a temporary state for the current tick, which will be written to states after all
 # agents have been updated
@@ -138,6 +140,8 @@ def get_latest_state(agent_ids):
     if current_tick is 4:
         print(states)
         # raise Exception("stop")
+
+    # print("State:", states)
 
     return jsonify(states)
 
@@ -481,8 +485,8 @@ def add_state(agent_id, state, agent_inheritence_chain):
     global next_tick_info
     if next_tick_info == {}:
         next_tick_info = state["World"]
-        print("New world info:", next_tick_info)
-        print("Agent", agent_id , " with state:", state)
+        # print("New world info:", next_tick_info)
+        # print("Agent", agent_id , " with state:", state)
 
     # reorder and save the new state along with some meta information
     temp_state[agent_id] = {'state': __reorder_state(state), 'agent_inheritence_chain': agent_inheritence_chain}
@@ -497,7 +501,7 @@ def next_tick():
     global MATRXS_info, next_tick_info
     MATRXS_info = copy.copy(next_tick_info)
     next_tick_info = {}
-    print("Next ticK:", MATRXS_info);
+    # print("Next ticK:", MATRXS_info);
 
     # publicize the states of the previous tick
     states.append(copy.copy(temp_state))
@@ -520,12 +524,29 @@ def pop_userinput(agent_id):
 
 
 def reset_api():
-    """ Reset the api MATRXS variables """
+    """ Reset the MATRXS API variables """
     global temp_state, userinput, matrxs_paused, matrxs_done
     temp_state = []
     userinput = {}
     matrxs_paused = False
     matrxs_done = False
+
+
+def register_world(world_ID):
+    """ Register a new simulation world
+
+    At the moment simulation of only one world at a time is supported, so this calling this function will discard
+    the previous world.
+
+    Parameters
+    ----------
+    world_ID
+        The ID of the world
+    -------
+    """
+    global current_world_ID
+    current_world_ID = world_ID
+    print("Current_world_ID:", current_world_ID)
 
 
 #########################################################################
@@ -538,7 +559,6 @@ def flask_thread():
     """
     app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
 
-    print("After app.run")
 
 def run_api():
     """ Creates a seperate Python thread in which the API (Flask) is started

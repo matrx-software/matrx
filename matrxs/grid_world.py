@@ -21,18 +21,17 @@ from matrxs.agents.agent_brain import AgentBrain
 
 class GridWorld:
 
-    def __init__(self, shape, tick_duration, simulation_goal, run_matrxs_api=True, run_visualization_server=True,
-                 rnd_seed=1, visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False):
+    def __init__(self, shape, tick_duration, simulation_goal, run_visualization_server=True,
+                 rnd_seed=1, visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False, world_ID=False):
         self.__tick_duration = tick_duration  # How long each tick should take (process sleeps until thatr time is passed)
         self.__simulation_goal = simulation_goal  # The simulation goal, the simulation end when this/these are reached
         self.__shape = shape  # The width and height of the GridWorld
-        self.__run_matrxs_api = run_matrxs_api  # Whether we should run the MATRXS API
         self.__run_visualization_server = run_visualization_server  # Whether we should run the visualization server
         self.__visualisation_process = None  # placeholder for the visualisation server process
-        self.__api_process = None # placeholder for the API server process
         self.__visualization_bg_clr = visualization_bg_clr  # The background color of the visualisation
         self.__visualization_bg_img = visualization_bg_img  # The background image of the visualisation
         self.__verbose = verbose  # Set whether we should print anything or not
+        self.world_ID = world_ID # ID of this simulation world
 
         self.__registered_agents = OrderedDict()  # The dictionary of all existing agents in the GridWorld
         self.__environment_objects = OrderedDict()  # The dictionary of all existing objects in the GridWorld
@@ -53,20 +52,25 @@ class GridWorld:
         self.__is_initialized = False  # Whether this GridWorld is already initialized
         self.__message_buffer = {}  # dictionary of messages that need to be send to agents, with receiver ids as keys
 
-    def initialize(self):
+    def initialize(self, api_info):
         # Only initialize when we did not already do so
         if not self.__is_initialized:
-
             # We update the grid, which fills everything with added objects and agents
             self.__update_grid()
 
             for agent_body in self.__registered_agents.values():
                 agent_body.brain_initialize_func()
 
-            # reset the API variables
+            # set the API variables
+            self.api_info = api_info
+            self.__run_matrxs_api = self.api_info['run_matrxs_api']
             if self.__run_matrxs_api:
                 api.reset_api()
                 api.tick_duration = self.__tick_duration
+                api.register_world(self.world_ID)
+
+                # make a function available to the API for adding agent messages
+                # api.add_message_to_agent = self.add_API_message_to_agent
 
 
             # Start the visualisation server process if we need to
@@ -87,12 +91,12 @@ class GridWorld:
 
 
             # start the MATRXS API server if we need to
-            started_API = False
-            if self.__run_matrxs_api and self.__api_process is None:
-                # start the MATRXS API server
-                started_API = self.__start_API()
-                # make a function available to the API for adding agent messages
-                api.add_message_to_agent = self.add_API_message_to_agent
+            # started_API = False
+            # if self.__run_matrxs_api and self.__api_process is None:
+            #     # start the MATRXS API server
+            #     # started_API = self.__start_API()
+            #     # make a function available to the API for adding agent messages
+            #     api.add_message_to_agent = self.add_API_message_to_agent
 
             # Set initialisation boolean
             self.__is_initialized = True
@@ -100,8 +104,8 @@ class GridWorld:
             if self.__verbose:
                 print(f"@{os.path.basename(__file__)}: Initialized the GridWorld.")
 
-    def run(self):
-        self.initialize()
+    def run(self, api_info):
+        self.initialize(api_info)
 
         if self.__verbose:
             print(f"@{os.path.basename(__file__)}: Starting game loop...")
@@ -119,10 +123,10 @@ class GridWorld:
                 break
 
         # stop the API thread if it was running
-        if self.__run_matrxs_api:
-            print("Shutting down API")
-            r = requests.get("http://localhost:" + str(api.port) + "/shutdown_API")
-            self.__api_process.join()
+        # if self.__run_matrxs_api:
+        #     print("Shutting down API")
+        #     r = requests.get("http://localhost:" + str(api.port) + "/shutdown_API")
+        #     self.api_info['api_process'].join()
 
 
 
@@ -439,12 +443,12 @@ class GridWorld:
         # save the god view state
         if self.__run_matrxs_api:
             api.add_state(agent_id="god", state=self.__get_complete_state(), agent_inheritence_chain="god")
+            print("God world ID passed to API:", self.__get_complete_state()['World']['world_ID'])
 
             # make the information of this tick available via the API, after all
             # agents have been updated
             api.next_tick()
             api.current_tick = self.__current_nr_ticks
-            # api.tick_duration = self.__tick_duration
             self.__tick_duration = api.tick_duration
             api.grid_size = self.shape
 
@@ -561,6 +565,7 @@ class GridWorld:
             "curr_tick_timestamp": int(round(time.time() * 1000)),
             "grid_shape": self.__shape,
             "tick_duration": self.tick_duration,
+            "world_ID": self.world_ID,
             "vis_settings": {
                 "vis_bg_clr": self.__visualization_bg_clr,
                 "vis_bg_img": self.__visualization_bg_img
@@ -595,6 +600,7 @@ class GridWorld:
             "grid_shape": self.__shape,
             "tick_duration": self.tick_duration,
             "team_members": team_members,
+            "world_ID": self.world_ID,
             "vis_settings": {
                 "vis_bg_clr": self.__visualization_bg_clr,
                 "vis_bg_img": self.__visualization_bg_img
@@ -754,27 +760,27 @@ class GridWorld:
 
         return succeeded
 
-    def __start_API(self):
-        # bool to denote whether we succeeded in starting the API server
-        succeeded = True
+    # def __start_API(self):
+    #     # bool to denote whether we succeeded in starting the API server
+    #     succeeded = True
+    #
+    #     # Set the server to debug mode if we are verbose
+    #     # TODO Enable this when the debugging of the API is correct)
+    #     # server.debug = self.__verbose
+    #
+    #     # Create the process and run it
+    #     self.__api_process = api.run_api()
 
-        # Set the server to debug mode if we are verbose
-        # TODO Enable this when the debugging of the API is correct)
-        # server.debug = self.__verbose
 
-        # Create the process and run it
-        self.__api_process = api.run_api()
-
-
-    def add_API_message_to_agent(self, message):
-        print(message.content, message.from_id, message.to_id)
-
-        if message.from_id in self.__registered_agents:
-            agent = self.__registered_agents[message.from_id]
-
-            msgs = agent.get_messages_func(None)
-
-            print ("Agent messages:", msgs)
+    # def add_API_message_to_agent(self, message):
+    #     print(message.content, message.from_id, message.to_id)
+    #
+    #     if message.from_id in self.__registered_agents:
+    #         agent = self.__registered_agents[message.from_id]
+    #
+    #         msgs = agent.get_messages_func(None)
+    #
+    #         print ("Agent messages:", msgs)
 
 
     @property
