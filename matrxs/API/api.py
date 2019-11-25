@@ -207,10 +207,15 @@ def send_message():
     """
     # fetch the data
     data = request.json
-    msg = Message(content=data['message'], from_id=data['sender'], to_id=data['receiver'])
 
-    # check if agent IDs exist
-    # check if list or single ID
+    # check validity of agent IDs
+    API_call_valid, error = check_API_request(current_tick, data['receiver'] + data['sender'], ids_required=True)
+    if not API_call_valid:
+        print("API request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
+    # create message
+    msg = Message(content=data['message'], from_id=data['sender'], to_id=data['receiver'])
 
     # add the messages to the API global variable
     if data['sender'] not in messages:

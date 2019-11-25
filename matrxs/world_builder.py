@@ -25,7 +25,7 @@ from matrxs.API import api
 
 class WorldBuilder:
 
-    def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=25, run_matrxs_api=False,
+    def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=1000, run_matrxs_api=False,
                  run_visualization_server=False, visualization_bg_clr="#C2C2C2", visualization_bg_img=None,
                  verbose=False):
         """

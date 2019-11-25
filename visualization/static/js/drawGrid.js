@@ -19,8 +19,6 @@ var firstDraw = true;
 // Colour of the default BG tile
 var bgTileColour = "#C2C2C2";
 var bgImage = null;
-var bgImgChanged = false;
-var highestTickSoFar = 0;
 
 var prevAnimatedObjects = {};
 var animatedObjects = {};
@@ -47,7 +45,6 @@ function initializeCanvas() {
  * Changes the size of the canvas on a window resize such that it is always fullscreen
  */
 window.addEventListener("resize", fixCanvasSize);
-
 function fixCanvasSize() {
 
     // get canvas element from html
@@ -377,18 +374,14 @@ function draw(new_tick) {
         updateGridSize(grid_size); // save the number of cells in x and y direction of the map
     }
 
-    // calculate how many milliseconds 1 frame should take based on our framerate last second
-//    msPerFrame = (1.0 / framesLastSecond) * 1000;
-
     if (new_tick) {
         // the tracked objects from last iteration are moved to a separate list
         prevAnimatedObjects = animatedObjects;
         animatedObjects = {};
     }
 
-    // Draw the state of the world
-    frames++;
 
+    frames++;
     calcFps();
     updateGridSize(grid_size); // save the number of cells in x and y direction of the map
     drawBg(); // draw a default bg tile
@@ -422,8 +415,6 @@ function draw(new_tick) {
             var x = obj['location'][0] * px_per_cell;
             var y = obj['location'][1] * px_per_cell;
 
-            // keep track of objects which need to be animated
-
             // fetch the previous location of the object from last iteration
             if (!(objID in animatedObjects) && objID in prevAnimatedObjects) {
                 // console.log("Fetching", objID, " from prevAnimatedObjects");
@@ -435,7 +426,7 @@ function draw(new_tick) {
                 };
             }
 
-            // check if we need to animate this movement, which is the case if:
+            // check if we need to animate movement, which is the case if:
             // it it is our first encounter with this object, or it moves to a new position
             if (!(objID in animatedObjects && animatedObjects[objID]['loc_from'] == obj['location'])) {
                 // console.log("This is a moving agent", obj);
