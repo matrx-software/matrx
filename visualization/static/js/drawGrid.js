@@ -379,7 +379,7 @@ function draw(new_tick) {
     }
 
     // calculate how many milliseconds 1 frame should take based on our framerate last second
-    msPerFrame = (1.0 / framesLastSecond) * 1000;
+//    msPerFrame = (1.0 / framesLastSecond) * 1000;
 
     if (new_tick) {
         // the tracked objects from last iteration are moved to a separate list

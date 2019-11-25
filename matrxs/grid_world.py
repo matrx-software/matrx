@@ -69,9 +69,6 @@ class GridWorld:
                 api.tick_duration = self.__tick_duration
                 api.register_world(self.world_ID)
 
-                # make a function available to the API for adding agent messages
-                # api.add_message_to_agent = self.add_API_message_to_agent
-
 
             # Start the visualisation server process if we need to
             # started_visualisation = False  # tracks if the server is running successfully
@@ -89,14 +86,6 @@ class GridWorld:
             # thread = threading.Thread(target=logMatrx.log_object_complete, args=(self,))
             # thread.start()
 
-
-            # start the MATRXS API server if we need to
-            # started_API = False
-            # if self.__run_matrxs_api and self.__api_process is None:
-            #     # start the MATRXS API server
-            #     # started_API = self.__start_API()
-            #     # make a function available to the API for adding agent messages
-            #     api.add_message_to_agent = self.add_API_message_to_agent
 
             # Set initialisation boolean
             self.__is_initialized = True
@@ -443,7 +432,6 @@ class GridWorld:
         # save the god view state
         if self.__run_matrxs_api:
             api.add_state(agent_id="god", state=self.__get_complete_state(), agent_inheritence_chain="god")
-            print("God world ID passed to API:", self.__get_complete_state()['World']['world_ID'])
 
             # make the information of this tick available via the API, after all
             # agents have been updated
@@ -504,9 +492,9 @@ class GridWorld:
         tick_duration = tick_end_time - start_time_current_tick
         self.__curr_tick_duration = tick_duration.total_seconds()
 
-        if self.__verbose:
-            print(
-                f"@{os.path.basename(__file__)}: Tick {self.__current_nr_ticks} took {tick_duration.total_seconds()} seconds.")
+        # if self.__verbose:
+        print(
+            f"@{os.path.basename(__file__)}: Tick {self.__current_nr_ticks} took {tick_duration.total_seconds()} seconds.")
 
         return self.__is_done, self.__curr_tick_duration
 
@@ -759,29 +747,6 @@ class GridWorld:
         self.__visualisation_process = True
 
         return succeeded
-
-    # def __start_API(self):
-    #     # bool to denote whether we succeeded in starting the API server
-    #     succeeded = True
-    #
-    #     # Set the server to debug mode if we are verbose
-    #     # TODO Enable this when the debugging of the API is correct)
-    #     # server.debug = self.__verbose
-    #
-    #     # Create the process and run it
-    #     self.__api_process = api.run_api()
-
-
-    # def add_API_message_to_agent(self, message):
-    #     print(message.content, message.from_id, message.to_id)
-    #
-    #     if message.from_id in self.__registered_agents:
-    #         agent = self.__registered_agents[message.from_id]
-    #
-    #         msgs = agent.get_messages_func(None)
-    #
-    #         print ("Agent messages:", msgs)
-
 
     @property
     def messages_send_previous_tick(self):

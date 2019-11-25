@@ -7,7 +7,7 @@ from matrxs.actions.move_actions import *
 
 
 def create_factory():
-    factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.2, verbose=False, run_matrxs_api=True,
+    factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.6, verbose=False, run_matrxs_api=True,
                            run_visualization_server=False, visualization_bg_clr="#000000", visualization_bg_img="/static/backgrounds/soesterberg_luchtfoto.jpg")
 
     factory.add_logger(logger_class=LogActions, save_path="log_data/")

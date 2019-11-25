@@ -18,11 +18,14 @@ var vis_timestamp_start = null;
 var world_ID = null;
 // ID of the world for which we received a tick, is it still the same as above or is this a new world?
 var new_world_ID = null;
+var restart_api = false;
+var world_loop_stopped = false;
 
 var msPerFrame = (1.0 / 60) * 1000; // placeholder
 var tps = 1; // placeholder
 var frames = 0;
 var last_update = Date.now();
+var timestamp = Date.now();
 
 var init_url = 'http://127.0.0.1:3001/get_info'
 var update_url = 'http://127.0.0.1:3001/get_latest_state/';
@@ -35,7 +38,6 @@ var state = {}
 // how long to wait before sending a new request to MATRXS for a new state
 var wait_for_next_tick = tick_duration;
 
-
 /*
  * Once the page has loaded, call the initialization functions
  */
@@ -45,9 +47,13 @@ $(document).ready(function() {
 
 function world_manager_loop() {
     init();
-    setTimeout(function() {
-        console.log("World ended, restarting world loop")
-        world_loop();
+
+    // if the previous world ended, or we received a tick from a new world, reinitialize
+    setInterval(function() {
+        if (restart_api) {
+            console.log("World ended, restarting world loop");
+            init();
+        }
     }, 500);
 }
 
@@ -56,6 +62,9 @@ function world_manager_loop() {
  */
 function init() {
     console.log("Initializing..");
+
+    world_loop_stopped = false;
+    restart_api = false;
 
     // fetch the canvas element from the html
     initializeCanvas();
@@ -85,6 +94,8 @@ function init() {
             init();
         }, 500);
     });
+
+    console.log(">>>>>>>>>>>>>>>Init done<<<<<<<<<<<<<");
 }
 
 /*
@@ -125,6 +136,7 @@ function parseInitialState(data) {
     initialized = true;
     tick_duration = data.tick_duration;
     world_ID = data.world_ID
+    new_world_ID = null;
 
     current_tick = data.nr_ticks;
     grid_size = data.grid_shape;
@@ -143,23 +155,31 @@ function parseInitialState(data) {
  * The main visualization loop
  */
 function world_loop() {
-    var timestamp = Date.now();
+    timestamp = Date.now();
     var progress = 0;
 
     // Fetch an update from the server
-    var update_request = update(progress);
+    var to_update_or_not_to_update = Date.now() > last_update + wait_for_next_tick && !open_update_request;
+    var update_request = false
+    if (to_update_or_not_to_update) {
+        // save that we requested an update at this time
+        last_update = Date.now();
+        open_update_request = true;
+        update_request = get_MATRXS_update();
+    }
 
     // we received an update for a new world, so reinitialize the visualization
     if (new_world_ID != null && world_ID != new_world_ID) {
         console.log("New world ID:", new_world_ID, "world_ID:", world_ID);
         first_tick = false;
+        restart_api = true;
         return;
     }
 
     // if MATRXS didn't have a new tick yet, only redraw the current tick on screen
-    if (!update_request) {
+    if (!to_update_or_not_to_update) {
         draw()
-        window.requestAnimationFrame(world_loop)
+        requestNewFrame();
 
     // if we requested an update check if it was successful
     } else {
@@ -177,8 +197,8 @@ function world_loop() {
             }
 
             open_update_request = false;
-            draw(new_tick = true);
-            window.requestAnimationFrame(world_loop)
+            draw(new_tick=true);
+            requestNewFrame();
         })
 
         // if the request gave an error, print to console and try again after a delay (to prevent infinite loops)
@@ -188,37 +208,40 @@ function world_loop() {
             console.log("Retrying in 0.5s");
             open_update_request = false;
             setTimeout(function() {
-                window.requestAnimationFrame(world_loop)
+                requestNewFrame();
             }, 500);
         })
     }
 }
 
-/*
- * Update the state of the world for the elapsed time since last render
- */
-function update(progress) {
+function requestNewFrame() {
 
-    // check if there is a new tick available yet based on the tick_duration
-    // the -0.015
-    if (Date.now() > last_update + wait_for_next_tick && !open_update_request) {
-        // save that we requested an update at this time
-        last_update = Date.now();
-        open_update_request = true;
-        return get_MATRXS_update();
-    }
+    // method 1
+    window.requestAnimationFrame(world_loop);
 
-    return false;
+    // method 2
+//    var elapsed_time = Date.now() - timestamp;
+//    var wait = msPerFrame - elapsed_time;
+//    if ( wait < 0 ) {
+//        wait = 0;
+//    }
+//    console.log("Elapsed time:", elapsed_time, " wait:", wait);
+
+    // draw next frame in x milliseconds to achieve 60fps
+//    setTimeout(world_loop, wait);
 }
+
 
 /*
  * Fetch an update from MATRXS when a new tick has occurred (based on tick duration speed)
  */
 function get_MATRXS_update() {
+    console.log("Fetching matrxs state with old wait:", wait_for_next_tick);
+
     // the get request is async, meaning the (success) function is only executed when
     // the response has been received
     var update_request = jQuery.getJSON(update_url + "['" + agent_id + "']", function(data) {
-//        console.log(data);
+        console.log(data);
         state = data[data.length - 1][agent_id]['state'];
 
         var world_obj = state[0]['World'];
@@ -235,7 +258,7 @@ function get_MATRXS_update() {
         var delay = (Date.now() - vis_timestamp_start) - (curr_tick_timestamp - MATRXS_timestamp_start);
         // calc how long we have to wait before fetching the next tick. This is calculated as
         // tick_duration - (delay) + a small buffer (15ms)
-        wait_for_next_tick = tick_duration * 1000 - (delay) + 15;
+        wait_for_next_tick = tick_duration * 1000 - delay + 15;
         if (wait_for_next_tick <= 0) { wait_for_next_tick = tick_duration * 1000;}
 
         console.log("wait:", wait_for_next_tick, "tick dur:", tick_duration, "delay:", delay, " now js:", Date.now(), " MATRXS time:", curr_tick_timestamp);
@@ -245,18 +268,8 @@ function get_MATRXS_update() {
         bgImage = world_obj['vis_settings']['vis_bg_img'];
 
         console.log("Current tick:", current_tick, " new_tick: ", new_tick)
-        // reinitialize the visualization if we encounter a new tick which is lower than our previous tick (server reset)
-        if (new_tick < current_tick) {
-            console.log("MATRXS restarted");
-            initialized = false;
-            first_tick = true;
-            init();
-        } else {
-            current_tick = new_tick;
-        }
-
+        current_tick = new_tick;
     });
-
     return update_request;
 }
 

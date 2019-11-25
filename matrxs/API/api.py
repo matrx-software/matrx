@@ -364,6 +364,11 @@ def check_API_request(tick=None, ids=None, ids_required=False):
             #                                                        f'requesting states of 1 agent (e.g. "god"), or a list of '
             #                                                        f'IDs(string) for requesting states of multiple agents'}
 
+        # check if the API was reset during this time
+        if len(states) is 0:
+            return False, {'error_code': 400,
+                           'error_message': f'API is reconnecting to a new world'}
+
         # check if the provided ids exist for all requested ticks
         ids = [ids] if isinstance(ids, str) else ids
         for t in range(tick, current_tick+1):
@@ -525,11 +530,21 @@ def pop_userinput(agent_id):
 
 def reset_api():
     """ Reset the MATRXS API variables """
-    global temp_state, userinput, matrxs_paused, matrxs_done
+    global temp_state, userinput, matrxs_paused, matrxs_done, states, current_tick, tick_duration, grid_size
+    global MATRXS_info, next_tick_info, messages, current_world_ID
     temp_state = []
     userinput = {}
     matrxs_paused = False
     matrxs_done = False
+    states = []
+    current_tick = 0
+    tick_duration = 0.0
+    grid_size = [1, 1]
+    MATRXS_info = {}
+    next_tick_info = {}
+    messages = {}
+    current_world_ID = False
+
 
 
 def register_world(world_ID):
@@ -546,7 +561,6 @@ def register_world(world_ID):
     """
     global current_world_ID
     current_world_ID = world_ID
-    print("Current_world_ID:", current_world_ID)
 
 
 #########################################################################

@@ -13,10 +13,7 @@ if __name__ == "__main__":
 
     # run each world
     for world in builder.worlds():
-        print("World ID main.py:", world.world_ID)
-        print("World ID API", api.current_world_ID)
         world.run(builder.api_info)
-        print("World ID API", api.current_world_ID)
 
 
     # stop the API if requested
