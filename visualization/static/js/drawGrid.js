@@ -268,7 +268,6 @@ function drawImage(imgName, x, y, tileW, tileH, size) {
 
     // if it is a gif and it has not been processed yet, do so
     if (imgName.substr(imgName.length - 4) === ".gif" && !parsedGifs.hasOwnProperty(imgName)) {
-        console.log("first time gif load");
         parsedGifs[imgName] = [];
         var gif = new SuperGif({
             gif: img

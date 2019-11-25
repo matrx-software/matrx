@@ -11,8 +11,8 @@ For documentation see the wiki at [https://ci.tno.nl/gitlab/SAIL-framework/testb
 
 
 # Todo:
-- create extra loop which catches reset and fully stops and resets visualizer. Send world ID along which is checked, 
-and vis reset if different?
+- send_message user checks 
+- double check vis
 - port API to worldbuilder level
 - check transition to next experiment
 - Jasper: property maken van global variable -> issue. 

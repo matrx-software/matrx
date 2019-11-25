@@ -25,7 +25,7 @@ from matrxs.API import api
 
 class WorldBuilder:
 
-    def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=100, run_matrxs_api=False,
+    def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=25, run_matrxs_api=False,
                  run_visualization_server=False, visualization_bg_clr="#C2C2C2", visualization_bg_img=None,
                  verbose=False):
         """
@@ -956,7 +956,8 @@ class WorldBuilder:
 
     def __create_grid_world(self):
         args = self.world_settings
-        args['world_ID'] = self.worlds_created
+        # create a world ID in the shape of "world_" + world number + seeded random int
+        args['world_ID'] = f"world_{self.worlds_created}"
         world = GridWorld(**args)
         return world
 

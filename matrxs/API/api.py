@@ -137,11 +137,6 @@ def get_latest_state(agent_ids):
         return abort(error['error_code'], description=error['error_message'])
 
     states = __fetch_states(current_tick, agent_ids)
-    if current_tick is 4:
-        print(states)
-        # raise Exception("stop")
-
-    # print("State:", states)
 
     return jsonify(states)
 
