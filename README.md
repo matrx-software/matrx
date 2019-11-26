@@ -7,9 +7,3 @@ For documentation see the wiki at [https://ci.tno.nl/gitlab/SAIL-framework/testb
 # Changes
 - run_sail_api -> run_matrxs_api
 - maybe check navigator -> traversable objs (smoke) overwrote intravers objs (wall). Agent got stuck in infinite try walk through wall loop.
-
-
-
-# Todo:
-- Jasper: property maken van global variable -> issue. 
-- message(with from and to_id) as message content?
