@@ -1,22 +1,22 @@
 import datetime
 import os.path
 import warnings
-import gevent
 from collections import OrderedDict
 import time
 import copy
 
 import requests
 
-from matrxs.logger.logger import GridWorldLogger
+import gevent
+
 from matrxs.actions.object_actions import *
-from matrxs.utils.utils import get_all_classes
-from matrxs.objects.simple_objects import AreaTile
-from visualization import server
-from visualization.visualizer import Visualizer
+from matrxs.logger.logger import GridWorldLogger
 from matrxs.objects.env_object import EnvObject
+from matrxs.objects.simple_objects import AreaTile
+from matrxs.utils.utils import get_all_classes
 from matrxs.API import api
 from matrxs.agents.agent_brain import AgentBrain
+
 
 
 class GridWorld:
@@ -367,13 +367,6 @@ class GridWorld:
                 if self.__run_matrxs_api:
                     api.add_state(agent_id=agent_id, state=filtered_agent_state, agent_inheritence_chain=agent_obj.class_inheritance)
 
-                # if this busy agent is at its last tick of waiting, we want to actually perform the action
-                if agent_obj._at_last_action_duration_tick(curr_tick=self.__current_nr_ticks):
-                    action_class_name, action_kwargs = agent_obj._get_duration_action()
-
-                    # store the action in the buffer
-                    action_buffer[agent_id] = (action_class_name, action_kwargs)
-
             else:  # agent is not busy
 
                 # For a HumanAgent any received data from the API for this HumanAgent is send along
@@ -400,9 +393,6 @@ class GridWorld:
                 # would be killing...)
                 self.__set_agent_busy(action_name=action_class_name, action_kwargs=action_kwargs, agent_id=agent_id)
 
-                # store the action in the buffer
-                action_buffer[agent_id] = (action_class_name, action_kwargs)
-
                 # Get all agents we have, as we need these to process all messages that are send to all agents
                 all_agent_ids = self.__registered_agents.keys()
 
@@ -428,6 +418,15 @@ class GridWorld:
             # save the current agent's state for the visualizer
             if self.__run_matrxs_api:
                 api.add_state(agent_id=agent_id, state=filtered_agent_state, agent_inheritence_chain=agent_obj.class_inheritance)
+
+            # if this agent is at its last tick of waiting on its action duration, we want to actually perform the
+            # action
+            if agent_obj._at_last_action_duration_tick(curr_tick=self.__current_nr_ticks):
+                # Get the action and arguments
+                action_class_name, action_kwargs = agent_obj._get_duration_action()
+                # store the action in the buffer
+                action_buffer[agent_id] = (action_class_name, action_kwargs)
+
 
         # save the god view state
         if self.__run_matrxs_api:
@@ -681,16 +680,22 @@ class GridWorld:
             # Obtain the duration of the action, defaults to the one of the action class if not in action_kwargs, and
             # otherwise that of Action
             duration_in_ticks = action.duration_in_ticks
+            if "action_duration" in action_kwargs.keys():
+                duration_in_ticks = action_kwargs["duration_in_ticks"]
+
+            # Older kwarg name, raises deprecation warning
             if "duration_in_ticks" in action_kwargs.keys():
+                warnings.warn("'duration_in_ticks' is deprecated for setting an action's duration; use "
+                              "'action_duration'.", PendingDeprecationWarning)
                 duration_in_ticks = action_kwargs["duration_in_ticks"]
 
         # The agent is now busy performing this action
-        self.registered_agents[agent_id]._set_agent_busy(curr_tick=self.current_nr_ticks,
+        self.__registered_agents[agent_id]._set_agent_busy(curr_tick=self.current_nr_ticks,
                                                          action_duration=duration_in_ticks)
 
         # Set the action and result in the agent so we know where the agent is busy with. In addition this is appended
         # to its properties so others know what agent did)
-        self.registered_agents[agent_id]._set_current_action(action_name=action_name, action_args=action_kwargs)
+        self.__registered_agents[agent_id]._set_current_action(action_name=action_name, action_args=action_kwargs)
 
     def __update_agent_location(self, agent_id):
         # Get current location of the agent

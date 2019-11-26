@@ -154,17 +154,11 @@ class WorldBuilder:
         # created world)
         self.__visualisation_thread = None
 
-        # Set our custom warning method for all of MATRXS
-        def _warning(message, category, filename, lineno, file=None, line=None):
-            filename = filename.split(os.sep)[-1].split(".")[0]
-            if lineno is not None:
-                print(f"{filename}@{lineno}:: {message}", file=sys.stderr)
-            elif line is not None:
-                print(f"{filename}@{line}:: {message}", file=sys.stderr)
-            else:
-                print(f"{filename}:: {message}", file=sys.stderr)
-
-        warnings.showwarning = _warning
+        # Based on our verbosity and debug level, we set a warning scheme
+        if verbose:
+            warnings.simplefilter("always")
+        else:  # use the default (print all warnings once per location [module and line number])
+            warnings.simplefilter("default")
 
 
     def worlds(self, nr_of_worlds: int = 100):
@@ -334,7 +328,7 @@ class WorldBuilder:
         """
 
         # Check if location and agent are of correct type
-        if not isinstance(location, list) or not isinstance(location, tuple) and len(location) != 2:
+        if not isinstance(location, list) and not isinstance(location, tuple) and len(location) != 2:
             raise ValueError(f"The given location {location} while adding the agent with name {name} is not a list, "
                              f"tuple or  of length two.")
 
@@ -885,7 +879,7 @@ class WorldBuilder:
         all_ = list(set(all_))
 
         # Check if all door locations are at wall locations, if so remove those wall locations
-        door_locations = None if door_locations is None else door_locations
+        door_locations = [] if door_locations is None else door_locations
         for door_loc in door_locations:
             if door_loc in all_:
                 all_.remove(door_loc)
