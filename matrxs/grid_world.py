@@ -491,9 +491,9 @@ class GridWorld:
         tick_duration = tick_end_time - start_time_current_tick
         self.__curr_tick_duration = tick_duration.total_seconds()
 
-        # if self.__verbose:
-        print(
-            f"@{os.path.basename(__file__)}: Tick {self.__current_nr_ticks} took {tick_duration.total_seconds()} seconds.")
+        if self.__verbose:
+            print(
+                f"@{os.path.basename(__file__)}: Tick {self.__current_nr_ticks} took {tick_duration.total_seconds()} seconds.")
 
         return self.__is_done, self.__curr_tick_duration
 
