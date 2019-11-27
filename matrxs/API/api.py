@@ -1,7 +1,7 @@
 import threading
 import time
 import copy
-import warnings
+import logging
 
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
@@ -60,7 +60,6 @@ def get_info():
         MATRXS world object, contianing general information on the world and scenario.
     -------
     """
-    print(f"Returning tick {current_tick}")
     return jsonify(MATRXS_info)
 
 @app.route('/get_states/<tick>', methods=['GET', 'POST'])
@@ -571,18 +570,23 @@ def flask_thread():
     """ Starts the Flask server on localhost:3001
     -------
     """
+    if not debug:
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.ERROR)
+
     app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
 
 
-def run_api():
+def run_api(verbose):
     """ Creates a seperate Python thread in which the API (Flask) is started
     Returns
         MATRXS API Python thread
     -------
     """
     print("Starting background API server")
-    global runs
+    global runs, debug
     runs = True
+    debug = verbose
 
     print("Initialized app:", app)
     API_thread = threading.Thread(target=flask_thread)

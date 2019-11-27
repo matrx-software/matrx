@@ -1086,7 +1086,7 @@ class WorldBuilder:
 
 
     def run_api(self):
-        self.api_info["api_process"] = api.run_api()
+        self.api_info["api_process"] = api.run_api(self.verbose)
 
 
     def stop_api(self):
