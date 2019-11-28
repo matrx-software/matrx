@@ -62,6 +62,7 @@ class GridWorld:
             self.api_info = api_info
             self.__run_matrxs_api = self.api_info['run_matrxs_api']
             if self.__run_matrxs_api:
+                # initialize this world in the API
                 api.reset_api()
                 api.tick_duration = self.__tick_duration
                 api.register_world(self.world_ID)
@@ -74,6 +75,7 @@ class GridWorld:
                 print(f"@{os.path.basename(__file__)}: Initialized the GridWorld.")
 
     def run(self, api_info):
+        # initialize the gridworld
         self.initialize(api_info)
 
         if self.__verbose:
@@ -90,13 +92,6 @@ class GridWorld:
             if self.__run_matrxs_api and api.matrxs_done:
                 print("Scenario stopped through API")
                 break
-
-        # stop the API thread if it was running
-        # if self.__run_matrxs_api:
-        #     print("Shutting down API")
-        #     r = requests.get("http://localhost:" + str(api.port) + "/shutdown_API")
-        #     self.api_info['api_thread'].join()
-
 
 
     def get_env_object(self, requested_id, obj_type=None):
@@ -349,7 +344,7 @@ class GridWorld:
 
             else:  # agent is not busy
 
-                # For a HumanAgent any received data from the API for this HumanAgent is send along
+                # Any received data from the API for this HumanAgent is send along to the get_action function
                 if agent_obj.is_human_agent:
                     usrinp = None
                     if self.__run_matrxs_api and agent_id in api.userinput:

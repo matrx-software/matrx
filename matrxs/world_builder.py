@@ -27,7 +27,7 @@ from matrxs_visualizer import visualization_server
 
 class WorldBuilder:
 
-    def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=1000, run_matrxs_api=False,
+    def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=1000, run_matrxs_api=True,
                  run_matrxs_visualizer=False, visualization_bg_clr="#C2C2C2", visualization_bg_img=None,
                  verbose=False):
         """
@@ -49,9 +49,9 @@ class WorldBuilder:
             The goal or goals of the world, either a single SimulationGoal, a list of such or a positive non-zero
             integer to denote the maximum number of 'ticks' the world(s) have to run. Defaults to 1000.
         run_matrxs_api : bool, optional
-            ToDocument
+            Whether to run the MATRXS API
         run_matrxs_visualizer : bool, optional
-            Not Yet Implemented.
+            Whether to run the default MATRXS visualizer, this requires the API to be run
         visualization_bg_clr : str, optional
             The color of the world when visualized using MATRXS' own visualisation server. A string representation of
             hexadecimal color. Defaults to "#C2C2C2" (light grey).
@@ -113,8 +113,20 @@ class WorldBuilder:
 
         # Check if the background image is a path
         if visualization_bg_img is not None and not isinstance(visualization_bg_img, str):
-            raise ValueError(f"The given visualization_bg_img {visualization_bg_img} should of type str denoting a path"
+            raise ValueError(f"The given visualization_bg_img {visualization_bg_img} should be of type str denoting a path"
                              f" to an image.")
+
+        if not isinstance(run_matrxs_visualizer, bool):
+            raise ValueError(f"The given value {run_matrxs_visualizer} for run_matrxs_visualizer is invalid, should be "
+                             f"of type bool ")
+
+        if not isinstance(run_matrxs_api, bool):
+            raise ValueError(f"The given value {run_matrxs_api} for run_matrxs_api is invalid, should be "
+                             f"of type bool.")
+
+        if not run_matrxs_api and run_matrxs_visualizer:
+            raise ValueError(f"Run_matrxs_api is set to False while run_matrxs_visualizer is set to True. The MATRXS "
+                             f"visualizer requires the API to work, so this is not possible.")
 
         # Set our random number generator
         self.rng = np.random.RandomState(random_seed)
@@ -1082,6 +1094,10 @@ class WorldBuilder:
 
 
     def startup(self):
+        """ Start any world-overarching MATRXS scripts, such as, if requested, the API or MATRXS visualization.
+        Returns
+        -------
+        """
         if self.run_matrxs_api:
             self.api_info["api_thread"] = api.run_api(self.verbose)
 
@@ -1089,6 +1105,10 @@ class WorldBuilder:
             self.matrxs_visualizer_thread = visualization_server.run_matrxs_visualizer(self.verbose)
 
     def stop(self):
+        """ Stop any world-overarching MATRXS scripts, such as, if started, the API or MATRXS visualization.
+        Returns
+        -------
+        """
         if self.run_matrxs_api:
             print("Shutting down MATRXs API")
             r = requests.get("http://localhost:" + str(api.port) + "/shutdown_API")

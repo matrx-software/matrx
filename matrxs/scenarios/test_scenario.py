@@ -1,6 +1,5 @@
 from matrxs.agents.human_agent_brain import HumanAgentBrain
 from matrxs.agents.patrolling_agent import PatrollingAgentBrain
-from matrxs.agents.agent_brain import AgentBrain
 from matrxs.logger.log_agent_actions import LogActions
 from matrxs.world_builder import WorldBuilder
 from matrxs.actions.move_actions import *
