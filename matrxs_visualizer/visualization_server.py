@@ -1,7 +1,6 @@
 import threading
-from gevent import sleep
-
-from flask import Flask, render_template
+import logging
+from flask import Flask, render_template, request, jsonify
 
 '''
 This file holds the code for the MATRXS RESTful API. 
@@ -12,8 +11,7 @@ For visualization, see the seperate MATRXS visualization folder / package.
 '''
 
 debug = True
-runs = True  # TODO : bool to stop the API during runtime
-
+port = 3000
 app = Flask(__name__, template_folder='static/templates')
 
 
@@ -74,6 +72,23 @@ def god_view():
     return render_template('god.html')
 
 
+@app.route('/shutdown_visualizer', methods=['GET', 'POST'])
+def shutdown():
+    """ Shuts down the visualizer by stopping the Flask thread
+
+    Returns
+        True
+    -------
+    """
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Unable to shutdown visualizer server. Not running with the Werkzeug Server')
+    func()
+    print("Visualizer server shutting down...")
+    return jsonify(True)
+
+
+
 #########################################################################
 # Visualization Flask methods
 #########################################################################
@@ -82,21 +97,26 @@ def flask_thread():
     """
     Starts the Flask server on localhost:3000
     """
-    app.run(host='0.0.0.0', port=3000, debug=False, use_reloader=False)
 
-def run_api():
-    """
-    Creates a seperate Python thread in which the API (Flask) is started
-    :return: MATRXS API Python thread
-    """
-    print("Starting background API server")
-    global runs
-    runs = True
+    if not debug:
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.ERROR)
 
+    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
+
+def run_matrxs_visualizer(verbose):
+    """
+    Creates a seperate Python thread in which the visualization server (Flask) is started, serving the JS visualization
+    :return: MATRXS visualization Python thread
+    """
+    global debug
+    debug = verbose
+
+    print("Starting visualization server")
     print("Initialized app:", app)
-    API_thread = threading.Thread(target=flask_thread)
-    API_thread.start()
-    return API_thread
+    vis_thread = threading.Thread(target=flask_thread)
+    vis_thread.start()
+    return vis_thread
 
 if __name__ == "__main__":
-    run_api()
+    run_matrxs_visualizer()

@@ -21,13 +21,11 @@ from matrxs.agents.agent_brain import AgentBrain
 
 class GridWorld:
 
-    def __init__(self, shape, tick_duration, simulation_goal, run_visualization_server=True,
-                 rnd_seed=1, visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False, world_ID=False):
+    def __init__(self, shape, tick_duration, simulation_goal, rnd_seed=1,
+                 visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False, world_ID=False):
         self.__tick_duration = tick_duration  # How long each tick should take (process sleeps until thatr time is passed)
         self.__simulation_goal = simulation_goal  # The simulation goal, the simulation end when this/these are reached
         self.__shape = shape  # The width and height of the GridWorld
-        self.__run_visualization_server = run_visualization_server  # Whether we should run the visualization server
-        self.__visualisation_process = None  # placeholder for the visualisation server process
         self.__visualization_bg_clr = visualization_bg_clr  # The background color of the visualisation
         self.__visualization_bg_img = visualization_bg_img  # The background image of the visualisation
         self.__verbose = verbose  # Set whether we should print anything or not
@@ -48,7 +46,6 @@ class GridWorld:
         self.__rnd_gen = np.random.RandomState(seed=self.__rnd_seed)  # The random state of this GridWorld
         self.__curr_tick_duration = 0.  # Duration of the current tick
         self.__current_nr_ticks = 0  # The number of tick this GridWorld has ran already
-        self.__visualizer = None  # Placeholder for the Visualizer class
         self.__is_initialized = False  # Whether this GridWorld is already initialized
         self.__message_buffer = {}  # dictionary of messages that need to be send to agents, with receiver ids as keys
 
@@ -68,23 +65,6 @@ class GridWorld:
                 api.reset_api()
                 api.tick_duration = self.__tick_duration
                 api.register_world(self.world_ID)
-
-
-            # Start the visualisation server process if we need to
-            # started_visualisation = False  # tracks if the server is running successfully
-            # if self.__run_visualization_server and self.__visualisation_process is None:
-            #     # Start the visualisation server
-            #     started_visualisation = self.__start_visualisation_server()
-            #
-            # # Initialize the visualizer
-            # self.__visualizer = Visualizer(self.__shape, self.__visualization_bg_clr, self.__visualization_bg_img,
-            #                                verbose=self.__verbose, server_running=started_visualisation)
-
-            # Visualize already
-            # self.__initial_visualisation()
-
-            # thread = threading.Thread(target=logMatrx.log_object_complete, args=(self,))
-            # thread.start()
 
 
             # Set initialisation boolean
@@ -115,7 +95,7 @@ class GridWorld:
         # if self.__run_matrxs_api:
         #     print("Shutting down API")
         #     r = requests.get("http://localhost:" + str(api.port) + "/shutdown_API")
-        #     self.api_info['api_process'].join()
+        #     self.api_info['api_thread'].join()
 
 
 
@@ -363,7 +343,7 @@ class GridWorld:
                 # only do the filter observation method to be able to update the agent's state to the API
                 filtered_agent_state = agent_obj.filter_observations(state)
 
-                # save the current agent's state for the visualizer
+                # save the current agent's state for the API
                 if self.__run_matrxs_api:
                     api.add_state(agent_id=agent_id, state=filtered_agent_state, agent_inheritence_chain=agent_obj.class_inheritance)
 
@@ -415,7 +395,7 @@ class GridWorld:
                         else:
                             self.__message_buffer[mssg.to_id].append(mssg)
 
-            # save the current agent's state for the visualizer
+            # save the current agent's state for the API
             if self.__run_matrxs_api:
                 api.add_state(agent_id=agent_id, state=filtered_agent_state, agent_inheritence_chain=agent_obj.class_inheritance)
 
@@ -558,7 +538,6 @@ class GridWorld:
                 "vis_bg_img": self.__visualization_bg_img
             }
         }
-        # print("Timestamp now:", state['World']['curr_tick_timestamp'])
 
         return state
 
@@ -593,8 +572,6 @@ class GridWorld:
                 "vis_bg_img": self.__visualization_bg_img
             }
         }
-        # print("Timestamp now:", state['World']['curr_tick_timestamp'])
-
 
         return state
 
@@ -718,40 +695,6 @@ class GridWorld:
 
     def __warn(self, warn_str):
         return f"[@{self.__current_nr_ticks}] {warn_str}"
-
-    def __initial_visualisation(self):
-
-        # Perform the initiali visualisation of the process is set and the boolean for running it is true
-        if self.__run_visualization_server and self.__visualisation_process is None:
-            # Loop through all agents, apply their observe to get their state for the gui
-            for agent_id, agent_obj in self.__registered_agents.items():
-                # TODO the agent's filtered state is now empty as it has not yet performed an action. Fill it or forget
-                # TODO about initializing the agent views?
-                # Obtain the agent's filtered state
-                filtered_agent_state = agent_obj.get_filtered_state()
-                # Save the state
-                self.__visualizer._save_state(inheritance_chain=agent_obj.class_inheritance, id=agent_id,
-                                              state=filtered_agent_state)
-
-            # save the state of the god view in the visualizer
-            self.__visualizer._save_state(inheritance_chain="god", id="god", state=self.__get_complete_state())
-
-            # update the visualizations of all (human)agents and god
-            self.__visualizer._update_guis(tick=self.__current_nr_ticks)
-
-    def __start_visualisation_server(self):
-        # bool to denote whether we succeeded in starting the visualisation server
-        succeeded = True
-
-        # Set the server to debug mode if we are verbose
-        # TODO Enable this when the debugging of the visualisation is correct (see issue #124)
-        # server.debug = self.__verbose
-
-        # Create the process and run it
-        server.run_visualisation_server()
-        self.__visualisation_process = True
-
-        return succeeded
 
     @property
     def messages_send_previous_tick(self):

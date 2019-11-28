@@ -20,13 +20,15 @@ from matrxs.utils import utils
 from matrxs.utils.utils import get_inheritence_path, get_default_value, _get_line_coords, create_sense_capability
 from matrxs.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
 from matrxs.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
-from matrxs.API import api
 
+# addons
+from matrxs.API import api
+from matrxs_visualizer import visualization_server
 
 class WorldBuilder:
 
     def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=1000, run_matrxs_api=False,
-                 run_visualization_server=False, visualization_bg_clr="#C2C2C2", visualization_bg_img=None,
+                 run_matrxs_visualizer=False, visualization_bg_clr="#C2C2C2", visualization_bg_img=None,
                  verbose=False):
         """
         A builder to create one or more worlds.
@@ -48,7 +50,7 @@ class WorldBuilder:
             integer to denote the maximum number of 'ticks' the world(s) have to run. Defaults to 1000.
         run_matrxs_api : bool, optional
             ToDocument
-        run_visualization_server : bool, optional
+        run_matrxs_visualizer : bool, optional
             Not Yet Implemented.
         visualization_bg_clr : str, optional
             The color of the world when visualized using MATRXS' own visualisation server. A string representation of
@@ -63,10 +65,6 @@ class WorldBuilder:
         ------
         ValueError
             On an incorrect argument. The exception specifies further what argument and what is erroneous about it.
-
-        NotImplementedError
-            On setting either the `run_sail_api` or `run_visualisation_server` booleans to True. As this functionality
-            is not yet implemented.
 
         Examples
         --------
@@ -126,10 +124,14 @@ class WorldBuilder:
         # Set our logger place holders
         self.loggers = []
 
-        # initialize an API variable
+        # initialize an API variables
         self.run_matrxs_api = run_matrxs_api
         self.api_info = {   "run_matrxs_api": run_matrxs_api,
                             "api_thread": False }
+
+        # initialize the visualization variables
+        self.run_matrxs_visualizer = run_matrxs_visualizer
+        self.matrxs_visualizer_thread = False
 
         # Whether the world factory and evrything else should print stuff
         self.verbose = verbose
@@ -142,17 +144,12 @@ class WorldBuilder:
         self.world_settings = self.__set_world_settings(shape=shape,
                                                         tick_duration=tick_duration,
                                                         simulation_goal=simulation_goal,
-                                                        run_visualization_server=run_visualization_server,
                                                         visualization_bg_clr=visualization_bg_clr,
                                                         visualization_bg_img=visualization_bg_img,
                                                         verbose=self.verbose,
                                                         rnd_seed=random_seed)
         # Keep track of the number of worlds we created
         self.worlds_created = 0
-
-        # Visualisation thread (stays None when run_visulisation_server is False, otherwise starts the thread on a first
-        # created world)
-        self.__visualisation_thread = None
 
         # Based on our verbosity and debug level, we set a warning scheme
         if verbose:
@@ -210,8 +207,8 @@ class WorldBuilder:
         self.__reset_random()
         return world
 
-    def __set_world_settings(self, shape, tick_duration, simulation_goal,
-                             run_visualization_server, rnd_seed, visualization_bg_clr, visualization_bg_img, verbose):
+    def __set_world_settings(self, shape, tick_duration, simulation_goal,  rnd_seed,
+                             visualization_bg_clr, visualization_bg_img, verbose):
 
         if rnd_seed is None:
             rnd_seed = self.rng.randint(0, 1000000)
@@ -219,7 +216,6 @@ class WorldBuilder:
         world_settings = {"shape": shape,
                           "tick_duration": tick_duration,
                           "simulation_goal": simulation_goal,
-                          "run_visualization_server": run_visualization_server,
                           "rnd_seed": rnd_seed,
                           "visualization_bg_clr": visualization_bg_clr,
                           "visualization_bg_img": visualization_bg_img,
@@ -1085,14 +1081,24 @@ class WorldBuilder:
         pass
 
 
-    def run_api(self):
-        self.api_info["api_process"] = api.run_api(self.verbose)
+    def startup(self):
+        if self.run_matrxs_api:
+            self.api_info["api_thread"] = api.run_api(self.verbose)
 
+        if self.run_matrxs_visualizer:
+            self.matrxs_visualizer_thread = visualization_server.run_matrxs_visualizer(self.verbose)
 
-    def stop_api(self):
-        print("Shutting down API")
-        r = requests.get("http://localhost:" + str(api.port) + "/shutdown_API")
-        self.api_info["api_process"].join();
+    def stop(self):
+        if self.run_matrxs_api:
+            print("Shutting down MATRXs API")
+            r = requests.get("http://localhost:" + str(api.port) + "/shutdown_API")
+            self.api_info["api_thread"].join()
+
+        if self.run_matrxs_visualizer:
+            print("Shutting down MATRXs visualizer")
+            r = requests.get("http://localhost:" + str(visualization_server.port) + "/shutdown_visualizer")
+            self.matrxs_vis_process.join()
+
 
 
 

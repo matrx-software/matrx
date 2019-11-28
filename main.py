@@ -7,14 +7,12 @@ if __name__ == "__main__":
     # future) through a UI.
     factory = test_scenario.create_factory()
 
-    # start the API if requested
-    if factory.run_matrxs_api:
-        factory.run_api()
+    # startup world-overarching MATRXS scripts, such as the API and/or visualizer if requested
+    factory.startup()
 
     # run each world
     for world in factory.worlds():
         world.run(factory.api_info)
 
-    # stop the API if requested
-    if factory.run_matrxs_api:
-        factory.stop_api()
+    # stop MATRXS scripts such as the API and visualizer (if used)
+    factory.stop()

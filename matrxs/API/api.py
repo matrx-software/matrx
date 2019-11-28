@@ -17,7 +17,6 @@ For visualization, see the seperate MATRXS visualization folder / package.
 '''
 
 debug = True
-runs = True  # TODO : bool to stop the API during runtime
 
 app = Flask(__name__)
 CORS(app)
@@ -584,8 +583,7 @@ def run_api(verbose):
     -------
     """
     print("Starting background API server")
-    global runs, debug
-    runs = True
+    global debug
     debug = verbose
 
     print("Initialized app:", app)
