@@ -102,9 +102,9 @@ highlight_language = 'python3'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
-# html_theme = 'sphinx_rtd_theme'
-html_theme = 'sphinx_modern_theme'
+
+html_theme = 'sphinx_rtd_theme'
+# html_theme = 'sphinx_modern_theme'
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -113,9 +113,12 @@ html_theme = 'sphinx_modern_theme'
 html_static_path = ['../build/_static']
 #html_static_path = []
 
+
+# import sphinx_modern_theme
+# html_theme_path = [sphinx_modern_theme.get_html_theme_path()]
+#
 # def setup(app):
-#     app.add_stylesheet("css/theme_overrides.css")
-
-import sphinx_modern_theme
-html_theme_path = [sphinx_modern_theme.get_html_theme_path()]
-
+#     # app.add_stylesheet("css/theme_overrides.css")
+#     app.add_stylesheet("custom/matrxs.css")
+#
+# html_style = 'custom/matrxs.css'
