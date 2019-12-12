@@ -225,7 +225,7 @@ class AgentBrain:
         return action, action_kwargs
 
     def get_log_data(self):
-        """  Provides a dictionary of data to potential Loggers
+        """ Provides a dictionary of data for any Logger
 
         This method functions to relay data from an agent's decision logic (this AgentBrain class) through the GridWorld
         into a Logger. Here it can be further processed and stored.
@@ -238,7 +238,8 @@ class AgentBrain:
         return {}
 
     def send_message(self, message):
-        """
+        """  Sends a Message from this agent to others
+
         Method that allows you to construct a message that will be send to either a specified agent, a team of agents
         or all agents.
 
@@ -248,9 +249,6 @@ class AgentBrain:
             A message object that needs to be send. Should be of type Message. It's to_id can contain a single
             recipient, a list of recipients or None. If None, it is send to all other agents.
 
-        Returns
-        -------
-        None
         """
         # Check if the message is a true message
         self.__check_message(message, self.agent_id)
@@ -258,26 +256,70 @@ class AgentBrain:
         self.messages_to_send.append(message)
 
     def is_action_possible(self, action, action_kwargs):
+        """ Checks if an action would be possible.
+
+        This method can be called from the AgentBrain to check if a certain action is possible to perform with the
+        current state of the GridWorld. It requires as input an action name and its arguments (if any), same as the
+        decide_on_action method should return.
+
+        This method does not guarantees that if the action is return by the brain it actually succeeds, as other agents
+        may intervene.
+
+        Parameters
+        ----------
+        action : str
+            The name of an Action class.
+        action_kwargs : dict
+            A dictionary with keys any action arguments and as values the actual argument values.
+
+        Returns
+        -------
+        succeeded : bool
+            True if the action can be performed, False otherwise.
+        action_results : ActionResult
+            An ActionResult object containing the success or failure of the action, and (if failed) the reason why.
+
+        """
         action_result = self.__callback_is_action_possible(self.agent_id, action, action_kwargs)
 
         return action_result.succeeded, action_result
 
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
                             customizable_properties, rnd_seed, callback_is_action_possible):
-        """
+        """ Initialization of the brain by the WorldBuilder.
+
         Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
         properties. This also sets the random number generator with a seed generated based on the random seed of the
         world that is generated.
 
-        Note; This method should NOT be overridden!
 
-        :param agent_name: The name of the agent.
-        :param agent_id: The unique ID given by the world to this agent's avatar. So the agent knows what body is his.
-        :param action_set: The list of action names this agent is allowed to perform.
-        :param sense_capability: The SenseCapability of the agent denoting what it can see withing what range.
-        :param agent_properties: The dictionary of properties containing all mandatory and custom properties.
-        :param customizable_properties: A list of keys in agent_properties that this agent is allowed to change.
-        :param rnd_seed: The random seed used to set the random number generator self.rng
+        :param agent_name:
+        :param agent_id:
+        :param action_set:
+        :param sense_capability:
+        :param agent_properties:
+        :param customizable_properties:
+        :param rnd_seed:
+
+        Parameters
+        ----------
+        agent_name : str
+            The name of the agent.
+        agent_id : str
+            The unique ID given by the world to this agent's avatar. So the agent knows what body is his.
+        action_set : str
+            The list of action names this agent is allowed to perform.
+        sense_capability : SenseCapability
+            The SenseCapability of the agent denoting what it can see withing what range.
+        agent_properties : dict
+            The dictionary of properties containing all mandatory and custom properties.
+        customizable_properties : list
+            A list of keys in agent_properties that this agent is allowed to change.
+        rnd_seed : int
+            The random seed used to set the random number generator self.rng
+        callback_is_action_possible : callable
+            A callback to a GridWorld method that can check if an action is possible.
+
         """
 
         # The name of the agent with which it is also known in the world
