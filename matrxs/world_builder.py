@@ -211,9 +211,8 @@ class WorldBuilder:
         See Also
         --------
 
-        TODO Refer to GridWorld.run()
-
         """
+        #TODO Refer to GridWorld.run()
         self.worlds_created += 1
         world = self.__create_world()
         self.__reset_random()
