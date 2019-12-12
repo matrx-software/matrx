@@ -7,9 +7,27 @@ from matrxs.actions.object_actions import *
 class AgentBrain:
 
     def __init__(self):
-        """
-        Creates an Agent. All other agents should inherit from this class if you want smarter agents. This agent
+        """ Defines the brain of an Agent.
+
+        The AgentBrain is the place where all the decision logic of an agent is contained. When you wish to create a new
+        agent, this is the class you need to extend. The functions you can override are the following;
+
+        - AgentBrain.initialize(): This method is called at the first tick of a new World. Can be used to initialize the
+        class with anything that requires information unavailable until the brain is connect to a body (e.g. its object
+        ID).
+
+        - AgentBrain.filter_observations(state): This method is responsible for further filtering the state received
+        from the world at each tick.
+
+        - AgentBrain.decidece_on_action(state): This method decides on the action the agent should perform. Here lies
+        the main decision logic of the agent.
+
+        - AgentBrain.get_log_data(): This method's output is provided to all Logger instances connected to the world.
+        This allows those loggers to process and/or log this data.
+
+        All other AgentBrains should inherit from this class if you want to make you own (smarter) agents. This agent
         simply randomly selects an action from the possible actions it can do.
+
         """
 
         # Class variables for tracking the past action and its result
@@ -39,37 +57,65 @@ class AgentBrain:
         """
 
     def filter_observations(self, state):
-        """
-        In this method you filter the state to only those properties and objects the agent is actually SUPPOSED to see.
+        """ Filters the state received from the world further.
+
+        In this method you filter the state to only those properties and objects the agent is actually supposed to see.
         Since the grid world returns ALL properties of ALL objects within a certain range(s), but perhaps some objects
-        are obscured because they are behind walls, or an agent is not able to see some properties an certain objects.
+        are obscured because they are behind walls, or an agent is not able to see some properties of certain objects.
 
-        This method is separated from the decide_on_action() method because it is also used by the GridWorld to make
-        sure all UI's
+        This method is separated from the decide_on_action() method because its return value is send to the API as well
+        to allows the agent's interface to only show that knowledge the agent is aware of.
 
-        :param state: A state description containing all properties of EnvObject that are within a certain range as
-        defined by self.sense_capability. It is a list of properties in a dictionary
-        :return: A filtered state.
+        A number of utility methods exist to help filter and memorize states. See <TODO>
+
+        Override this method when creating a new AgentBrain and you need to filter the state further.
+
+        Parameters
+        ----------
+        state: dict
+            A state description containing all properties of EnvObject and sub classes that are within a certain range
+            as defined by self.sense_capability. The object id is the key, and the value is a dictionary of properties.
+
+        Returns
+        -------
+        filtered_state : dict
+            A dictionary describing the filtered state this agent perceives of the world.
         """
 
         return state
 
     def decide_on_action(self, state):
-        """
-        In this method you compute your action.
+        """ Contains the decision logic of the agent.
 
-        For example, this default agent randomly selects an action from the possible_actions list. However,
-        for smarter agents you need the state representation for example to know what a good action is. In addition
-        you should also return a dictionary of potential keyword arguments your intended action may require. You can
-        set this to an empty dictionary if there are none. Though if you do not provide a required keyword argument
-        (or wrongly name it), the action will throw an Exception and the environment will crash.
+        This method determines what action the agent should perform. The GridWorld is responsible for deciding when an
+        agent can perform an action again, if so this method is called for each agent. Two things need to be determined,
+        which action and with what arguments.
 
-        :param state: A state description containing all properties of EnvObject that are within a certain range as
+        The action is returned simply as the class name (as a string), and the action arguments as a dictionary with the
+        keys the names of the keyword arguments. An argument that is always possible is that of action_duration, which
+        denotes how many ticks this action should take (e.g. a duration of 1, makes sure the agent has to wait 1 tick).
+
+        To quickly build a fairly intelligent agent, several utility classes and methods are available. See <TODO>.
+
+
+        Parameters
+        ==========
+        state : dict
+        A state description containing all properties of EnvObject that are within a certain range as
         defined by self.sense_capability. It is a list of properties in a dictionary
-        :return: An action string of the class name of an action that is also in self.action_set. You should also return
-        a dictionary of action arguments the world might need to perform this action. See the implementation of the
-        action to know which keyword arguments it requires. For example if you want to remove an object, you should
-        provide it object ID with a specific key (e.g. 'object_id' = some_object_id_agent_should_remove).
+
+        Returns
+        =======
+        action_name : str
+            A string of the class name of an action that is also in self.action_set. To ensure backwards compatibility
+            you could use Action.__name__ where Action is the intended action.
+
+        action_args : dict
+            A dictionary with keys any action arguments and as values the actual argument values. If a required argument
+            is missing an exception is raised, if an argument that is not used by that action a warning is printed. The
+            argument applicable to all action is `action_duration`, which sets the number ticks the agent is put on hold
+            by the GridWorld until the action's world mutation is actual performed and the agent can perform a new
+            action (a value of 0 is no wait, 1 means to wait 1 tick, etc.).
         """
 
         # Send a message to a random agent
@@ -179,12 +225,15 @@ class AgentBrain:
         return action, action_kwargs
 
     def get_log_data(self):
-        """
-        Method that is called by the GridWorld to obtain this agent's brain specific data that is send towards all the
-        loggers.
+        """  Provides a dictionary of data to potential Loggers
 
-        :return:
-            A dictionary with the keys as columns and values as the data to be logged.
+        This method functions to relay data from an agent's decision logic (this AgentBrain class) through the GridWorld
+        into a Logger. Here it can be further processed and stored.
+
+        Returns
+        -------
+        data : dict
+            A dictionary with keys identifiable names and the data as its value.
         """
         return {}
 

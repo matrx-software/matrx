@@ -82,6 +82,8 @@ autodoc_default_options = {
 
 master_doc = 'index'
 
+autodoc_member_order = 'bysource'
+
 autosummary_generate = True
 
 html_theme_options = {

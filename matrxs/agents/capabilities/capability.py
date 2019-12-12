@@ -50,8 +50,9 @@ class SenseCapability(Capability):
     def get_capabilities(self):
         """ Returns the dictionary defining what types can be perceived within which distance.
 
-        :return:
-        dict
+        Returns
+        -------
+        sense_capabilities: dict
             A dictionary with as keys the object types and values the distances.
         """
         return self.__detectable_objects.copy()
