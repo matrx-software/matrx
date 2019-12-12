@@ -476,6 +476,16 @@ a.external {color:#656AE0;}
 
 /* Start Sphinx 2.0 fixes. */
 .rst-content .admonition > :last-child {margin-bottom: 0}
+.rst-content .document dl dt {
+.class > dt, .function > dt, .method > dt {
+    padding: 0.5rem;
+    background-color: #f8f8f8;
+    font-weight: normal;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-left: 2px solid #ff9c34;
+    overflow: auto;
+    margin-bottom: 1rem;
+}
 .rst-content dl.field-list {
 	display: grid;
 	grid-template-columns: minmax(min-content,max-content) auto;
@@ -507,4 +517,38 @@ a.external {color:#656AE0;}
 	width: 100%
 }
 
+/* table */
+table.align-default {
+  margin-left: auto;
+  margin-right: auto;
+}
 
+table.docutils tr:nth-child(odd) {
+  background-color: #F0F7FA;
+}
+
+table.docutils tr {
+  border-style: solid none solid none;
+  border-width: 1px 0;
+  border-color: #ddd;
+}
+
+table.docutils td, table.docutils th {
+  padding: 0.125rem 0.5rem 0.125rem 0.25rem;
+}
+
+table.docutils {
+  margin-bottom: 1rem;
+  line-height: 1rem;
+  max-width: 100%;
+}
+
+table.docutils p {
+  margin-bottom: 0;
+}
+
+table.docutils p {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: initial;
+}
