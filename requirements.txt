@@ -8,3 +8,4 @@ gevent>=1.4.0
 flask-cors>=3.0.0
 numpydoc>=0.9.1
 sphinx>=2.2.0
+sphinx_modern_theme
