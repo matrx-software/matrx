@@ -476,7 +476,6 @@ a.external {color:#656AE0;}
 
 /* Start Sphinx 2.0 fixes. */
 .rst-content .admonition > :last-child {margin-bottom: 0}
-.rst-content .document dl dt {
 .class > dt, .function > dt, .method > dt {
     padding: 0.5rem;
     background-color: #f8f8f8;
@@ -551,4 +550,9 @@ table.docutils p {
   white-space: pre-wrap;
   word-wrap: break-word;
   word-break: initial;
+}
+
+dt.field-odd, dt.field-even {
+    background-color: #F0F7FA;
+    padding-left: 0.25rem;
 }
