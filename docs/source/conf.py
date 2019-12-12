@@ -116,9 +116,9 @@ html_static_path = ['../build/_static']
 
 # import sphinx_modern_theme
 # html_theme_path = [sphinx_modern_theme.get_html_theme_path()]
-#
-# def setup(app):
-#     # app.add_stylesheet("css/theme_overrides.css")
-#     app.add_stylesheet("custom/matrxs.css")
-#
+
+def setup(app):
+    app.add_stylesheet("css/theme_overrides.css")
+    # app.add_stylesheet("custom/matrxs.css")
+
 # html_style = 'custom/matrxs.css'
