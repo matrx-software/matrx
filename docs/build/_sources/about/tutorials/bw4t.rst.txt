@@ -1,0 +1,27 @@
+.. _Part 1: A team of two
+
+
+Part 1: A team of two
+=====================
+
+In this tutorial, we will create the scenario of two agents co-operating to find, grab and deliver a certain sequence
+of blocks. The two agents are autonomous, thus no human agents are involved in this tutorial. We will cover the implementation
+of the block-gathering agent brain, and handle the communication between the two agents. Basic actions like building a
+world and adding objects and agents to the world are assumed to be prior knowledge for this creating this scenario.
+
+In this scenario, there are 4 rooms, each containing a certain color of blocks. Each room contains one door. The agents
+cannot see what is inside a room before the door is opened. Together, the agents have to deliver a sequence of blocks
+to a designated delivery area. The sequence is specified by the user. Once all blocks in the sequence have successfully
+been delivered, the simulation is over.
+
+The image below shows what the scene created during the tutorial looks like. Having trouble building this world? Check
+the basic tutorials :ref:`Creating your MATRXS world` and :ref:`Adding objects`.
+
+.. image:: images/BW4T_start.png
+  :width: 400
+  :alt: An image showing the initial state of the teaming task.
+
+
+
+
+One could also put blocks of different random colors in one room, but handling that would require a different strategy than the one executed here.

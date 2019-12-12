@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>matrxs.agents.patrolling_agent.PatrollingAgentBrain &mdash; MATRXS 0.0.1 Manual 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="matrxs.agents.capabilities.capability.SenseCapability" href="matrxs.agents.capabilities.capability.SenseCapability.html" />
+    <link rel="prev" title="matrxs.agents.human_agent_brain.HumanAgentBrain" href="matrxs.agents.human_agent_brain.HumanAgentBrain.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> MATRXS 0.0.1 Manual
+          
+
+          
+            
+            <img src="../../_static/matrxslogo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/aboutmatrxs.html">About MATRXS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation/installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about/FAQ.html">F.A.Q.</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Sections</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../worlds.html">Worlds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../actions.html">Actions</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../brains.html">Brains</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="matrxs.agents.agent_brain.AgentBrain.html">matrxs.agents.agent_brain.AgentBrain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrxs.agents.human_agent_brain.HumanAgentBrain.html">matrxs.agents.human_agent_brain.HumanAgentBrain</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">matrxs.agents.patrolling_agent.PatrollingAgentBrain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrxs.agents.capabilities.capability.SenseCapability.html">matrxs.agents.capabilities.capability.SenseCapability</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../objects.html">Object placement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../simgoals.html">Simulation goals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MATRXS 0.0.1 Manual</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../brains.html">Brains</a> &raquo;</li>
+        
+      <li>matrxs.agents.patrolling_agent.PatrollingAgentBrain</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/sections/_generated_autodoc/matrxs.agents.patrolling_agent.PatrollingAgentBrain.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="matrxs-agents-patrolling-agent-patrollingagentbrain">
+<h1>matrxs.agents.patrolling_agent.PatrollingAgentBrain<a class="headerlink" href="#matrxs-agents-patrolling-agent-patrollingagentbrain" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="matrxs.agents.patrolling_agent.PatrollingAgentBrain">
+<em class="property">class </em><code class="sig-name descname">PatrollingAgentBrain</code><span class="sig-paren">(</span><em class="sig-param">waypoints</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the PatrollingAgentBrain class.</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.decide_on_action" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.decide_on_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decide_on_action</span></code></a>(self, state)</p></td>
+<td><p>Decision of which action to perform.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.filter_observations" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.filter_observations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_observations</span></code></a>(self, state)</p></td>
+<td><p>Filtering the agent’s observations.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.initialize" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.initialize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize</span></code></a>(self)</p></td>
+<td><p>Initialization of the agent’s state tracker.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_action_possible</span></code>(self, action, action_kwargs)</p></td>
+<td><p>Check whether the action is possible.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_message</span></code>(self, message_content, dict], …)</p></td>
+<td><p>Method that allows you to construct a message that will be send to either a specified agent, a team of agents or all agents.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="matrxs.agents.patrolling_agent.PatrollingAgentBrain.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">waypoints</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an Agent. All other agents should inherit from this class if you want smarter agents. This agent
+simply randomly selects an action from the possible actions it can do.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.__init__" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, waypoints)</p></td>
+<td><p>Creates an Agent.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.decide_on_action" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.decide_on_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decide_on_action</span></code></a>(self, state)</p></td>
+<td><p>Decision of which action to perform.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.filter_observations" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.filter_observations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_observations</span></code></a>(self, state)</p></td>
+<td><p>Filtering the agent’s observations.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.initialize" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.initialize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize</span></code></a>(self)</p></td>
+<td><p>Initialization of the agent’s state tracker.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_action_possible</span></code>(self, action, action_kwargs)</p></td>
+<td><p>Check whether the action is possible.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_message</span></code>(self, message_content, dict], …)</p></td>
+<td><p>Method that allows you to construct a message that will be send to either a specified agent, a team of agents or all agents.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">waypoints</em><span class="sig-paren">)</span></dt>
+<dd><p>Creates an Agent. All other agents should inherit from this class if you want smarter agents. This agent
+simply randomly selects an action from the possible actions it can do.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.agents.patrolling_agent.PatrollingAgentBrain.initialize">
+<code class="sig-name descname">initialize</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization of the agent’s state tracker.
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.agents.patrolling_agent.PatrollingAgentBrain.filter_observations">
+<code class="sig-name descname">filter_observations</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">state</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.filter_observations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filtering the agent’s observations.
+:param state:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.agents.patrolling_agent.PatrollingAgentBrain.decide_on_action">
+<code class="sig-name descname">decide_on_action</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">state</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.decide_on_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decision of which action to perform.
+:param state:
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="matrxs.agents.capabilities.capability.SenseCapability.html" class="btn btn-neutral float-right" title="matrxs.agents.capabilities.capability.SenseCapability" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="matrxs.agents.human_agent_brain.HumanAgentBrain.html" class="btn btn-neutral float-left" title="matrxs.agents.human_agent_brain.HumanAgentBrain" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The MATRXS Team at TNO.nl
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #303030;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+      background: #578a64;
+    }
+  </style>
+
+
+</body>
+</html>
