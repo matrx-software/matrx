@@ -507,3 +507,142 @@ a.external {color:#656AE0;}
 	width: 100%
 }
 
+
+
+/* Custom MATRXs styling*/
+
+/* longtables */
+
+table.longtable p {
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    -webkit-hyphens: none;
+    hyphens: none;
+    line-height: 1.1em;
+    margin-bottom: 0;
+}
+
+table.longtable td, table.longtable th {
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  padding-right: 0.5rem;
+  white-space:nowrap;
+}
+
+table.longtable tr.row-odd {
+  background-color: #F0F7FA;
+}
+
+/* api docs */
+
+.class > dt, .function > dt, .method > dt {
+  padding: 0.5rem;
+  background-color: #f8f8f8;
+  font-weight: normal;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-left: 2px solid #ff9c34;
+  overflow: auto;
+  margin-bottom: 1rem;
+}
+
+.class > dt::after, .function > dt::after, .method > dt::after {
+  overflow: auto;
+}
+
+code.descname {
+  font-weight: bold;
+  background-color: transparent;
+  padding: 0;
+}
+
+code.descclassname {
+  background-color: transparent;
+}
+
+.viewcode-link {
+  float: right;
+}
+
+dl.field-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+dl.field-list > dt {
+  flex-basis: 100%;
+  font-weight: bold;
+  word-break: break-word;
+}
+
+dl.field-list > dd {
+  flex-basis: 100%;
+  margin-bottom: 0;
+}
+
+@media screen and (min-width: 768px) {
+  dl.field-list > dt {
+    flex-basis: 110px;
+  }
+  dl.field-list > dd {
+    flex: 1 0 calc(100% - 110px);
+    max-width: calc(100% - 110px);
+  }
+
+}
+
+dt.field-odd, dt.field-even {
+  background-color: #F0F7FA;
+  padding-left: 0.25rem;
+}
+
+.field-odd, .field-even {
+  margin-top: 0;
+  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+dl.field-list > dt:after {
+  content: ":";
+}
+
+.classifier {
+  font-style: italic;
+}
+
+.classifier::before {
+  font-style: normal;
+  margin: 0.3em;
+  content: ":";
+}
+
+dd {
+  padding-left: 1rem;
+}
+
+.rubric {
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+ul.simple li p {
+  margin-bottom: 0;
+}
+
+ul.simple {
+  padding-left: 1.5rem;
+}
+
+.class > dt, .function > dt, .method > dt {
+    padding: 0.5rem;
+    background-color: #f8f8f8 !important;
+    font-weight: normal;
+    border: 1px solid rgba(0, 0, 0, 0.125) !important;
+    border-left: 2px solid #ff9c34 !important;
+    overflow: auto;
+    margin-bottom: 1rem;
+}
+
+.wy-nav-content {
+    max-width: 1200px
+}
