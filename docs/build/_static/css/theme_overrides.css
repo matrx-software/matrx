@@ -477,13 +477,13 @@ a.external {color:#656AE0;}
 /* Start Sphinx 2.0 fixes. */
 .rst-content .admonition > :last-child {margin-bottom: 0}
 .class > dt, .function > dt, .method > dt {
-    padding: 0.5rem;
-    background-color: #f8f8f8;
-    font-weight: normal;
-    border: 1px solid rgba(0, 0, 0, 0.125);
-    border-left: 2px solid #ff9c34;
+    padding: 0.5rem !important;
+    background-color: #f8f8f8 !important;
+    font-weight: normal !important;
+    border: 1px solid rgba(0, 0, 0, 0.125) !important;
+    border-left: 2px solid #ff9c34 !important;
     overflow: auto;
-    margin-bottom: 1rem;
+    margin-bottom: 1rem !important;
 }
 .rst-content dl.field-list {
 	display: grid;
@@ -552,7 +552,37 @@ table.docutils p {
   word-break: initial;
 }
 
+.rst-content dl:not(.docutils) dt {
+    color: rgb(64, 64, 64) !important;
+}
+
 dt.field-odd, dt.field-even {
-    background-color: #F0F7FA;
-    padding-left: 0.25rem;
+    background-color: #F0F7FA !important;
+    padding-left: 0.25rem !important;
+    border: none !important;
+    border-bottom: 1px solid #ddd !important;
+    border-top: 0px solid #ddd !important;
+}
+
+.wy-nav-content {
+    background: white !important;
+}
+
+.rst-content dl:not(.docutils) dt
+    display: block !important;
+}
+
+.rst-content dl:not(.docutils) dl dt {
+    font-size: 1rem !important;
+    color: #212529 !important;
+    font-weight: bold !important;
+    word-break: break-word !important;
+}
+
+.rst-content .section ul li {
+    list-style: none !important;
+}
+
+.rst-content dl.field-list {
+    column-gap: 0px !important;
 }
