@@ -653,7 +653,7 @@ class GridWorld:
             # otherwise that of Action
             duration_in_ticks = action.duration_in_ticks
             if "action_duration" in action_kwargs.keys():
-                duration_in_ticks = action_kwargs["duration_in_ticks"]
+                duration_in_ticks = action_kwargs["action_duration"]
 
             # Older kwarg name, raises deprecation warning
             if "duration_in_ticks" in action_kwargs.keys():

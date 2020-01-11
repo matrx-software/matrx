@@ -29,4 +29,4 @@ class PatrollingAgentBrain(AgentBrain):
 
         move_action = self.navigator.get_move_action(self.state_tracker)
 
-        return move_action, {"duration_in_ticks": self.move_speed}
+        return move_action, {"action_duration": self.move_speed}
