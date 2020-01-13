@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="../css/custom.css">
 
     <!-- Font Awesome icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../images/fontawesome-free-5.12.0-web/css/all.css">
 
     <title>MATRXS</title>
   </head>
@@ -23,13 +23,21 @@
       <div class="row">
         <div class="col-sm">
           <img src="../images/matrxs_logo.png" alt="MATRXS" style="width:103px;height:43px;">
-          <button type="button" class="btn btn-dark"><i class="fa fa-play text-light"></i></button>
-          <button type="button" class="btn btn-dark"><i class="fa fa-stop text-light"></i></button>
+          <button type="button" class="btn btn-dark"><i class="fas fa-play text-light"></i></button>
+          <button type="button" class="btn btn-dark"><i class="fas fa-stop text-light"></i></button>
+          <div class="btn-group">
+            <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-users"></i></button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="agent_1.html">Agent 1</a>
+              <a class="dropdown-item" href="agent_2.html">Agent 2</a>
+              <a class="dropdown-item" href="god.html">God</a>
+            </div>
+          </div>
         </div>
         <div class="col-sm" align="right">
-          <button type="button" class="btn btn-dark"><i class="fa fa-comments text-light"></i></button>
-          <button type="button" class="btn btn-dark"><i class="fa fa-search-plus text-light"></i></button>
-          <button type="button" class="btn btn-dark"><i class="fa fa-pencil text-light"></i></button>
+          <button type="button" class="btn btn-dark" id="chat_button" onclick="chatToggle()" data-toggle="collapse" data-target="#chat" aria-expanded="false" aria-controls="chat"><i class="fas fa-comments text-light"></i></button>
+          <button type="button" class="btn btn-dark"><i class="fas fa-search-plus text-light"></i></button>
+          <button type="button" class="btn btn-dark" id="draw_button" onclick="drawToggle()"><i class="fas fa-pencil-alt text-light"></i></button>
         </div>
       </div>
     </div>
@@ -38,81 +46,83 @@
       <div class="row">
 
         <!-- Grid -->
-        <div class="col-md-auto">
-          <div class="row">
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-          </div>
-          <div class="row">
-            <div class="cell"></div>
-            <div class="agent" id="agent_1" data-toggle="modal" data-target="#agent_modal" onclick="clickAgent(id)">agent_1</div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-          </div>
-          <div class="row">
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="agent" id="agent_2" data-toggle="modal" data-target="#agent_modal" onclick="clickAgent(id)">agent_2</div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-          </div>
-          <div class="row">
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-          </div>
-          <div class="row">
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-          </div>
-          <div class="row">
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-          </div>
-          <div class="row">
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
+        <div id="container">
+          <div class="col-md-auto">
+            <div class="row">
+              <div class="cell" id="cell_0" onclick=drawCell(id)></div>
+              <div class="cell" id="cell_1" onclick=drawCell(id)></div>
+              <div class="cell" id="cell_2" onclick=drawCell(id)></div>
+              <div class="cell" id="cell_3" onclick=drawCell(id)></div>
+              <div class="cell" id="cell_4" onclick=drawCell(id)></div>
+              <div class="cell" id="cell_5" onclick=drawCell(id)></div>
+              <div class="cell" id="cell_6" onclick=drawCell(id)></div>
+              <div class="cell" id="cell_7" onclick=drawCell(id)></div>
+            </div>
+            <div class="row">
+              <div class="cell"></div>
+              <div class="agent" id="agent_1" data-toggle="modal" data-target="#agent_modal" onclick="clickAgent(id)">agent_1</div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+            </div>
+            <div class="row">
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="agent" id="agent_2" data-toggle="modal" data-target="#agent_modal" onclick="clickAgent(id)">agent_2</div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+            </div>
+            <div class="row">
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+            </div>
+            <div class="row">
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+            </div>
+            <div class="row">
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+            </div>
+            <div class="row">
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+              <div class="cell"></div>
+            </div>
           </div>
         </div>
 
         <!-- Chat -->
-        <div class="col-md-auto">
+        <div class="collapse" id="chat">
           <div class="container-fluid">
             <h5>Chats</h5>
             <div class="row">
@@ -166,6 +176,7 @@
 
     <!-- Custom JavaScript -->
     <script src="../js/custom.js"></script>
+    <script src="../zoom-pan-master/public/bundle.min.js"></script>
 
   </body>
 

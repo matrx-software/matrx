@@ -42,11 +42,27 @@ var draw = false;
 function drawToggle() {
   draw = !draw;
   if (draw) {
-    document.getElementById("draw_button").className = "btn btn-dark active";
+    document.getElementById("draw_button").className = "btn btn-secondary";
     var cells = document.getElementsByClassName("cell");
-
+    for (var i = 0; i < cells.length; i++) {
+      cells[i].className = "cell draw_mode";  // Change class of all cells so that they are highlighted when hovered
+    }
   } else {
     document.getElementById("draw_button").className = "btn btn-dark";
+    var cells = document.getElementsByClassName("cell");
+    for (var i = 0; i < cells.length; i++) {
+      cells[i].className = "cell";
+    }
+  }
+}
+
+var chat = false;
+function chatToggle() {
+  chat = !chat;
+  if (chat) {
+    document.getElementById("chat_button").className = "btn btn-secondary";
+  } else {
+    document.getElementById("chat_button").className = "btn btn-dark";
   }
 }
 
