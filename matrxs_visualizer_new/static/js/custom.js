@@ -14,7 +14,7 @@ function sendMessage() {
   div.className = "message_you";
   div.innerHTML = message;
   document.getElementById("messages").appendChild(div);
-  document.getElementById("message_input").innerHTML = "";  // TODO clearning the input doesn't work
+  document.getElementById("message_input").value = null;
 }
 
 function selectContact(agent_id) {
