@@ -67,6 +67,7 @@ class HumanAgentBrain(AgentBrain):
         else:
             self.key_action_map = key_action_map
 
+
     def _get_action(self, state, agent_properties, agent_id, userinput):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
@@ -74,7 +75,9 @@ class HumanAgentBrain(AgentBrain):
 
         The function overwrites the default get_action() function for normal agents,
         and instead executes the action commanded by the user, which is received
-        via the API of the visualization server.
+        via the API from e.g. a visualization interface.
+
+        Note; This method should NOT be overridden!
 
         :param state: A state description containing all properties of EnvObject that are detectable by this agent,
         i.e. within the detectable range as defined by self.sense_capability. It is a list of properties in a dictionary
@@ -90,22 +93,74 @@ class HumanAgentBrain(AgentBrain):
         self.agent_properties = agent_properties
 
         # first filter the state to only show things this particular agent can see
-        state = self.filter_observations(state)
+        filtered_state = self.filter_observations(state)
 
         # only keep userinput which is actually connected to an agent action
-        pressed_keys = self.filter_userinput(userinput)
+        usrinput = self.filter_userinput(userinput)
+
+        # Call the method that decides on an action
+        action, action_kwargs = self.decide_on_action(filtered_state, usrinput)
+
+        # Store the action so in the next call the agent still knows what it did
+        self.previous_action = action
+
+        # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
+        # action if needed.
+        return filtered_state, self.agent_properties, action, action_kwargs
+
+
+    def decide_on_action(self, state, usrinput):
+        """ Contains the decision logic of the agent.
+
+        This method determines what action the human agent will perform. The GridWorld is responsible for deciding when
+        an agent can perform an action again, if so this method is called for each agent. Two things need to be
+        determined, which action and with what arguments.
+
+        The action is returned simply as the class name (as a string), and the action arguments as a dictionary with the
+        keys the names of the keyword arguments. An argument that is always possible is that of action_duration, which
+        denotes how many ticks this action should take (e.g. a duration of 1, makes sure the agent has to wait 1 tick).
+
+        To quickly build a fairly intelligent (human) agent, several utility classes and methods are available.
+        See <TODO>.
+
+        Note; this function of the human_agent_brain overwrites the decide_on_action() function of the default agent,
+        also providing the usrinput.
+
+
+        Parameters
+        ==========
+        state : dict
+            A state description containing all properties of EnvObject that are within a certain range as
+            defined by self.sense_capability. It is a list of properties in a dictionary
+
+        usrinput: list
+            A dictionary containing the key presses of the user, intended for controlling thus human agent.
+
+        Returns
+        =======
+        action_name : str
+            A string of the class name of an action that is also in self.action_set. To ensure backwards compatibility
+            you could use Action.__name__ where Action is the intended action.
+
+        action_args : dict
+            A dictionary with keys any action arguments and as values the actual argument values. If a required argument
+            is missing an exception is raised, if an argument that is not used by that action a warning is printed. The
+            argument applicable to all action is `action_duration`, which sets the number ticks the agent is put on hold
+            by the GridWorld until the action's world mutation is actual performed and the agent can perform a new
+            action (a value of 0 is no wait, 1 means to wait 1 tick, etc.).
+        """
 
         action_kwargs = {}
 
         # if no keys were pressed, do nothing
-        if pressed_keys is None or pressed_keys == []:
-            return state, self.agent_properties, None, {}
+        if usrinput is None or usrinput == []:
+            return None, {}
 
         # take the latest pressed key (for now), and fetch the action associated with that key
-        pressed_keys = pressed_keys[-1]
+        pressed_keys = usrinput[-1]
         action = self.key_action_map[pressed_keys]
 
-        # if the user chose a grab action, choose an object with a grab_range of 1
+        # if the user chose a grab action, choose an object within a grab_range of 1
         if action == GrabObject.__name__:
             # Assign it to the arguments list
             action_kwargs['grab_range'] = 1  # Set grab range
@@ -126,7 +181,7 @@ class HumanAgentBrain(AgentBrain):
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
                     np.array(state[object_id]['location']) - np.array(
-                        state[agent_id]['location']))))
+                        state[self.agent_id]['location']))))
                 if dist <= action_kwargs['grab_range'] and state[object_id]["is_movable"]:
                     object_in_range.append(object_id)
 
@@ -135,7 +190,7 @@ class HumanAgentBrain(AgentBrain):
                 object_id = self.rnd_gen.choice(object_in_range)
                 action_kwargs['object_id'] = object_id
 
-        # if the user chose to do a open or close door action, find a door to open/close within 1 block
+        # if the user chose to do an open or close door action, find a door to open/close within 1 block
         elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:
             action_kwargs['door_range'] = 1
             action_kwargs['object_id'] = None
@@ -158,8 +213,8 @@ class HumanAgentBrain(AgentBrain):
             if len(doors_in_range) > 0:
                 action_kwargs['object_id'] = self.rnd_gen.choice(doors_in_range)
 
-        # otherwise check which action is mapped to that key and return it
-        return state, self.agent_properties, action, action_kwargs
+        return action, action_kwargs
+
 
     def filter_observations(self, state):
         """
