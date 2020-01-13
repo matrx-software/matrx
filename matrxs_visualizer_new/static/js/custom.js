@@ -76,3 +76,15 @@ function drawCell(cell_id) {
     }
   }
 }
+
+function initGrid() {
+  var rows = 8;
+  var columns = 8;
+  var grid = document.getElementById("grid");
+  var row = document.createElement("div").className = "row";
+
+  for (var i = 0; i < columns; i++) {
+    grid.appendChild(row);
+  }
+
+}

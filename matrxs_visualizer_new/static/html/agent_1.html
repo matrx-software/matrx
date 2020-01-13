@@ -47,78 +47,7 @@
 
         <!-- Grid -->
         <div id="container">
-          <div class="col-md-auto">
-            <div class="row">
-              <div class="cell" id="cell_0" onclick=drawCell(id)></div>
-              <div class="cell" id="cell_1" onclick=drawCell(id)></div>
-              <div class="cell" id="cell_2" onclick=drawCell(id)></div>
-              <div class="cell" id="cell_3" onclick=drawCell(id)></div>
-              <div class="cell" id="cell_4" onclick=drawCell(id)></div>
-              <div class="cell" id="cell_5" onclick=drawCell(id)></div>
-              <div class="cell" id="cell_6" onclick=drawCell(id)></div>
-              <div class="cell" id="cell_7" onclick=drawCell(id)></div>
-            </div>
-            <div class="row">
-              <div class="cell"></div>
-              <div class="agent" id="agent_1" data-toggle="modal" data-target="#agent_modal" onclick="clickAgent(id)">agent_1</div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-            </div>
-            <div class="row">
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="agent" id="agent_2" data-toggle="modal" data-target="#agent_modal" onclick="clickAgent(id)">agent_2</div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-            </div>
-            <div class="row">
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-            </div>
-            <div class="row">
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-            </div>
-            <div class="row">
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-            </div>
-            <div class="row">
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-              <div class="cell"></div>
-            </div>
-          </div>
+          <div class="col-md-auto" id="grid"></div>    
         </div>
 
         <!-- Chat -->
@@ -177,6 +106,7 @@
     <!-- Custom JavaScript -->
     <script src="../js/custom.js"></script>
     <script src="../dist/zoom-pan-master/public/bundle.min.js"></script>
+    <script src="../js/init_grid.js"></script>
 
   </body>
 
