@@ -43,8 +43,16 @@ function drawToggle() {
   draw = !draw;
   if (draw) {
     document.getElementById("draw_button").className = "btn btn-secondary";
+    var cells = document.getElementsByClassName("cell");
+    for (var i = 0; i < cells.length; i++) {
+      cells[i].className = "cell draw_mode";  // Change class of all cells so that they are highlighted when hovered
+    }
   } else {
     document.getElementById("draw_button").className = "btn btn-dark";
+    var cells = document.getElementsByClassName("cell");
+    for (var i = 0; i < cells.length; i++) {
+      cells[i].className = "cell";
+    }
   }
 }
 

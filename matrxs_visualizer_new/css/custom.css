@@ -9,7 +9,7 @@
   width: 5em;
 }
 
-.cell:hover {
+.cell.draw_mode:hover {
   cursor: pointer;
   background-color: indianred;
 }
