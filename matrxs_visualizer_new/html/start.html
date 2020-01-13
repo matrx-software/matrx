@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/custom.css">
+
+    <!-- Font Awesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <title>MATRXS</title>
+  </head>
+  <body>
+    <!-- Toolbar -->
+    <div class="container-fluid toolbar bg-dark">
+      <div class="row">
+        <div class="col-sm">
+          <img src="../images/matrxs_logo.png" alt="MATRXS" style="width:103px;height:43px;">
+          <button type="button" class="btn btn-dark"><i class="fa fa-play text-light"></i></button>
+          <button type="button" class="btn btn-dark"><i class="fa fa-stop text-light"></i></button>
+        </div>
+        <div class="col-sm" align="right">
+          <button type="button" class="btn btn-dark"><i class="fa fa-comments text-light"></i></button>
+          <button type="button" class="btn btn-dark"><i class="fa fa-search-plus text-light"></i></button>
+          <button type="button" class="btn btn-dark"><i class="fa fa-pencil text-light"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="container-fluid">
+      <br>
+      <h2>Welcome to MATRXS</h2>
+      <br>
+
+      <form>
+        <div class="form-group">
+          <label for="view_mode">Select an agent to view/control</label>
+          <select class="form-control" id="view_mode">
+            <option>Agent_1</option>
+            <option>Agent_1_draw</option>
+            <option>Agent_1_zoom</option>
+            <option>Agent_2</option>
+            <option>Konva</option>
+            <option>God</option>
+          </select>
+        </div>
+      </form>
+
+      <button type="button" class="btn btn-primary" onclick="run()">Start</button>
+
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="../js/custom.js"></script>
+
+  </body>
+
+</html>
