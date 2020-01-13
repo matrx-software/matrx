@@ -9,6 +9,11 @@
   width: 5em;
 }
 
+.cell:hover {
+  cursor: pointer;
+  background-color: indianred;
+}
+
 .agent {
   z-index: 1;
   color: #fff;

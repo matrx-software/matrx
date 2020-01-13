@@ -29,7 +29,7 @@
         <div class="col-sm" align="right">
           <button type="button" class="btn btn-dark"><i class="fa fa-comments text-light"></i></button>
           <button type="button" class="btn btn-dark"><i class="fa fa-search-plus text-light"></i></button>
-          <button type="button" class="btn btn-dark"><i class="fa fa-pencil text-light"></i></button>
+          <button type="button" class="btn btn-dark" id="draw_button" onclick="drawToggle()"><i class="fa fa-pencil text-light"></i></button>
         </div>
       </div>
     </div>
@@ -40,14 +40,14 @@
         <!-- Grid -->
         <div class="col-md-auto">
           <div class="row">
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
+            <div class="cell" id="cell_0" onclick=drawCell(id)></div>
+            <div class="cell" id="cell_1" onclick=drawCell(id)></div>
+            <div class="cell" id="cell_2" onclick=drawCell(id)></div>
+            <div class="cell" id="cell_3" onclick=drawCell(id)></div>
+            <div class="cell" id="cell_4" onclick=drawCell(id)></div>
+            <div class="cell" id="cell_5" onclick=drawCell(id)></div>
+            <div class="cell" id="cell_6" onclick=drawCell(id)></div>
+            <div class="cell" id="cell_7" onclick=drawCell(id)></div>
           </div>
           <div class="row">
             <div class="cell"></div>
