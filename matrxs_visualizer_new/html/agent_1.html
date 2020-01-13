@@ -35,7 +35,7 @@
           </div>
         </div>
         <div class="col-sm" align="right">
-          <button type="button" class="btn btn-dark"><i class="fas fa-comments text-light"></i></button>
+          <button type="button" class="btn btn-dark" id="chat_button" onclick="chatToggle()" data-toggle="collapse" data-target="#chat" aria-expanded="false" aria-controls="chat"><i class="fas fa-comments text-light"></i></button>
           <button type="button" class="btn btn-dark"><i class="fas fa-search-plus text-light"></i></button>
           <button type="button" class="btn btn-dark" id="draw_button" onclick="drawToggle()"><i class="fas fa-pencil-alt text-light"></i></button>
         </div>
@@ -122,7 +122,7 @@
         </div>
 
         <!-- Chat -->
-        <div class="col-md-auto">
+        <div class="collapse" id="chat">
           <div class="container-fluid">
             <h5>Chats</h5>
             <div class="row">

@@ -42,11 +42,19 @@ var draw = false;
 function drawToggle() {
   draw = !draw;
   if (draw) {
-    document.getElementById("draw_button").className = "btn btn-dark active";
-    var cells = document.getElementsByClassName("cell");
-
+    document.getElementById("draw_button").className = "btn btn-secondary";
   } else {
     document.getElementById("draw_button").className = "btn btn-dark";
+  }
+}
+
+var chat = false;
+function chatToggle() {
+  chat = !chat;
+  if (chat) {
+    document.getElementById("chat_button").className = "btn btn-secondary";
+  } else {
+    document.getElementById("chat_button").className = "btn btn-dark";
   }
 }
 
