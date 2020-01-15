@@ -14,7 +14,7 @@ for (var x = 0; x < grid_size[0]; x++) {
     cell.setAttribute("onclick", "drawCell(id)");
     var pos_x = x * cell_size;
     var pos_y = y * cell_size;
-    cell.style = "position:absolute; left:" + pos_x + "em; top:" + pos_y + "em;";
+    cell.style = "position:absolute; left:" + pos_x + "em; top:" + pos_y + "em; height:" + cell_size + "em; width:" + cell_size + "em;";
     grid.append(cell);
   }
 }
@@ -31,7 +31,7 @@ for (var i = 0; i < agents.length; i++) {
   agent.innerHTML = agent_id;
   var pos_x = agent_locations[i][0] * cell_size;
   var pos_y = agent_locations[i][1] * cell_size;
-  agent.style = "position:absolute; left:" + pos_x + "em; top:" + pos_y + "em;";
+  agent.style = "position:absolute; left:" + pos_x + "em; top:" + pos_y + "em; height:" + cell_size + "em; width:" + cell_size + "em;";
   grid.append(agent);
 }
 
