@@ -11,7 +11,7 @@ for (var x = 0; x < grid_size[0]; x++) {
     var cell = document.createElement("div");
     cell.className = "cell";
     cell.id = "cell_" + x.toString() + "_" + y.toString();
-    cell.onclick = "drawCell(id)";  // TODO fix this
+    cell.setAttribute("onclick", "drawCell(id)");
     var pos_x = x * cell_size;
     var pos_y = y * cell_size;
     cell.style = "position:absolute; left:" + pos_x + "em; top:" + pos_y + "em;";
@@ -27,7 +27,7 @@ for (var i = 0; i < agents.length; i++) {
   agent.id = agent_id;
   agent.dataset.toggle = "modal";
   agent.dataset.target = "#agent_modal";
-  agent.onclick = "clickAgent(id)"; // TODO fix this
+  agent.setAttribute("onclick", "clickAgent(id)");
   agent.innerHTML = agent_id;
   var pos_x = agent_locations[i][0] * cell_size;
   var pos_y = agent_locations[i][1] * cell_size;

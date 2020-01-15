@@ -70,9 +70,9 @@ function drawCell(cell_id) {
   if (draw) {
     var cell = document.getElementById(cell_id);
     if (getComputedStyle(cell).backgroundColor == "rgb(220, 20, 60)") {
-      cell.style = "";
+      cell.style.backgroundColor = "";
     } else {
-      cell.style = "background-color: crimson";
+      cell.style.backgroundColor = "crimson";
     }
   }
 }
