@@ -66,7 +66,46 @@ function chatToggle() {
   }
 }
 
+function startDraw() {
+  if (draw) {
+    var cell = document.getElementById(cell_id);
+    if (getComputedStyle(cell).backgroundColor == "rgb(220, 20, 60)") {
+      decolorCell();
+    } else {
+      colorCell();
+    }
+  }
+}
+
+function startDraw(cell_id) {
+  if (draw) {
+    drawCell(cell_id);
+    startDrawDrag();
+  }
+}
+
 function drawCell(cell_id) {
+  if (draw) {
+    var cell = document.getElementById(cell_id);
+    cell.style.backgroundColor = "crimson";
+  }
+}
+
+function startDrawDrag() {
+  var cells = document.getElementsByClassName("cell");
+  for (var i = 0; i < cells.length; i++) {
+    cells[i].setAttribute("onmouseenter", "drawCell(id)");
+  }
+}
+
+function stopDraw() {
+  var cells = document.getElementsByClassName("cell");
+  for (var i = 0; i < cells.length; i++) {
+    cells[i].setAttribute("onmouseenter", "");
+  }
+}
+
+function drawCellOld(cell_id) {
   if (draw) {
     var cell = document.getElementById(cell_id);
     if (getComputedStyle(cell).backgroundColor == "rgb(220, 20, 60)") {
