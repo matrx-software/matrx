@@ -11,8 +11,8 @@ for (var x = 0; x < grid_size[0]; x++) {
     var cell = document.createElement("div");
     cell.className = "cell";
     cell.id = "cell_" + x.toString() + "_" + y.toString();
-    cell.setAttribute("onmousedown", "startDraw(id)");
-    cell.setAttribute("onmouseup", "stopDraw()");
+    cell.setAttribute("onmousedown", "startDrawErase(id)");
+    cell.setAttribute("onmouseup", "stopDrag()");
     var pos_x = x * cell_size;
     var pos_y = y * cell_size;
     cell.style = "position:absolute; left:" + pos_x + "em; top:" + pos_y + "em; height:" + cell_size + "em; width:" + cell_size + "em;";

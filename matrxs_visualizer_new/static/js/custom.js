@@ -40,6 +40,9 @@ message_input.onkeypress = function(event) {
 
 var draw = false;
 function drawToggle() {
+  if (erase) {
+    eraseToggle();
+  }
   draw = !draw;
   if (draw) {
     document.getElementById("draw_button").className = "btn btn-secondary";
@@ -56,6 +59,37 @@ function drawToggle() {
   }
 }
 
+var erase = false;
+function eraseToggle() {
+  if (draw) {
+    drawToggle();
+  }
+  erase = !erase;
+  if (erase) {
+    document.getElementById("erase_button").className = "btn btn-secondary";
+    var cells = document.getElementsByClassName("cell");
+    for (var i = 0; i < cells.length; i++) {
+      cells[i].className = "cell erase_mode";  // Change class of all cells so that they are highlighted when hovered
+    }
+  } else {
+    document.getElementById("erase_button").className = "btn btn-dark";
+    var cells = document.getElementsByClassName("cell");
+    for (var i = 0; i < cells.length; i++) {
+      cells[i].className = "cell";
+    }
+  }
+}
+
+function eraseHoverEnter(cell_id) {
+  var cell = document.getElementById(cell_id);
+  cell.style.backgroundColor = "blue";
+}
+
+function eraseHoverLeave(cell_id) {
+  var cell = document.getElementById(cell_id);
+  cell.style.backgroundColor = "";
+}
+
 var chat = false;
 function chatToggle() {
   chat = !chat;
@@ -66,21 +100,14 @@ function chatToggle() {
   }
 }
 
-function startDraw() {
-  if (draw) {
-    var cell = document.getElementById(cell_id);
-    if (getComputedStyle(cell).backgroundColor == "rgb(220, 20, 60)") {
-      decolorCell();
-    } else {
-      colorCell();
-    }
-  }
-}
-
-function startDraw(cell_id) {
+function startDrawErase(cell_id) {
   if (draw) {
     drawCell(cell_id);
     startDrawDrag();
+  }
+  if (erase) {
+    eraseCell(cell_id);
+    startEraseDrag();
   }
 }
 
@@ -98,10 +125,24 @@ function startDrawDrag() {
   }
 }
 
-function stopDraw() {
+function stopDrag() {
   var cells = document.getElementsByClassName("cell");
   for (var i = 0; i < cells.length; i++) {
     cells[i].setAttribute("onmouseenter", "");
+  }
+}
+
+function eraseCell(cell_id) {
+  if (erase) {
+    var cell = document.getElementById(cell_id);
+    cell.style.backgroundColor = "";
+  }
+}
+
+function startEraseDrag() {
+  var cells = document.getElementsByClassName("cell");
+  for (var i = 0; i < cells.length; i++) {
+    cells[i].setAttribute("onmouseenter", "eraseCell(id)");
   }
 }
 
