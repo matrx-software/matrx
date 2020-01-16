@@ -16,9 +16,12 @@ Download or clone the file structure to your workspace.
 Installing dependencies:
 The 3rd-party packages required to run MATRXS are defined in ``requirements.txt``.
 Using ``PIP``::
-pip3 install -r requirements.txt
+
+    pip3 install -r requirements.txt
+
 Using ``Conda``::
-conda install --file requirements.txt
+
+    conda install --file requirements.txt
 
 First run
 ============
@@ -28,8 +31,8 @@ python3 main.py
 Open a web browser and visit the MATRXS' god view visualization by opening the following link::
 `<http://localhost:3000/god>`_
 
-Other views, such as the ``agent view`` and ``human-agent view`` can be opened by the endpoints described in the documentation section ``Visualization``.
-Please follow the ::ref::`Tutorials` to familiarize yourself with the fundamentals of MATRXS.
+Other views, such as the ``agent view`` and ``human-agent view`` can be opened by the endpoints described in the documentation section :ref:`Visualization`.
+Please follow the :ref:`Tutorials` to familiarize yourself with the fundamentals of MATRXS.
 
 
 
