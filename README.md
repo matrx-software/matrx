@@ -2,9 +2,5 @@
 
 2D-discrete testbed to facilitate HAT-research, with SAIL connection
 
-For documentation see the wiki at [https://ci.tno.nl/gitlab/SAIL-framework/testbed/wikis/home](https://ci.tno.nl/gitlab/SAIL-framework/testbed/wikis/home).
+For documentation see the readthedocs at [matrxs.readthedocs.io/](https://matrxs.readthedocs.io/).
 
-
-# Todo: 
-- auto startup visualizer 
-- incorporate loggers in API 
