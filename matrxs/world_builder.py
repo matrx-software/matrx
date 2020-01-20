@@ -1116,7 +1116,7 @@ class WorldBuilder:
         if self.run_matrxs_visualizer:
             print("Shutting down MATRXs visualizer")
             r = requests.get("http://localhost:" + str(visualization_server.port) + "/shutdown_visualizer")
-            self.matrxs_vis_process.join()
+            self.matrxs_visualizer_thread.join()
 
 
 
