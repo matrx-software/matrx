@@ -8,12 +8,12 @@
 }
 
 .cell.draw_mode:hover {
-  cursor: pointer;
+  cursor: url("pencil-alt.svg") 0 15, pointer;
   background-color: indianred;
 }
 
 .cell.erase_mode:hover {
-  cursor: pointer;
+  cursor: url("eraser.svg") 0 15, pointer;
 }
 
 .agent {
