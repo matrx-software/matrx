@@ -114,4 +114,6 @@ h5 {
   background-color: white;
   padding-bottom: 1em;
   padding-left: 0.5em;
+  padding-right: 1em;
+  z-index: 1;
 }
