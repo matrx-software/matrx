@@ -19,30 +19,29 @@
   <body>
 
     <!-- Toolbar -->
-    <div class="container-fluid toolbar bg-dark">
-      <div class="row">
-        <div class="col-sm">
-          <img src="../images/matrxs_logo.png" alt="MATRXS" style="width:103px;height:43px;">
-          <button type="button" class="btn btn-dark"><i class="fas fa-play text-light"></i></button>
-          <button type="button" class="btn btn-dark"><i class="fas fa-stop text-light"></i></button>
-          <div class="btn-group">
-            <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-users"></i></button>
-            <div class="dropdown-menu">
-              <a class="dropdown-item" href="agent_1.html">Agent 1</a>
-              <a class="dropdown-item" href="agent_2.html">Agent 2</a>
-              <a class="dropdown-item" href="team_1.html">Team 1</a>
-              <a class="dropdown-item" href="god.html">God</a>
-            </div>
+    <div class="row toolbar bg-dark">
+      <div class="col-sm">
+        <img src="../images/matrxs_logo.png" alt="MATRXS" style="width:103px;height:43px;">
+        <button type="button" class="btn btn-dark"><i class="fas fa-play text-light"></i></button>
+        <button type="button" class="btn btn-dark"><i class="fas fa-stop text-light"></i></button>
+        <div class="btn-group">
+          <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-users"></i></button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="agent_1.html">Agent 1</a>
+            <a class="dropdown-item" href="agent_2.html">Agent 2</a>
+            <a class="dropdown-item" href="team_1.html">Team 1</a>
+            <a class="dropdown-item" href="god.html">God</a>
           </div>
         </div>
-        <div class="col-sm" align="right">
-          <button type="button" class="btn btn-dark" id="chat_button" onclick="chatToggle()" data-toggle="collapse" data-target="#chat" aria-expanded="false" aria-controls="chat"><i class="fas fa-comments text-light"></i></button>
-          <button type="button" class="btn btn-dark"><i class="fas fa-search-plus text-light"></i></button>
-          <button type="button" class="btn btn-dark" id="draw_button" onclick="drawToggle()"><i class="fas fa-pencil-alt text-light"></i></button>
-          <button type="button" class="btn btn-dark" id="erase_button" onclick="eraseToggle()"><i class="fas fa-eraser text-light"></i></button>
-        </div>
+      </div>
+      <div class="col-sm" align="right">
+        <button type="button" class="btn btn-dark" id="chat_button" onclick="chatToggle()" data-toggle="collapse" data-target="#chat" aria-expanded="false" aria-controls="chat"><i class="fas fa-comments text-light"></i></button>
+        <button type="button" class="btn btn-dark"><i class="fas fa-search-plus text-light"></i></button>
+        <button type="button" class="btn btn-dark" id="draw_button" onclick="drawToggle()"><i class="fas fa-pencil-alt text-light"></i></button>
+        <button type="button" class="btn btn-dark" id="erase_button" onclick="eraseToggle()"><i class="fas fa-eraser text-light"></i></button>
       </div>
     </div>
+
 
 
       <div class="row">
@@ -53,7 +52,7 @@
         </div>
 
         <!-- Chat -->
-        <div class=collapse id="chat">
+        <div class="collapse" id="chat">
           <div class="container-fluid">
             <h5>Chats</h5>
             <div class="row">
