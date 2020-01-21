@@ -109,3 +109,9 @@ h5 {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
 }
+
+#chat {
+  background-color: white;
+  padding-bottom: 1em;
+  padding-left: 0.5em;
+}
