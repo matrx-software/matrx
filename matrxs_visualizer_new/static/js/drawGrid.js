@@ -375,7 +375,7 @@ function draw2(new_tick) {
 
 }
 
-***
+
 /**
  * Draw all objects on the canvas
  * @param new_tick = whether this is the first draw after a new tick/update

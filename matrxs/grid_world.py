@@ -340,7 +340,9 @@ class GridWorld:
 
                 # save the current agent's state for the API
                 if self.__run_matrxs_api:
-                    api.add_state(agent_id=agent_id, state=filtered_agent_state, agent_inheritence_chain=agent_obj.class_inheritance)
+                    api.add_state(agent_id=agent_id, state=filtered_agent_state,
+                                  agent_inheritence_chain=agent_obj.class_inheritance,
+                                  world_settings=self.__get_complete_state()['World'])
 
             else:  # agent is not busy
 
@@ -392,7 +394,9 @@ class GridWorld:
 
             # save the current agent's state for the API
             if self.__run_matrxs_api:
-                api.add_state(agent_id=agent_id, state=filtered_agent_state, agent_inheritence_chain=agent_obj.class_inheritance)
+                api.add_state(agent_id=agent_id, state=filtered_agent_state,
+                              agent_inheritence_chain=agent_obj.class_inheritance,
+                              world_settings=self.__get_complete_state()['World'])
 
             # if this agent is at its last tick of waiting on its action duration, we want to actually perform the
             # action
@@ -405,7 +409,8 @@ class GridWorld:
 
         # save the god view state
         if self.__run_matrxs_api:
-            api.add_state(agent_id="god", state=self.__get_complete_state(), agent_inheritence_chain="god")
+            api.add_state(agent_id="god", state=self.__get_complete_state(), agent_inheritence_chain="god",
+                          world_settings=self.__get_complete_state()['World'])
 
             # make the information of this tick available via the API, after all
             # agents have been updated

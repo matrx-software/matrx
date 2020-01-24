@@ -5,7 +5,7 @@ if __name__ == "__main__":
 
     # By creating scripts that return a factory, we can define infinite number of use cases and select them (in the
     # future) through a UI.
-    factory = test_scenario.create_factory()
+    factory = simple_scenario.create_factory()
 
     # startup world-overarching MATRXS scripts, such as the API and/or visualizer if requested
     factory.startup()
