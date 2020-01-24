@@ -1,6 +1,13 @@
 .toolbar {
   padding-top: 0.1em;
   padding-bottom: 0.1em;
+  padding-left: 1em;
+  position: sticky;
+  z-index: 1;
+}
+
+.row {
+  margin-right: 0;
 }
 
 .cell {
@@ -8,12 +15,12 @@
 }
 
 .cell.draw_mode:hover {
-  cursor: pointer;
+  cursor: url("pencil-alt.svg") 0 15, pointer;
   background-color: indianred;
 }
 
 .cell.erase_mode:hover {
-  cursor: pointer;
+  cursor: url("eraser.svg") 0 15, pointer;
 }
 
 .agent {
@@ -108,4 +115,12 @@
 h5 {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
+}
+
+#chat {
+  background-color: white;
+  padding-bottom: 1em;
+  padding-left: 0.5em;
+  padding-right: 1em;
+  z-index: 1;
 }
