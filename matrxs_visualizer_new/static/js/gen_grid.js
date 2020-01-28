@@ -27,6 +27,12 @@ var firstDraw = true,
     tile_size = null, // in Pixels. tiles are always square, so width and height are the same
     navbar = null;
 
+var prev_obj_ids = null,
+    obj_ids = null,
+    saved_prev_objs = {}, // obj containing the IDs of objects and their visualization settings of the previous tick
+    saved_objs = {}; // obj containing the IDs of objects and their visualization settings of the current tick
+
+
 /**
  * Get the grid wrapper object
  */
@@ -96,7 +102,7 @@ function fix_tile_size() {
 }
 
 /**
- * Draw all objects on the canvas
+ * Generate the grid and all its objects
  * @param state: the MATRXS state
  * @param world_settings: the MATRXS World object, containing all settings of the current MATRXS World
  * @param new_tick: whether this is the first draw after a new tick/update
@@ -106,8 +112,16 @@ function draw(state, world_settings, new_tick) {
     // parse the new word settings, and change the grid, background, and tiles based on any changes in the settings
     if (new_tick) {
         parse_world_settings(world_settings);
-//        console.log(world_settings);
     }
+
+    // identify the objects we received
+    var obj_keys = Object.keys(state);
+
+    // calculate how many frames the animation of movement should take
+    var animationDurationFrames = (framesLastSecond / tps) * animationDurationPerc;
+
+    // calculate how many milliseconds the movement animation should take
+    var animationDurationMs = animationDurationFrames * msPerFrame;
 
     // Loop through the visualization depths
     var vis_depths = Object.keys(state);
@@ -117,11 +131,97 @@ function draw(state, world_settings, new_tick) {
         var objects = Object.keys(state[vis_depth]);
         objects.forEach(function(objID) {
 
+            // skip the World object
+            if (objID === "World") {
+                return;
+            }
 
+            // fetch object from the MATRXS state
+            obj = state[vis_depth][objID];
+
+            // fetch location of object in pixel values
+            var x = obj['location'][0] * tile_size;
+            var y = obj['location'][1] * tile_size;
+
+            // set position in css
+            var obj_style = "left:" + pos_x + "px; top:" + pos_y + "px; width: " + tile_size + "px; height: " + tile_size + "px;";
+
+            // fetch bg img if defined
+            var obj_img = null;
+            if (Object.keys(obj).includes('img_name')) {
+                obj_img =  obj['img_name']
+            }
+
+            // save visualization settings for this object
+            var obj_vis_settings = {"img": obj_img,
+                                "shape": obj['visualization']['shape'],
+                                "size": obj['visualization']['size'],
+                                "colour": hexToRgba(obj['visualization']['colour'], obj['visualization']['opacity']),
+
+
+            var obj_element = null; // the html element of this object
+            var animate_movement = false; // whether any x,y position changes should be animated
+            var object_is_new = false; // whether this is a new object, not present in the html yet
+            var generate_object = true; // whether this object should be regenerated, e.g. because vis settings changed
+
+            // check if this is a new object
+            if (! Object.keys(saved_prev_objs).includes(objID)) {
+                // create a html element for this object and set classes / ID
+                var obj_element = document.createElement("div");
+                obj_element.className = "tile";
+                obj_element.id = objID;
+
+                // this is a new object
+                new_object = true;
+
+                // add to grid
+                grid.append(obj_element);
+
+            // we already generated this object in a previous tick
+            } else {
+                // fetch the object from html
+                obj_element = document.getElementById(objID);
+
+                // check if the coordinate changed compared to the previous tick, and if so, add css rules
+                // for animating the x,y coordinates change
+                if (obj_element.style.left != x || obj_element.style.top != y) {
+                    obj_style += "-webkit-transition: left " + (animationDurationMs/1000) + "s;";
+                    obj_style += "-webkit-transition: top " + (animationDurationMs/1000) + "s;";
+                    obj_style += "transition: left " + (animationDurationMs/1000) + "s;";
+                    obj_style += "transition: top " + (animationDurationMs/1000) + "s";
+                }
+
+                // if nothing changed in the visualisation settubg of this obj, we don't need to regenerate the object
+                if (saved_prev_objs[objID] == obj_vis_settings) {
+                    generate_object = false;
+                }
+            }
+
+            // assign the css to the object
+            obj_element.style = obj_style;
+
+            // if we need to generate this object, e.g. because it's new or visualiation settings changed,
+            // regenerate the specfic object type with its settings
+            if (generate_object) {
+                // draw the object with the correct shape, size and colour
+                if (obj_vis_settings['shape'] == 0) {
+                    drawRectangle(obj_vis_settings, obj_element);
+                } else if (obj_vis_settings['shape'] == 1) {
+                    drawTriangle(x, y, obj_vis_settings, obj_element);
+                } else if (obj_vis_settings['shape'] == 2) {
+                    drawCircle(obj_vis_settings, obj_element);
+                } else if (obj_vis_settings['img'] != null) {
+                    drawImage(obj_vis_settings, obj_element);
+                }
+            }
         });
     });
 
+    // Draw the FPS to the canvas as last so it's drawn on top
+    ctx.fillStyle = "#ff0000";
+    ctx.fillText("TPS: " + tps, 65, 20);
 }
+
 
 
 /**
@@ -183,6 +283,118 @@ function update_grid_size(new_grid_size) {
     }
 }
 
+
+
+
+/*********************************************************************
+ * Generate objects
+ ********************************************************************/
+
+/**
+ * Generate the css for a rectangle
+ *
+ * @param {Object} obj_vis_settings: contains the visualization settings of the object
+ * @param {HTML Element} obj_element: contains the HTML element of the object
+ * @param {String} element_type: (optional) can be used to specify what type of HTML element should be added
+ */
+function genRectangle(x, y, obj_vis_settings, obj_element, element_type="div") {
+    // if it is size 1, simply set the color of the tile object and we are done
+    if (size == 1 && element_type != "img") {
+        obj_element.style.backgroundColor = clr; // set colour
+        obj_element.style.borderRadius = "0"; // remove any round corners
+        return obj_element;
+    }
+
+    // if the object has a smaller size than 1, we create a subobject centerd in the middle
+    var shape_obj = document.createElement(element_type);
+    shape_obj.className = "shape rectangle";
+
+    // coords of top left corner, such that it is centerd in our tile
+    shape.style.left = x + ((1 - size) * 0.5 * tile_size);
+    shape.style.top = y + ((1 - size) * 0.5 * tile_size);
+
+    // width and height of rectangle
+    shape.style.width = size * tile_size;
+    shape.style.height = size * tile_size;
+
+    // remove any old shapes
+    while (obj_element.firstChild) {
+        obj_element.removeChild(obj_element.firstChild);
+    }
+
+    // add the new shape
+    obj_element.append(shape);
+    return shape;
+}
+
+
+/**
+ * Generate the css for a triangle
+ *
+ * @param {int} x: x location of tile (top left)
+ * @param {int} y: y location of tile (top left)
+ * @param {Object} obj_vis_settings: contains the visualization settings of the object
+ * @param {HTML Element} obj_element: contains the HTML element of the object
+ */
+function drawTriangle(x, y, clr, size, obj_element, is_obj_new) {
+    // calc the coordinates of the top corner of the triangle
+    topX = x + 0.5 * tile_size;
+    topY = y + ((1 - size) * 0.5 * tile_size);
+
+    // calc the coordinates of the bottom left corner of the triangle
+    bt_leftX = x + ((1 - size) * 0.5 * tile_size);
+    bt_leftY = y + tileH - ((1 - size) * 0.5 * tile_size);
+
+    // calc the coordinates of the bottom right corner of the triangle
+    bt_rightX = x + tileW - ((1 - size) * 0.5 * tile_size);
+    bt_rightY = y + tileH - ((1 - size) * 0.5 * tile_size);
+
+    // draw triangle point by point
+    ctx.beginPath();
+    ctx.moveTo(topX, topY); // center top
+    ctx.lineTo(bt_leftX, bt_leftY); // bottom left
+    ctx.lineTo(bt_rightX, bt_rightY); // bottom right
+    ctx.closePath();
+
+    // fill the shape with colour
+    ctx.fillStyle = clr;
+    ctx.fill();
+}
+
+
+/**
+ * Draw a circle on screen. This is a rectangle with rounded corners.
+ *
+ * @param {Object} obj_vis_settings: contains the visualization settings of the object
+ * @param {HTML Element} obj_element: contains the HTML element of the object
+ */
+function genCircle(obj_vis_settings, obj_element) {
+    // generate a rectangle
+    var shape = genRectangle(obj_vis_settings, obj_element);
+
+    // round the corners
+    shape.style.borderRadius = "50%";
+
+    return shape;
+}
+
+/**
+ * Draw an image. This is a rectangle with an image src added
+ *
+ * @param {Object} obj_vis_settings: contains the visualization settings of the object
+ * @param {HTML Element} obj_element: contains the HTML element of the object
+ */
+function drawImage(obj_vis_settings, obj_element) {
+    // add a rectangular "img" HTML element
+    var shape = genRectangle(obj_vis_settings, obj_element, element_type="img");
+
+    // set the image source
+    shape.setAttribute("src", obj_vis_settings["img"]);
+
+    return shape;
+}
+
+
 /**
  * Regenerate all bg tiles in the correct size
  */
@@ -222,6 +434,10 @@ function draw_bg_tiles() {
 }
 
 
+/*********************************************************************
+ * Helper methods
+ ********************************************************************/
+
 /**
  * Removes an element by ID
  */
@@ -230,3 +446,12 @@ function remove_element(id) {
     return elem.parentNode.removeChild(elem);
 }
 
+
+/**
+ * Convert a hexadecimal colour code to an RGBA colour code
+ */
+function hexToRgba(hex, opacity) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? "rgba(" + parseInt(result[1], 16) + "," + parseInt(result[2], 16) +
+        "," + parseInt(result[3], 16) + "," + opacity + ")" : null;
+}

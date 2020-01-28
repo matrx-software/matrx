@@ -175,7 +175,7 @@ function world_loop() {
 
     // if MATRXS didn't have a state update yet, only redraw (animate) the movement of the current tick on screen
     if (!lv_to_update_or_not_to_update) {
-        draw(lv_state, lv_world_settings, new_tick=false);
+//        draw(lv_state, lv_world_settings, new_tick=false);
         request_new_frame();
 
     // if we requested an update check if it was successful

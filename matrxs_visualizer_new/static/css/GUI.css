@@ -8,6 +8,7 @@ html {
     background-size: cover;
 }
 
-#grid .tile {
+#grid .tile,
+#grid .tile .shape {
     position:absolute;
 }
