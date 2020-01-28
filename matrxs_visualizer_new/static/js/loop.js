@@ -175,7 +175,7 @@ function world_loop() {
 
     // if MATRXS didn't have a state update yet, only redraw (animate) the movement of the current tick on screen
     if (!lv_to_update_or_not_to_update) {
-        draw(lv_state, lv_world_settings, new_tick=false)
+        draw(lv_state, lv_world_settings, new_tick=false);
         request_new_frame();
 
     // if we requested an update check if it was successful
@@ -242,7 +242,6 @@ function get_MATRXS_update() {
 
         // decode lv_state and other info from the request
         lv_state = data[data.length - 1][lv_agent_id]['state'];
-        console.log("State:", lv_state);
         var lv_world_obj = lv_state[0]['World'];
         var lv_new_tick = lv_state[0]['World']['nr_ticks'];
         curr_tick_timestamp = lv_world_obj['curr_tick_timestamp'];

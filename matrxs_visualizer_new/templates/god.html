@@ -23,7 +23,7 @@
 <body>
 
     <!-- Toolbar -->
-    <div class="row toolbar bg-dark">
+    <div id="matrxs-toolbar" class="row toolbar bg-dark">
         <div class="col-sm">
             <img src="../images/matrxs_logo.png" alt="MATRXS" style="width:103px;height:43px;">
             <button type="button" class="btn btn-dark"><i class="fas fa-play text-light"></i></button>
@@ -46,11 +46,10 @@
     </div>
 
 
-
-    <div class="row">
+    <div class="row content-row">
 
         <!-- Grid -->
-        <div class="col-md" id="container">
+        <div class="col-md grid-container" id="container">
             <!-- container id is needed for the zoom/pan package -->
             <div id="grid"></div>
         </div>
@@ -113,7 +112,6 @@
     <!--    <script src="/dist/zoom-pan-master/public/bundle.min.js"></script>-->
     <script type="text/javascript" src="/js/gen_grid.js"></script>
     <script type="text/javascript" src="/js/loop.js"></script>
-
 </body>
 
 </html>

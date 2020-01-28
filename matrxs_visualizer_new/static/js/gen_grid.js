@@ -23,7 +23,7 @@ var bg_tile_ids = [], // obj_IDS of background tiles
 
 var firstDraw = true,
     tile_size = null, // in Pixels. tiles are always square, so width and height are the same
-    style = null;
+    navbar = null;
 
 /**
  * Get the grid wrapper object
@@ -31,46 +31,66 @@ var firstDraw = true,
 function initialize_grid() {
     grid = document.getElementById("grid");
 
-    // create a stylesheet for managing the dimensions of individual tiles
-    style = document.createElement('style');
-    style.innerHTML = ".tile { width: 10px; height: 10px;}"; // placeholder width and height
-    style.appendChild(document.createTextNode(""));
-    document.head.appendChild(style);
+    navbar = document.getElementById("matrxs-toolbar");
 }
 
 window.addEventListener("resize", fix_grid_size);
 function fix_grid_size() {
 
+    console.log("Fixed tile and grid size");
+
     // calc and fix the new tile size, given the maximum possible dimensions of the grid
-    fix_tile_size(document.body.clientWidth, document.body.clientHeight);
+    if (fix_tile_size()) {
+        console.log("Objects regenerated");
+        // redraw the background if the tile size changed
+        draw_bg_tiles();
+    }
 
     // resize the grid to exactly encompass all tiles
     grid.style.width = tile_size * grid_size[0];
     grid.style.height = tile_size * grid_size[1];
+}
 
-    console.log("Fixed tile and grid size");
+/**
+ * Calc how much height and width is available for the grid
+ */
+function get_max_grid_dimensions() {
+    // height is page height minus navbar
+    var height = document.documentElement.clientHeight - navbar.scrollHeight;
+
+    // width is full page width
+    var width = document.documentElement.clientWidth;
+    return [height, width];
 }
 
 /**
  * Given the size of the grid, calculate how large the tiles should be to fill the maximum amount of room while
- * remaining the correct ratio (square tiles).
+ * remaining the correct ratio (square tiles). Returns whether the tile size changed or not.
  */
-function fix_tile_size(max_width, max_height) {
+function fix_tile_size() {
+    // calc the available size for the grid
+    var available_height = null,
+        available_width = null;
+    [available_height, available_width] = get_max_grid_dimensions();
+
     // calc the pixel per cell ratio in the x and y direction
-    var px_per_cell_x = Math.round(max_width / grid_size[0]);
-    var px_per_cell_y = Math.round(max_height / grid_size[1]);
+    var px_per_cell_x = Math.floor(available_width / grid_size[0]);
+    var px_per_cell_y = Math.floor(available_height / grid_size[1]);
 
     // Use the smallest one as the width AND height of the cells to keep tiles square
     var new_tile_size = Math.min(px_per_cell_x, px_per_cell_y);
 
-    // fix the tile sizes of all tiles by changing the class
+    // check if anything changed
     if (new_tile_size != tile_size) {
         // save the new tile size
         tile_size = new_tile_size;
 
-        // change the CSS class such that all tiles are the correct width/height in one go
-        style.innerHTML = ".tile { width: " + new_tile_size + "px; height: " + new_tile_size + "px;}";
+        // return that the tile size has changed
+        return true
     }
+
+    // we did not have to change the tile size
+    return false
 }
 
 /**
@@ -154,6 +174,7 @@ function draw_bg() {
 function update_grid_size(new_grid_size) {
     if (grid_size == null || new_grid_size[0] != grid_size[0] || new_grid_size[1] != grid_size[1]) {
         grid_size = new_grid_size;
+        fix_tile_size();
         draw_bg_tiles();
     }
 }
@@ -168,10 +189,6 @@ function draw_bg_tiles() {
         remove_element(bg_tile_id);
     });
     bg_tile_ids = [];
-
-    // Now that all tiles have been removed, we can safely recalc the tile size without
-    // anything shifting on screen
-    fix_tile_size();
 
     // add new background tiles
     for (var x = 0; x < grid_size[0]; x++) {
@@ -189,7 +206,7 @@ function draw_bg_tiles() {
             // set position
             var pos_x = x * tile_size;
             var pos_y = y * tile_size;
-            tile.style = "position:absolute; left:" + pos_x + "px; top:" + pos_y + "px;";
+            tile.style = "left:" + pos_x + "px; top:" + pos_y + "px; width: " + tile_size + "px; height: " + tile_size + "px;";
 
             // add to grid
             grid.append(tile);
