@@ -13,8 +13,10 @@ var tps = null;
     vis_settings = null;
 
 // Visualization settings
-var bg_image = null,
-    bg_colour = null;
+var prev_bg_image = null,
+    bg_image = null,
+    bg_colour = null,
+    prev_bg_colour = null;
 
 // tracked HTML objects
 var bg_tile_ids = [], // obj_IDS of background tiles
@@ -37,18 +39,18 @@ function initialize_grid() {
 window.addEventListener("resize", fix_grid_size);
 function fix_grid_size() {
 
-    console.log("Fixed tile and grid size");
-
     // calc and fix the new tile size, given the maximum possible dimensions of the grid
     if (fix_tile_size()) {
         console.log("Objects regenerated");
         // redraw the background if the tile size changed
         draw_bg_tiles();
+
+        // resize the grid to exactly encompass all tiles
+        grid.style.width = tile_size * grid_size[0] + "px";
+        grid.style.height = tile_size * grid_size[1] + "px";
     }
 
-    // resize the grid to exactly encompass all tiles
-    grid.style.width = tile_size * grid_size[0];
-    grid.style.height = tile_size * grid_size[1];
+    console.log("Fixed tile and grid size");
 }
 
 /**
@@ -104,6 +106,7 @@ function draw(state, world_settings, new_tick) {
     // parse the new word settings, and change the grid, background, and tiles based on any changes in the settings
     if (new_tick) {
         parse_world_settings(world_settings);
+//        console.log(world_settings);
     }
 
     // Loop through the visualization depths
@@ -142,7 +145,7 @@ function parse_world_settings(world_settings) {
  * Parse the visualization settings passed in the World settings of MATRXS. Also changes the bg if needed
  */
 function parse_vis_settings(vis_settings) {
-    bg_colour = vis_settings['visualization_bg_clr'];
+    bg_colour = vis_settings['vis_bg_clr'];
     bg_image = vis_settings['vis_bg_img'];
 
     // update background colour / image if needed
@@ -157,13 +160,15 @@ function parse_vis_settings(vis_settings) {
 function draw_bg() {
 
     // change bg colour if needed
-    if (grid.style.backgroundColor != bg_colour) {
-        grid.setAttribute("background-color", bg_colour);
+    if (prev_bg_colour != bg_colour) {
+        prev_bg_colour = bg_colour;
+        grid.style.backgroundColor =  bg_colour;
     }
 
     // change bg image if needed
-    if (grid.style.backgroundImage != bg_image) {
-        grid.setAttribute("background-image", bg_image);
+    if (prev_bg_image != bg_image) {
+        prev_bg_image = bg_image;
+        grid.style.backgroundImage = "url('" + bg_image + "')";
     }
 }
 
@@ -174,8 +179,7 @@ function draw_bg() {
 function update_grid_size(new_grid_size) {
     if (grid_size == null || new_grid_size[0] != grid_size[0] || new_grid_size[1] != grid_size[1]) {
         grid_size = new_grid_size;
-        fix_tile_size();
-        draw_bg_tiles();
+        fix_grid_size();
     }
 }
 
