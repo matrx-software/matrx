@@ -4,10 +4,6 @@ function run() {
   window.location.href = view_page;
 }
 
-function clickAgent(agent_id) {
-  document.getElementById("agent_modal_label").innerHTML = agent_id;
-}
-
 function sendMessage() {
   var message = document.getElementById("message_input").value;
   var div = document.createElement("div");
@@ -167,4 +163,8 @@ function initGrid() {
     grid.appendChild(row);
   }
 
+}
+
+function agentAction(agent_id) {
+  alert(agent_id + "_performs action");
 }
