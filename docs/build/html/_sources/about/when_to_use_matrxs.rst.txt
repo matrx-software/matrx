@@ -1,0 +1,7 @@
+.. _when_to_use_matrxs:
+
+=========
+When to Use MATRXS
+=========
+
+.. image:: /_static/images/MATRXS-when-to-use-flowchart.jpg

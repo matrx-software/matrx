@@ -471,7 +471,7 @@ def __reorder_state(state):
     return sorted_state
 
 
-def add_state(agent_id, state, agent_inheritence_chain):
+def add_state(agent_id, state, agent_inheritence_chain, world_settings):
     """ aves the state of an agent for use via the API
 
     Parameters
@@ -482,14 +482,20 @@ def add_state(agent_id, state, agent_inheritence_chain):
         state as filtered by the agent
     agent_inheritence_chain
          inheritance_chain of classes, can be used to figure out type of agent
+    world_settings
+        This object contains all information on the MATRXS world, such as tick and grid_size. Some agents might filter
+        these out of their state, as such it is sent along seperatly to make sure the world settings, required by the
+        visualization, are passed along.
     -------
     """
     # save the new general info on the MATRXS World (once)
     global next_tick_info
     if next_tick_info == {}:
-        next_tick_info = state["World"]
-        # print("New world info:", next_tick_info)
-        # print("Agent", agent_id , " with state:", state)
+        next_tick_info = world_settings
+
+    # Make sure the world settings are in the state, as these are used by the visualization
+    if 'World' not in state:
+        state['World'] = world_settings
 
     # reorder and save the new state along with some meta information
     temp_state[agent_id] = {'state': __reorder_state(state), 'agent_inheritence_chain': agent_inheritence_chain}

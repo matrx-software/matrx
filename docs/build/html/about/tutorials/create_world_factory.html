@@ -1,0 +1,293 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Creating your MATRXS world &mdash; MATRXS 0.0.1 Manual 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> MATRXS 0.0.1 Manual
+          
+
+          
+            
+            <img src="../../_static/matrxslogo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Sections</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../sections/worlds.html">Worlds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sections/actions.html">Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sections/objects.html">Object placement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sections/simgoals.html">Simulation goals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sections/utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MATRXS 0.0.1 Manual</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>Creating your MATRXS world</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/about/tutorials/create_world_factory.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="creating-your-matrxs-world">
+<h1>Creating your MATRXS world<a class="headerlink" href="#creating-your-matrxs-world" title="Permalink to this headline">¶</a></h1>
+<p>In order to use MATRXS, a world must be created. In this tutorial, all aspects of creating such a world will be
+demonstrated. Everything that is demonstrated can also be found in the MATRXS package under <a href="#id1"><span class="problematic" id="id2">`</span></a>Examples’.</p>
+<div class="section" id="setting-the-world">
+<h2>Setting the world<a class="headerlink" href="#setting-the-world" title="Permalink to this headline">¶</a></h2>
+<p>We will start creating the frame in which we set up our world. All code explained in this section can be found in
+create_world_factory.py. The factory is created so that, might we need to run multiple world simultaneously
+(e.g. for experiments), we can set the amount of worlds needed.</p>
+<p>We start out by creating a factory method that can be called once the world(s) is/are made:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_factory</span><span class="p">():</span>
+    <span class="n">factory</span> <span class="o">=</span> <span class="n">WorldBuilder</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">factory</span>
+</pre></div>
+</div>
+<p>In this method, the WorldBuilder class is used to set the parameters in our world. These parameters are: shape,
+tick_duration, random_seed, simulation_goal, run_sail_api, run_visualization_server, visualization_bg_clr,
+visualization_bg_img, and verbose. The only parameter that is not set while intiliazing the class is the <a href="#id3"><span class="problematic" id="id4">`</span></a>shape’
+parameter. We need to choose a shape that indicates the size we want our world to be.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_factory</span><span class="p">():</span>
+    <span class="n">factory</span> <span class="o">=</span> <span class="n">WorldBuilder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">factory</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-agents">
+<h2>Adding agents<a class="headerlink" href="#adding-agents" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have a world, we can also put agents and objects in the simulation. Suppose we want one human agent to
+interact with one autonomous agent. For now, the autonomous agent uses the simple behaviour of the PatrollingAgentBrain.
+It needs a range in which to patrol, so we add some ranges as parameters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_factory</span><span class="p">():</span>
+    <span class="n">factory</span> <span class="o">=</span> <span class="n">WorldBuilder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+
+    <span class="n">human_agent</span> <span class="o">=</span> <span class="n">HumanAgentBrain</span><span class="p">()</span>
+    <span class="n">autonomous_agent</span> <span class="o">=</span> <span class="n">PatrollingAgentBrain</span><span class="p">(</span><span class="n">waypoints</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">)])</span>
+
+    <span class="k">return</span> <span class="n">factory</span>
+</pre></div>
+</div>
+<p>The human agent is controlled by the user of the simulation. It needs to know what actions can be performed after what
+command. For now, the human agent can move to the North, East, South and West. We immediately add the agent to the
+factory and give it a location and name, and also by feeding it the possible user input. There are several icons
+available to visually represent the agent in the simulation. To use a different icon than the example
+(<a href="#id5"><span class="problematic" id="id6">`</span></a>civilian.png’} below, check the <a href="#id7"><span class="problematic" id="id8">`</span></a>avatars’ folder in the package for options.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_factory</span><span class="p">():</span>
+    <span class="n">factory</span> <span class="o">=</span> <span class="n">WorldBuilder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+
+    <span class="n">human_agent</span> <span class="o">=</span> <span class="n">HumanAgentBrain</span><span class="p">()</span>
+    <span class="n">autonomous_agent</span> <span class="o">=</span> <span class="n">PatrollingAgentBrain</span><span class="p">(</span><span class="n">waypoints</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">)])</span>
+
+    <span class="n">usrinp_action_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="n">MoveNorth</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="n">MoveEast</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="n">MoveSouth</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">MoveWest</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">factory</span><span class="o">.</span><span class="n">add_human_agent</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">human_agent</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Henry&quot;</span><span class="p">,</span>
+                        <span class="n">usrinp_action_map</span><span class="o">=</span><span class="n">usrinp_action_map</span><span class="p">,</span> <span class="n">visualize_shape</span><span class="o">=</span><span class="s1">&#39;img&#39;</span><span class="p">,</span>
+                        <span class="n">img_name</span><span class="o">=</span><span class="s2">&quot;civilian.png&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">factory</span>
+</pre></div>
+</div>
+<p>Adding the autonomous agent works approximately the same as adding a human agent, but using <a href="#id9"><span class="problematic" id="id10">`</span></a>.add_agent’
+instead of <a href="#id11"><span class="problematic" id="id12">`</span></a>.add_human_agent’. In a similar way, objects like walls can also be added.</p>
+<p>Now, we can try and run our simple MATRXS simulation. We create our <a href="#id13"><span class="problematic" id="id14">`</span></a>main.py’ like below. We can choose to run multiple
+worlds simultaneously, but for now we run only one instance. Do not forget to import all necessary modules and classes!</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">examples.create_world_factory</span> <span class="k">as</span> <span class="nn">tutorial_worldcreation</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="n">factory</span> <span class="o">=</span> <span class="n">tutorial_worldcreation</span><span class="o">.</span><span class="n">create_factory</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">world</span> <span class="ow">in</span> <span class="n">factory</span><span class="o">.</span><span class="n">worlds</span><span class="p">(</span><span class="n">nr_of_worlds</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">world</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now run the main file to see the scene below.</p>
+<a class="reference internal image-reference" href="../../_images/tutorial_worlds.png"><img alt="An image showing the world created in this tutorial." src="../../_images/tutorial_worlds.png" style="width: 400px;" /></a>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The MATRXS Team at TNO.nl
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #303030;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+      background: #578a64;
+    }
+  </style>
+
+
+</body>
+</html>

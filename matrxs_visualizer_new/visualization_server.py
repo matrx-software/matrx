@@ -12,7 +12,7 @@ For visualization, see the seperate MATRXS visualization folder / package.
 
 debug = True
 port = 3000
-app = Flask(__name__, template_folder='static/templates')
+app = Flask(__name__, template_folder='templates', static_folder='static/')
 
 
 #########################################################################
