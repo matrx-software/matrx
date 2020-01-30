@@ -124,3 +124,11 @@ h5 {
   padding-right: 1em;
   z-index: 1;
 }
+
+
+/****************************************
+  Newly added for connecting to MATRXS
+*****************************************/
+.object:hover {
+    cursor: pointer;
+}

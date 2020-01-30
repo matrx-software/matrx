@@ -4,6 +4,12 @@ Parses the MATRXS state and generates and updates the grid
 
 */
 
+// GUI settings
+// How long should the animation of the movement be, in percentage with respect to
+// the maximum number of time available between ticks 1 = max duration between ticks, 0.001 min (no animation)
+// Note: it is not recommended to set this value to higher than ~0.9, as the exact duration between ticks can
+// slightly vary between ticks, resulting in jittery movement
+var animation_duration_perc = 0.8;
 
 // Variables that will be parsed from the World settings
 var tps = null;
@@ -18,20 +24,17 @@ var prev_bg_image = null,
     bg_colour = null,
     prev_bg_colour = null;
 
-// tracked HTML objects
-var bg_tile_ids = [], // obj_IDS of background tiles
-    matrxs_tile_ids = []; // obj_IDS of MATRXS objects
-
-
+// vars for the working of the GUI
 var firstDraw = true,
     tile_size = null, // in Pixels. tiles are always square, so width and height are the same
-    navbar = null;
+    navbar = null,
+    animation_duration_s = null; // is calculated based on animation_duration_perc and tps.
 
-var prev_obj_ids = null,
-    obj_ids = null,
-    saved_prev_objs = {}, // obj containing the IDs of objects and their visualization settings of the previous tick
-    saved_objs = {}; // obj containing the IDs of objects and their visualization settings of the current tick
-
+// tracked HTML objects
+var saved_prev_objs = {}, // obj containing the IDs of objects and their visualization settings of the previous tick
+    saved_objs = {}, // obj containing the IDs of objects and their visualization settings of the current tick
+    bg_tile_ids = [], // obj_IDS of background tiles
+    matrxs_tile_ids = []; // obj_IDS of MATRXS objects
 
 /**
  * Get the grid wrapper object
@@ -57,123 +60,126 @@ function draw(state, world_settings, new_tick) {
         parse_world_settings(world_settings);
     }
 
-    // identify the objects we received
-    var obj_keys = Object.keys(state);
-
-    // calculate how many frames the animation of movement should take
-    var animationDurationFrames = (framesLastSecond / tps) * animationDurationPerc;
-
-    // calculate how many milliseconds the movement animation should take
-    var animationDurationMs = animationDurationFrames * msPerFrame;
-
     // move the objects from last tick to another list
     saved_prev_objs = saved_objs;
     saved_objs = {};
 
-    // Loop through the visualization depths
-    var vis_depths = Object.keys(state);
+    // Loop through the IDs of the objects we received in the MATRXS state
+    var obj_ids = Object.keys(state);
     var saved_prev_obj_keys = Object.keys(saved_prev_objs);
-    vis_depths.forEach(function(vis_depth) {
+    obj_ids.forEach(function(objID) {
 
-        // Loop through the objects at this depth and visualize them
-        var objects = Object.keys(state[vis_depth]);
-        objects.forEach(function(objID) {
+        // skip the World object
+        if (objID === "World") {
+            return;
+        }
 
-            // skip the World object
-            if (objID === "World") {
-                return;
+        // fetch object from the MATRXS state
+        obj = state[objID];
+
+        // get the location of the object in pixel values
+        var x = obj['location'][0] * tile_size;
+        var y = obj['location'][1] * tile_size;
+
+        // fetch bg img if defined
+        var obj_img = null;
+        if (Object.keys(obj).includes('img_name')) {
+            obj_img =  obj['img_name']
+        }
+
+        // save visualization settings for this object
+        var obj_vis_settings = {"img": obj_img,
+                            "shape": obj['visualization']['shape'],
+                            "size": obj['visualization']['size'], // percentage how much of tile is filled
+                            "colour": hexToRgba(obj['visualization']['colour'], obj['visualization']['opacity']),
+                            "opacity": obj['visualization']['opacity'],
+                            "dimension": tile_size // width / height of the tile
+                            };
+
+        var obj_element = null; // the html element of this object
+        var animate_movement = false; // whether any x,y position changes should be animated
+        var object_is_new = false; // whether this is a new object, not present in the html yet
+        var style_object = true; // whether this object should be regenerated, e.g. because vis settings changed
+
+        // check if this is a new object
+        if (!saved_prev_obj_keys.includes(objID)) {
+            // create a html element for this object and set classes / ID
+            obj_element = document.createElement("div");
+            obj_element.className = "tile object";
+            obj_element.id = objID;
+            obj_element.dataset.toggle = "modal";
+            obj_element.dataset.target = "#obj_modal";
+            obj_element.setAttribute("onclick", "clickObject('" + objID + "')");
+
+            // set the coordinates of the object
+            move_object(obj_element, x, y);
+
+            // this is a new object
+            new_object = true;
+
+            // add to grid
+            grid.append(obj_element);
+
+        // we already generated this object in a previous tick
+        } else {
+            // fetch the object from html
+            obj_element = document.getElementById(objID);
+
+            // check if the coordinate changed compared to the previous tick, and if so, add css rules
+            // for animating the x,y coordinates change
+            if (obj_element.style.left != (x * tile_size) || obj_element.style.top != (y * tile_size)) {
+                obj_element.style.setProperty("-webkit-transition", "all " + animation_duration_s + "s");
+                obj_element.style.transition = "all " + animation_duration_s + "s";
+
+                // move the object to the new coordinates
+                move_object(obj_element, x, y);
             }
 
-            // fetch object from the MATRXS state
-            obj = state[vis_depth][objID];
-
-            // fetch location of object in pixel values
-            var x = obj['location'][0] * tile_size;
-            var y = obj['location'][1] * tile_size;
-
-            // set position in css
-            var obj_style = "left:" + pos_x + "px; top:" + pos_y + "px; width: " + tile_size + "px; height: " + tile_size + "px;";
-
-            // fetch bg img if defined
-            var obj_img = null;
-            if (Object.keys(obj).includes('img_name')) {
-                obj_img =  obj['img_name']
+            // if nothing changed in the visualisation setting of this obj, we don't need
+            // to (re)style the object
+            if (compare_objects(saved_prev_objs[objID],  obj_vis_settings)) {
+                style_object = false;
             }
+        }
 
-            // save visualization settings for this object
-            var obj_vis_settings = {"img": obj_img,
-                                "shape": obj['visualization']['shape'],
-                                "size": obj['visualization']['size'],
-                                "colour": hexToRgba(obj['visualization']['colour'], obj['visualization']['opacity']),
+        // set the visualization depth of this object
+        obj_element.style.zIndex = obj['vis_depth'];
 
+        // if we need to style this object, e.g. because it's new or visualiation settings changed,
+        // regenerate the specfic object shape with its settings
+        if (style_object) {
+            set_tile_dimensions(obj_element);
 
-            var obj_element = null; // the html element of this object
-            var animate_movement = false; // whether any x,y position changes should be animated
-            var object_is_new = false; // whether this is a new object, not present in the html yet
-            var generate_object = true; // whether this object should be regenerated, e.g. because vis settings changed
-
-            // check if this is a new object
-            if (! saved_prev_obj_keys.includes(objID)) {
-                // create a html element for this object and set classes / ID
-                var obj_element = document.createElement("div");
-                obj_element.className = "tile";
-                obj_element.id = objID;
-
-                // this is a new object
-                new_object = true;
-
-                // add to grid
-                grid.append(obj_element);
-
-            // we already generated this object in a previous tick
-            } else {
-                // fetch the object from html
-                obj_element = document.getElementById(objID);
-
-                // check if the coordinate changed compared to the previous tick, and if so, add css rules
-                // for animating the x,y coordinates change
-                if (obj_element.style.left != x || obj_element.style.top != y) {
-                    obj_style += "-webkit-transition: left " + (animationDurationMs/1000) + "s;";
-                    obj_style += "-webkit-transition: top " + (animationDurationMs/1000) + "s;";
-                    obj_style += "transition: left " + (animationDurationMs/1000) + "s;";
-                    obj_style += "transition: top " + (animationDurationMs/1000) + "s";
-                }
-
-                // if nothing changed in the visualisation settubg of this obj, we don't need to regenerate the object
-                if (saved_prev_objs[objID] == obj_vis_settings) {
-                    generate_object = false;
-                }
+            // draw the object with the correct shape, size and colour
+            if (obj_vis_settings['img'] != null) {
+                gen_image(obj_vis_settings, obj_element);
+            } else if (obj_vis_settings['shape'] == 0) {
+                gen_rectangle(obj_vis_settings, obj_element);
+            } else if (obj_vis_settings['shape'] == 1) {
+                gen_triangle(obj_vis_settings, obj_element);
+            } else if (obj_vis_settings['shape'] == 2) {
+                gen_circle(obj_vis_settings, obj_element);
             }
+        }
 
-            // assign the css to the object
-            obj_element.style = obj_style;
+        // add the object ID and the visualization settings to the saved_objs list of the current tick
+        saved_objs[objID] = obj_vis_settings;
 
-            // if we need to generate this object, e.g. because it's new or visualiation settings changed,
-            // regenerate the specfic object type with its settings
-            if (generate_object) {
-                // draw the object with the correct shape, size and colour
-                if (obj_vis_settings['shape'] == 0) {
-                    drawRectangle(obj_vis_settings, obj_element);
-                } else if (obj_vis_settings['shape'] == 1) {
-                    drawTriangle(x, y, obj_vis_settings, obj_element);
-                } else if (obj_vis_settings['shape'] == 2) {
-                    drawCircle(obj_vis_settings, obj_element);
-                } else if (obj_vis_settings['img'] != null) {
-                    drawImage(obj_vis_settings, obj_element);
-                }
-            }
-
-            // add the object ID and the visualization settings to the saved_objs list
-            saved_objs[objID] = obj_vis_settings;
-
-            // TODO: remove old objects from HTML which are not present anymore 
-            saved_prev_obj_keys
-        });
+        // remove this item from our list of tracked objs from the previous tick
+        saved_prev_obj_keys = saved_prev_obj_keys.filter(function(e) { return e !== objID })
     });
 
+    // any objects present in the previous tick but not present in the current
+    // tick should be removed
+    saved_prev_obj_keys.forEach(function(objID) {
+        remove_element(objID);
+    });
+
+
     // Draw the FPS to the canvas as last so it's drawn on top
-    ctx.fillStyle = "#ff0000";
-    ctx.fillText("TPS: " + tps, 65, 20);
+    // TODO: draw tps?
+//    ctx.fillStyle = "#ff0000";
+//    ctx.fillText("TPS: " + tps, 65, 20);
 }
 
 
@@ -255,6 +261,9 @@ function parse_world_settings(world_settings) {
     current_tick = world_settings['nr_ticks'];
     world_ID = world_settings['world_ID'];
 
+    // calculate how many milliseconds the movement animation should take
+    animation_duration_s = (1.0 / tps) * animation_duration_perc;
+
     // parse new visualization settings
     vis_settings = world_settings['vis_settings'];
     parse_vis_settings(vis_settings);
@@ -319,25 +328,23 @@ function update_grid_size(new_grid_size) {
  * @param {HTML Element} obj_element: contains the HTML element of the object
  * @param {String} element_type: (optional) can be used to specify what type of HTML element should be added
  */
-function genRectangle(obj_vis_settings, obj_element, element_type="div") {
-    // if it is size 1, simply set the color of the tile object and we are done
-    if (size == 1 && element_type != "img") {
-        obj_element.style.backgroundColor = clr; // set colour
-        obj_element.style.borderRadius = "0"; // remove any round corners
-        return obj_element;
-    }
+function gen_rectangle(obj_vis_settings, obj_element, element_type="div") {
+    var size = obj_vis_settings['size'];
 
     // if the object has a smaller size than 1, we create a centered subobject
-    var shape_obj = document.createElement(element_type);
-    shape_obj.className = "shape";
+    var shape = document.createElement(element_type);
+    shape.className = "shape";
 
     // coords of top left corner, such that it is centerd in our tile
-    shape.style.left = x + ((1 - size) * 0.5 * tile_size);
-    shape.style.top = y + ((1 - size) * 0.5 * tile_size);
+    shape.style.left = ((1 - size) * 0.5 * tile_size);
+    shape.style.top = ((1 - size) * 0.5 * tile_size);
 
     // width and height of rectangle
-    shape.style.width = size * tile_size;
-    shape.style.height = size * tile_size;
+    shape.style.width = size * tile_size + "px";
+    shape.style.height = size * tile_size + "px";
+
+    // styling
+    shape.style.background = obj_vis_settings['colour'];
 
     // remove any old shapes
     while (obj_element.firstChild) {
@@ -356,15 +363,16 @@ function genRectangle(obj_vis_settings, obj_element, element_type="div") {
  * @param {Object} obj_vis_settings: contains the visualization settings of the object
  * @param {HTML Element} obj_element: contains the HTML element of the object
  */
-function drawTriangle(obj_vis_settings, obj_element) {
+function gen_triangle(obj_vis_settings, obj_element) {
+    var size = obj_vis_settings['size'];
 
     // create a centered subobject
-    var shape_obj = document.createElement(element_type);
-    shape_obj.className = "shape";
+    var shape = document.createElement('div');
+    shape.className = "shape";
 
     // coords of top left corner, such that it is centerd in our tile
-    shape.style.left = x + ((1 - size) * 0.5 * tile_size);
-    shape.style.top = y + ((1 - size) * 0.5 * tile_size);
+    shape.style.left = ((1 - size) * 0.5 * tile_size);
+    shape.style.top = ((1 - size) * 0.5 * tile_size);
 
     // for a triangle, we set the content width/height to 0
     shape.style.width = 0;
@@ -375,6 +383,11 @@ function drawTriangle(obj_vis_settings, obj_element) {
     shape.style.borderBottom = (size * tile_size) + "px solid " + obj_vis_settings['colour'];
     shape.style.borderLeft = (size * tile_size / 2) + "px solid transparent";
     shape.style.borderRight = (size * tile_size / 2) + "px solid transparent";
+
+    // remove any old shapes
+    while (obj_element.firstChild) {
+        obj_element.removeChild(obj_element.firstChild);
+    }
 
     // add the new shape
     obj_element.append(shape);
@@ -388,9 +401,9 @@ function drawTriangle(obj_vis_settings, obj_element) {
  * @param {Object} obj_vis_settings: contains the visualization settings of the object
  * @param {HTML Element} obj_element: contains the HTML element of the object
  */
-function genCircle(obj_vis_settings, obj_element) {
+function gen_circle(obj_vis_settings, obj_element) {
     // generate a rectangle
-    var shape = genRectangle(obj_vis_settings, obj_element);
+    var shape = gen_rectangle(obj_vis_settings, obj_element);
 
     // round the corners
     shape.style.borderRadius = "50%";
@@ -404,12 +417,16 @@ function genCircle(obj_vis_settings, obj_element) {
  * @param {Object} obj_vis_settings: contains the visualization settings of the object
  * @param {HTML Element} obj_element: contains the HTML element of the object
  */
-function drawImage(obj_vis_settings, obj_element) {
+function gen_image(obj_vis_settings, obj_element) {
     // add a rectangular "img" HTML element
-    var shape = genRectangle(obj_vis_settings, obj_element, element_type="img");
+    var shape = gen_rectangle(obj_vis_settings, obj_element, element_type="img");
 
     // set the image source
     shape.setAttribute("src", obj_vis_settings["img"]);
+
+    // set the background as transparent
+    shape.style.background = "transparent";
+    shape.style.opacity = obj_vis_settings["opacity"];
 
     return shape;
 }
@@ -439,10 +456,10 @@ function draw_bg_tiles() {
             tile.setAttribute("onmousedown", "startDrawErase(id)");
             tile.setAttribute("onmouseup", "stopDrag()");
 
-            // set position
+            // set position and z-index
             var pos_x = x * tile_size;
             var pos_y = y * tile_size;
-            tile.style = "left:" + pos_x + "px; top:" + pos_y + "px; width: " + tile_size + "px; height: " + tile_size + "px;";
+            tile.style = "left:" + pos_x + "px; top:" + pos_y + "px; width: " + tile_size + "px; height: " + tile_size + "px; z-index: 0;"
 
             // add to grid
             grid.append(tile);
@@ -474,4 +491,44 @@ function hexToRgba(hex, opacity) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? "rgba(" + parseInt(result[1], 16) + "," + parseInt(result[2], 16) +
         "," + parseInt(result[3], 16) + "," + opacity + ")" : null;
+}
+
+/**
+ * Compares two objects on equality
+ */
+function compare_objects(o1, o2){
+    if (o1 === undefined || o2 === undefined) {
+        return false;
+    }
+    for(var p in o1){
+        if(o1.hasOwnProperty(p)){
+            if(o1[p] !== o2[p]){
+                return false;
+            }
+        }
+    }
+    for(var p in o2){
+        if(o2.hasOwnProperty(p)){
+            if(o1[p] !== o2[p]){
+                return false;
+            }
+        }
+    }
+    return true;
+};
+
+/*
+ * Move an object to a new x, y coordinate using css
+ */
+function move_object(obj_element, x, y) {
+    obj_element.style.left = x + "px";
+    obj_element.style.top = y + "px";
+}
+
+/*
+ * Reset the width and height of a tile, e.g. because the grid size changed
+ */
+function set_tile_dimensions(obj_element) {
+    obj_element.style.width = tile_size + "px";
+    obj_element.style.height = tile_size + "px";
 }

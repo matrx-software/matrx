@@ -167,7 +167,7 @@ function world_loop() {
 
     // we received an update for a different world from our current, so reinitialize the visualization
     if (lv_new_world_ID != null && lv_world_ID != lv_new_world_ID) {
-        // console.log("New world ID:", lv_new_world_ID, "world_ID:", world_ID);
+         console.log("New world ID received:", lv_new_world_ID);
         lv_first_tick = false;
         lv_reinitialize_vis = true;
         return;
@@ -242,16 +242,15 @@ function get_MATRXS_update() {
 
         // decode lv_state and other info from the request
         lv_state = data[data.length - 1][lv_agent_id]['state'];
-        var lv_world_obj = lv_state[0]['World'];
-        var lv_new_tick = lv_state[0]['World']['nr_ticks'];
-        curr_tick_timestamp = lv_world_obj['curr_tick_timestamp'];
-        lv_tick_duration = lv_world_obj['tick_duration'];
+        var lv_new_tick = lv_state['World']['nr_ticks'];
+        curr_tick_timestamp = lv_state['World']['curr_tick_timestamp'];
+        lv_tick_duration = lv_state['World']['tick_duration'];
         lv_tps = (1.0 / lv_tick_duration).toFixed(1); // round to 1 decimal behind the dot
 
-        lv_world_settings = lv_world_obj;
+        lv_world_settings = lv_state['World'];
 
         // check what the ID of this world is. Is it still the same world we were expecting, or a different world?
-        lv_new_world_ID = lv_world_obj['world_ID'];
+        lv_new_world_ID = lv_state['World']['world_ID'];
 
         // Calculate the delay between when MATRXS sent the tick and the visualizer received the tick
         // The calculation takes a (potential) difference in time between MATRXS and the visualizer into account

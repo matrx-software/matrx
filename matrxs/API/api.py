@@ -430,45 +430,27 @@ def create_error_response(code, message):
 
 
 def __reorder_state(state):
-    """ This private function converts the MATRXS state from indexing based on object ID, to indexing based on visualization
-    depth.
+    """ This private function makes the MATRXS state ready for sending as a JSON object
 
     Parameters
     ----------
     state
          The world state, a dictionary with object IDs as keys
     Returns
-        The world state, but sorted on visualization depth
+        The world state, JSON serializable
     -------
     """
-    new_state = {}
+    new_state = copy.copy(state)
 
     # loop through all objects in the state
     for objID, obj in state.items():
 
-        # add the World object at depth 0, and the others at their own respective visualization depth
-        vis_depth = 0
         if not objID is "World":
-            # fetch the visualization depth
-            vis_depth = state[objID]["visualization"]['depth']
-
+            # make the sense capability JSON serializable
             if "sense_capability" in obj:
-                obj["sense_capability"] = str(obj["sense_capability"])
+                new_state[objID]["sense_capability"] = str(obj["sense_capability"])
 
-
-        # save the object in the new_state dict at its visualization_depth
-        if vis_depth not in new_state:
-            new_state[vis_depth] = {}
-
-        # add the object or agent to the list at the (x,y) location in the dict
-        new_state[vis_depth][objID] = obj
-
-    # sort dict on depth
-    sorted_state = {}
-    for depth in sorted(new_state.keys()):
-        sorted_state[depth] = new_state[depth]
-
-    return sorted_state
+    return new_state
 
 
 def add_state(agent_id, state, agent_inheritence_chain, world_settings):
