@@ -4,11 +4,6 @@ function run() {
   window.location.href = view_page;
 }
 
-
-function clickAgent(agent_id) {
-  document.getElementById("agent_modal_label").innerHTML = agent_id;
-}
-
 function sendMessage() {
   var message = document.getElementById("message_input").value;
   var div = document.createElement("div");
@@ -170,7 +165,9 @@ function initGrid() {
 
 }
 
-
+function agentAction(agent_id) {
+  alert(agent_id + "_performs action");
+}
 
 /*************************************
  Newly added for connecting to MATRXS
@@ -178,3 +175,4 @@ function initGrid() {
 function clickObject(object_id) {
   document.getElementById("object_modal_label").innerHTML = object_id;
 }
+
