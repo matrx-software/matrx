@@ -12,3 +12,9 @@ html {
 #grid .tile .shape {
     position:absolute;
 }
+
+
+/* Toggle the start button to pause or vice versa if pressed */
+.hidden {
+    display: none;
+}
