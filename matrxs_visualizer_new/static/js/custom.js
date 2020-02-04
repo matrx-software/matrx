@@ -34,17 +34,19 @@ message_input.onkeypress = function(event) {
    }
 }
 
+// Change class of all tiles so that they are highlighted when hovered
 function add_draw_erase_classes(class_name) {
     var tiles = document.getElementsByClassName("tile");
     for (var i = 0; i < tiles.length; i++) {
-      tiles[i].className = "tile " + class_name;  // Change class of all tiles so that they are highlighted when hovered
+      tiles[i].className = "tile " + class_name;
     }
     var objects = document.getElementsByClassName("object");
     for (var i = 0; i < objects.length; i++) {
-      objects[i].className = "object " + class_name;  // Change class of all tiles so that they are highlighted when hovered
+      objects[i].className = "object " + class_name;
     }
 }
 
+// Change class of all tiles so that they are no longer highlighted when hovered
 function remove_draw_erase_classes() {
     var tiles = document.getElementsByClassName("tile");
     for (var i = 0; i < tiles.length; i++) {
@@ -56,10 +58,10 @@ function remove_draw_erase_classes() {
     }
 }
 
+// Called when draw button is clicked. Enables/disables draw function
 var draw_activated = false;
 function drawToggle() {
-    console.log("Toggled");
-  if (erase_activated) {
+  if (erase_activated) {    // If the erase function is active, disable it
     eraseToggle();
   }
   draw_activated = !draw_activated;
@@ -72,9 +74,10 @@ function drawToggle() {
   }
 }
 
+// Called when erase button is clicked. Enables/disables erase function
 var erase_activated = false;
 function eraseToggle() {
-  if (draw_activated) {
+  if (draw_activated) { // If the draw function is active, disable it
     drawToggle();
   }
   erase_activated = !erase_activated;
@@ -87,38 +90,19 @@ function eraseToggle() {
   }
 }
 
-function eraseHoverEnter(tile_id) {
-  var tile = document.getElementById(tile_id);
-  tile.style.backgroundColor = "blue";
-}
-
-function eraseHoverLeave(tile_id) {
-  var tile = document.getElementById(tile_id);
-  tile.style.backgroundColor = "";
-}
-
-var chat = false;
-function chatToggle() {
-  chat = !chat;
-  if (chat) {
-    document.getElementById("chat_button").className = "btn btn-secondary";
-  } else {
-    document.getElementById("chat_button").className = "btn btn-dark";
-  }
-}
-
+// Called when a tile is clicked. Draws/erases the tile and starts drag function that allows the user to draw/erase multiple tiles while holding the left mouse button
 function startDrawErase(tile_id) {
   if (draw_activated) {
-    drawCell(tile_id);
+    drawTile(tile_id);
     startDrawDrag();
   }
   if (erase_activated) {
-    eraseCell(tile_id);
+    eraseTile(tile_id);
     startEraseDrag();
   }
 }
 
-function drawCell(tile_id) {
+function drawTile(tile_id) {
   if (draw_activated) {
     var tile = document.getElementById(tile_id);
     tile.style.backgroundColor = "crimson";
@@ -128,7 +112,7 @@ function drawCell(tile_id) {
 function startDrawDrag() {
   var tiles = document.getElementsByClassName("tile");
   for (var i = 0; i < tiles.length; i++) {
-    tiles[i].setAttribute("onmouseenter", "drawCell(id)");
+    tiles[i].setAttribute("onmouseenter", "drawTile(id)");
   }
 }
 
@@ -139,7 +123,7 @@ function stopDrag() {
   }
 }
 
-function eraseCell(tile_id) {
+function eraseTile(tile_id) {
   if (erase_activated) {
     var tile = document.getElementById(tile_id);
     tile.style.backgroundColor = "";
@@ -149,18 +133,17 @@ function eraseCell(tile_id) {
 function startEraseDrag() {
   var tiles = document.getElementsByClassName("tile");
   for (var i = 0; i < tiles.length; i++) {
-    tiles[i].setAttribute("onmouseenter", "eraseCell(id)");
+    tiles[i].setAttribute("onmouseenter", "eraseTile(id)");
   }
 }
 
-function drawCellOld(tile_id) {
-  if (draw_activated) {
-    var tile = document.getElementById(tile_id);
-    if (getComputedStyle(tile).backgroundColor == "rgb(220, 20, 60)") {
-      tile.style.backgroundColor = "";
-    } else {
-      tile.style.backgroundColor = "crimson";
-    }
+var chat = false;
+function chatToggle() {
+  chat = !chat;
+  if (chat) {
+    document.getElementById("chat_button").className = "btn btn-secondary";
+  } else {
+    document.getElementById("chat_button").className = "btn btn-dark";
   }
 }
 
