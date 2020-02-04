@@ -105,7 +105,7 @@ function draw(state, world_settings, new_tick) {
         if (!saved_prev_obj_keys.includes(objID)) {
             // create a html element for this object and set classes / ID
             obj_element = document.createElement("div");
-            obj_element.className = "tile object";
+            obj_element.className = "object";
             obj_element.id = objID;
             obj_element.dataset.toggle = "modal";
             obj_element.dataset.target = "#obj_modal";

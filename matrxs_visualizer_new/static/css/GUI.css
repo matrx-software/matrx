@@ -9,7 +9,8 @@ html {
 }
 
 #grid .tile,
-#grid .tile .shape {
+#grid .object,
+#grid .object .shape {
     position:absolute;
 }
 
