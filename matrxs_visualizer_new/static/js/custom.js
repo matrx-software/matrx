@@ -34,45 +34,56 @@ message_input.onkeypress = function(event) {
    }
 }
 
-var draw = false;
-function drawToggle() {
-  if (erase) {
-    eraseToggle();
-  }
-  draw = !draw;
-  if (draw) {
-    document.getElementById("draw_button").className = "btn btn-secondary";
+function add_draw_erase_classes(class_name) {
     var tiles = document.getElementsByClassName("tile");
     for (var i = 0; i < tiles.length; i++) {
-      tiles[i].className = "tile draw_mode";  // Change class of all tiles so that they are highlighted when hovered
+      tiles[i].className = "tile " + class_name;  // Change class of all tiles so that they are highlighted when hovered
     }
-  } else {
-    document.getElementById("draw_button").className = "btn btn-dark";
+    var objects = document.getElementsByClassName("object");
+    for (var i = 0; i < objects.length; i++) {
+      objects[i].className = "object " + class_name;  // Change class of all tiles so that they are highlighted when hovered
+    }
+}
+
+function remove_draw_erase_classes() {
     var tiles = document.getElementsByClassName("tile");
     for (var i = 0; i < tiles.length; i++) {
       tiles[i].className = "tile";
     }
+    var objects = document.getElementsByClassName("object");
+    for (var i = 0; i < objects.length; i++) {
+      objects[i].className = "object";
+    }
+}
+
+var draw_activated = false;
+function drawToggle() {
+    console.log("Toggled");
+  if (erase_activated) {
+    eraseToggle();
+  }
+  draw_activated = !draw_activated;
+  if (draw_activated) {
+    document.getElementById("draw_button").className = "btn btn-secondary";
+    add_draw_erase_classes("draw_mode");
+  } else {
+    document.getElementById("draw_button").className = "btn btn-dark";
+    remove_draw_erase_classes();
   }
 }
 
-var erase = false;
+var erase_activated = false;
 function eraseToggle() {
-  if (draw) {
+  if (draw_activated) {
     drawToggle();
   }
-  erase = !erase;
-  if (erase) {
+  erase_activated = !erase_activated;
+  if (erase_activated) {
     document.getElementById("erase_button").className = "btn btn-secondary";
-    var tiles = document.getElementsByClassName("tile");
-    for (var i = 0; i < tiles.length; i++) {
-      tiles[i].className = "tile erase_mode";  // Change class of all tiles so that they are highlighted when hovered
-    }
+    add_draw_erase_classes("erase_mode");
   } else {
     document.getElementById("erase_button").className = "btn btn-dark";
-    var tiles = document.getElementsByClassName("tile");
-    for (var i = 0; i < tiles.length; i++) {
-      tiles[i].className = "tile";
-    }
+    remove_draw_erase_classes();
   }
 }
 
@@ -97,18 +108,18 @@ function chatToggle() {
 }
 
 function startDrawErase(tile_id) {
-  if (draw) {
+  if (draw_activated) {
     drawCell(tile_id);
     startDrawDrag();
   }
-  if (erase) {
+  if (erase_activated) {
     eraseCell(tile_id);
     startEraseDrag();
   }
 }
 
 function drawCell(tile_id) {
-  if (draw) {
+  if (draw_activated) {
     var tile = document.getElementById(tile_id);
     tile.style.backgroundColor = "crimson";
   }
@@ -129,7 +140,7 @@ function stopDrag() {
 }
 
 function eraseCell(tile_id) {
-  if (erase) {
+  if (erase_activated) {
     var tile = document.getElementById(tile_id);
     tile.style.backgroundColor = "";
   }
@@ -143,7 +154,7 @@ function startEraseDrag() {
 }
 
 function drawCellOld(tile_id) {
-  if (draw) {
+  if (draw_activated) {
     var tile = document.getElementById(tile_id);
     if (getComputedStyle(tile).backgroundColor == "rgb(220, 20, 60)") {
       tile.style.backgroundColor = "";
