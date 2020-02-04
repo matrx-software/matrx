@@ -19,3 +19,8 @@ html {
 .hidden {
     display: none;
 }
+
+.agent_menu_preview {
+    display: inline-block;
+    margin-right: 10px;
+}

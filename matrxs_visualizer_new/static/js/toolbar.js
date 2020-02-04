@@ -11,7 +11,6 @@ var stop_button = document.getElementById("stop_button");
 
 start_button.addEventListener("click", toggle_start, false);
 function toggle_start() {
-    console.log("toggle start");
     // hide / unhide the correct button
     start_button.classList.toggle("hidden");
     pause_button.classList.toggle("hidden");
@@ -22,7 +21,6 @@ function toggle_start() {
 
 pause_button.addEventListener("click", toggle_pause, false);
 function toggle_pause() {
-    console.log("toggle pause");
     // hide / unhide the correct button
     start_button.classList.toggle("hidden");
     pause_button.classList.toggle("hidden");
@@ -54,64 +52,72 @@ function send_api_message(type) {
 /**
  * Populate the menu with links to the views of all agents
  */
-function populate_agent_menu(state, id) {
-    console.log("Populating menu with data:", id, state);
+function populate_agent_menu(state) {
+    agents = [];
+    var dropdown = document.getElementById("agent_dropdown");
 
-    // Hide the menu from people who are not eligible to see it
-    if(id != "god" || !state[id].hasOwnProperty('has_menu')) {
-        return false;
+    // remove old agents
+    while (dropdown.firstChild) {
+        dropdown.removeChild(dropdown.firstChild);
     }
 
-    agents = [];
 
     // search for agents
-    var objects = Object.keys(state[vis_depth]);
-    objects.forEach(function(objID) {
+    var objects_keys = Object.keys(state);
+    objects_keys.forEach(function(objID) {
         // don't list ourselves
-        if (objID == id) {
-            return
+        if (objID == lv_agent_id) {
+            return;
         }
 
         // fetch agent object from state
-        var agent = state[vis_depth][objID];
+        var obj = state[objID];
 
         // save the agent
-        if (agent.hasOwnProperty('isAgent')) {
+        if (obj.hasOwnProperty('isAgent')) {
             agents.push(obj);
         }
     })
-
-
-    var dropdown = document.getElementById("agent_dropdown");
 
     // show what the agent looks like
     agents.forEach(function(agent) {
         var agentType = agent["is_human_agent"] ? "human-agent" : "agent";
 
+        // preview of the agent
+        var agent_preview = document.createElement("div");
 
+        // use the image as the agent preview
+        if (Object.keys(obj).includes('img_name')) {
+            var img = new Image();
+            img.src = window.location.origin + agent['img_name'];
+            agent_preview.append(img);
 
-        var newLi = $("<li>").append(
-            $('<a>').attr('href', '/' + agentType + '/' + agent["obj_id"]).append($('<div>').attr('class', 'textMenuDiv').append(agent["name"] + " " + agent["obj_id"])));
+        // otherwise, use the the agent shape and colour as a preview
+        } else {
+            agent_preview.classList.add("agent_menu_preview");
 
-        switch(agent['visualization']['shape']) {
-            case 'img':
-                var img = new Image();
-                img.src = window.location.origin + agent['img_name'];
-                newLi.append($('<div>').attr('class', 'imageMenuDiv').append(img));
-                break;
-            case 0:
-                newLi.append($('<div>').attr('class', 'imageMenuDiv').attr('style', 'background-color:' + agent['visualization']['colour'] + ';'));
-                break;
-            case 2:
-                newLi.append($('<div>').attr('class', 'imageMenuDiv').attr('style', 'background-color:' + agent['visualization']['colour'] + '; border-radius: 100%'))
-                break;
-            case 1:
-                newLi.append($('<div>').attr('class', 'imageMenuDiv').attr('style', 'width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;border-bottom: 24px solid' + agent['visualization']['colour'] + ';'))
-                break;
+            // add the css for the corresponding agent shape
+            switch(agent['visualization']['shape']) {
+                case 0:
+                    agent_preview.setAttribute("style", "background-color: " + agent['visualization']['colour'] + ';');
+                    break;
+                case 2:
+                    agent_preview.setAttribute("style", 'background-color:' + agent['visualization']['colour'] + '; border-radius: 100%');
+                    break;
+                case 1:
+                    agent_preview.setAttribute("style", 'width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;border-bottom: 24px solid' + agent['visualization']['colour'] + ';');
+                    break;
+            }
         }
-        $("#ListAgents").append(newLi);
-    })
-    if (!showMenu) {
-        $(".menuButton").hide();
-    }
+
+        // create a new dropdown item and add the preview and agent name
+        var list_item = document.createElement('a');
+        list_item.classList.add('dropdown-item');
+        list_item.append(agent_preview);
+        list_item.appendChild( document.createTextNode(agentType + ": " + agent["obj_id"]));
+        list_item.href = '/' + agentType + '/' + agent["obj_id"]
+
+        // add the agent to the dropdown list
+        dropdown.append(list_item);
+    });
 }

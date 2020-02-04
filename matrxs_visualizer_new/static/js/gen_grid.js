@@ -28,7 +28,8 @@ var prev_bg_image = null,
 var firstDraw = true,
     tile_size = null, // in Pixels. tiles are always square, so width and height are the same
     navbar = null,
-    animation_duration_s = null; // is calculated based on animation_duration_perc and tps.
+    animation_duration_s = null, // is calculated based on animation_duration_perc and tps.
+    populate_god_agent_menu = null;
 
 // tracked HTML objects
 var saved_prev_objs = {}, // obj containing the IDs of objects and their visualization settings of the previous tick
@@ -54,6 +55,8 @@ function initialize_grid() {
  * @param new_tick: whether this is the first draw after a new tick/update
  */
 function draw(state, world_settings, new_tick) {
+    // whether to (re)populate the dropdown menu with links to all agents
+    populate_god_agent_menu = false;
 
     // parse the new word settings, and change the grid, background, and tiles based on any changes in the settings
     if (new_tick) {
@@ -84,7 +87,7 @@ function draw(state, world_settings, new_tick) {
         // fetch bg img if defined
         var obj_img = null;
         if (Object.keys(obj).includes('img_name')) {
-            obj_img =  obj['img_name']
+            obj_img =  obj['img_name'];
         }
 
         // save visualization settings for this object
@@ -120,6 +123,11 @@ function draw(state, world_settings, new_tick) {
             // add to grid
             grid.append(obj_element);
 
+            // add this agent to the dropdown list
+            if(obj_element.hasOwnProperty('isAgent')) {
+                populate_god_agent_menu = true;
+            }
+
         // we already generated this object in a previous tick
         } else {
             // fetch the object from html
@@ -139,6 +147,11 @@ function draw(state, world_settings, new_tick) {
             // to (re)style the object
             if (compare_objects(saved_prev_objs[objID],  obj_vis_settings)) {
                 style_object = false;
+
+                // repopulate the agent list, when the visualization settings changed of an agent
+                if(obj_element.hasOwnProperty('isAgent')) {
+                    populate_god_agent_menu = true;
+                }
             }
         }
 
@@ -175,6 +188,10 @@ function draw(state, world_settings, new_tick) {
         remove_element(objID);
     });
 
+    // (re)populate the dropdown menu with links to all agents
+    if (lv_agent_id == "god" && populate_god_agent_menu) {
+        populate_agent_menu(state);
+    }
 
     // Draw the FPS to the canvas as last so it's drawn on top
     // TODO: draw tps?
@@ -259,6 +276,10 @@ function fix_tile_size() {
 function parse_world_settings(world_settings) {
     tps = (1.0 / world_settings['tick_duration']).toFixed(1);
     current_tick = world_settings['nr_ticks'];
+
+    if (world_ID != world_settings['world_ID']) {
+        populate_god_agent_menu = true;
+    }
     world_ID = world_settings['world_ID'];
 
     // calculate how many milliseconds the movement animation should take

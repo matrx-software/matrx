@@ -10,10 +10,6 @@
   margin-right: 0;
 }
 
-.tile {
-  background-color: lightgray;
-}
-
 .tile.draw_mode:hover {
   cursor: url("pencil-alt.svg") 0 15, pointer;
   background-color: indianred;
