@@ -10,16 +10,16 @@
   margin-right: 0;
 }
 
-.cell {
+.tile {
   background-color: lightgray;
 }
 
-.cell.draw_mode:hover {
+.tile.draw_mode:hover {
   cursor: url("pencil-alt.svg") 0 15, pointer;
   background-color: indianred;
 }
 
-.cell.erase_mode:hover {
+.tile.erase_mode:hover {
   cursor: url("eraser.svg") 0 15, pointer;
 }
 
