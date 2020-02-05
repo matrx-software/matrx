@@ -37,7 +37,7 @@ current_world_ID = False
 
 # a temporary state for the current tick, which will be written to states after all
 # agents have been updated
-temp_state = []
+temp_state = {}
 
 # variables to be read (only!) by MATRXS and set (only!) through API calls
 userinput = {}
@@ -525,7 +525,7 @@ def reset_api():
     """ Reset the MATRXS API variables """
     global temp_state, userinput, matrxs_paused, matrxs_done, states, current_tick, tick_duration, grid_size
     global MATRXS_info, next_tick_info, messages, current_world_ID
-    temp_state = []
+    temp_state = {}
     userinput = {}
     matrxs_paused = False
     matrxs_done = False

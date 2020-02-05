@@ -179,9 +179,8 @@ function world_loop() {
         return;
     }
 
-    // if MATRXS didn't have a state update yet, only redraw (animate) the movement of the current tick on screen
+    // if MATRXS didn't have a state update yet, wait for the next frame and check again at that time
     if (!lv_to_update_or_not_to_update) {
-//        draw(lv_state, lv_world_settings, new_tick=false);
         request_new_frame();
 
     // if we requested an update check if it was successful
@@ -192,8 +191,6 @@ function world_loop() {
             // the first tick, initialize the visualization with state information, and synch the timing between
             // the visualization and MATRXS
             if (lv_first_tick) {
-                // populate the GOD agents overview menu
-//                populateMenu(state, lv_agent_id);
                 lv_first_tick = false;
                 // save the timestamp of our first tick, which we use to match the clock of MATRXS and the visualizer
                 lv_MATRXS_timestamp_start = curr_tick_timestamp;
@@ -208,6 +205,10 @@ function world_loop() {
 
         // if the request gave an error, print to console and try to reinitialize
         lv_update_request.fail(function(data) {
+//        lv_update_request.fail(function(jqxhr, textStatus, error) {
+//            var err = textStatus + ", " + error;
+//            console.log( "Error: " + err );
+
             console.log("Could not connect to MATRXS API.");
             console.log("Provided error:", data.responseJSON)
             lv_first_tick = false;

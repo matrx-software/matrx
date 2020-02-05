@@ -66,6 +66,8 @@ class GridWorld:
                 api.reset_api()
                 api.tick_duration = self.__tick_duration
                 api.register_world(self.world_ID)
+                api.current_tick = self.__current_nr_ticks
+                api.grid_size = self.shape
 
                 # init API with world info
                 api.MATRXS_info =  {
@@ -82,11 +84,40 @@ class GridWorld:
                 # start paused
                 api.matrxs_paused = True
 
+                # fetch the initial state of every agent to display
+                self.fetch_initial_states()
+
             # Set initialisation boolean
             self.__is_initialized = True
 
             if self.__verbose:
                 print(f"@{os.path.basename(__file__)}: Initialized the GridWorld.")
+
+
+    def fetch_initial_states(self):
+        """ MATRX starts paused by default, to prime the API and any connected GUI's, we fetch the first state
+        from all agents to send which can be shown while waiting for the experiment leader to press play.
+        """
+        for agent_id, agent_obj in self.__registered_agents.items():
+            # given the agent's capabilities, get everything the agent can perceive
+            state = self.__get_agent_state(agent_obj)
+
+            # filter other things from the agent state
+            filtered_agent_state = agent_obj.filter_observations(state)
+
+            # save the current agent's state for the API
+            api.add_state(agent_id=agent_id, state=filtered_agent_state,
+                          agent_inheritence_chain=agent_obj.class_inheritance,
+                          world_settings=api.MATRXS_info)
+
+        # add god state
+        api.add_state(agent_id="god", state=self.__get_complete_state(), agent_inheritence_chain="god",
+                      world_settings=api.MATRXS_info)
+
+        # make the information of this tick available via the API, after all
+        # agents have been updated
+        api.next_tick()
+
 
     def run(self, api_info):
         # initialize the gridworld
@@ -333,6 +364,11 @@ class GridWorld:
         # will be made accessible via the API.
         if self.__run_matrxs_api:
             api.temp_state = {}
+
+            # if this is the first tick, clear the placeholder states
+            if self.__current_nr_ticks == 0:
+                api.MATRXS_info = {}
+                api.next_tick_info = {}
 
         # Go over all agents, detect what each can detect, figure out what actions are possible and send these to
         # that agent. Then receive the action back and store the action in a buffer.
