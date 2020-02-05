@@ -1,91 +1,67 @@
+var ss_update_url = 'http://127.0.0.1:3001/get_latest_state/';
 
-// data on the MATRX API
-var matrx_url = "http://127.0.0.1"
-var port = "3001"
+var ss_state = null,
+    ss_world_settings = null,
+    ss_new_world_ID = null,
+    ss_tick_duration = null,
+    ss_tps = null;
 
-// Toolbar elements
-var start_button = document.getElementById("start_button");
-var pause_button = document.getElementById("pause_button");
-var stop_button = document.getElementById("stop_button");
-
-
-/**
- * Synchronizes the play/pause button with the current value of MATRXS
+/*
+ * Once the page has loaded, call the initialization functions
  */
-function sync_play_button(matrxs_paused) {
-    // hide the play button and show the pause button
-    if(!matrxs_paused) {
-        start_button.classList.add("hidden");
-        pause_button.classList.remove("hidden");
-
-    // vice versa
-    } else {
-        start_button.classList.remove("hidden");
-        pause_button.classList.add("hidden");
-    }
-}
-
-start_button.addEventListener("click", toggle_start, false);
-function toggle_start() {
-    // hide / unhide the correct button
-    start_button.classList.toggle("hidden");
-    pause_button.classList.toggle("hidden");
-
-    // send API message to MATRX
-    send_api_message("start");
-}
-
-pause_button.addEventListener("click", toggle_pause, false);
-function toggle_pause() {
-    // hide / unhide the correct button
-    start_button.classList.toggle("hidden");
-    pause_button.classList.toggle("hidden");
-
-    // send API message to MATRX
-    send_api_message("pause");
-}
+$(document).ready(function() {
+    ss_fetch_MATRX_state();
+});
 
 
-stop_button.addEventListener("click", toggle_stop, false);
-function toggle_stop() {
-    send_api_message("stop");
-}
+function ss_fetch_MATRX_state() {
 
+    console.log("Fetching MATRX state");
+    // Fetch the latest MATRX state via the API
+    var ss_update_request = jQuery.getJSON(ss_update_url + "['god']");
 
-/**
- * Send a message to the MATRX API
- */
-function send_api_message(type) {
-    var resp = $.ajax({
-        method: "GET",
-        url: matrx_url + ":" + port + "/" + type,
-        contentType:"application/json; charset=utf-8",
-        dataType: 'json'
+    // if succesfull, save the state and initialize the start screen
+    ss_update_request.done(function(data) {
+        console.log("Succesfully fetched MATRX state:", data);
+        // parse the state info
+        ss_state = data[data.length - 1]['god']['state'];
+        ss_world_settings = ss_state['World'];
+        ss_new_world_ID = ss_state['World']['world_ID'];
+        ss_tick_duration = ss_state['World']['tick_duration'];
+        ss_tps = (1.0 / ss_tick_duration).toFixed(1); // round to 1 decimal behind the dot
+
+        // populate the agent menu
+        ss_populate_agent_menu(ss_state);
     });
+
+    // if the request gave an error, print to console and try again in some time
+    ss_update_request.fail(function(data) {
+        console.log("Could not connect to MATRXS API.");
+        console.log("Provided error:", data.responseJSON)
+
+        setTimeout(function() {
+            ss_fetch_MATRX_state();
+        }, 500);
+    });
+
 }
 
 
 /**
  * Populate the menu with links to the views of all agents
  */
-function populate_agent_menu(state) {
+function ss_populate_agent_menu(state) {
     agents = [];
-    var dropdown = document.getElementById("agent_dropdown");
+    var dropdown = document.getElementById("view_mode");
 
     // remove old agents
     while (dropdown.firstChild) {
         dropdown.removeChild(dropdown.firstChild);
     }
 
-
     // search for agents
     var objects_keys = Object.keys(state);
     objects_keys.forEach(function(objID) {
-        // don't list ourselves
-        if (objID == lv_agent_id) {
-            return;
-        }
-
         // fetch agent object from state
         var obj = state[objID];
 
@@ -94,6 +70,18 @@ function populate_agent_menu(state) {
             agents.push(obj);
         }
     })
+
+    // Add god view
+    var god_icon = document.createElement("div");
+    god_icon.classList.add("god_preview");
+
+    var list_item = document.createElement('a');
+    list_item.classList.add('dropdown-item');
+    list_item.append(god_icon);
+    list_item.appendChild( document.createTextNode('God'));
+    list_item.href = '/god'
+    // add the agent to the dropdown list
+    dropdown.append(list_item);
 
     // show what the agent looks like
     agents.forEach(function(agent) {
@@ -130,10 +118,20 @@ function populate_agent_menu(state) {
         var list_item = document.createElement('a');
         list_item.classList.add('dropdown-item');
         list_item.append(agent_preview);
-        list_item.appendChild( document.createTextNode(agentType + ": " + agent["obj_id"]));
+        list_item.appendChild( document.createTextNode(agent["obj_id"]));
         list_item.href = '/' + agentType + '/' + agent["obj_id"]
 
         // add the agent to the dropdown list
         dropdown.append(list_item);
     });
+}
+
+
+/**
+ * Open the agent view in a new tab
+ */
+function run() {
+    var view_mode = document.getElementById("view_mode").value;
+    var view_page = view_mode + ".html";
+    window.location.href = view_page;
 }

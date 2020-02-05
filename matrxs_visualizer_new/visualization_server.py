@@ -71,6 +71,21 @@ def god_view():
     """
     return render_template('god.html')
 
+@app.route('/start')
+def start_view():
+    """
+    Route for the 'start' view which shows information about the current scenario, including links to all agents.
+
+    Returns
+    -------
+    str
+        The template for this view.
+
+    """
+    return render_template('start.html')
+
+
+
 
 @app.route('/shutdown_visualizer', methods=['GET', 'POST'])
 def shutdown():

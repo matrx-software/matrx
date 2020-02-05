@@ -94,6 +94,7 @@ function init() {
 
         // start the visualization loop
         world_loop();
+
     });
 
     // if the request gave an error, print to console and try again
