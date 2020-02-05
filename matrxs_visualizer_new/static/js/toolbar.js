@@ -9,6 +9,22 @@ var pause_button = document.getElementById("pause_button");
 var stop_button = document.getElementById("stop_button");
 
 
+/**
+ * Synchronizes the play/pause button with the current value of MATRXS
+ */
+function sync_play_button(matrxs_paused) {
+    // hide the play button and show the pause button
+    if(!matrxs_paused) {
+        start_button.classList.add("hidden");
+        pause_button.classList.remove("hidden");
+
+    // vice versa
+    } else {
+        start_button.classList.remove("hidden");
+        pause_button.classList.add("hidden");
+    }
+}
+
 start_button.addEventListener("click", toggle_start, false);
 function toggle_start() {
     // hide / unhide the correct button
@@ -16,7 +32,7 @@ function toggle_start() {
     pause_button.classList.toggle("hidden");
 
     // send API message to MATRX
-    send_api_message("pause");
+    send_api_message("start");
 }
 
 pause_button.addEventListener("click", toggle_pause, false);
@@ -26,7 +42,7 @@ function toggle_pause() {
     pause_button.classList.toggle("hidden");
 
     // send API message to MATRX
-    send_api_message("start");
+    send_api_message("pause");
 }
 
 

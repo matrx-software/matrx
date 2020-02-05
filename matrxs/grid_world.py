@@ -67,6 +67,20 @@ class GridWorld:
                 api.tick_duration = self.__tick_duration
                 api.register_world(self.world_ID)
 
+                # init API with world info
+                api.MATRXS_info =  {
+                    "nr_ticks": self.__current_nr_ticks,
+                    "curr_tick_timestamp": int(round(time.time() * 1000)),
+                    "grid_shape": self.__shape,
+                    "tick_duration": self.tick_duration,
+                    "world_ID": self.world_ID,
+                    "vis_settings": {
+                        "vis_bg_clr": self.__visualization_bg_clr,
+                        "vis_bg_img": self.__visualization_bg_img
+                    }
+                }
+                # start paused
+                api.matrxs_paused = True
 
             # Set initialisation boolean
             self.__is_initialized = True

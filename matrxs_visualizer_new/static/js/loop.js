@@ -24,7 +24,8 @@ var lv_MATRXS_timestamp_start = null,
     lv_world_ID = null, // ID of the world we received when initializing
     lv_new_world_ID = null, // ID of the world for which we received a tick
     lv_reinitialize_vis = false, // whether to reinitialize the visualization
-    lv_wait_for_next_tick = 0; // how long to wait before sending a new request to MATRXS for a new state
+    lv_wait_for_next_tick = 0, // how long to wait before sending a new request to MATRXS for a new state
+    lv_matrxs_paused = false;
 
 var lv_tps = 1, // placeholder value
     lv_msPerFrame = (1.0 / 60) * 1000, // placeholder
@@ -84,6 +85,9 @@ function init() {
 
         // add a hidden container to the html in which preloaded images can be added
         $('body').append("<div id='preloaded_imgs' style='display:none;'></div>");
+
+        // if MATRXS is running, change the start/pause button to match that
+        sync_play_button(lv_matrxs_paused);
 
         // preload the background image
 //        preload_image(bgImage);
@@ -145,6 +149,7 @@ function parse_initial_state(data) {
     lv_grid_size_loop = data.grid_shape;
     lv_wait_for_next_tick = 0;
     lv_tps = Math.floor(1.0 / lv_tick_duration); // calc ticks per second
+    lv_matrxs_paused = data.matrxs_paused;
 }
 
 
@@ -167,9 +172,10 @@ function world_loop() {
 
     // we received an update for a different world from our current, so reinitialize the visualization
     if (lv_new_world_ID != null && lv_world_ID != lv_new_world_ID) {
-         console.log("New world ID received:", lv_new_world_ID);
+        console.log("New world ID received:", lv_new_world_ID);
         lv_first_tick = false;
         lv_reinitialize_vis = true;
+        sync_play_button();
         return;
     }
 
@@ -263,6 +269,13 @@ function get_MATRXS_update() {
 
         // note our new current tick
         lv_current_tick = lv_new_tick;
+
+        // make sure to synchronize the play/pause button of the frontend with the current MATRX version
+        var matrxs_paused = lv_state['World']['matrxs_paused'];
+        if (matrxs_paused != lv_matrxs_paused) {
+            lv_matrxs_paused = matrxs_paused;
+            sync_play_button(lv_matrxs_paused);
+        }
     });
     return lv_update_request;
 }

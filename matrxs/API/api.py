@@ -59,6 +59,7 @@ def get_info():
         MATRXS world object, contianing general information on the world and scenario.
     -------
     """
+    MATRXS_info['matrxs_paused'] = matrxs_paused
     return jsonify(MATRXS_info)
 
 @app.route('/get_states/<tick>', methods=['GET', 'POST'])
@@ -349,6 +350,10 @@ def check_API_request(tick=None, ids=None, ids_required=False):
     if not tick in range(0, current_tick+1):
         return False, {'error_code': 400, 'error_message': f'Indicated tick does not exist, has to be in range 0 - {current_tick}, but is {tick}'}
 
+    # Don't throw an error if MATRXS is paused the first tick, and thus still has no states
+    # if current_tick is 0 and matrxs_paused:
+    #     return True, None
+
     # if this API call requires ids, check this variable on validity as well
     if ids_required:
 
@@ -478,6 +483,8 @@ def add_state(agent_id, state, agent_inheritence_chain, world_settings):
     # Make sure the world settings are in the state, as these are used by the visualization
     if 'World' not in state:
         state['World'] = world_settings
+
+    state['World']['matrxs_paused'] = matrxs_paused
 
     # reorder and save the new state along with some meta information
     temp_state[agent_id] = {'state': __reorder_state(state), 'agent_inheritence_chain': agent_inheritence_chain}
