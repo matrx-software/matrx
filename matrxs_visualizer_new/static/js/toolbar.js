@@ -132,6 +132,7 @@ function populate_agent_menu(state) {
         list_item.append(agent_preview);
         list_item.appendChild( document.createTextNode(agentType + ": " + agent["obj_id"]));
         list_item.href = '/' + agentType + '/' + agent["obj_id"]
+        list_item.setAttribute('target', '_blank'); // open in a new tab
 
         // add the agent to the dropdown list
         dropdown.append(list_item);
