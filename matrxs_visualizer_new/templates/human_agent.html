@@ -17,7 +17,7 @@
     <!-- Font Awesome icons -->
     <link rel="stylesheet" href="/dist/fontawesome-free-5.12.0-web/css/all.css">
 
-    <title>God view</title>
+    <title>{{ id }} view</title>
 </head>
 
 <body>
@@ -26,10 +26,10 @@
     <div id="matrxs-toolbar" class="row toolbar bg-dark">
         <div class="col-sm">
             <img src="../images/matrxs_logo.png" alt="MATRXS" style="width:103px;height:43px;">
-            <button type="button" class="btn btn-dark" id="start_button"><i class="fas fa-play text-light"></i></button>
-            <button type="button" class="btn btn-dark hidden" id="pause_button"><i class="fas fa-pause text-light"></i></button>
-            <button type="button" class="btn btn-dark" id="stop_button"><i class="fas fa-stop text-light"></i></button>
-            <div class="btn-group">
+            <button type="button" class="btn btn-dark" id="start_button" style="display:none;"><i class="fas fa-play text-light"></i></button>
+            <button type="button" class="btn btn-dark hidden" id="pause_button" style="display:none;"><i class="fas fa-pause text-light"></i></button>
+            <button type="button" class="btn btn-dark" id="stop_button" style="display:none;"><i class="fas fa-stop text-light"></i></button>
+            <div class="btn-group" style="display:none;">
                 <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-users"></i></button>
                 <div id="agent_dropdown" class="dropdown-menu">
                 </div>
@@ -128,9 +128,9 @@
     <!-- Custom JavaScript -->
     <script src="/js/toolbar.js"></script>
     <script src="/js/custom.js"></script>
-    <!--    <script src="/dist/zoom-pan-master/public/bundle.min.js"></script>-->
     <script type="text/javascript" src="/js/gen_grid.js"></script>
     <script type="text/javascript" src="/js/loop.js"></script>
+    <script type="text/javascript" src="/js/human_agent.js"></script>
 </body>
 
 </html>

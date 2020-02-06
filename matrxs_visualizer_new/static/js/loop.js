@@ -33,11 +33,14 @@ var lv_tps = 1, // placeholder value
     lv_timestamp = Date.now();
 
 // MATRXS API urls
-var lv_init_url = 'http://127.0.0.1:3001/get_info',
-    lv_update_url = 'http://127.0.0.1:3001/get_latest_state/',
-    lv_send_userinput_url = 'http://127.0.0.1:3001/send_userinput/',
+var lv_base_url = window.location.hostname,
+    lv_init_url = 'http://' + lv_base_url + ':3001/get_info',
+    lv_update_url = 'http://' + lv_base_url + ':3001/get_latest_state/',
+    lv_send_userinput_url = 'http://' + lv_base_url + ':3001/send_userinput/',
     lv_agent_id = "";
 
+
+console.log("lv_send_userinput_url:", lv_send_userinput_url);
 
 /*
  * Once the page has loaded, call the initialization functions
@@ -121,7 +124,9 @@ function initial_connect() {
     };
     // Get the agent ID from the url (e.g. "god", "agent_0123", etc.)
     var lv_ID = lv_path.substring(lv_path.lastIndexOf('/') + 1).toLowerCase();
-    lv_agent_id = lv_ID;
+    // decode the URL (e.g. spaces are encoding in urls as %20), and set the agent ID
+    lv_agent_id = decodeURI(lv_ID);
+
 
     // check if this view is for the god view, agent, or human-agent, and get the correct urls
     if (lv_type == "" && lv_ID == "god") {
@@ -246,7 +251,6 @@ function get_MATRXS_update() {
     // the get request is async, meaning the (success) function is only executed when
     // the response has been received
     var lv_update_request = jQuery.getJSON(lv_update_url + "['" + lv_agent_id + "']", function(data) {
-        // console.log(data);
 
         // decode lv_state and other info from the request
         lv_state = data[data.length - 1][lv_agent_id]['state'];

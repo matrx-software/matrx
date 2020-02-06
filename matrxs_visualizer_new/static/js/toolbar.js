@@ -1,12 +1,12 @@
 
 // data on the MATRX API
-var matrx_url = "http://127.0.0.1"
-var port = "3001"
+var matrx_url = 'http://' + window.location.hostname,
+    port = "3001";
 
 // Toolbar elements
-var start_button = document.getElementById("start_button");
-var pause_button = document.getElementById("pause_button");
-var stop_button = document.getElementById("stop_button");
+var start_button = document.getElementById("start_button"),
+    pause_button = document.getElementById("pause_button"),
+    stop_button = document.getElementById("stop_button");
 
 
 /**
@@ -101,6 +101,7 @@ function populate_agent_menu(state) {
 
         // preview of the agent
         var agent_preview = document.createElement("div");
+        agent_preview.classList.add("agent_menu_preview");
 
         // use the image as the agent preview
         if (Object.keys(agent).includes('img_name')) {
@@ -110,7 +111,6 @@ function populate_agent_menu(state) {
 
         // otherwise, use the the agent shape and colour as a preview
         } else {
-            agent_preview.classList.add("agent_menu_preview");
 
             // add the css for the corresponding agent shape
             switch(agent['visualization']['shape']) {

@@ -71,15 +71,23 @@ function ss_populate_agent_menu(state) {
         }
     })
 
-    // Add god view
-    var god_icon = document.createElement("div");
-    god_icon.classList.add("god_preview");
+    // preview of the god view
+    var god_preview = document.createElement("div");
+    god_preview.classList.add("agent_menu_preview");
 
+    // Set god icon
+    var god_icon = new Image();
+    god_icon.src = window.location.origin + "/images/god.png";
+    god_preview.append(god_icon);
+
+    // add god view to the list
     var list_item = document.createElement('a');
     list_item.classList.add('dropdown-item');
-    list_item.append(god_icon);
+    list_item.append(god_preview);
     list_item.appendChild( document.createTextNode('God'));
     list_item.href = '/god'
+    list_item.setAttribute('target', '_blank'); // open in a new tab
+
     // add the agent to the dropdown list
     dropdown.append(list_item);
 
@@ -89,6 +97,7 @@ function ss_populate_agent_menu(state) {
 
         // preview of the agent
         var agent_preview = document.createElement("div");
+        agent_preview.classList.add("agent_menu_preview");
 
         // use the image as the agent preview
         if (Object.keys(agent).includes('img_name')) {
@@ -98,7 +107,6 @@ function ss_populate_agent_menu(state) {
 
         // otherwise, use the the agent shape and colour as a preview
         } else {
-            agent_preview.classList.add("agent_menu_preview");
 
             // add the css for the corresponding agent shape
             switch(agent['visualization']['shape']) {
@@ -109,7 +117,7 @@ function ss_populate_agent_menu(state) {
                     agent_preview.setAttribute("style", 'background-color:' + agent['visualization']['colour'] + '; border-radius: 100%');
                     break;
                 case 1:
-                    agent_preview.setAttribute("style", 'width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;border-bottom: 24px solid' + agent['visualization']['colour'] + ';');
+                    agent_preview.setAttribute("style", 'width: 0; height: 0; border-left: 17px solid transparent; border-right: 17px solid transparent;border-bottom: 30px solid' + agent['visualization']['colour'] + ';');
                     break;
             }
         }
@@ -120,6 +128,7 @@ function ss_populate_agent_menu(state) {
         list_item.append(agent_preview);
         list_item.appendChild( document.createTextNode(agent["obj_id"]));
         list_item.href = '/' + agentType + '/' + agent["obj_id"]
+        list_item.setAttribute('target', '_blank'); // open in a new tab
 
         // add the agent to the dropdown list
         dropdown.append(list_item);

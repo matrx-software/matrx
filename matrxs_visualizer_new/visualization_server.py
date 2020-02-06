@@ -71,6 +71,8 @@ def god_view():
     """
     return render_template('god.html')
 
+
+@app.route('/')
 @app.route('/start')
 def start_view():
     """
