@@ -1,0 +1,30 @@
+matrxs.scenarios package
+========================
+
+Submodules
+----------
+
+matrxs.scenarios.simple\_scenario module
+----------------------------------------
+
+.. automodule:: matrxs.scenarios.simple_scenario
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+matrxs.scenarios.test\_scenario module
+--------------------------------------
+
+.. automodule:: matrxs.scenarios.test_scenario
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: matrxs.scenarios
+   :members:
+   :undoc-members:
+   :show-inheritance:

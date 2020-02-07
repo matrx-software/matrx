@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>matrxs.agents.patrolling_agent.PatrollingAgentBrain &mdash; MATRXS 0.0.1 Manual 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> MATRXS 0.0.1 Manual
+          
+
+          
+            
+            <img src="../../_static/matrx_logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../aboutmatrxs.html">About MATRXS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation/installing.html">Installation and first run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../FAQ.html">F.A.Q.</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Sections</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../sections/worlds.html">Worlds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sections/actions.html">Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sections/objects.html">Object placement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sections/simgoals.html">Simulation goals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sections/utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MATRXS 0.0.1 Manual</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>matrxs.agents.patrolling_agent.PatrollingAgentBrain</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/about/_generated_autodoc/matrxs.agents.patrolling_agent.PatrollingAgentBrain.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="matrxs-agents-patrolling-agent-patrollingagentbrain">
+<h1>matrxs.agents.patrolling_agent.PatrollingAgentBrain<a class="headerlink" href="#matrxs-agents-patrolling-agent-patrollingagentbrain" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="matrxs.agents.patrolling_agent.PatrollingAgentBrain">
+<em class="property">class </em><code class="sig-name descname">PatrollingAgentBrain</code><span class="sig-paren">(</span><em class="sig-param">waypoints</em>, <em class="sig-param">move_speed=1</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../sections/_generated_autodoc/matrxs.agents.patrolling_agent.PatrollingAgentBrain.html#matrxs.agents.patrolling_agent.PatrollingAgentBrain.decide_on_action" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.decide_on_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decide_on_action</span></code></a>(self, state)</p></td>
+<td><p>Contains the decision logic of the agent.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../../sections/_generated_autodoc/matrxs.agents.patrolling_agent.PatrollingAgentBrain.html#matrxs.agents.patrolling_agent.PatrollingAgentBrain.filter_observations" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.filter_observations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_observations</span></code></a>(self, state)</p></td>
+<td><p>Filters the state received from the world further.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_log_data</span></code>(self)</p></td>
+<td><p>Provides a dictionary of data for any Logger</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../../sections/_generated_autodoc/matrxs.agents.patrolling_agent.PatrollingAgentBrain.html#matrxs.agents.patrolling_agent.PatrollingAgentBrain.initialize" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.initialize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize</span></code></a>(self)</p></td>
+<td><p>Method called the very first time this AgentBrain is called from the world.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_action_possible</span></code>(self, action, action_kwargs)</p></td>
+<td><p>Checks if an action would be possible.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">preprocess_messages</span></code>(this_agent_id, …)</p></td>
+<td><p>Preprocess messages for sending, such that they can be understood by the GridWorld.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_message</span></code>(self, message)</p></td>
+<td><p>Sends a Message from this agent to others</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="matrxs.agents.patrolling_agent.PatrollingAgentBrain.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">waypoints</em>, <em class="sig-param">move_speed=1</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the brain of an Agent.</p>
+<p>The AgentBrain is the place where all the decision logic of an agent is contained. When you wish to create a new
+agent, this is the class you need to extend. The functions you can override are the following;</p>
+<ul class="simple">
+<li><p>AgentBrain.initialize(): This method is called at the first tick of a new World. Can be used to initialize the</p></li>
+</ul>
+<p>class with anything that requires information unavailable until the brain is connect to a body (e.g. its object
+ID).</p>
+<ul class="simple">
+<li><p>AgentBrain.filter_observations(state): This method is responsible for further filtering the state received</p></li>
+</ul>
+<p>from the world at each tick.</p>
+<ul class="simple">
+<li><p>AgentBrain.decidece_on_action(state): This method decides on the action the agent should perform. Here lies</p></li>
+</ul>
+<p>the main decision logic of the agent.</p>
+<ul class="simple">
+<li><p>AgentBrain.get_log_data(): This method’s output is provided to all Logger instances connected to the world.</p></li>
+</ul>
+<p>This allows those loggers to process and/or log this data.</p>
+<p>All other AgentBrains should inherit from this class if you want to make you own (smarter) agents. This agent
+simply randomly selects an action from the possible actions it can do.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../sections/_generated_autodoc/matrxs.agents.patrolling_agent.PatrollingAgentBrain.html#matrxs.agents.patrolling_agent.PatrollingAgentBrain.__init__" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, waypoints[, move_speed])</p></td>
+<td><p>Defines the brain of an Agent.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../../sections/_generated_autodoc/matrxs.agents.patrolling_agent.PatrollingAgentBrain.html#matrxs.agents.patrolling_agent.PatrollingAgentBrain.decide_on_action" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.decide_on_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decide_on_action</span></code></a>(self, state)</p></td>
+<td><p>Contains the decision logic of the agent.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../sections/_generated_autodoc/matrxs.agents.patrolling_agent.PatrollingAgentBrain.html#matrxs.agents.patrolling_agent.PatrollingAgentBrain.filter_observations" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.filter_observations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_observations</span></code></a>(self, state)</p></td>
+<td><p>Filters the state received from the world further.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_log_data</span></code>(self)</p></td>
+<td><p>Provides a dictionary of data for any Logger</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../sections/_generated_autodoc/matrxs.agents.patrolling_agent.PatrollingAgentBrain.html#matrxs.agents.patrolling_agent.PatrollingAgentBrain.initialize" title="matrxs.agents.patrolling_agent.PatrollingAgentBrain.initialize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize</span></code></a>(self)</p></td>
+<td><p>Method called the very first time this AgentBrain is called from the world.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_action_possible</span></code>(self, action, action_kwargs)</p></td>
+<td><p>Checks if an action would be possible.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">preprocess_messages</span></code>(this_agent_id, …)</p></td>
+<td><p>Preprocess messages for sending, such that they can be understood by the GridWorld.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_message</span></code>(self, message)</p></td>
+<td><p>Sends a Message from this agent to others</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">waypoints</em>, <em class="sig-param">move_speed=1</em><span class="sig-paren">)</span></dt>
+<dd><p>Defines the brain of an Agent.</p>
+<p>The AgentBrain is the place where all the decision logic of an agent is contained. When you wish to create a new
+agent, this is the class you need to extend. The functions you can override are the following;</p>
+<ul class="simple">
+<li><p>AgentBrain.initialize(): This method is called at the first tick of a new World. Can be used to initialize the</p></li>
+</ul>
+<p>class with anything that requires information unavailable until the brain is connect to a body (e.g. its object
+ID).</p>
+<ul class="simple">
+<li><p>AgentBrain.filter_observations(state): This method is responsible for further filtering the state received</p></li>
+</ul>
+<p>from the world at each tick.</p>
+<ul class="simple">
+<li><p>AgentBrain.decidece_on_action(state): This method decides on the action the agent should perform. Here lies</p></li>
+</ul>
+<p>the main decision logic of the agent.</p>
+<ul class="simple">
+<li><p>AgentBrain.get_log_data(): This method’s output is provided to all Logger instances connected to the world.</p></li>
+</ul>
+<p>This allows those loggers to process and/or log this data.</p>
+<p>All other AgentBrains should inherit from this class if you want to make you own (smarter) agents. This agent
+simply randomly selects an action from the possible actions it can do.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.agents.patrolling_agent.PatrollingAgentBrain.initialize">
+<code class="sig-name descname">initialize</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method called the very first time this AgentBrain is called from the world. Here you can initialize everything
+you need for your agent to work since you can’t do much in the constructor as the brain needs to be connected to
+a GridWorld first in most cases (e.g. to get an AgentID, its random seed, etc.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.agents.patrolling_agent.PatrollingAgentBrain.filter_observations">
+<code class="sig-name descname">filter_observations</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">state</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.filter_observations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filters the state received from the world further.</p>
+<p>In this method you filter the state to only those properties and objects the agent is actually supposed to see.
+Since the grid world returns ALL properties of ALL objects within a certain range(s), but perhaps some objects
+are obscured because they are behind walls, or an agent is not able to see some properties of certain objects.</p>
+<p>This method is separated from the decide_on_action() method because its return value is send to the API as well
+to allows the agent’s interface to only show that knowledge the agent is aware of.</p>
+<p>A number of utility methods exist to help filter and memorize states. See &lt;TODO&gt;</p>
+<p>Override this method when creating a new AgentBrain and you need to filter the state further.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>state: dict</strong></dt><dd><p>A state description containing all properties of EnvObject and sub classes that are within a certain range
+as defined by self.sense_capability. The object id is the key, and the value is a dictionary of properties.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>filtered_state</strong><span class="classifier">dict</span></dt><dd><p>A dictionary describing the filtered state this agent perceives of the world.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.agents.patrolling_agent.PatrollingAgentBrain.decide_on_action">
+<code class="sig-name descname">decide_on_action</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">state</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.patrolling_agent.PatrollingAgentBrain.decide_on_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains the decision logic of the agent.</p>
+<p>This method determines what action the agent should perform. The GridWorld is responsible for deciding when an
+agent can perform an action again, if so this method is called for each agent. Two things need to be determined,
+which action and with what arguments.</p>
+<p>The action is returned simply as the class name (as a string), and the action arguments as a dictionary with the
+keys the names of the keyword arguments. An argument that is always possible is that of action_duration, which
+denotes how many ticks this action should take (e.g. a duration of 1, makes sure the agent has to wait 1 tick).</p>
+<p>To quickly build a fairly intelligent agent, several utility classes and methods are available. See &lt;TODO&gt;.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>state</strong><span class="classifier">dict</span></dt><dd></dd>
+<dt><strong>A state description containing all properties of EnvObject that are within a certain range as</strong></dt><dd></dd>
+<dt><strong>defined by self.sense_capability. It is a list of properties in a dictionary</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>action_name</strong><span class="classifier">str</span></dt><dd><p>A string of the class name of an action that is also in self.action_set. To ensure backwards compatibility
+you could use Action.__name__ where Action is the intended action.</p>
+</dd>
+<dt><strong>action_args</strong><span class="classifier">dict</span></dt><dd><p>A dictionary with keys any action arguments and as values the actual argument values. If a required argument
+is missing an exception is raised, if an argument that is not used by that action a warning is printed. The
+argument applicable to all action is <cite>action_duration</cite>, which sets the number ticks the agent is put on hold
+by the GridWorld until the action’s world mutation is actual performed and the agent can perform a new
+action (a value of 0 is no wait, 1 means to wait 1 tick, etc.).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The MATRXS Team at TNO.nl
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #303030;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+      background: #578a64;
+    }
+  </style>
+
+
+</body>
+</html>

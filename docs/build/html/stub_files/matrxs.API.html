@@ -1,0 +1,521 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>matrxs.API package &mdash; MATRXS 0.0.1 Manual 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/matrx.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> MATRXS 0.0.1 Manual
+          
+
+          
+            
+            <img src="../_static/matrxslogo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">matrxs.API package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-matrxs.API.api">matrxs.API.api module</a></li>
+<li><a class="reference internal" href="#module-matrxs.API.logMatrx">matrxs.API.logMatrx module</a></li>
+<li><a class="reference internal" href="#module-matrxs.API">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MATRXS 0.0.1 Manual</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>matrxs.API package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/stub_files/matrxs.API.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="matrxs-api-package">
+<h1>matrxs.API package<a class="headerlink" href="#matrxs-api-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-matrxs.API.api">
+<span id="matrxs-api-api-module"></span><h2>matrxs.API.api module<a class="headerlink" href="#module-matrxs.API.api" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="matrxs.API.api.add_state">
+<code class="sig-name descname">add_state</code><span class="sig-paren">(</span><em class="sig-param">agent_id</em>, <em class="sig-param">state</em>, <em class="sig-param">agent_inheritence_chain</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.add_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>aves the state of an agent for use via the API</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>agent_id</strong></dt><dd><p>ID of the agent of who the state is</p>
+</dd>
+<dt><strong>state</strong></dt><dd><p>state as filtered by the agent</p>
+</dd>
+<dt><strong>agent_inheritence_chain</strong></dt><dd><p>inheritance_chain of classes, can be used to figure out type of agent</p>
+</dd>
+<dt><strong>——-</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.bad_request">
+<code class="sig-name descname">bad_request</code><span class="sig-paren">(</span><em class="sig-param">e</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.bad_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.change_MATRXS_speed">
+<code class="sig-name descname">change_MATRXS_speed</code><span class="sig-paren">(</span><em class="sig-param">tick_dur</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.change_MATRXS_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the tick duration / simulation speed of MATRXS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tick_duration</strong></dt><dd><p>The duration of 1 tick</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd><p>True if successfully changed tick speed (400 error if tick_duration not valid)</p>
+</dd>
+<dt><strong>——-</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.check_API_request">
+<code class="sig-name descname">check_API_request</code><span class="sig-paren">(</span><em class="sig-param">tick=None</em>, <em class="sig-param">ids=None</em>, <em class="sig-param">ids_required=False</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.check_API_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the variables of the API request are valid, and if the requested information exists</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tick</strong></dt><dd><p>MATRXS tick</p>
+</dd>
+<dt><strong>ids</strong></dt><dd><p>string with 1 agent ID, or list of agent IDS</p>
+</dd>
+<dt><strong>ids_required</strong></dt><dd><p>Whether IDS are required</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd><p>Success (Boolean indicating whether it is valid or not), Error (if any, prodiving the type and a message)
+See for the error codes <a class="reference external" href="https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.0/com.ibm.qradar.doc/c_rest_api_errors.html">https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.0/com.ibm.qradar.doc/c_rest_api_errors.html</a></p>
+</dd>
+<dt><strong>——-</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.create_error_response">
+<code class="sig-name descname">create_error_response</code><span class="sig-paren">(</span><em class="sig-param">code</em>, <em class="sig-param">message</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.create_error_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an error code with a custom message</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.flask_thread">
+<code class="sig-name descname">flask_thread</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.flask_thread" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.get_info">
+<code class="sig-name descname">get_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides the general information on the world, contained in the world object.</p>
+<dl class="simple">
+<dt>Returns</dt><dd><p>MATRXS world object, contianing general information on the world and scenario.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.get_latest_state">
+<code class="sig-name descname">get_latest_state</code><span class="sig-paren">(</span><em class="sig-param">agent_ids</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.get_latest_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides the latest state of one or multiple agents</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>agent_ids</strong></dt><dd><p>IDs of agents for which to send the latest state. Either a single agent ID, or a list of agent IDs.
+God view = “god”</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd><p>Returns a list of length ‘tick’ to current_tick. For each tick, a dictionary contains the states for each
+agent as specified in ‘agent_ids’, indexed by their agent ID.</p>
+</dd>
+<dt><strong>——-</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.get_states">
+<code class="sig-name descname">get_states</code><span class="sig-paren">(</span><em class="sig-param">tick</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.get_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides the states of all agents (including the god view) from tick ‘tick’ onwards to current tick.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tick</strong></dt><dd><p>integer indicating from which tick onwards to send the states.</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd><p>Returns a list of length ‘tick’ to current_tick. For each tick (item in the list), a dictionary contains the
+state for each agent existing in the simulation, indexed by their agent ID.</p>
+</dd>
+<dt><strong>——-</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.get_states_specific_agents">
+<code class="sig-name descname">get_states_specific_agents</code><span class="sig-paren">(</span><em class="sig-param">tick</em>, <em class="sig-param">agent_ids</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.get_states_specific_agents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides the states starting from tick ‘tick’ to current_tick, for the agents specified in ‘agent_ids’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tick</strong></dt><dd><p>integer indicating from which tick onwards to send the states.</p>
+</dd>
+<dt><strong>agent_ids</strong></dt><dd><p>One agent ID, or a List of agent IDs for which the states should be returned. God view = “god”</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd><p>Returns a list of length ‘tick’ to current_tick. For each tick (item in the list), a dictionary contains the
+state for each agent as specified in ‘agent_ids’, indexed by their agent ID.</p>
+</dd>
+<dt><strong>——-</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.next_tick">
+<code class="sig-name descname">next_tick</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.next_tick" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.pause_MATRXS">
+<code class="sig-name descname">pause_MATRXS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.pause_MATRXS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pause the MATRXS simulation</p>
+<dl class="simple">
+<dt>Returns</dt><dd><p>True if paused, False if already paused</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.pop_userinput">
+<code class="sig-name descname">pop_userinput</code><span class="sig-paren">(</span><em class="sig-param">agent_id</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.pop_userinput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pop the user input for an agent from the userinput dictionary and return it</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>agent_id</strong></dt><dd><p>ID of the agent for which to return the userinput</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd><p>A list of keys pressed. See this link for the encoding of keys: <a class="reference external" href="https://developer.mozilla.org/nl/docs/Web/API/KeyboardEvent/key/Key_Values">https://developer.mozilla.org/nl/docs/Web/API/KeyboardEvent/key/Key_Values</a></p>
+</dd>
+<dt><strong>——-</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.register_world">
+<code class="sig-name descname">register_world</code><span class="sig-paren">(</span><em class="sig-param">world_ID</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.register_world" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a new simulation world</p>
+<p>At the moment simulation of only one world at a time is supported, so this calling this function will discard
+the previous world.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>world_ID</strong></dt><dd><p>The ID of the world</p>
+</dd>
+<dt><strong>——-</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.reset_api">
+<code class="sig-name descname">reset_api</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.reset_api" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the MATRXS API variables</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.run_api">
+<code class="sig-name descname">run_api</code><span class="sig-paren">(</span><em class="sig-param">verbose</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.run_api" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a seperate Python thread in which the API (Flask) is started
+Returns</p>
+<blockquote>
+<div><p>MATRXS API Python thread</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.send_message">
+<code class="sig-name descname">send_message</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.send_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a message containing information to one or multiple specific agent, the agent’s team, or all agents</p>
+<p>Message as defined in agent_brain.py</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>message</strong></dt><dd><p>Message contents to send</p>
+</dd>
+<dt><strong>sender</strong></dt><dd><p>ID of (human)agent from which sent the message</p>
+</dd>
+<dt><strong>receiver</strong></dt><dd><p>ID(s) (human)agents which will receive the message. Multiple options available:
+ID or list of agent IDs (JS/Python) =   send to specific agent(s)
+null (JS)       = None (Python)     =   send to all agents
+teamname (JS / Python)              =   send to everyone in the team</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.send_userinput">
+<code class="sig-name descname">send_userinput</code><span class="sig-paren">(</span><em class="sig-param">agent_ids</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.send_userinput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Can be used to send user input from the user (pressed keys) to the specified human agent(s) in MATRXS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>agent_ids</strong></dt><dd><p>ID(s) of the human agent(s) to which the data should be passed.</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd><p>returns True if the data was valid (right now always)</p>
+</dd>
+<dt><strong>——-</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.shutdown">
+<code class="sig-name descname">shutdown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shuts down the API by stopping the Flask thread</p>
+<dl class="simple">
+<dt>Returns</dt><dd><p>True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.start_MATRXS">
+<code class="sig-name descname">start_MATRXS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.start_MATRXS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts / unpauses the MATRXS simulation</p>
+<dl class="simple">
+<dt>Returns</dt><dd><p>True if it has been started, False if it is already running</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.api.stop_MATRXS">
+<code class="sig-name descname">stop_MATRXS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.api.stop_MATRXS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops MATRXS scenario</p>
+<dl class="simple">
+<dt>Returns</dt><dd><p>True</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-matrxs.API.logMatrx">
+<span id="matrxs-api-logmatrx-module"></span><h2>matrxs.API.logMatrx module<a class="headerlink" href="#module-matrxs.API.logMatrx" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="matrxs.API.logMatrx.log_object_complete">
+<code class="sig-name descname">log_object_complete</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">depth=0</em>, <em class="sig-param">logFile='generalStructureLog'</em>, <em class="sig-param">msgType=200</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.logMatrx.log_object_complete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.logMatrx.log_object_custom">
+<code class="sig-name descname">log_object_custom</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">path=[]</em>, <em class="sig-param">log_customData={}</em>, <em class="sig-param">logLevel=210</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.logMatrx.log_object_custom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.logMatrx.pickleObj">
+<code class="sig-name descname">pickleObj</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.logMatrx.pickleObj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="matrxs.API.logMatrx.setup_logger">
+<code class="sig-name descname">setup_logger</code><span class="sig-paren">(</span><em class="sig-param">logger_name</em>, <em class="sig-param">log_file</em>, <em class="sig-param">level=20</em>, <em class="sig-param">dataFormat=&lt;logging.Formatter object at 0x0000018474466488&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.API.logMatrx.setup_logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-matrxs.API">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-matrxs.API" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, The MATRXS Team at TNO.nl
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #303030;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+      background: #578a64;
+    }
+  </style>
+
+
+</body>
+</html>

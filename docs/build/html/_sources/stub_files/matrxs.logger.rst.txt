@@ -1,0 +1,46 @@
+matrxs.logger package
+=====================
+
+Submodules
+----------
+
+matrxs.logger.log\_agent\_actions module
+----------------------------------------
+
+.. automodule:: matrxs.logger.log_agent_actions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+matrxs.logger.log\_idle\_agents module
+--------------------------------------
+
+.. automodule:: matrxs.logger.log_idle_agents
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+matrxs.logger.log\_tick module
+------------------------------
+
+.. automodule:: matrxs.logger.log_tick
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+matrxs.logger.logger module
+---------------------------
+
+.. automodule:: matrxs.logger.logger
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: matrxs.logger
+   :members:
+   :undoc-members:
+   :show-inheritance:

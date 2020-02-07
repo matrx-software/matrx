@@ -58,6 +58,7 @@ extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.todo',
+    'recommonmark'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -73,18 +74,19 @@ exclude_patterns = []
 add_module_names = False
 
 # Auto generate the TOC elements for when using this autodoc flag (e.g. 'members')
-autodoc_default_options = {
-    'members': None,
-    'member-order': 'bysource',
-    'special-members': '__init__',
-    'undoc-members': None
-}
+# autodoc_default_options = {
+#     'members': True,
+#     'member-order': 'bysource',
+#     'special-members': '__init__',
+#     'undoc-members': True
+# }
 
 master_doc = 'index'
 
 autodoc_member_order = 'bysource'
 
 autosummary_generate = True
+autosummary_imported_members = True
 
 html_theme_options = {
     'prev_next_buttons_location': 'bottom',
@@ -94,7 +96,8 @@ html_theme_options = {
     'titles_only': True,
 }
 
-html_logo = 'matrxslogo.png'
+html_logo = '_static/images/matrx_logo.svg'
+
 # -- Options for HTML output -------------------------------------------------
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -108,11 +111,10 @@ highlight_language = 'python3'
 html_theme = 'sphinx_rtd_theme'
 # html_theme = 'sphinx_modern_theme'
 
+html_static_path = ['_static']
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['../build/_static']
-
 def setup(app):
     app.add_stylesheet("css/theme_overrides.css")

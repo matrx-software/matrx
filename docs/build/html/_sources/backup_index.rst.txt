@@ -1,0 +1,107 @@
+
+
+Sections
+========
+.. The image ratio is: width: 350px; height: 350/4 + (2x5) ~= 98px
+.. toctree::
+   :maxdepth: 2
+   :caption: Sections
+   :hidden:
+
+   sections/worlds.rst
+   sections/actions.rst
+   sections/brains.rst
+   sections/objects.rst
+   sections/simgoals.rst
+   sections/utils.rst
+..   sections/visuals.rst
+
+
+.. .. only:: builder_html and (not singlehtml)
+
+.. container:: tocdescr
+
+  .. container:: descr
+
+     .. figure:: /_static/images/worlds_banner.jpg
+        :target: sections/worlds.html
+
+     :ref:`Worlds`
+        Learn MATRXS' way of creating worlds.
+
+  .. container:: descr
+
+     .. figure:: /_static/images/brains_banner.jpg
+        :target: sections/brains.html
+
+     :ref:`Brains`
+       Check this section for a piece of the agents' minds.
+
+  .. container:: descr
+
+     .. figure:: /_static/images/shape_banner.jpg
+        :target: sections/objects.html
+
+     :ref:`Object placement`
+        Make the world more worldlike by placing objects in it.
+
+  .. container:: descr
+
+     .. figure:: /_static/images/action_banner.jpg
+        :target: sections/actions.html
+
+     :ref:`Actions`
+        Agents can perform actions.
+
+  .. container:: descr
+
+     .. figure:: /_static/images/goal_banner.jpg
+        :target: sections/simgoals.html
+
+     :ref:`Simulation goals`
+        A certain goal is set for the simulation to end.
+
+  .. container:: descr
+
+     .. figure:: /_static/images/utils_banner.jpg
+        :target: sections/utils.html
+
+     :ref:`Utils`
+        Useful functions.
+
+..      .. container:: descr
+
+..         .. figure:: /_static/images/server.jpg
+            :target: sections/visuals.html
+           :ref:`Visualization`
+            Visualization by using a Flask server.
+
+
+
+Other
+===============
+
+:ref:`genindex`
+Glossary
+Development
+Roadmap
+When to use
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,45 @@
+matrxs.agents package
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   matrxs.agents.capabilities
+
+Submodules
+----------
+
+matrxs.agents.agent\_brain module
+---------------------------------
+
+.. automodule:: matrxs.agents.agent_brain
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+matrxs.agents.human\_agent\_brain module
+----------------------------------------
+
+.. automodule:: matrxs.agents.human_agent_brain
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+matrxs.agents.patrolling\_agent module
+--------------------------------------
+
+.. automodule:: matrxs.agents.patrolling_agent
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: matrxs.agents
+   :members:
+   :undoc-members:
+   :show-inheritance:

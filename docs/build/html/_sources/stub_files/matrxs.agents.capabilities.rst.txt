@@ -1,0 +1,22 @@
+matrxs.agents.capabilities package
+==================================
+
+Submodules
+----------
+
+matrxs.agents.capabilities.capability module
+--------------------------------------------
+
+.. automodule:: matrxs.agents.capabilities.capability
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: matrxs.agents.capabilities
+   :members:
+   :undoc-members:
+   :show-inheritance:

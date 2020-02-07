@@ -1,0 +1,44 @@
+matrxs package
+==============
+
+Subpackages
+-----------
+
+.. toctree::
+
+   matrxs.API
+   matrxs.actions
+   matrxs.agents
+   matrxs.logger
+   matrxs.objects
+   matrxs.scenarios
+   matrxs.sim_goals
+   matrxs.utils
+
+Submodules
+----------
+
+matrxs.grid\_world module
+-------------------------
+
+.. automodule:: matrxs.grid_world
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+matrxs.world\_builder module
+----------------------------
+
+.. automodule:: matrxs.world_builder
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: matrxs
+   :members:
+   :undoc-members:
+   :show-inheritance:
