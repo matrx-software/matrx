@@ -111,7 +111,7 @@ highlight_language = 'python3'
 html_theme = 'sphinx_rtd_theme'
 # html_theme = 'sphinx_modern_theme'
 
-html_static_path = ['_static']
+html_static_path = ['../build/_static']
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
