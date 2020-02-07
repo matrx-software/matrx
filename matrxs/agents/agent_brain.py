@@ -500,7 +500,7 @@ class AgentBrain:
         """
 
         # We empty all received messages as this is from the previous tick
-        self.received_messages = []
+        # self.received_messages = []
 
         # Loop through all messages and create a Message object out of the dictionaries.
         for mssg in messages:
