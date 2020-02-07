@@ -1,0 +1,18 @@
+:mod:`matrxs.logger.log_agent_actions`
+======================================
+
+.. py:module:: matrxs.logger.log_agent_actions
+
+
+Module Contents
+---------------
+
+.. py:class:: LogActions(save_path='', file_name_prefix='', file_extension='.csv', delimeter=';')
+
+   Bases: :class:`matrxs.logger.logger.GridWorldLogger`
+
+   .. method:: log(self, grid_world: GridWorld, agent_data: dict)
+
+
+
+

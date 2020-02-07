@@ -1,0 +1,101 @@
+:mod:`matrxs.actions.move_actions`
+==================================
+
+.. py:module:: matrxs.actions.move_actions
+
+
+Module Contents
+---------------
+
+.. function:: act_move(grid_world, agent_id, dx, dy)
+
+
+.. function:: is_possible_movement(grid_world, agent_id, dx, dy)
+
+
+.. function:: possible_movement(grid_world, agent_id, dx, dy)
+
+
+.. py:class:: MoveActionResult(result, succeeded)
+
+   Bases: :class:`matrxs.actions.action.ActionResult`
+
+   .. attribute:: RESULT_NO_MOVE
+      :annotation: = Move action resulted in a new location with the agent already present.
+
+      
+
+   .. attribute:: RESULT_SUCCESS
+      :annotation: = Move action success
+
+      
+
+   .. attribute:: RESULT_OUT_OF_BOUNDS
+      :annotation: = Move action out of bounds
+
+      
+
+   .. attribute:: RESULT_OCCUPIED
+      :annotation: = Move action towards occupied space
+
+      
+
+   .. attribute:: RESULT_NOT_PASSABLE_OBJECT
+      :annotation: = Move action toward space which is not traversable by agent due object
+
+      
+
+
+.. py:class:: Move(duration_in_ticks=1)
+
+   Bases: :class:`matrxs.actions.action.Action`
+
+   .. method:: is_possible(self, grid_world, agent_id, **kwargs)
+
+
+
+   .. method:: mutate(self, grid_world, agent_id, **kwargs)
+
+
+
+
+.. py:class:: MoveNorth
+
+   Bases: :class:`matrxs.actions.move_actions.Move`
+
+
+.. py:class:: MoveNorthEast
+
+   Bases: :class:`matrxs.actions.move_actions.Move`
+
+
+.. py:class:: MoveEast
+
+   Bases: :class:`matrxs.actions.move_actions.Move`
+
+
+.. py:class:: MoveSouthEast
+
+   Bases: :class:`matrxs.actions.move_actions.Move`
+
+
+.. py:class:: MoveSouth
+
+   Bases: :class:`matrxs.actions.move_actions.Move`
+
+
+.. py:class:: MoveSouthWest
+
+   Bases: :class:`matrxs.actions.move_actions.Move`
+
+
+.. py:class:: MoveWest
+
+   Bases: :class:`matrxs.actions.move_actions.Move`
+
+
+.. py:class:: MoveNorthWest
+
+   Bases: :class:`matrxs.actions.move_actions.Move`
+
+

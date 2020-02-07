@@ -23,6 +23,12 @@ matrxs.utils.utils
 
    
    
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      SenseCapability
+   
    
 
    

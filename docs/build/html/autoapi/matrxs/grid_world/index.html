@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>matrxs.grid_world &mdash; MATRXS 0.0.1 Manual 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> MATRXS 0.0.1 Manual
+          
+
+          
+            
+            <img src="../../../_static/matrx_logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../general_info/aboutmatrxs.html">About MATRXS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation/installing.html">Installation and first run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference_by_category.html">Reference by category</a></li>
+</ul>
+<p class="caption"><span class="caption-text">General Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../general_info/when_to_use.html">When to use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../general_info/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../general_info/roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../general_info/faq.html">F.A.Q.</a></li>
+</ul>
+<p class="caption"><span class="caption-text">For Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_info/how_to_contribute.html">How to contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_info/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference by Category</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../sections/worlds.html">Worlds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sections/actions.html">Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sections/agents.html">Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sections/objects.html">Object placement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sections/simgoals.html">Simulation goals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sections/scenarios.html">Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sections/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MATRXS 0.0.1 Manual</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">matrxs.grid_world</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/autoapi/matrxs/grid_world/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-matrxs.grid_world">
+<span id="matrxs-grid-world"></span><h1><a class="reference internal" href="#module-matrxs.grid_world" title="matrxs.grid_world"><code class="xref py py-mod docutils literal notranslate"><span class="pre">matrxs.grid_world</span></code></a><a class="headerlink" href="#module-matrxs.grid_world" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="matrxs.grid_world.GridWorld">
+<em class="property">class </em><code class="sig-name descname">GridWorld</code><span class="sig-paren">(</span><em class="sig-param">shape</em>, <em class="sig-param">tick_duration</em>, <em class="sig-param">simulation_goal</em>, <em class="sig-param">rnd_seed=1</em>, <em class="sig-param">visualization_bg_clr='#C2C2C2'</em>, <em class="sig-param">visualization_bg_img=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">world_ID=False</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="matrxs.grid_world.GridWorld.initialize">
+<code class="sig-name descname">initialize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">api_info</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.initialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">api_info</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.get_env_object">
+<code class="sig-name descname">get_env_object</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">requested_id</em>, <em class="sig-param">obj_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.get_env_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.get_objects_in_range">
+<code class="sig-name descname">get_objects_in_range</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">agent_loc</em>, <em class="sig-param">object_type</em>, <em class="sig-param">sense_range</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.get_objects_in_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all objects of a obj type (normal objects or agent) within a
+certain range around the agent’s location</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.remove_from_grid">
+<code class="sig-name descname">remove_from_grid</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">object_id</em>, <em class="sig-param">remove_from_carrier=True</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.remove_from_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove an object from the grid
+:param object_id: ID of the object to remove
+:param remove_from_carrier: whether to also remove from agents which carry the
+object or not.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.add_to_grid">
+<code class="sig-name descname">add_to_grid</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.add_to_grid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld._register_agent">
+<code class="sig-name descname">_register_agent</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">agent</em>, <em class="sig-param">agent_avatar: AgentBody</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld._register_agent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register human agents and agents to the gridworld environment</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld._register_env_object">
+<code class="sig-name descname">_register_env_object</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">env_object: EnvObject</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld._register_env_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>this function adds the objects</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld._register_logger">
+<code class="sig-name descname">_register_logger</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">logger: GridWorldLogger</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld._register_logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__validate_obj_placement">
+<code class="sig-name descname">__validate_obj_placement</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">env_object</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__validate_obj_placement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether an object can be successfully placed on the grid</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__step">
+<code class="sig-name descname">__step</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__check_simulation_goal">
+<code class="sig-name descname">__check_simulation_goal</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__check_simulation_goal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__sleep">
+<code class="sig-name descname">__sleep</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__sleep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sleeps the current python process for the amount of time that is left after self.curr_tick_duration up to
+in self.__tick_duration
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__update_grid">
+<code class="sig-name descname">__update_grid</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__update_grid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__get_complete_state">
+<code class="sig-name descname">__get_complete_state</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__get_complete_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compile all objects and agents on the grid in one state dictionary
+:return: state with all objects and agents on the grid</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__get_agent_state">
+<code class="sig-name descname">__get_agent_state</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">agent_obj: AgentBody</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__get_agent_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__check_action_is_possible">
+<code class="sig-name descname">__check_action_is_possible</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">action_name</em>, <em class="sig-param">action_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__check_action_is_possible" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__perform_action">
+<code class="sig-name descname">__perform_action</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">action_name</em>, <em class="sig-param">action_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__perform_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__set_agent_busy">
+<code class="sig-name descname">__set_agent_busy</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">action_name</em>, <em class="sig-param">action_kwargs</em>, <em class="sig-param">agent_id</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__set_agent_busy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__update_agent_location">
+<code class="sig-name descname">__update_agent_location</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">agent_id</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__update_agent_location" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__update_obj_location">
+<code class="sig-name descname">__update_obj_location</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">obj_id</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__update_obj_location" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.__warn">
+<code class="sig-name descname">__warn</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">warn_str</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.__warn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.messages_send_previous_tick">
+<em class="property">property </em><code class="sig-name descname">messages_send_previous_tick</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.messages_send_previous_tick" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.registered_agents">
+<em class="property">property </em><code class="sig-name descname">registered_agents</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.registered_agents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.environment_objects">
+<em class="property">property </em><code class="sig-name descname">environment_objects</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.environment_objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.is_done">
+<em class="property">property </em><code class="sig-name descname">is_done</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.is_done" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.current_nr_ticks">
+<em class="property">property </em><code class="sig-name descname">current_nr_ticks</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.current_nr_ticks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.grid">
+<em class="property">property </em><code class="sig-name descname">grid</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.grid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.shape">
+<em class="property">property </em><code class="sig-name descname">shape</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.simulation_goal">
+<em class="property">property </em><code class="sig-name descname">simulation_goal</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.simulation_goal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.grid_world.GridWorld.tick_duration">
+<em class="property">property </em><code class="sig-name descname">tick_duration</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.grid_world.GridWorld.tick_duration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The MATRXS Team at TNO.nl
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #303030;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+      background: #578a64;
+    }
+  </style>
+
+
+</body>
+</html>

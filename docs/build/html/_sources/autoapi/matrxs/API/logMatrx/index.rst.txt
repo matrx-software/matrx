@@ -1,0 +1,52 @@
+:mod:`matrxs.API.logMatrx`
+==========================
+
+.. py:module:: matrxs.API.logMatrx
+
+
+Module Contents
+---------------
+
+.. data:: DataFormats
+   
+
+   
+
+.. data:: LogFiles
+   
+
+   
+
+.. data:: LogLevels
+   
+
+   
+
+.. data:: DataFormat4Log
+   
+
+   
+
+.. data:: LogLevel4Log
+   
+
+   
+
+.. function:: setup_logger(logger_name, log_file, level=logging.INFO, dataFormat=DataFormats['message'])
+
+
+.. function:: pickleObj(obj)
+
+
+.. function:: log_object_complete(obj, depth=0, logFile='generalStructureLog', msgType=200)
+
+
+.. function:: log_object_custom(obj, path=[], log_customData={}, logLevel=LogLevels['runTimeData'])
+
+
+.. function:: __log_object_complete(d, depth=0, logFile='generalStructureLog', msgType=LogLevels['generalStructure'])
+
+
+.. function:: __log_object_custom(d, path=[], log_customData={}, msgType=LogLevels['runTimeData'], logFile='runtimeDataLog')
+
+

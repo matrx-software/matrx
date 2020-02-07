@@ -1,0 +1,151 @@
+:mod:`matrxs.utils.agent_utils.navigator`
+=========================================
+
+.. py:module:: matrxs.utils.agent_utils.navigator
+
+
+Module Contents
+---------------
+
+.. py:class:: Navigator(agent_id, action_set, algorithm=A_STAR_ALGORITHM, is_circular=False)
+
+   .. attribute:: A_STAR_ALGORITHM
+      :annotation: = a_star
+
+      
+
+   .. method:: add_waypoint(self, waypoint)
+
+
+
+   .. method:: add_waypoints(self, waypoints, is_circular=False)
+
+
+
+   .. method:: get_all_waypoints(self)
+
+
+
+   .. method:: get_upcoming_waypoints(self)
+
+
+
+   .. method:: get_current_waypoint(self)
+
+
+
+   .. method:: get_move_action(self, state_tracker: StateTracker)
+
+
+
+   .. method:: reset(self)
+
+
+
+   .. method:: reset_full(self)
+
+
+
+   .. method:: __get_current_waypoint(self)
+
+
+
+   .. method:: __initialize_path_planner(self, algorithm, action_set)
+
+
+
+   .. method:: __update_waypoints(self, agent_loc)
+
+
+
+   .. method:: __get_route(self, state_tracker: StateTracker)
+
+
+
+   .. method:: __get_route_from_path(self, agent_loc, path)
+
+
+
+
+.. py:class:: PathPlanner(action_set)
+
+   .. method:: plan(self, start, goal, occupation_map)
+
+
+
+
+.. py:class:: AStarPlanner(action_set, metric=EUCLIDEAN_METRIC)
+
+   Bases: :class:`matrxs.utils.agent_utils.navigator.PathPlanner`
+
+   A* algorithm for path planning.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. attribute:: EUCLIDEAN_METRIC
+      :annotation: = euclidean
+
+      
+
+   .. attribute:: MANHATTAN_METRIC
+      :annotation: = manhattan
+
+      
+
+   .. method:: plan(self, start, goal, occupation_map)
+
+
+      A star algorithm, returns the shortest path to get from goal to start.
+      Uses an 2D numpy array, with 0 being traversable, anything else (e.g. 1) not traversable
+      Implementation from: https://www.analytics-link.com/single-post/2018/09/14/Applying-the-A-Path-Finding-Algorithm-in-Python-Part-1-2D-square-grid
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+
+.. py:class:: Waypoint(loc, priority)
+
+   .. method:: is_visited(self, current_loc=None)
+
+
+
+   .. method:: reset(self)
+
+
+
+
+.. function:: get_move_actions(action_set)
+
+

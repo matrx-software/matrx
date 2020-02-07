@@ -1,0 +1,24 @@
+:mod:`matrxs.utils`
+===================
+
+.. py:module:: matrxs.utils
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   agent_utils/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   utils/index.rst
+
+

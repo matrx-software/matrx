@@ -1,0 +1,16 @@
+:mod:`matrxs.scenarios`
+=======================
+
+.. py:module:: matrxs.scenarios
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   simple_scenario/index.rst
+   test_scenario/index.rst
+
+

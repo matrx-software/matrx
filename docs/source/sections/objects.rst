@@ -1,4 +1,4 @@
-.. _Object placement
+.. _Object placement:
 
 ================
 Object placement
@@ -13,4 +13,3 @@ The world of MATRXS can contain a various amount of objects. Below such object c
     matrxs.objects.agent_body.AgentBody
     matrxs.objects.simple_objects
     matrxs.objects.advanced_objects
-

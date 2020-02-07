@@ -15,6 +15,7 @@ matrxs.objects.simple\_objects
    
       AreaTile
       Door
+      EnvObject
       SmokeTile
       SquareBlock
       Wall

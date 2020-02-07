@@ -89,6 +89,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../general_info/aboutmatrxs.html">About MATRXS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation/installing.html">Installation and first run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../reference_by_category.html">Reference by category</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../worlds.html">Worlds</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../actions.html">Actions</a><ul class="current">
@@ -132,6 +133,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../simgoals.html">Simulation goals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../scenarios.html">Scenarios</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
 
             
@@ -209,7 +211,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../_generated_autodoc/matrxs.actions.door_actions.is_possible_door_open_close.html#matrxs.actions.door_actions.is_possible_door_open_close" title="matrxs.actions.door_actions.is_possible_door_open_close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_possible_door_open_close</span></code></a>(grid_world, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/actions/door_actions/index.html#matrxs.actions.door_actions.is_possible_door_open_close" title="matrxs.actions.door_actions.is_possible_door_open_close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_possible_door_open_close</span></code></a>(grid_world, …)</p></td>
 <td><p>Same as is_possible, but this function uses the action_kwargs to get a more accurate prediction.</p></td>
 </tr>
 </tbody>
@@ -221,16 +223,30 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="matrxs.actions.door_actions.CloseDoorAction.html#matrxs.actions.door_actions.CloseDoorAction" title="matrxs.actions.door_actions.CloseDoorAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CloseDoorAction</span></code></a>([duration_in_ticks])</p></td>
-<td><p>Action to open a Door</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Action</span></code>([duration_in_ticks])</p></td>
+<td><p><p class="rubric">Methods</p>
+</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="matrxs.actions.door_actions.CloseDoorActionResult.html#matrxs.actions.door_actions.CloseDoorActionResult" title="matrxs.actions.door_actions.CloseDoorActionResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CloseDoorActionResult</span></code></a>(result, succeeded)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActionResult</span></code>(result, succeeded)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="matrxs.actions.door_actions.OpenDoorAction.html#matrxs.actions.door_actions.OpenDoorAction" title="matrxs.actions.door_actions.OpenDoorAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenDoorAction</span></code></a>([duration_in_ticks])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/actions/door_actions/index.html#matrxs.actions.door_actions.CloseDoorAction" title="matrxs.actions.door_actions.CloseDoorAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CloseDoorAction</span></code></a>([duration_in_ticks])</p></td>
 <td><p>Action to open a Door</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="matrxs.actions.door_actions.OpenDoorActionResult.html#matrxs.actions.door_actions.OpenDoorActionResult" title="matrxs.actions.door_actions.OpenDoorActionResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenDoorActionResult</span></code></a>(result, succeeded)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/actions/door_actions/index.html#matrxs.actions.door_actions.CloseDoorActionResult" title="matrxs.actions.door_actions.CloseDoorActionResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CloseDoorActionResult</span></code></a>(result, succeeded)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Door</span></code>(location, is_open[, name, open_colour, …])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/actions/door_actions/index.html#matrxs.actions.door_actions.OpenDoorAction" title="matrxs.actions.door_actions.OpenDoorAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenDoorAction</span></code></a>([duration_in_ticks])</p></td>
+<td><p>Action to open a Door</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/actions/door_actions/index.html#matrxs.actions.door_actions.OpenDoorActionResult" title="matrxs.actions.door_actions.OpenDoorActionResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenDoorActionResult</span></code></a>(result, succeeded)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>

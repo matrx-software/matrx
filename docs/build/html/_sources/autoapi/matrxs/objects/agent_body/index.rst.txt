@@ -1,0 +1,269 @@
+:mod:`matrxs.objects.agent_body`
+================================
+
+.. py:module:: matrxs.objects.agent_body
+
+
+Module Contents
+---------------
+
+.. py:class:: AgentBody(location, possible_actions, sense_capability, class_callable, callback_agent_get_action, callback_agent_set_action_result, callback_agent_observe, callback_agent_get_messages, callback_agent_set_messages, callback_agent_initialize, callback_agent_log, visualize_size, visualize_shape, visualize_colour, visualize_depth, visualize_opacity, is_traversable, team, name, is_movable, is_human_agent, customizable_properties, **custom_properties)
+
+   Bases: :class:`matrxs.objects.env_object.EnvObject`
+
+   .. method:: _set_agent_busy(self, curr_tick, action_duration)
+
+
+      specify the duration of the action in ticks currently being executed by the
+      agent, and its starting tick
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: _check_agent_busy(self, curr_tick)
+
+
+      check if the agent is done with executing the action
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: _at_last_action_duration_tick(self, curr_tick)
+
+
+      Returns True if this agent is at its last tick of the action's duration.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: _get_duration_action(self)
+
+
+      Returns the action we are waiting for 'self.current_action_duration_in_ticks', gets called in the GridWorld
+      when we are at the last tick on which we should wait (see self._at_last_action_duration_tick).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: _set_current_action(self, action_name, action_args)
+
+
+      Sets the current action of the agent. Since the GridWorld performs the mutate of an action first, and then waits
+      for the duration to pass, we also have the result available.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: _set_agent_changed_properties(self, props: dict)
+
+
+      The Agent has possibly changed some of its properties during its OODA loop. Here the agent properties are also
+      updated in the Agent's body, if it is allowed to change them as defined in 'customizable_properties' list.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: change_property(self, property_name, property_value)
+
+
+      Changes the value of an existing (!) property.
+      :param property_name: The name of the property.
+      :param property_value:  The value of the property.
+      :return: The new properties.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: location(self)
+      :property:
+
+
+      We override the location pythonic property here so we can override its setter.
+      :return: The location tuple of the form; (x, y).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: properties(self)
+      :property:
+
+
+      Returns the custom properties of this object, but also any mandatory properties such as location, name,
+      is_traversable and all visualization properties (those are in their own dictionary under 'visualization').
+
+      In the case we return the properties of a class that inherits from EnvObject, we check if that class has
+
+      :return: All mandatory and custom properties in a dictionary.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: current_action(self)
+      :property:
+
+
+
+   .. method:: current_action_duration_in_ticks(self)
+      :property:
+
+
+
+   .. method:: current_action_tick_started(self)
+      :property:
+
+
+
+   .. method:: current_action_args(self)
+      :property:
+
+
+
+   .. method:: is_blocked(self)
+      :property:
+
+
+
+

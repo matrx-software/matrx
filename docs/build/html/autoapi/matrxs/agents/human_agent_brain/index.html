@@ -1,0 +1,357 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>matrxs.agents.human_agent_brain &mdash; MATRXS 0.0.1 Manual 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> MATRXS 0.0.1 Manual
+          
+
+          
+            
+            <img src="../../../../_static/matrx_logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/aboutmatrxs.html">About MATRXS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation/installing.html">Installation and first run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../reference_by_category.html">Reference by category</a></li>
+</ul>
+<p class="caption"><span class="caption-text">General Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/when_to_use.html">When to use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/faq.html">F.A.Q.</a></li>
+</ul>
+<p class="caption"><span class="caption-text">For Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_info/how_to_contribute.html">How to contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_info/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference by Category</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/worlds.html">Worlds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/actions.html">Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/agents.html">Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/objects.html">Object placement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/simgoals.html">Simulation goals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/scenarios.html">Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">MATRXS 0.0.1 Manual</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">matrxs.agents.human_agent_brain</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../../_sources/autoapi/matrxs/agents/human_agent_brain/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-matrxs.agents.human_agent_brain">
+<span id="matrxs-agents-human-agent-brain"></span><h1><a class="reference internal" href="#module-matrxs.agents.human_agent_brain" title="matrxs.agents.human_agent_brain"><code class="xref py py-mod docutils literal notranslate"><span class="pre">matrxs.agents.human_agent_brain</span></code></a><a class="headerlink" href="#module-matrxs.agents.human_agent_brain" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="matrxs.agents.human_agent_brain.HumanAgentBrain">
+<em class="property">class </em><code class="sig-name descname">HumanAgentBrain</code><a class="headerlink" href="#matrxs.agents.human_agent_brain.HumanAgentBrain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../../../sections/_generated_autodoc/matrxs.agents.agent_brain.AgentBrain.html#matrxs.agents.agent_brain.AgentBrain" title="matrxs.agents.agent_brain.AgentBrain"><code class="xref py py-class docutils literal notranslate"><span class="pre">matrxs.agents.agent_brain.AgentBrain</span></code></a></p>
+<dl class="method">
+<dt id="matrxs.agents.human_agent_brain.HumanAgentBrain._factory_initialise">
+<code class="sig-name descname">_factory_initialise</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">agent_name</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">action_set</em>, <em class="sig-param">sense_capability</em>, <em class="sig-param">agent_properties</em>, <em class="sig-param">customizable_properties</em>, <em class="sig-param">rnd_seed</em>, <em class="sig-param">callback_is_action_possible</em>, <em class="sig-param">key_action_map=None</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.human_agent_brain.HumanAgentBrain._factory_initialise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
+properties. This also sets the random number generator with a seed generated based on the random seed of the
+world that is generated.</p>
+<p>Note; This method should NOT be overridden!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>agent_name</strong> – The name of the agent.</p></li>
+<li><p><strong>agent_id</strong> – The unique ID given by the world to this agent’s avatar. So the agent knows what body is his.</p></li>
+<li><p><strong>action_set</strong> – The list of action names this agent is allowed to perform.</p></li>
+<li><p><strong>sense_capability</strong> – The SenseCapability of the agent denoting what it can see withing what range.</p></li>
+<li><p><strong>agent_properties</strong> – The dictionary of properties containing all mandatory and custom properties.</p></li>
+<li><p><strong>customizable_properties</strong> – A list of keys in agent_properties that this agent is allowed to change.</p></li>
+<li><p><strong>rnd_seed</strong> – The random seed used to set the random number generator self.rng</p></li>
+<li><p><strong>key_action_map</strong> – maps user pressed keys (e.g. arrow key up) to a specific action</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.agents.human_agent_brain.HumanAgentBrain._get_action">
+<code class="sig-name descname">_get_action</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">state</em>, <em class="sig-param">agent_properties</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">userinput</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.human_agent_brain.HumanAgentBrain._get_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>The function the environment calls. The environment receives this function object and calls it when it is time
+for this agent to select an action.</p>
+<p>The function overwrites the default get_action() function for normal agents,
+and instead executes the action commanded by the user, which is received
+via the API from e.g. a visualization interface.</p>
+<p>Note; This method should NOT be overridden!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state</strong> – A state description containing all properties of EnvObject that are detectable by this agent,</p>
+</dd>
+</dl>
+<p>i.e. within the detectable range as defined by self.sense_capability. It is a list of properties in a dictionary
+:param agent_properties: The properties of the agent, which might have been changed by the
+environment as a result of actions of this or other agents.
+:param agent_id: the ID of this agent
+:param userinput: any userinput given by the user for this human agent via the API
+:return: The filtered state of this agent, the agent properties which the agent might have changed,
+and an action string, which is the class name of one of the actions in the Action package.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.agents.human_agent_brain.HumanAgentBrain.decide_on_action">
+<code class="sig-name descname">decide_on_action</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">state</em>, <em class="sig-param">usrinput</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.human_agent_brain.HumanAgentBrain.decide_on_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains the decision logic of the agent.</p>
+<p>This method determines what action the human agent will perform. The GridWorld is responsible for deciding when
+an agent can perform an action again, if so this method is called for each agent. Two things need to be
+determined, which action and with what arguments.</p>
+<p>The action is returned simply as the class name (as a string), and the action arguments as a dictionary with the
+keys the names of the keyword arguments. An argument that is always possible is that of action_duration, which
+denotes how many ticks this action should take (e.g. a duration of 1, makes sure the agent has to wait 1 tick).</p>
+<p>To quickly build a fairly intelligent (human) agent, several utility classes and methods are available.
+See &lt;TODO&gt;.</p>
+<p>Note; this function of the human_agent_brain overwrites the decide_on_action() function of the default agent,
+also providing the usrinput.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>state</strong><span class="classifier">dict</span></dt><dd><p>A state description containing all properties of EnvObject that are within a certain range as
+defined by self.sense_capability. It is a list of properties in a dictionary</p>
+</dd>
+<dt><strong>usrinput: list</strong></dt><dd><p>A dictionary containing the key presses of the user, intended for controlling thus human agent.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>action_name</strong><span class="classifier">str</span></dt><dd><p>A string of the class name of an action that is also in self.action_set. To ensure backwards compatibility
+you could use Action.__name__ where Action is the intended action.</p>
+</dd>
+<dt><strong>action_args</strong><span class="classifier">dict</span></dt><dd><p>A dictionary with keys any action arguments and as values the actual argument values. If a required argument
+is missing an exception is raised, if an argument that is not used by that action a warning is printed. The
+argument applicable to all action is <cite>action_duration</cite>, which sets the number ticks the agent is put on hold
+by the GridWorld until the action’s world mutation is actual performed and the agent can perform a new
+action (a value of 0 is no wait, 1 means to wait 1 tick, etc.).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.agents.human_agent_brain.HumanAgentBrain.filter_observations">
+<code class="sig-name descname">filter_observations</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">state</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.human_agent_brain.HumanAgentBrain.filter_observations" title="Permalink to this definition">¶</a></dt>
+<dd><p>All our agent work through the OODA-loop paradigm; first you observe, then you orient/pre-process, followed by
+a decision process of an action after which we act upon the action.</p>
+<p>However, as a human agent is controlled by a human, only the observe part is executed.</p>
+<p>This is the Observe phase. In this phase you filter the state further to only those properties the agent is
+actually SUPPOSED to see. Since the grid world returns ALL properties of ALL objects within a certain range(s),
+but perhaps some objects are obscured because they are behind walls, or an agent is not able to see some
+properties an certain objects.</p>
+<p>This filtering is what you do here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state</strong> – A state description containing all properties of EnvObject that are within a certain range as</p>
+</dd>
+</dl>
+<p>defined by self.sense_capability. It is a list of properties in a dictionary
+:return: A filtered state.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.agents.human_agent_brain.HumanAgentBrain.filter_userinput">
+<code class="sig-name descname">filter_userinput</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">userinput</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.agents.human_agent_brain.HumanAgentBrain.filter_userinput" title="Permalink to this definition">¶</a></dt>
+<dd><p>From the received userinput, only keep those which are actually Connected
+to a specific agent action</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The MATRXS Team at TNO.nl
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #303030;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+      background: #578a64;
+    }
+  </style>
+
+
+</body>
+</html>

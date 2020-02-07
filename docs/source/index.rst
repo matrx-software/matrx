@@ -30,7 +30,7 @@ Getting started
       general_info/aboutmatrxs.rst
       installation/installing.rst
       tutorials/tutorials.rst
-      examples.rst
+      tutorials/examples.rst
       reference_by_category.rst
 
 

@@ -1,0 +1,20 @@
+API Reference
+=============
+
+This page contains auto-generated API reference documentation [#f1]_.
+
+.. toctree::
+   :titlesonly:
+
+   /autoapi/setup/index
+   /autoapi/main/index
+   /autoapi/conf/index
+   /autoapi/visualization_server/index
+   /autoapi/create_agent/index
+   /autoapi/create_human_agent/index
+   /autoapi/create_object/index
+   /autoapi/create_simulation_goal/index
+   /autoapi/create_world_factory/index
+   /autoapi/matrxs/index
+
+.. [#f1] Created with `sphinx-autoapi <https://github.com/rtfd/sphinx-autoapi>`_

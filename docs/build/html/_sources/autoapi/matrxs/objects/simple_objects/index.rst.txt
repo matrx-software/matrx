@@ -1,0 +1,82 @@
+:mod:`matrxs.objects.simple_objects`
+====================================
+
+.. py:module:: matrxs.objects.simple_objects
+
+
+Module Contents
+---------------
+
+.. py:class:: SquareBlock(location, name='Block')
+
+   Bases: :class:`matrxs.objects.env_object.EnvObject`
+
+
+.. py:class:: Door(location, is_open, name='Door', open_colour='#006400', closed_colour='#640000')
+
+   Bases: :class:`matrxs.objects.env_object.EnvObject`
+
+   .. method:: open_door(self)
+
+
+      Opens the door, changes the colour and sets the properties as such.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. method:: close_door(self)
+
+
+      Closes the door, changes the colour and sets the properties as such.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+
+.. py:class:: Wall(location, name='Wall', visualize_colour='#000000')
+
+   Bases: :class:`matrxs.objects.env_object.EnvObject`
+
+
+.. py:class:: AreaTile(location, name='AreaTile', visualize_colour='#8ca58c', visualize_depth=None, visualize_opacity=1.0)
+
+   Bases: :class:`matrxs.objects.env_object.EnvObject`
+
+
+.. py:class:: SmokeTile(location, name='SmokeTile', visualize_colour='#b7b7b7', visualize_opacity=0.8, visualize_depth=101)
+
+   Bases: :class:`matrxs.objects.simple_objects.AreaTile`
+
+

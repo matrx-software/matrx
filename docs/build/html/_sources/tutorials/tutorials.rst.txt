@@ -1,4 +1,4 @@
-.. _Tutorials
+.. _Tutorials:
 
 =========
 Tutorials
@@ -10,26 +10,30 @@ might be where you want to start.
 The basics
 ----------------
 
-.. toctree::
-   :maxdepth: 1
-   :caption: The Basics
+.. container:: hidden_caption
 
-   create_world.rst
-   adding_objects.rst
-   agent_implementation.rst
+    .. toctree::
+       :maxdepth: 1
+       :caption: The Basics
+
+       create_world.rst
+       adding_objects.rst
+       agent_implementation.rst
 
 
 BlocksWorld in MATRXS
-----
+----------------------------
 
 Inspired by `BlocksWorld for Teams (BW4T) <https://github.com/eishub/BW4T>`_ the tutorials in this section serve as
 examples of scenarios that simulate teaming tasks in a block world.
 
-.. toctree::
-   :maxdepth: 1
-   :caption: BW4T
+.. container:: hidden_caption
 
-   bw4t_part1.rst
-   bw4t_part2.rst
+    .. toctree::
+       :maxdepth: 1
+       :caption: BW4T
+
+       bw4t_part1.rst
+       bw4t_part2.rst
 
 Once more MATRXS tutorials are available, you can find them here.

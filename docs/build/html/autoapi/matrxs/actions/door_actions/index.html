@@ -1,0 +1,425 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>matrxs.actions.door_actions &mdash; MATRXS 0.0.1 Manual 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> MATRXS 0.0.1 Manual
+          
+
+          
+            
+            <img src="../../../../_static/matrx_logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/aboutmatrxs.html">About MATRXS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation/installing.html">Installation and first run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../reference_by_category.html">Reference by category</a></li>
+</ul>
+<p class="caption"><span class="caption-text">General Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/when_to_use.html">When to use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/faq.html">F.A.Q.</a></li>
+</ul>
+<p class="caption"><span class="caption-text">For Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_info/how_to_contribute.html">How to contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_info/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference by Category</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/worlds.html">Worlds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/actions.html">Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/agents.html">Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/objects.html">Object placement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/simgoals.html">Simulation goals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/scenarios.html">Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">MATRXS 0.0.1 Manual</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">matrxs.actions.door_actions</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../../_sources/autoapi/matrxs/actions/door_actions/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-matrxs.actions.door_actions">
+<span id="matrxs-actions-door-actions"></span><h1><a class="reference internal" href="../../../../sections/_generated_autodoc/matrxs.actions.door_actions.html#module-matrxs.actions.door_actions" title="matrxs.actions.door_actions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">matrxs.actions.door_actions</span></code></a><a class="headerlink" href="#module-matrxs.actions.door_actions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="matrxs.actions.door_actions.OpenDoorAction">
+<em class="property">class </em><code class="sig-name descname">OpenDoorAction</code><span class="sig-paren">(</span><em class="sig-param">duration_in_ticks=1</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.door_actions.OpenDoorAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../action/index.html#matrxs.actions.action.Action" title="matrxs.actions.action.Action"><code class="xref py py-class docutils literal notranslate"><span class="pre">matrxs.actions.action.Action</span></code></a></p>
+<p>Action to open a Door</p>
+<dl class="method">
+<dt id="matrxs.actions.door_actions.OpenDoorAction.mutate">
+<code class="sig-name descname">mutate</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.door_actions.OpenDoorAction.mutate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the actual action in the world.
+Opens the door, by changing the colour and setting the open_door property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid_world</strong> – A pointer to the actual world object.</p></li>
+<li><p><strong>agent_id</strong> – The id known in the grid world as an agent that peforms this action.</p></li>
+<li><p><strong>kwargs</strong> – Requires the door_range (int indicating cells range) and object_id arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An action result depicting the action’s success or failure and reason/description of that result.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.actions.door_actions.OpenDoorAction.is_possible">
+<code class="sig-name descname">is_possible</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.door_actions.OpenDoorAction.is_possible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether the action is possible in the world when performed by the given agent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid_world</strong> – A pointer to the actual world object.</p></li>
+<li><p><strong>agent_id</strong> – The id known in the grid world as an agent that peforms this action.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns two things; a boolean signalling whether the action is possible or not, and a string telling</p>
+</dd>
+</dl>
+<p>you why the action was not possible.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matrxs.actions.door_actions.CloseDoorAction">
+<em class="property">class </em><code class="sig-name descname">CloseDoorAction</code><span class="sig-paren">(</span><em class="sig-param">duration_in_ticks=1</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.door_actions.CloseDoorAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../action/index.html#matrxs.actions.action.Action" title="matrxs.actions.action.Action"><code class="xref py py-class docutils literal notranslate"><span class="pre">matrxs.actions.action.Action</span></code></a></p>
+<p>Action to open a Door</p>
+<dl class="method">
+<dt id="matrxs.actions.door_actions.CloseDoorAction.mutate">
+<code class="sig-name descname">mutate</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.door_actions.CloseDoorAction.mutate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the actual action in the world.
+Opens the door, by changing the colour and setting the open_door property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid_world</strong> – A pointer to the actual world object.</p></li>
+<li><p><strong>agent_id</strong> – The id known in the grid world as an agent that peforms this action.</p></li>
+<li><p><strong>kwargs</strong> – Requires the door_range (int indicating cells range) and object_id arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An action result depicting the action’s success or failure and reason/description of that result.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.actions.door_actions.CloseDoorAction.is_possible">
+<code class="sig-name descname">is_possible</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.door_actions.CloseDoorAction.is_possible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether the action is possible in the world when performed by the given agent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid_world</strong> – A pointer to the actual world object.</p></li>
+<li><p><strong>agent_id</strong> – The id known in the grid world as an agent that peforms this action.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns two things; a boolean signalling whether the action is possible or not, and a string telling</p>
+</dd>
+</dl>
+<p>you why the action was not possible.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matrxs.actions.door_actions.CloseDoorActionResult">
+<em class="property">class </em><code class="sig-name descname">CloseDoorActionResult</code><span class="sig-paren">(</span><em class="sig-param">result</em>, <em class="sig-param">succeeded</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.door_actions.CloseDoorActionResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../action/index.html#matrxs.actions.action.ActionResult" title="matrxs.actions.action.ActionResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">matrxs.actions.action.ActionResult</span></code></a></p>
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.CloseDoorActionResult.RESULT_SUCCESS">
+<code class="sig-name descname">RESULT_SUCCESS</code><em class="property"> = Door was succesfully closed.</em><a class="headerlink" href="#matrxs.actions.door_actions.CloseDoorActionResult.RESULT_SUCCESS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.CloseDoorActionResult.NO_DOORS_IN_RANGE">
+<code class="sig-name descname">NO_DOORS_IN_RANGE</code><em class="property"> = No door found in range</em><a class="headerlink" href="#matrxs.actions.door_actions.CloseDoorActionResult.NO_DOORS_IN_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.CloseDoorActionResult.NOT_IN_RANGE">
+<code class="sig-name descname">NOT_IN_RANGE</code><em class="property"> = Specified door is not within range.</em><a class="headerlink" href="#matrxs.actions.door_actions.CloseDoorActionResult.NOT_IN_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.CloseDoorActionResult.NOT_A_DOOR">
+<code class="sig-name descname">NOT_A_DOOR</code><em class="property"> = CloseDoor action could not be performed, as object isn't a door</em><a class="headerlink" href="#matrxs.actions.door_actions.CloseDoorActionResult.NOT_A_DOOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.CloseDoorActionResult.RESULT_UNKNOWN_OBJECT_TYPE">
+<code class="sig-name descname">RESULT_UNKNOWN_OBJECT_TYPE</code><em class="property"> = obj_id is no Agent and no Object, unknown what to do</em><a class="headerlink" href="#matrxs.actions.door_actions.CloseDoorActionResult.RESULT_UNKNOWN_OBJECT_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.CloseDoorActionResult.DOOR_ALREADY_CLOSED">
+<code class="sig-name descname">DOOR_ALREADY_CLOSED</code><em class="property"> = Can't close door, door is already closed.</em><a class="headerlink" href="#matrxs.actions.door_actions.CloseDoorActionResult.DOOR_ALREADY_CLOSED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.CloseDoorActionResult.DOOR_BLOCKED">
+<code class="sig-name descname">DOOR_BLOCKED</code><em class="property"> = Can't close door, object or agent is blocking the door opening.</em><a class="headerlink" href="#matrxs.actions.door_actions.CloseDoorActionResult.DOOR_BLOCKED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.CloseDoorActionResult.NO_OBJECT_SPECIFIED">
+<code class="sig-name descname">NO_OBJECT_SPECIFIED</code><em class="property"> = No object_id of a door specified to close.</em><a class="headerlink" href="#matrxs.actions.door_actions.CloseDoorActionResult.NO_OBJECT_SPECIFIED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matrxs.actions.door_actions.OpenDoorActionResult">
+<em class="property">class </em><code class="sig-name descname">OpenDoorActionResult</code><span class="sig-paren">(</span><em class="sig-param">result</em>, <em class="sig-param">succeeded</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.door_actions.OpenDoorActionResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../action/index.html#matrxs.actions.action.ActionResult" title="matrxs.actions.action.ActionResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">matrxs.actions.action.ActionResult</span></code></a></p>
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.OpenDoorActionResult.RESULT_SUCCESS">
+<code class="sig-name descname">RESULT_SUCCESS</code><em class="property"> = Door was successfully opened.</em><a class="headerlink" href="#matrxs.actions.door_actions.OpenDoorActionResult.RESULT_SUCCESS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.OpenDoorActionResult.NO_DOORS_IN_RANGE">
+<code class="sig-name descname">NO_DOORS_IN_RANGE</code><em class="property"> = No door found in range</em><a class="headerlink" href="#matrxs.actions.door_actions.OpenDoorActionResult.NO_DOORS_IN_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.OpenDoorActionResult.NOT_IN_RANGE">
+<code class="sig-name descname">NOT_IN_RANGE</code><em class="property"> = Specified door is not within range.</em><a class="headerlink" href="#matrxs.actions.door_actions.OpenDoorActionResult.NOT_IN_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.OpenDoorActionResult.NOT_A_DOOR">
+<code class="sig-name descname">NOT_A_DOOR</code><em class="property"> = OpenDoor action could not be performed, as object isn't a door</em><a class="headerlink" href="#matrxs.actions.door_actions.OpenDoorActionResult.NOT_A_DOOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.OpenDoorActionResult.RESULT_UNKNOWN_OBJECT_TYPE">
+<code class="sig-name descname">RESULT_UNKNOWN_OBJECT_TYPE</code><em class="property"> = obj_id is no Agent and no Object, unknown what to do</em><a class="headerlink" href="#matrxs.actions.door_actions.OpenDoorActionResult.RESULT_UNKNOWN_OBJECT_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.OpenDoorActionResult.DOOR_ALREADY_OPEN">
+<code class="sig-name descname">DOOR_ALREADY_OPEN</code><em class="property"> = Can't open door, door is already open</em><a class="headerlink" href="#matrxs.actions.door_actions.OpenDoorActionResult.DOOR_ALREADY_OPEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.OpenDoorActionResult.DOOR_BLOCKED">
+<code class="sig-name descname">DOOR_BLOCKED</code><em class="property"> = Can't close door, object or agent is blocking the door opening.</em><a class="headerlink" href="#matrxs.actions.door_actions.OpenDoorActionResult.DOOR_BLOCKED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.door_actions.OpenDoorActionResult.NO_OBJECT_SPECIFIED">
+<code class="sig-name descname">NO_OBJECT_SPECIFIED</code><em class="property"> = No object_id of a door specified to open.</em><a class="headerlink" href="#matrxs.actions.door_actions.OpenDoorActionResult.NO_OBJECT_SPECIFIED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="matrxs.actions.door_actions.is_possible_door_open_close">
+<code class="sig-name descname">is_possible_door_open_close</code><span class="sig-paren">(</span><em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">action_result</em>, <em class="sig-param">object_id=None</em>, <em class="sig-param">door_range=np.inf</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.door_actions.is_possible_door_open_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as is_possible, but this function uses the action_kwargs to get a more accurate prediction.
+Can be used both for checking if the door is already open or closed</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The MATRXS Team at TNO.nl
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #303030;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+      background: #578a64;
+    }
+  </style>
+
+
+</body>
+</html>

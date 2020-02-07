@@ -1,0 +1,18 @@
+:mod:`matrxs.objects`
+=====================
+
+.. py:module:: matrxs.objects
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   advanced_objects/index.rst
+   agent_body/index.rst
+   env_object/index.rst
+   simple_objects/index.rst
+
+

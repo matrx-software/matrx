@@ -1,4 +1,4 @@
-.. _Adding objects
+.. _Adding objects:
 
 Adding objects
 ==============
@@ -46,4 +46,3 @@ autonomous agent's brain, or be activated after input by a human agent.
 
 The image above is a situation simulating BlocksWorld For Teams (BW4T). It contains four rooms, each containing two
 blocks. One of the agents in the scene has opened a door, indicated by the door being green instead of red.
-

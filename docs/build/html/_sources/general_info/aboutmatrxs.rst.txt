@@ -1,4 +1,4 @@
-.. _About_MATRXS
+.. _About_MATRXS:
 
 ============
 About MATRXS
@@ -14,4 +14,3 @@ a system's behaviour to its human user(s).
 
 The entirety of the back-end development of MATRXS is done in Python (3.7) and adheres to an object-oriented programming
 style. The visualisation of behaviour is done by using a combination of JavaScript, HTML and CSS via a Flask server.
-

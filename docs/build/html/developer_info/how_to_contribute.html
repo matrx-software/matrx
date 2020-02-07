@@ -89,6 +89,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../general_info/aboutmatrxs.html">About MATRXS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation/installing.html">Installation and first run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference_by_category.html">Reference by category</a></li>
 </ul>
 <p class="caption"><span class="caption-text">General Information</span></p>
@@ -112,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../sections/simgoals.html">Simulation goals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sections/scenarios.html">Scenarios</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sections/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
 </ul>
 
             
@@ -177,7 +179,34 @@
            <div itemprop="articleBody">
             
   <div class="section" id="how-to-contribute">
-<h1>How to contribute<a class="headerlink" href="#how-to-contribute" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>How to contribute<a class="headerlink" href="#how-to-contribute" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><strong>What docstring format does MATRX use?</strong></div>
+<div class="line">MATRX uses the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html">Numpy docstring format</a>.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>How can I change the default docstring format in PyCharm?</strong></div>
+<div class="line">Open the settings, and go to Tools &gt; Python Integrated Tools &gt; NumPy.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>How can I generate the Readthedocs documentation locally to test my documentation changes?</strong></div>
+<div class="line">Make sure you have all dependencies from requirements.txt installed.</div>
+<div class="line">Go to the MATRX/docs folder in a terminal</div>
+<div class="line">Type: make html</div>
+<div class="line">Open: MATRX/docs/build/html/index.html in your browser</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>I added a function / class (e.g. new agent type), but it does not show on readthedocs, what do I do?</strong></div>
+<div class="line">The documentation generation on readthedocs is semi-automatic. New classes might have to be added manually.</div>
+<div class="line">To add a new class to be mined by readthedocs, in MATRX go to the folder /docs/source/sections.</div>
+<div class="line">Open the file that matches your category, e.g. for a new agent that is /docs/source/sections/agents.rst.</div>
+<div class="line">Add your new class to the list in similar fashion as the other already present classes.</div>
+<div class="line">Check if your changes worked as you expected locally before pushing (see the question above).</div>
+<div class="line">Push your changes and create a merge request for your branch to dev, after which matrxs.readthedocs.io will be automatically updated with your changes.</div>
+</div>
+</div>
 </div>
 
 

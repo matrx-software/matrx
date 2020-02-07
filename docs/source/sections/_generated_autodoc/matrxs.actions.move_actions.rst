@@ -21,6 +21,9 @@ matrxs.actions.move\_actions
 
    .. autosummary::
    
+      Action
+      ActionResult
+      AgentBody
       Move
       MoveActionResult
       MoveEast

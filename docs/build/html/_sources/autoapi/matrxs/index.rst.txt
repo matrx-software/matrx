@@ -1,0 +1,32 @@
+:mod:`matrxs`
+=============
+
+.. py:module:: matrxs
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   API/index.rst
+   actions/index.rst
+   agents/index.rst
+   logger/index.rst
+   objects/index.rst
+   scenarios/index.rst
+   sim_goals/index.rst
+   utils/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   grid_world/index.rst
+   world_builder/index.rst
+
+

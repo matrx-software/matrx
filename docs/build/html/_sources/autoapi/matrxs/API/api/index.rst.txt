@@ -1,0 +1,769 @@
+:mod:`matrxs.API.api`
+=====================
+
+.. py:module:: matrxs.API.api
+
+
+Module Contents
+---------------
+
+.. data:: debug
+   :annotation: = True
+
+   
+
+.. data:: app
+   
+
+   
+
+.. data:: port
+   :annotation: = 3001
+
+   
+
+.. data:: states
+   :annotation: = []
+
+   
+
+.. data:: current_tick
+   :annotation: = 0
+
+   
+
+.. data:: tick_duration
+   :annotation: = 0.0
+
+   
+
+.. data:: grid_size
+   :annotation: = [1, 1]
+
+   
+
+.. data:: MATRXS_info
+   
+
+   
+
+.. data:: next_tick_info
+   
+
+   
+
+.. data:: add_message_to_agent
+   
+
+   
+
+.. data:: messages
+   
+
+   
+
+.. data:: current_world_ID
+   :annotation: = False
+
+   
+
+.. data:: temp_state
+   :annotation: = []
+
+   
+
+.. data:: userinput
+   
+
+   
+
+.. data:: matrxs_paused
+   :annotation: = False
+
+   
+
+.. data:: matrxs_done
+   :annotation: = False
+
+   
+
+.. data:: tick_duration
+   :annotation: = 0.5
+
+   
+
+.. function:: get_info()
+
+   Provides the general information on the world, contained in the world object.
+
+   Returns
+       MATRXS world object, contianing general information on the world and scenario.
+   -------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: get_states(tick)
+
+   Provides the states of all agents (including the god view) from tick 'tick' onwards to current tick.
+
+
+   :Parameters:
+
+       **tick**
+           integer indicating from which tick onwards to send the states.
+
+       **Returns**
+           Returns a list of length 'tick' to current_tick. For each tick (item in the list), a dictionary contains the
+           state for each agent existing in the simulation, indexed by their agent ID.
+
+       **-------**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: get_states_specific_agents(tick, agent_ids)
+
+   Provides the states starting from tick 'tick' to current_tick, for the agents specified in 'agent_ids'.
+
+
+   :Parameters:
+
+       **tick**
+           integer indicating from which tick onwards to send the states.
+
+       **agent_ids**
+           One agent ID, or a List of agent IDs for which the states should be returned. God view = "god"
+
+       **Returns**
+           Returns a list of length 'tick' to current_tick. For each tick (item in the list), a dictionary contains the
+           state for each agent as specified in 'agent_ids', indexed by their agent ID.
+
+       **-------**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: get_latest_state(agent_ids)
+
+   Provides the latest state of one or multiple agents
+
+
+   :Parameters:
+
+       **agent_ids**
+           IDs of agents for which to send the latest state. Either a single agent ID, or a list of agent IDs.
+           God view = "god"
+
+       **Returns**
+           Returns a list of length 'tick' to current_tick. For each tick, a dictionary contains the states for each
+           agent as specified in 'agent_ids', indexed by their agent ID.
+
+       **-------**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: send_userinput(agent_ids)
+
+   Can be used to send user input from the user (pressed keys) to the specified human agent(s) in MATRXS
+
+
+   :Parameters:
+
+       **agent_ids**
+           ID(s) of the human agent(s) to which the data should be passed.
+
+       **Returns**
+           returns True if the data was valid (right now always)
+
+       **-------**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: send_message()
+
+   Send a message containing information to one or multiple specific agent, the agent's team, or all agents
+
+   Message as defined in agent_brain.py
+
+   :Parameters:
+
+       **message**
+           Message contents to send
+
+       **sender**
+           ID of (human)agent from which sent the message
+
+       **receiver**
+           ID(s) (human)agents which will receive the message. Multiple options available:
+           ID or list of agent IDs (JS/Python) =   send to specific agent(s)
+           null (JS)       = None (Python)     =   send to all agents
+           teamname (JS / Python)              =   send to everyone in the team
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: pause_MATRXS()
+
+   Pause the MATRXS simulation
+
+   Returns
+       True if paused, False if already paused
+   -------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: start_MATRXS()
+
+   Starts / unpauses the MATRXS simulation
+
+   Returns
+       True if it has been started, False if it is already running
+   -------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: stop_MATRXS()
+
+   Stops MATRXS scenario
+
+   Returns
+       True
+   -------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: change_MATRXS_speed(tick_dur)
+
+   Change the tick duration / simulation speed of MATRXS
+
+
+   :Parameters:
+
+       **tick_duration**
+           The duration of 1 tick
+
+       **Returns**
+           True if successfully changed tick speed (400 error if tick_duration not valid)
+
+       **-------**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: shutdown()
+
+   Shuts down the API by stopping the Flask thread
+
+   Returns
+       True
+   -------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: bad_request(e)
+
+
+.. function:: check_API_request(tick=None, ids=None, ids_required=False)
+
+   Checks if the variables of the API request are valid, and if the requested information exists
+
+
+   :Parameters:
+
+       **tick**
+           MATRXS tick
+
+       **ids**
+           string with 1 agent ID, or list of agent IDS
+
+       **ids_required**
+           Whether IDS are required
+
+       **Returns**
+           Success (Boolean indicating whether it is valid or not), Error (if any, prodiving the type and a message)
+           See for the error codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.0/com.ibm.qradar.doc/c_rest_api_errors.html
+
+       **-------**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: __fetch_states(tick, ids=None)
+
+   This private function fetches, filters and orders the states as specified by the tick and agent ids.
+
+
+   :Parameters:
+
+       **tick**
+           Tick from which onwards to return the states. Thus will return a list of length [tick:current_tick]
+
+       **ids**
+           Id(s) from agents/god for which to return the states. Either a single agent ID or a list of agent IDs.
+           God view = "god"
+
+       **Returns**
+           Returns a list of length [tick:current_tick]. For each tick, a dictionary contains the states for each agent as
+           specified in 'agent_ids', indexed by their agent ID.
+
+       **-------**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: create_error_response(code, message)
+
+   Creates an error code with a custom message 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: __reorder_state(state)
+
+   This private function converts the MATRXS state from indexing based on object ID, to indexing based on visualization
+   depth.
+
+
+   :Parameters:
+
+       **state**
+           The world state, a dictionary with object IDs as keys
+
+       **Returns**
+           The world state, but sorted on visualization depth
+
+       **-------**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: add_state(agent_id, state, agent_inheritence_chain)
+
+   aves the state of an agent for use via the API
+
+
+   :Parameters:
+
+       **agent_id**
+           ID of the agent of who the state is
+
+       **state**
+           state as filtered by the agent
+
+       **agent_inheritence_chain**
+           inheritance_chain of classes, can be used to figure out type of agent
+
+       **-------**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: next_tick()
+
+   Proceed to the next tick, publicizing data of the new tick via the API (the new states).
+   -------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: pop_userinput(agent_id)
+
+   Pop the user input for an agent from the userinput dictionary and return it
+
+
+   :Parameters:
+
+       **agent_id**
+           ID of the agent for which to return the userinput
+
+       **Returns**
+           A list of keys pressed. See this link for the encoding of keys: https://developer.mozilla.org/nl/docs/Web/API/KeyboardEvent/key/Key_Values
+
+       **-------**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: reset_api()
+
+   Reset the MATRXS API variables 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: register_world(world_ID)
+
+   Register a new simulation world
+
+   At the moment simulation of only one world at a time is supported, so this calling this function will discard
+   the previous world.
+
+   :Parameters:
+
+       **world_ID**
+           The ID of the world
+
+       **-------**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: flask_thread()
+
+   Starts the Flask server on localhost:3001
+   -------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. function:: run_api(verbose)
+
+   Creates a seperate Python thread in which the API (Flask) is started
+   Returns
+       MATRXS API Python thread
+   -------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+

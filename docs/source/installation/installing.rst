@@ -1,11 +1,11 @@
-.. _Installation
+.. _Installation:
 
-############
+####################################
 Installation and first run
-############
+####################################
 
 Installing MATRXS
-============
+========================
 
 MATRXS runs on Python 3.6 or higher.
 
@@ -24,7 +24,7 @@ Using ``Conda``::
     conda install --file requirements.txt
 
 First run
-============
+========================
 From the MATRXS workspace location, start the testbed mainloop and visualization server::
 python3 main.py
 
@@ -35,10 +35,3 @@ Other views, such as the ``agent view`` and ``human-agent view`` can be opened v
 `<http://localhost:3000/>`_
 
 Please follow the :ref:`Tutorials` to familiarize yourself with the fundamentals of MATRXS.
-
-
-
-
-
-
-

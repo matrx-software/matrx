@@ -1,0 +1,12 @@
+:mod:`matrxs.scenarios.simple_scenario`
+=======================================
+
+.. py:module:: matrxs.scenarios.simple_scenario
+
+
+Module Contents
+---------------
+
+.. function:: create_factory()
+
+

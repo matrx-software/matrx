@@ -1,0 +1,15 @@
+:mod:`matrxs.agents.capabilities`
+=================================
+
+.. py:module:: matrxs.agents.capabilities
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   capability/index.rst
+
+

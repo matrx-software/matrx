@@ -1,0 +1,18 @@
+:mod:`matrxs.logger.log_idle_agents`
+====================================
+
+.. py:module:: matrxs.logger.log_idle_agents
+
+
+Module Contents
+---------------
+
+.. py:class:: LogIdleAgents(log_strategy=1, save_path='', file_name_prefix='', file_extension='.csv', delimeter=';')
+
+   Bases: :class:`matrxs.logger.logger.GridWorldLogger`
+
+   .. method:: log(self, grid_world: GridWorld, agent_data: dict)
+
+
+
+

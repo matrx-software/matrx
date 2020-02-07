@@ -595,3 +595,24 @@ img.logo {
 .hidden-caption .toctree-wrapper .caption {
     display: none;
 }
+
+body.wy-body-for-nav {
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+html {
+    background: #f7f7f7;
+}
+
+.wy-nav-content {
+    max-width: 1000px;
+}
+
+@media only screen and (min-width: 800px) {
+
+    .wy-nav-side,
+    .rst-versions {
+        left: unset;
+    }
+}

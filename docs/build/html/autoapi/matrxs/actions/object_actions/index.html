@@ -1,0 +1,508 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>matrxs.actions.object_actions &mdash; MATRXS 0.0.1 Manual 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> MATRXS 0.0.1 Manual
+          
+
+          
+            
+            <img src="../../../../_static/matrx_logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/aboutmatrxs.html">About MATRXS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation/installing.html">Installation and first run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../reference_by_category.html">Reference by category</a></li>
+</ul>
+<p class="caption"><span class="caption-text">General Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/when_to_use.html">When to use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../general_info/faq.html">F.A.Q.</a></li>
+</ul>
+<p class="caption"><span class="caption-text">For Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_info/how_to_contribute.html">How to contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_info/changelog.html">Changelog</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference by Category</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/worlds.html">Worlds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/actions.html">Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/agents.html">Agents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/objects.html">Object placement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/simgoals.html">Simulation goals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/scenarios.html">Scenarios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sections/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">MATRXS 0.0.1 Manual</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">matrxs.actions.object_actions</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../../_sources/autoapi/matrxs/actions/object_actions/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-matrxs.actions.object_actions">
+<span id="matrxs-actions-object-actions"></span><h1><a class="reference internal" href="../../../../sections/_generated_autodoc/matrxs.actions.object_actions.html#module-matrxs.actions.object_actions" title="matrxs.actions.object_actions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">matrxs.actions.object_actions</span></code></a><a class="headerlink" href="#module-matrxs.actions.object_actions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="matrxs.actions.object_actions.RemoveObject">
+<em class="property">class </em><code class="sig-name descname">RemoveObject</code><span class="sig-paren">(</span><em class="sig-param">duration_in_ticks=1</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.RemoveObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../action/index.html#matrxs.actions.action.Action" title="matrxs.actions.action.Action"><code class="xref py py-class docutils literal notranslate"><span class="pre">matrxs.actions.action.Action</span></code></a></p>
+<p>An action that allows agent to remove EnvObjects (basically ALL objects except YOURSELF) from the GridWorld
+permanently. This includes other AgentAvatars.</p>
+<dl class="method">
+<dt id="matrxs.actions.object_actions.RemoveObject.mutate">
+<code class="sig-name descname">mutate</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.RemoveObject.mutate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the object specified in kwargs[‘object_id’] permanently from the grid world if within range of
+kwargs[‘remove_range’] (if key exists, otherwise default range is 1).</p>
+<p>It does not allow you to remove itself!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid_world</strong> – The current GridWorld</p></li>
+<li><p><strong>agent_id</strong> – The agent that performs the action.</p></li>
+<li><p><strong>kwargs</strong> – Requires an ‘object_id’ that exists in the GridWorld and the optional ‘remove_range’ to specify</p></li>
+</ul>
+</dd>
+</dl>
+<p>the range in which the object can be removed. If a range is not given, defaults to 1.
+:return: An ObjectActionResult.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.actions.object_actions.RemoveObject.is_possible">
+<code class="sig-name descname">is_possible</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.RemoveObject.is_possible" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matrxs.actions.object_actions.RemoveObjectResult">
+<em class="property">class </em><code class="sig-name descname">RemoveObjectResult</code><span class="sig-paren">(</span><em class="sig-param">result</em>, <em class="sig-param">succeeded</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.RemoveObjectResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../action/index.html#matrxs.actions.action.ActionResult" title="matrxs.actions.action.ActionResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">matrxs.actions.action.ActionResult</span></code></a></p>
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.RemoveObjectResult.NO_OBJECTS_IN_RANGE">
+<code class="sig-name descname">NO_OBJECTS_IN_RANGE</code><em class="property"> = No objects were in `REMOVE_RANGE`.</em><a class="headerlink" href="#matrxs.actions.object_actions.RemoveObjectResult.NO_OBJECTS_IN_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.RemoveObjectResult.OBJECT_ID_NOT_WITHIN_RANGE">
+<code class="sig-name descname">OBJECT_ID_NOT_WITHIN_RANGE</code><em class="property"> = The object with id `OBJECT_ID` is not within the range of `REMOVE_RANGE`.</em><a class="headerlink" href="#matrxs.actions.object_actions.RemoveObjectResult.OBJECT_ID_NOT_WITHIN_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.RemoveObjectResult.OBJECT_REMOVED">
+<code class="sig-name descname">OBJECT_REMOVED</code><em class="property"> = The object with id `OBJECT_ID` is removed.</em><a class="headerlink" href="#matrxs.actions.object_actions.RemoveObjectResult.OBJECT_REMOVED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.RemoveObjectResult.REMOVAL_FAILED">
+<code class="sig-name descname">REMOVAL_FAILED</code><em class="property"> = The object with id `OBJECT_ID` failed to be removed by the environment for some reason.</em><a class="headerlink" href="#matrxs.actions.object_actions.RemoveObjectResult.REMOVAL_FAILED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matrxs.actions.object_actions.GrabObject">
+<em class="property">class </em><code class="sig-name descname">GrabObject</code><span class="sig-paren">(</span><em class="sig-param">duration_in_ticks=1</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.GrabObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../action/index.html#matrxs.actions.action.Action" title="matrxs.actions.action.Action"><code class="xref py py-class docutils literal notranslate"><span class="pre">matrxs.actions.action.Action</span></code></a></p>
+<p>An action that allows agent to grab EnvObjects (only objects) from the GridWorld. This
+excludes other AgentAvatars. Grabbing automatically is followed by carrying of the object.
+Carrying is implemented in movement actions.</p>
+<dl class="method">
+<dt id="matrxs.actions.object_actions.GrabObject.is_possible">
+<code class="sig-name descname">is_possible</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.GrabObject.is_possible" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function checks if grabbing an object is possible.
+For this it assumes a infinite grab range and a random object in that range
+The check if an object is within range is done within ‘mutate’
+:param grid_world: The current GridWorld
+:param agent_id: The agent that performes the action
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.actions.object_actions.GrabObject.mutate">
+<code class="sig-name descname">mutate</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.GrabObject.mutate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Picks up the object specified in kwargs[‘object_id’]  if within range of
+kwargs[‘grab_range’] (if key exists, otherwise default range is 0).</p>
+<p>It does not allow you to grab yourself/other agents</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid_world</strong> – The current GridWorld</p></li>
+<li><p><strong>agent_id</strong> – The agent that performs the action.</p></li>
+<li><p><strong>kwargs</strong> – An optional ‘object_id’ that exists in the GridWorld (if none is specified</p></li>
+</ul>
+</dd>
+</dl>
+<p>a random object within range is chosen).</p>
+<p>Optional ‘grab_range’ to specify the range in which the object can be removed.
+If a range is not given, defaults to 0.</p>
+<p>Optional ‘max_objects’ for the amount of objects the agent can carry.
+If no ‘max_objects’ is set, default is set to 1.
+:return: An ObjectActionResult.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.actions.object_actions.GrabObject.is_possible_grab">
+<code class="sig-name descname">is_possible_grab</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">object_id</em>, <em class="sig-param">grab_range</em>, <em class="sig-param">max_objects</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.GrabObject.is_possible_grab" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matrxs.actions.object_actions.GrabObjectResult">
+<em class="property">class </em><code class="sig-name descname">GrabObjectResult</code><span class="sig-paren">(</span><em class="sig-param">result</em>, <em class="sig-param">succeeded</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.GrabObjectResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../action/index.html#matrxs.actions.action.ActionResult" title="matrxs.actions.action.ActionResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">matrxs.actions.action.ActionResult</span></code></a></p>
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.GrabObjectResult.FAILED_TO_REMOVE_OBJECT_FROM_WORLD">
+<code class="sig-name descname">FAILED_TO_REMOVE_OBJECT_FROM_WORLD</code><em class="property"> = Grab action failed; could not remove object with id {OBJECT_ID} from grid.</em><a class="headerlink" href="#matrxs.actions.object_actions.GrabObjectResult.FAILED_TO_REMOVE_OBJECT_FROM_WORLD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.GrabObjectResult.RESULT_SUCCESS">
+<code class="sig-name descname">RESULT_SUCCESS</code><em class="property"> = Grab action success</em><a class="headerlink" href="#matrxs.actions.object_actions.GrabObjectResult.RESULT_SUCCESS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.GrabObjectResult.NOT_IN_RANGE">
+<code class="sig-name descname">NOT_IN_RANGE</code><em class="property"> = Object not in range</em><a class="headerlink" href="#matrxs.actions.object_actions.GrabObjectResult.NOT_IN_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.GrabObjectResult.RESULT_AGENT">
+<code class="sig-name descname">RESULT_AGENT</code><em class="property"> = This is an agent, cannot be picked up</em><a class="headerlink" href="#matrxs.actions.object_actions.GrabObjectResult.RESULT_AGENT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.GrabObjectResult.RESULT_NO_OBJECT">
+<code class="sig-name descname">RESULT_NO_OBJECT</code><em class="property"> = No Object specified</em><a class="headerlink" href="#matrxs.actions.object_actions.GrabObjectResult.RESULT_NO_OBJECT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.GrabObjectResult.RESULT_CARRIES_OBJECT">
+<code class="sig-name descname">RESULT_CARRIES_OBJECT</code><em class="property"> = Agent already carries the maximum amount of objects</em><a class="headerlink" href="#matrxs.actions.object_actions.GrabObjectResult.RESULT_CARRIES_OBJECT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.GrabObjectResult.RESULT_OBJECT_CARRIED">
+<code class="sig-name descname">RESULT_OBJECT_CARRIED</code><em class="property"> = Object is already carried by {AGENT_ID}</em><a class="headerlink" href="#matrxs.actions.object_actions.GrabObjectResult.RESULT_OBJECT_CARRIED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.GrabObjectResult.RESULT_UNKNOWN_OBJECT_TYPE">
+<code class="sig-name descname">RESULT_UNKNOWN_OBJECT_TYPE</code><em class="property"> = obj_id is no Agent and no Object, unknown what to do</em><a class="headerlink" href="#matrxs.actions.object_actions.GrabObjectResult.RESULT_UNKNOWN_OBJECT_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.GrabObjectResult.RESULT_OBJECT_UNMOVABLE">
+<code class="sig-name descname">RESULT_OBJECT_UNMOVABLE</code><em class="property"> = Object is not movable</em><a class="headerlink" href="#matrxs.actions.object_actions.GrabObjectResult.RESULT_OBJECT_UNMOVABLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matrxs.actions.object_actions.DropObject">
+<em class="property">class </em><code class="sig-name descname">DropObject</code><span class="sig-paren">(</span><em class="sig-param">duration_in_ticks=1</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.DropObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../action/index.html#matrxs.actions.action.Action" title="matrxs.actions.action.Action"><code class="xref py py-class docutils literal notranslate"><span class="pre">matrxs.actions.action.Action</span></code></a></p>
+<dl class="method">
+<dt id="matrxs.actions.object_actions.DropObject.is_possible">
+<code class="sig-name descname">is_possible</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.DropObject.is_possible" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="matrxs.actions.object_actions.DropObject.mutate">
+<code class="sig-name descname">mutate</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.DropObject.mutate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function drops one of the items carried by the agent.
+It tries to drop the object within the specified drop_range around the agent,
+trying to drop it as close to the agent as possible</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid_world</strong> – pointer to current GridWorld</p></li>
+<li><p><strong>agent_id</strong> – agent that acts</p></li>
+<li><p><strong>kwargs</strong> – Optional an “object_id” can be given. If an agent is carrying</p></li>
+</ul>
+</dd>
+</dl>
+<p>two or more items, this specifies which item should be dropped.
+:return: Always True</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.actions.object_actions.DropObject.act_drop">
+<code class="sig-name descname">act_drop</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent</em>, <em class="sig-param">env_obj</em>, <em class="sig-param">drop_loc</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.DropObject.act_drop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop the object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.actions.object_actions.DropObject.find_drop_loc">
+<code class="sig-name descname">find_drop_loc</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent</em>, <em class="sig-param">env_obj</em>, <em class="sig-param">drop_range</em>, <em class="sig-param">start_loc</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.DropObject.find_drop_loc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do a breadth first search starting from the agent’s location to find
+the closest valid drop location.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid_world</strong> – The grid_world object</p></li>
+<li><p><strong>reg_ag</strong> – the agent object of the agent who wants to drop the object</p></li>
+<li><p><strong>env_obj</strong> – the object to be dropped</p></li>
+<li><p><strong>drop_range</strong> – the range from our current location for which we can drop</p></li>
+</ul>
+</dd>
+</dl>
+<p>the object
+:return: False if no valid drop location can be found, otherwise the [x,y]
+coords of the closest drop location</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.actions.object_actions.DropObject.is_drop_poss">
+<code class="sig-name descname">is_drop_poss</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">env_obj</em>, <em class="sig-param">dropLocation</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.DropObject.is_drop_poss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the object can be dropped at a specific location by checking if
+there are any intraversable objects at that location, and if the object to
+be dropped is intraversable
+:param grid_world: The grid_world object
+:param env_obj: the object to be dropped
+:param dropLocation: location to check if it is possible to drop the env_obj there</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="matrxs.actions.object_actions.DropObject.possible_drop">
+<code class="sig-name descname">possible_drop</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">grid_world</em>, <em class="sig-param">agent_id</em>, <em class="sig-param">obj_id</em>, <em class="sig-param">drop_range</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.DropObject.possible_drop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="matrxs.actions.object_actions.DropObjectResult">
+<em class="property">class </em><code class="sig-name descname">DropObjectResult</code><span class="sig-paren">(</span><em class="sig-param">result</em>, <em class="sig-param">succeeded</em>, <em class="sig-param">obj_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#matrxs.actions.object_actions.DropObjectResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../action/index.html#matrxs.actions.action.ActionResult" title="matrxs.actions.action.ActionResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">matrxs.actions.action.ActionResult</span></code></a></p>
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.DropObjectResult.RESULT_SUCCESS">
+<code class="sig-name descname">RESULT_SUCCESS</code><em class="property"> = Drop action success</em><a class="headerlink" href="#matrxs.actions.object_actions.DropObjectResult.RESULT_SUCCESS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.DropObjectResult.RESULT_NO_OBJECT">
+<code class="sig-name descname">RESULT_NO_OBJECT</code><em class="property"> = The item is not carried</em><a class="headerlink" href="#matrxs.actions.object_actions.DropObjectResult.RESULT_NO_OBJECT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.DropObjectResult.RESULT_NONE_GIVEN">
+<code class="sig-name descname">RESULT_NONE_GIVEN</code><em class="property"> = 'None' used as input id</em><a class="headerlink" href="#matrxs.actions.object_actions.DropObjectResult.RESULT_NONE_GIVEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.DropObjectResult.RESULT_AGENT">
+<code class="sig-name descname">RESULT_AGENT</code><em class="property"> = Cannot drop item on an agent</em><a class="headerlink" href="#matrxs.actions.object_actions.DropObjectResult.RESULT_AGENT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.DropObjectResult.RESULT_OBJECT">
+<code class="sig-name descname">RESULT_OBJECT</code><em class="property"> = Cannot drop item on another intraversable object</em><a class="headerlink" href="#matrxs.actions.object_actions.DropObjectResult.RESULT_OBJECT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.DropObjectResult.RESULT_UNKNOWN_OBJECT_TYPE">
+<code class="sig-name descname">RESULT_UNKNOWN_OBJECT_TYPE</code><em class="property"> = Cannot drop item on an unknown object</em><a class="headerlink" href="#matrxs.actions.object_actions.DropObjectResult.RESULT_UNKNOWN_OBJECT_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="matrxs.actions.object_actions.DropObjectResult.RESULT_NO_OBJECT_CARRIED">
+<code class="sig-name descname">RESULT_NO_OBJECT_CARRIED</code><em class="property"> = Cannot drop object when none carried</em><a class="headerlink" href="#matrxs.actions.object_actions.DropObjectResult.RESULT_NO_OBJECT_CARRIED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, The MATRXS Team at TNO.nl
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #303030;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+      background: #578a64;
+    }
+  </style>
+
+
+</body>
+</html>

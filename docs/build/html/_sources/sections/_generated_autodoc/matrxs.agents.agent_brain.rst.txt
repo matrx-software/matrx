@@ -5,6 +5,13 @@ matrxs.agents.agent\_brain
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_distance
+      is_possible_door_open_close
+   
    
 
    
@@ -13,8 +20,23 @@ matrxs.agents.agent\_brain
 
    .. autosummary::
    
+      Action
+      ActionResult
+      AgentBody
       AgentBrain
+      AreaTile
+      CloseDoorAction
+      CloseDoorActionResult
+      Door
+      DropObject
+      DropObjectResult
+      GrabObject
+      GrabObjectResult
       Message
+      OpenDoorAction
+      OpenDoorActionResult
+      RemoveObject
+      RemoveObjectResult
    
    
 

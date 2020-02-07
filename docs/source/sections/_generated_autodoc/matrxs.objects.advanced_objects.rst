@@ -14,6 +14,7 @@ matrxs.objects.advanced\_objects
    .. autosummary::
    
       Battery
+      EnvObject
    
    
 

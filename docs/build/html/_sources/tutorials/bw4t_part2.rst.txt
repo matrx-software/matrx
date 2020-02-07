@@ -1,4 +1,4 @@
-.. _Part 2: BW4T action plan
+.. _Part 2: BW4T action plan:
 
 
 Part 2: BW4T action plan

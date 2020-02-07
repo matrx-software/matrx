@@ -19,8 +19,11 @@ matrxs.actions.door\_actions
 
    .. autosummary::
    
+      Action
+      ActionResult
       CloseDoorAction
       CloseDoorActionResult
+      Door
       OpenDoorAction
       OpenDoorActionResult
    

@@ -5,6 +5,12 @@ matrxs.actions.object\_actions
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_distance
+   
    
 
    
@@ -13,6 +19,10 @@ matrxs.actions.object\_actions
 
    .. autosummary::
    
+      Action
+      ActionResult
+      AgentBody
+      AreaTile
       DropObject
       DropObjectResult
       GrabObject

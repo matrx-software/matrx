@@ -1,4 +1,4 @@
-.. _Utils
+.. _Utils:
 
 #####
 Utils

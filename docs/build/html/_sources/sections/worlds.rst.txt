@@ -1,4 +1,4 @@
-.. _Worlds
+.. _Worlds:
 
 ======
 Worlds
@@ -13,7 +13,3 @@ below ensure such worlds can be built.
 
     matrxs.world_builder.WorldBuilder
     matrxs.grid_world.GridWorld
-
-
-
-

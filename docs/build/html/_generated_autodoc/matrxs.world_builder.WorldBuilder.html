@@ -87,6 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../general_info/aboutmatrxs.html">About MATRXS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation/installing.html">Installation and first run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference_by_category.html">Reference by category</a></li>
 </ul>
 <p class="caption"><span class="caption-text">General Information</span></p>
@@ -293,13 +294,13 @@ of the path to the image file. Defaults to None (no image).</p>
 </dl>
 <p class="rubric">Examples</p>
 <p>This creates a WorldBuilder that creates world of a certain size (here 10 by 10);</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matrxs.world_builder</span> <span class="kn">import</span> <span class="n">WorldBuilder</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matrxs.world_builder</span> <span class="k">import</span> <span class="n">WorldBuilder</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">WorldBuilder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>To create a WorldBuilder with a black background, a tick duration as fast as possible and with a different
 master random seed;</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matrxs.world_builder</span> <span class="kn">import</span> <span class="n">WorldBuilder</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matrxs.world_builder</span> <span class="k">import</span> <span class="n">WorldBuilder</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">WorldBuilder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random_seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">tick_duration</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">visualization_bg_clr</span><span class="o">=</span><span class="s2">&quot;#000000&quot;</span><span class="p">)</span>
 </pre></div>
 </div>

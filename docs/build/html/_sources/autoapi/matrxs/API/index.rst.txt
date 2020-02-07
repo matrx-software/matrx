@@ -1,0 +1,16 @@
+:mod:`matrxs.API`
+=================
+
+.. py:module:: matrxs.API
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   api/index.rst
+   logMatrx/index.rst
+
+

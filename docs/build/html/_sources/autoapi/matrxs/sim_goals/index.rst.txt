@@ -1,0 +1,15 @@
+:mod:`matrxs.sim_goals`
+=======================
+
+.. py:module:: matrxs.sim_goals
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   sim_goal/index.rst
+
+

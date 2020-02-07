@@ -1,0 +1,18 @@
+:mod:`matrxs.logger`
+====================
+
+.. py:module:: matrxs.logger
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   log_agent_actions/index.rst
+   log_idle_agents/index.rst
+   log_tick/index.rst
+   logger/index.rst
+
+

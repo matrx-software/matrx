@@ -1,4 +1,4 @@
-.. _Implementing an agent
+.. _Implementing an agent:
 
 ===========================
 Implementing an agent
@@ -20,5 +20,3 @@ an action (moving, picking up, etc.) for every situation the agent can find itse
 
 For examples of how to implement a new agent brain, you can take a look at the tutorials about :ref:`BW4T<Part 1: BW4T skeleton>`.
 Here, all assets of creating an agent's brain are implemented and examples are shown.
-
-

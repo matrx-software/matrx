@@ -1,0 +1,26 @@
+:mod:`matrxs.agents.patrolling_agent`
+=====================================
+
+.. py:module:: matrxs.agents.patrolling_agent
+
+
+Module Contents
+---------------
+
+.. py:class:: PatrollingAgentBrain(waypoints, move_speed=1)
+
+   Bases: :class:`matrxs.agents.agent_brain.AgentBrain`
+
+   .. method:: initialize(self)
+
+
+
+   .. method:: filter_observations(self, state)
+
+
+
+   .. method:: decide_on_action(self, state)
+
+
+
+

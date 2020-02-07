@@ -1,0 +1,26 @@
+:mod:`matrxs.agents`
+====================
+
+.. py:module:: matrxs.agents
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   capabilities/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   agent_brain/index.rst
+   human_agent_brain/index.rst
+   patrolling_agent/index.rst
+
+

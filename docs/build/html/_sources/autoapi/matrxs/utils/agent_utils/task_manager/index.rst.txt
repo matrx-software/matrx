@@ -1,0 +1,12 @@
+:mod:`matrxs.utils.agent_utils.task_manager`
+============================================
+
+.. py:module:: matrxs.utils.agent_utils.task_manager
+
+
+Module Contents
+---------------
+
+.. py:class:: TaskManager
+
+

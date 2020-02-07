@@ -1,4 +1,4 @@
-.. _Part 1: BW4T skeleton
+.. _Part 1: BW4T skeleton:
 
 
 Part 1: BW4T skeleton
@@ -96,6 +96,3 @@ an agent's actions. We also provide other practicalities, such as keeping track 
 agent(s). The method returns the action the agent should perform at the current time point in the simulation, followed by
 any variable values, if needed. In the next part of this tutorial series, you can find how exactly the currently discussed
 BlocksWorld agent brain has been implemented.
-
-
-

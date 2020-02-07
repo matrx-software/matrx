@@ -89,6 +89,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../general_info/aboutmatrxs.html">About MATRXS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation/installing.html">Installation and first run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../reference_by_category.html">Reference by category</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../worlds.html">Worlds</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">matrxs.world_builder.WorldBuilder</a></li>
@@ -128,6 +129,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../simgoals.html">Simulation goals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../scenarios.html">Scenarios</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
 
             
@@ -208,29 +210,29 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_agent</span></code>(self, location, list], …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_agent" title="matrxs.world_builder.WorldBuilder.add_agent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_agent</span></code></a>(self, location, list], …)</p></td>
 <td><p>The helper method within a WorldFactory instance to add a single agent.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_multiple_agents</span></code>(self, agents, locations)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_multiple_agents" title="matrxs.world_builder.WorldBuilder.add_multiple_agents"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_multiple_agents</span></code></a>(self, agents, locations)</p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p></p></dd>
 </dl>
 </p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_team</span></code>(self, agent_brains, tuple], …[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_team" title="matrxs.world_builder.WorldBuilder.add_team"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_team</span></code></a>(self, agent_brains, tuple], …[, …])</p></td>
 <td><p>Adds a group of agents as a single team (meaning that their ‘team’ property all have the given team name).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_world</span></code>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.get_world" title="matrxs.world_builder.WorldBuilder.get_world"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_world</span></code></a>(self)</p></td>
 <td><p>Creates a single GridWorld instance based on the current state of this WorldFactor instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">startup</span></code>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.startup" title="matrxs.world_builder.WorldBuilder.startup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startup</span></code></a>(self)</p></td>
 <td><p>Start any world-overarching MATRXS scripts, such as, if requested, the API or MATRXS visualization.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">stop</span></code>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.stop" title="matrxs.world_builder.WorldBuilder.stop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stop</span></code></a>(self)</p></td>
 <td><p>Stop any world-overarching MATRXS scripts, such as, if started, the API or MATRXS visualization.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../_generated_autodoc/matrxs.world_builder.WorldBuilder.worlds.html#matrxs.world_builder.WorldBuilder.worlds" title="matrxs.world_builder.WorldBuilder.worlds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">worlds</span></code></a>(self, nr_of_worlds)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.worlds" title="matrxs.world_builder.WorldBuilder.worlds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">worlds</span></code></a>(self, nr_of_worlds)</p></td>
 <td><p>Returns a Generator of GridWorld instance for the specified number of worlds.</p></td>
 </tr>
 </tbody>
@@ -315,13 +317,13 @@ of the path to the image file. Defaults to None (no image).</p>
 </dl>
 <p class="rubric">Examples</p>
 <p>This creates a WorldBuilder that creates world of a certain size (here 10 by 10);</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matrxs.world_builder</span> <span class="kn">import</span> <span class="n">WorldBuilder</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matrxs.world_builder</span> <span class="k">import</span> <span class="n">WorldBuilder</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">WorldBuilder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>To create a WorldBuilder with a black background, a tick duration as fast as possible and with a different
 master random seed;</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matrxs.world_builder</span> <span class="kn">import</span> <span class="n">WorldBuilder</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">matrxs.world_builder</span> <span class="k">import</span> <span class="n">WorldBuilder</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">WorldBuilder</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random_seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">tick_duration</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">visualization_bg_clr</span><span class="o">=</span><span class="s2">&quot;#000000&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -337,59 +339,59 @@ master random seed;</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#matrxs.world_builder.WorldBuilder.__init__" title="matrxs.world_builder.WorldBuilder.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, shape[, tick_duration, …])</p></td>
 <td><p>A builder to create one or more worlds.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_agent</span></code>(self, location, list], …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_agent" title="matrxs.world_builder.WorldBuilder.add_agent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_agent</span></code></a>(self, location, list], …)</p></td>
 <td><p>The helper method within a WorldFactory instance to add a single agent.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_agent_prospect</span></code>(self, location, agent, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_agent_prospect" title="matrxs.world_builder.WorldBuilder.add_agent_prospect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_agent_prospect</span></code></a>(self, location, agent, …)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_area</span></code>(self, top_left_location, width, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_area" title="matrxs.world_builder.WorldBuilder.add_area"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_area</span></code></a>(self, top_left_location, width, …)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_human_agent</span></code>(self, location, agent[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_human_agent" title="matrxs.world_builder.WorldBuilder.add_human_agent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_human_agent</span></code></a>(self, location, agent[, …])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_line</span></code>(self, start, end, name[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_line" title="matrxs.world_builder.WorldBuilder.add_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_line</span></code></a>(self, start, end, name[, …])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_logger</span></code>(self, logger_class[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_logger" title="matrxs.world_builder.WorldBuilder.add_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_logger</span></code></a>(self, logger_class[, …])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_multiple_agents</span></code>(self, agents, locations)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_multiple_agents" title="matrxs.world_builder.WorldBuilder.add_multiple_agents"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_multiple_agents</span></code></a>(self, agents, locations)</p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p></p></dd>
 </dl>
 </p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_multiple_objects</span></code>(self, locations[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_multiple_objects" title="matrxs.world_builder.WorldBuilder.add_multiple_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_multiple_objects</span></code></a>(self, locations[, …])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_object</span></code>(self, location, name[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_object" title="matrxs.world_builder.WorldBuilder.add_object"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_object</span></code></a>(self, location, name[, …])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_object_prospect</span></code>(self, location, name, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_object_prospect" title="matrxs.world_builder.WorldBuilder.add_object_prospect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_object_prospect</span></code></a>(self, location, name, …)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_room</span></code>(self, top_left_location, width, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_room" title="matrxs.world_builder.WorldBuilder.add_room"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_room</span></code></a>(self, top_left_location, width, …)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_smoke_area</span></code>(self, top_left_location, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_smoke_area" title="matrxs.world_builder.WorldBuilder.add_smoke_area"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_smoke_area</span></code></a>(self, top_left_location, …)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_team</span></code>(self, agent_brains, tuple], …[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.add_team" title="matrxs.world_builder.WorldBuilder.add_team"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_team</span></code></a>(self, agent_brains, tuple], …[, …])</p></td>
 <td><p>Adds a group of agents as a single team (meaning that their ‘team’ property all have the given team name).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_world</span></code>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.get_world" title="matrxs.world_builder.WorldBuilder.get_world"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_world</span></code></a>(self)</p></td>
 <td><p>Creates a single GridWorld instance based on the current state of this WorldFactor instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">startup</span></code>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.startup" title="matrxs.world_builder.WorldBuilder.startup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startup</span></code></a>(self)</p></td>
 <td><p>Start any world-overarching MATRXS scripts, such as, if requested, the API or MATRXS visualization.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">stop</span></code>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.stop" title="matrxs.world_builder.WorldBuilder.stop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stop</span></code></a>(self)</p></td>
 <td><p>Stop any world-overarching MATRXS scripts, such as, if started, the API or MATRXS visualization.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../../_generated_autodoc/matrxs.world_builder.WorldBuilder.worlds.html#matrxs.world_builder.WorldBuilder.worlds" title="matrxs.world_builder.WorldBuilder.worlds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">worlds</span></code></a>(self, nr_of_worlds)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/world_builder/index.html#matrxs.world_builder.WorldBuilder.worlds" title="matrxs.world_builder.WorldBuilder.worlds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">worlds</span></code></a>(self, nr_of_worlds)</p></td>
 <td><p>Returns a Generator of GridWorld instance for the specified number of worlds.</p></td>
 </tr>
 </tbody>

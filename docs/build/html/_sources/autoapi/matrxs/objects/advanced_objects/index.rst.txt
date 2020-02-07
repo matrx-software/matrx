@@ -1,0 +1,40 @@
+:mod:`matrxs.objects.advanced_objects`
+======================================
+
+.. py:module:: matrxs.objects.advanced_objects
+
+
+Module Contents
+---------------
+
+.. py:class:: Battery(location, name='Battery', start_energy_level=1.0, energy_decay=0.01)
+
+   Bases: :class:`matrxs.objects.env_object.EnvObject`
+
+   .. method:: update(self, grid_world)
+
+
+      Updates the current energy level, changes the property accordingly, and also change the visualization color.
+      :param grid_world: The state of the world. Not used.
+      :return: The new properties
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+

@@ -1,0 +1,14 @@
+:mod:`setup`
+============
+
+.. py:module:: setup
+
+
+Module Contents
+---------------
+
+.. data:: long_description
+   
+
+   
+

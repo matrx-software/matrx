@@ -96,6 +96,7 @@
 <li class="toctree-l2"><a class="reference internal" href="bw4t_part2.html">Part 2: BW4T action plan</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference_by_category.html">Reference by category</a></li>
 </ul>
 <p class="caption"><span class="caption-text">General Information</span></p>
@@ -119,6 +120,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../sections/simgoals.html">Simulation goals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sections/scenarios.html">Scenarios</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sections/utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
 </ul>
 
             
@@ -251,7 +253,7 @@ the items within the room become known to the agent(s) and stay in their memory 
     <span class="n">closed_room_colors</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="s1">&#39;door@&#39;</span> <span class="ow">in</span> <span class="n">k</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_open&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;door@&#39;</span> <span class="ow">in</span> <span class="n">k</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_open&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
             <span class="n">color</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">closed_room_colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>

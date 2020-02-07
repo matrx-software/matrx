@@ -1,0 +1,45 @@
+:mod:`matrxs.agents.capabilities.capability`
+============================================
+
+.. py:module:: matrxs.agents.capabilities.capability
+
+
+Module Contents
+---------------
+
+.. py:class:: Capability
+
+
+.. py:class:: SenseCapability(detectable_objects)
+
+   Bases: :class:`matrxs.agents.capabilities.capability.Capability`
+
+   .. method:: get_capabilities(self)
+
+
+      Returns the dictionary defining what types can be perceived within which distance.
+
+
+
+      :Returns:
+
+          sense_capabilities: dict
+              A dictionary with as keys the object types and values the distances.
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+

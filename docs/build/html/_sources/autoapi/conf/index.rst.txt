@@ -1,0 +1,117 @@
+:mod:`conf`
+===========
+
+.. py:module:: conf
+
+
+Module Contents
+---------------
+
+.. data:: release
+   :annotation: = 0.0.1
+
+   
+
+.. data:: project
+   
+
+   
+
+.. data:: copyright
+   :annotation: = 2019, The MATRXS Team at TNO.nl
+
+   
+
+.. data:: author
+   :annotation: = The MATRXS Team at TNO.nl
+
+   
+
+.. data:: extensions
+   :annotation: = ['sphinx.ext.autosummary', 'sphinx.ext.autodoc', 'autoapi.extension', 'sphinx.ext.coverage', 'numpydoc', 'sphinx_rtd_theme', 'sphinx.ext.autosectionlabel', 'sphinx.ext.todo', 'recommonmark']
+
+   
+
+.. data:: autoapi_dirs
+   :annotation: = ['../..']
+
+   
+
+.. data:: autoapi_type
+   :annotation: = python
+
+   
+
+.. data:: autoapi_options
+   :annotation: = ['members', 'undoc-members', 'private-members', 'show-inheritance', 'special-members', 'show-module-summary']
+
+   
+
+.. data:: templates_path
+   :annotation: = ['_templates']
+
+   
+
+.. data:: exclude_patterns
+   :annotation: = []
+
+   
+
+.. data:: add_module_names
+   :annotation: = False
+
+   
+
+.. data:: master_doc
+   :annotation: = index
+
+   
+
+.. data:: autodoc_member_order
+   :annotation: = bysource
+
+   
+
+.. data:: autosummary_generate
+   :annotation: = True
+
+   
+
+.. data:: numpydoc_class_members_toctree
+   :annotation: = True
+
+   
+
+.. data:: html_theme_options
+   
+
+   
+
+.. data:: html_logo
+   :annotation: = _static/images/matrx_logo.svg
+
+   
+
+.. data:: pygments_style
+   :annotation: = sphinx
+
+   
+
+.. data:: highlight_language
+   :annotation: = python3
+
+   
+
+.. data:: html_theme
+   :annotation: = sphinx_rtd_theme
+
+   
+
+.. data:: html_static_path
+   :annotation: = ['_static']
+
+   
+
+.. function:: setup(app)
+
+

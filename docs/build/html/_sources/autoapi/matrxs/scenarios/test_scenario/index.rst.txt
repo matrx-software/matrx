@@ -1,0 +1,12 @@
+:mod:`matrxs.scenarios.test_scenario`
+=====================================
+
+.. py:module:: matrxs.scenarios.test_scenario
+
+
+Module Contents
+---------------
+
+.. function:: create_factory()
+
+

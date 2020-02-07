@@ -1,4 +1,4 @@
-.. _Agents
+.. _Agents:
 
 ============
 Agents
@@ -24,6 +24,3 @@ Sense capabilities of an agent:
    :toctree: _generated_autodoc
 
    matrxs.agents.capabilities.capability
-
-
-

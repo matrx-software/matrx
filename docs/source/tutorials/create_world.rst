@@ -1,4 +1,4 @@
-.. _Creating your MATRXS world
+.. _Creating your MATRXS world:
 
 
 Creating your MATRXS world
