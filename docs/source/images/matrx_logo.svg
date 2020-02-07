@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="710.908px" height="203.001px" viewBox="55.73 281.744 710.908 203.001"
+	 enable-background="new 55.73 281.744 710.908 203.001" xml:space="preserve">
+<g>
+	<g>
+		<g enable-background="new    ">
+			<path fill="#353535" d="M267.906,442.856l-33.125-95.391h-0.625c0.885,14.168,1.328,27.449,1.328,39.844v55.547h-16.953V328.638
+				h26.328l31.719,90.859h0.469l32.656-90.859h26.406v114.219h-17.969v-56.484c0-5.676,0.143-13.072,0.43-22.188
+				c0.286-9.113,0.533-14.635,0.742-16.563h-0.625l-34.297,95.234H267.906z"/>
+			<path fill="#353535" d="M437.046,442.856l-11.406-31.719h-43.671l-11.172,31.719h-19.688l42.734-114.688h20.312l42.734,114.688
+				H437.046z M420.718,395.044l-10.703-31.094c-0.781-2.082-1.862-5.363-3.242-9.844c-1.381-4.479-2.331-7.76-2.852-9.844
+				c-1.406,6.406-3.464,13.412-6.171,21.016l-10.313,29.766H420.718z"/>
+			<path fill="#353535" d="M511.421,442.856H492.75v-98.203h-33.594v-16.016h85.859v16.016h-33.594V442.856z"/>
+			<path fill="#353535" d="M581.187,397.231v45.625h-18.672V328.638h32.266c14.739,0,25.65,2.762,32.734,8.281
+				c7.083,5.521,10.625,13.855,10.625,25c0,14.219-7.396,24.35-22.188,30.391l32.266,50.547h-21.25l-27.344-45.625H581.187z
+				 M581.187,381.763h12.969c8.697,0,15-1.613,18.906-4.844c3.906-3.229,5.859-8.02,5.859-14.375c0-6.457-2.109-11.094-6.328-13.906
+				s-10.573-4.219-19.063-4.219h-12.344V381.763z"/>
+		</g>
+	</g>
+	<g>
+		<polygon fill="#F4AD26" stroke="#FFFFFF" stroke-width="8" stroke-miterlimit="10" points="131.384,360.823 97.603,472.71 
+			165.167,472.71 		"/>
+		
+			<rect x="89.013" y="324.298" fill="#F4AD26" stroke="#FFFFFF" stroke-width="8" stroke-miterlimit="10" width="84.745" height="84.747"/>
+	</g>
+	<g>
+		<polygon fill="#0795BB" stroke="#FFFFFF" stroke-width="8" stroke-miterlimit="10" points="97.603,338.703 52.265,488.857 
+			142.941,488.857 		"/>
+		<circle fill="#0795BB" stroke="#FFFFFF" stroke-width="8" stroke-miterlimit="10" cx="97.603" cy="324.366" r="45.337"/>
+	</g>
+	
+		<rect x="700.63" y="296.915" transform="matrix(-0.8192 -0.5735 0.5735 -0.8192 1078.001 1112.1836)" fill="#F4AD26" stroke="#FFFFFF" stroke-width="8" stroke-miterlimit="10" width="27.336" height="178.534"/>
+	
+		<rect x="700.809" y="296.974" transform="matrix(0.8191 -0.5736 0.5736 0.8191 -92.3286 479.6829)" fill="#0795BB" stroke="#FFFFFF" stroke-width="8" stroke-miterlimit="10" width="27.332" height="178.547"/>
+	<rect x="629.859" y="292.375" fill="#FFFFFF" width="169.018" height="35.77"/>
+	<rect x="631.902" y="443.337" fill="#FFFFFF" width="169.018" height="35.771"/>
+</g>
+</svg>
