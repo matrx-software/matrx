@@ -14,6 +14,16 @@ html {
     position:absolute;
 }
 
+/* Logo */
+
+#matrx_logo {
+    width: 103px;
+    height: 43px;
+    background: white;
+    border-radius: 2px;
+    padding: 2px 5px;
+}
+
 
 /* Toggle the start button to pause or vice versa if pressed */
 .hidden {
