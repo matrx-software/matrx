@@ -120,7 +120,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../simgoals.html">Simulation goals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../scenarios.html">Scenarios</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">Utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
 
             
@@ -189,21 +188,6 @@
             
   <div class="section" id="module-matrxs.agents.agent_brain">
 <span id="matrxs-agents-agent-brain"></span><h1>matrxs.agents.agent_brain<a class="headerlink" href="#module-matrxs.agents.agent_brain" title="Permalink to this headline">¶</a></h1>
-<p class="rubric">Functions</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_distance</span></code>(coord1, coord2)</p></td>
-<td><p>Get distance between two x,y coordinates</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_possible_door_open_close</span></code>(grid_world, …)</p></td>
-<td><p>Same as is_possible, but this function uses the action_kwargs to get a more accurate prediction.</p></td>
-</tr>
-</tbody>
-</table>
 <p class="rubric">Classes</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -211,71 +195,12 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Action</span></code>([duration_in_ticks])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="matrxs.agents.agent_brain.AgentBrain.html#matrxs.agents.agent_brain.AgentBrain" title="matrxs.agents.agent_brain.AgentBrain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AgentBrain</span></code></a>()</p></td>
 <td><p><p class="rubric">Methods</p>
 </p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActionResult</span></code>(result, succeeded)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AgentBody</span></code>(location, possible_actions, …)</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">Attributes</dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="matrxs.agents.agent_brain.AgentBrain.html#matrxs.agents.agent_brain.AgentBrain" title="matrxs.agents.agent_brain.AgentBrain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AgentBrain</span></code></a>()</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AreaTile</span></code>(location[, name, visualize_colour, …])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">Attributes</dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CloseDoorAction</span></code>([duration_in_ticks])</p></td>
-<td><p>Action to open a Door</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CloseDoorActionResult</span></code>(result, succeeded)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Door</span></code>(location, is_open[, name, open_colour, …])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">Attributes</dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropObject</span></code>([duration_in_ticks])</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DropObjectResult</span></code>(result, succeeded[, obj_id])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">GrabObject</span></code>([duration_in_ticks])</p></td>
-<td><p>An action that allows agent to grab EnvObjects (only objects) from the GridWorld.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">GrabObjectResult</span></code>(result, succeeded)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/agents/agent_brain/index.html#matrxs.agents.agent_brain.Message" title="matrxs.agents.agent_brain.Message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Message</span></code></a>(content, from_id[, to_id])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/agents/agent_brain/index.html#matrxs.agents.agent_brain.Message" title="matrxs.agents.agent_brain.Message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Message</span></code></a>(content, from_id[, to_id])</p></td>
 <td><p>A simple object representing a communication message.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenDoorAction</span></code>([duration_in_ticks])</p></td>
-<td><p>Action to open a Door</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenDoorActionResult</span></code>(result, succeeded)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoveObject</span></code>([duration_in_ticks])</p></td>
-<td><p>An action that allows agent to remove EnvObjects (basically ALL objects except YOURSELF) from the GridWorld permanently.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoveObjectResult</span></code>(result, succeeded)</p></td>
-<td><p></p></td>
 </tr>
 </tbody>
 </table>

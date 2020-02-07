@@ -29,10 +29,6 @@ import sphinx_rtd_theme
 sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath("../.."))
 
-# print("\n\n -- System Path --> \n")
-# for p in sys.path:
-#     print(f"{p}")
-# print("\n\n")
 
 # -- Project information -----------------------------------------------------
 # The full version, including alpha/beta/rc tags
@@ -50,7 +46,7 @@ author = 'The MATRXS Team at TNO.nl'
 # ones.
 extensions = [
     'sphinx.ext.autosummary',
-    'sphinx.ext.autodoc',
+    # 'sphinx.ext.autodoc',
     'autoapi.extension',
     'sphinx.ext.coverage',
     'numpydoc',
@@ -64,6 +60,7 @@ extensions = [
 autoapi_dirs = ['../..']
 autoapi_type = 'python'
 autoapi_options = ['members', 'undoc-members', 'private-members', 'show-inheritance', 'special-members', 'show-module-summary']
+autoapi_add_toctree_entry = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -82,6 +79,7 @@ master_doc = 'index'
 autodoc_member_order = 'bysource'
 
 autosummary_generate = True
+autosummary_imported_members = False
 
 html_theme_options = {
     'prev_next_buttons_location': 'bottom',

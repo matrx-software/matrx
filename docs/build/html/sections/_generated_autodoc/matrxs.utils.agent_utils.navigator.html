@@ -133,7 +133,6 @@
 <li class="toctree-l2"><a class="reference internal" href="matrxs.utils.agent_utils.task_manager.html">matrxs.utils.agent_utils.task_manager</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
 
             
@@ -211,16 +210,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">act_move</span></code>(grid_world, agent_id, dx, dy)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/utils/agent_utils/navigator/index.html#matrxs.utils.agent_utils.navigator.get_move_actions" title="matrxs.utils.agent_utils.navigator.get_move_actions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_move_actions</span></code></a>(action_set)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_possible_movement</span></code>(grid_world, agent_id, …)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">possible_movement</span></code>(grid_world, agent_id, dx, dy)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/utils/agent_utils/navigator/index.html#matrxs.utils.agent_utils.navigator.get_move_actions" title="matrxs.utils.agent_utils.navigator.get_move_actions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_move_actions</span></code></a>(action_set)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -235,75 +225,15 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/utils/agent_utils/navigator/index.html#matrxs.utils.agent_utils.navigator.AStarPlanner" title="matrxs.utils.agent_utils.navigator.AStarPlanner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AStarPlanner</span></code></a>(action_set[, metric])</p></td>
 <td><p>A* algorithm for path planning.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Action</span></code>([duration_in_ticks])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/utils/agent_utils/navigator/index.html#matrxs.utils.agent_utils.navigator.Navigator" title="matrxs.utils.agent_utils.navigator.Navigator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Navigator</span></code></a>(agent_id, action_set[, algorithm, …])</p></td>
 <td><p><p class="rubric">Methods</p>
 </p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActionResult</span></code>(result, succeeded)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AgentBody</span></code>(location, possible_actions, …)</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">Attributes</dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Move</span></code>([duration_in_ticks])</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveActionResult</span></code>(result, succeeded)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveEast</span></code>()</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveNorth</span></code>()</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveNorthEast</span></code>()</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveNorthWest</span></code>()</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveSouth</span></code>()</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveSouthEast</span></code>()</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveSouthWest</span></code>()</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveWest</span></code>()</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/utils/agent_utils/navigator/index.html#matrxs.utils.agent_utils.navigator.Navigator" title="matrxs.utils.agent_utils.navigator.Navigator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Navigator</span></code></a>(agent_id, action_set[, algorithm, …])</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OrderedDict</span></code></p></td>
-<td><p>Dictionary that remembers insertion order</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/utils/agent_utils/navigator/index.html#matrxs.utils.agent_utils.navigator.PathPlanner" title="matrxs.utils.agent_utils.navigator.PathPlanner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PathPlanner</span></code></a>(action_set)</p></td>
 <td><p><p class="rubric">Methods</p>
 </p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">StateTracker</span></code>(agent_id[, knowledge_decay])</p></td>
-<td><p><p class="rubric">Methods</p>
-</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/utils/agent_utils/navigator/index.html#matrxs.utils.agent_utils.navigator.Waypoint" title="matrxs.utils.agent_utils.navigator.Waypoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Waypoint</span></code></a>(loc, priority)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/utils/agent_utils/navigator/index.html#matrxs.utils.agent_utils.navigator.Waypoint" title="matrxs.utils.agent_utils.navigator.Waypoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Waypoint</span></code></a>(loc, priority)</p></td>
 <td><p><p class="rubric">Methods</p>
 </p></td>
 </tr>

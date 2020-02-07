@@ -5,12 +5,6 @@ matrxs.utils.agent\_utils.state\_tracker
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      get_distance
-   
    
 
    

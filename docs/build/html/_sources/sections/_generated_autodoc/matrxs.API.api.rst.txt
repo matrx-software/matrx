@@ -9,7 +9,6 @@ matrxs.API.api
 
    .. autosummary::
    
-      abort
       add_state
       bad_request
       change_MATRXS_speed
@@ -20,7 +19,6 @@ matrxs.API.api
       get_latest_state
       get_states
       get_states_specific_agents
-      jsonify
       next_tick
       pause_MATRXS
       pop_userinput
@@ -36,14 +34,6 @@ matrxs.API.api
    
 
    
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-   
-      CORS
-      Flask
-      Message
    
    
 

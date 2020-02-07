@@ -111,7 +111,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../simgoals.html">Simulation goals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../scenarios.html">Scenarios</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">Utils</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../autoapi/index.html">API Reference</a></li>
 </ul>
 
             
@@ -185,41 +184,35 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">abort</span></code>(status, \*args, \*\*kwargs)</p></td>
-<td><p>Raises an <code class="xref py py-exc docutils literal notranslate"><span class="pre">HTTPException</span></code> for the given status code or WSGI application.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.add_state" title="matrxs.API.api.add_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_state</span></code></a>(agent_id, state, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.add_state" title="matrxs.API.api.add_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_state</span></code></a>(agent_id, state, …)</p></td>
 <td><p>aves the state of an agent for use via the API</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.bad_request" title="matrxs.API.api.bad_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bad_request</span></code></a>(e)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.bad_request" title="matrxs.API.api.bad_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bad_request</span></code></a>(e)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.change_MATRXS_speed" title="matrxs.API.api.change_MATRXS_speed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">change_MATRXS_speed</span></code></a>(tick_dur)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.change_MATRXS_speed" title="matrxs.API.api.change_MATRXS_speed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">change_MATRXS_speed</span></code></a>(tick_dur)</p></td>
 <td><p>Change the tick duration / simulation speed of MATRXS</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.check_API_request" title="matrxs.API.api.check_API_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_API_request</span></code></a>([tick, ids, ids_required])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.check_API_request" title="matrxs.API.api.check_API_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_API_request</span></code></a>([tick, ids, ids_required])</p></td>
 <td><p>Checks if the variables of the API request are valid, and if the requested information exists</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.create_error_response" title="matrxs.API.api.create_error_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_error_response</span></code></a>(code, message)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.create_error_response" title="matrxs.API.api.create_error_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_error_response</span></code></a>(code, message)</p></td>
 <td><p>Creates an error code with a custom message</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.flask_thread" title="matrxs.API.api.flask_thread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flask_thread</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.flask_thread" title="matrxs.API.api.flask_thread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flask_thread</span></code></a>()</p></td>
 <td><p>Starts the Flask server on localhost:3001</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.get_info" title="matrxs.API.api.get_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_info</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.get_info" title="matrxs.API.api.get_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_info</span></code></a>()</p></td>
 <td><p>Provides the general information on the world, contained in the world object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.get_latest_state" title="matrxs.API.api.get_latest_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_latest_state</span></code></a>(agent_ids)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.get_latest_state" title="matrxs.API.api.get_latest_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_latest_state</span></code></a>(agent_ids)</p></td>
 <td><p>Provides the latest state of one or multiple agents</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.get_states" title="matrxs.API.api.get_states"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_states</span></code></a>(tick)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.get_states" title="matrxs.API.api.get_states"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_states</span></code></a>(tick)</p></td>
 <td><p>Provides the states of all agents (including the god view) from tick ‘tick’ onwards to current tick.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.get_states_specific_agents" title="matrxs.API.api.get_states_specific_agents"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_states_specific_agents</span></code></a>(tick, agent_ids)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.get_states_specific_agents" title="matrxs.API.api.get_states_specific_agents"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_states_specific_agents</span></code></a>(tick, agent_ids)</p></td>
 <td><p>Provides the states starting from tick ‘tick’ to current_tick, for the agents specified in ‘agent_ids’.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">jsonify</span></code>(\*args, \*\*kwargs)</p></td>
-<td><p>This function wraps <code class="xref py py-func docutils literal notranslate"><span class="pre">dumps()</span></code> to add a few enhancements that make life easier.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.next_tick" title="matrxs.API.api.next_tick"><code class="xref py py-obj docutils literal notranslate"><span class="pre">next_tick</span></code></a>()</p></td>
 <td><p>Proceed to the next tick, publicizing data of the new tick via the API (the new states).</p></td>
@@ -253,24 +246,6 @@
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="../../autoapi/matrxs/API/api/index.html#matrxs.API.api.stop_MATRXS" title="matrxs.API.api.stop_MATRXS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stop_MATRXS</span></code></a>()</p></td>
 <td><p>Stops MATRXS scenario</p></td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Classes</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CORS</span></code>([app])</p></td>
-<td><p>Initializes Cross Origin Resource sharing for the application.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Flask</span></code>(import_name[, static_url_path, …])</p></td>
-<td><p>The flask object implements a WSGI application and acts as the central object.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Message</span></code>(content, from_id[, to_id])</p></td>
-<td><p>A simple object representing a communication message.</p></td>
 </tr>
 </tbody>
 </table>

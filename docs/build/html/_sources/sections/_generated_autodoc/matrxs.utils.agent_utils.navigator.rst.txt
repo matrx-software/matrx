@@ -9,10 +9,7 @@ matrxs.utils.agent\_utils.navigator
 
    .. autosummary::
    
-      act_move
       get_move_actions
-      is_possible_movement
-      possible_movement
    
    
 
@@ -23,23 +20,8 @@ matrxs.utils.agent\_utils.navigator
    .. autosummary::
    
       AStarPlanner
-      Action
-      ActionResult
-      AgentBody
-      Move
-      MoveActionResult
-      MoveEast
-      MoveNorth
-      MoveNorthEast
-      MoveNorthWest
-      MoveSouth
-      MoveSouthEast
-      MoveSouthWest
-      MoveWest
       Navigator
-      OrderedDict
       PathPlanner
-      StateTracker
       Waypoint
    
    

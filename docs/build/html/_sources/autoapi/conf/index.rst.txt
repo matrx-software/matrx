@@ -28,7 +28,7 @@ Module Contents
    
 
 .. data:: extensions
-   :annotation: = ['sphinx.ext.autosummary', 'sphinx.ext.autodoc', 'autoapi.extension', 'sphinx.ext.coverage', 'numpydoc', 'sphinx_rtd_theme', 'sphinx.ext.autosectionlabel', 'sphinx.ext.todo', 'recommonmark']
+   :annotation: = ['sphinx.ext.autosummary', 'autoapi.extension', 'sphinx.ext.coverage', 'numpydoc', 'sphinx_rtd_theme', 'sphinx.ext.autosectionlabel', 'sphinx.ext.todo', 'recommonmark']
 
    
 
@@ -44,6 +44,11 @@ Module Contents
 
 .. data:: autoapi_options
    :annotation: = ['members', 'undoc-members', 'private-members', 'show-inheritance', 'special-members', 'show-module-summary']
+
+   
+
+.. data:: autoapi_add_toctree_entry
+   :annotation: = False
 
    
 
@@ -77,8 +82,8 @@ Module Contents
 
    
 
-.. data:: numpydoc_class_members_toctree
-   :annotation: = True
+.. data:: autosummary_imported_members
+   :annotation: = False
 
    
 
