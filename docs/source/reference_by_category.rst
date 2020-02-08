@@ -15,7 +15,7 @@ Reference by category
    sections/brains.rst
    sections/objects.rst
    sections/simgoals.rst
-   setions/api.rst
+   sections/api.rst
    sections/scenarios.rst
    sections/utils.rst
 
@@ -24,7 +24,7 @@ Reference by category
 
   .. container:: descr
 
-     .. figure:: images/worlds_banner.jpg
+     .. figure:: _static/images/worlds_banner.jpg
         :target: sections/worlds.html
 
      :ref:`Worlds`
@@ -32,7 +32,7 @@ Reference by category
 
   .. container:: descr
 
-     .. figure:: images/brains_banner.jpg
+     .. figure:: _static/images/brains_banner.jpg
         :target: sections/agents.html
 
      :ref:`Agents`
@@ -40,7 +40,7 @@ Reference by category
 
   .. container:: descr
 
-     .. figure:: images/shape_banner.jpg
+     .. figure:: _static/images/shape_banner.jpg
         :target: sections/objects.html
 
      :ref:`Object placement`
@@ -48,7 +48,7 @@ Reference by category
 
   .. container:: descr
 
-     .. figure:: images/action_banner.jpg
+     .. figure:: _static/images/action_banner.jpg
         :target: sections/actions.html
 
      :ref:`Actions`
@@ -56,7 +56,7 @@ Reference by category
 
   .. container:: descr
 
-     .. figure:: images/goal_banner.jpg
+     .. figure:: _static/images/goal_banner.jpg
         :target: sections/simgoals.html
 
      :ref:`Simulation goals`
@@ -65,7 +65,7 @@ Reference by category
 
   .. container:: descr
 
-     .. figure:: images/shape_banner.jpg
+     .. figure:: _static/images/shape_banner.jpg
         :target: sections/scenarios.html
 
      :ref:`Scenarios`
@@ -74,7 +74,7 @@ Reference by category
 
   .. container:: descr
 
-     .. figure:: images/utils_banner.jpg
+     .. figure:: _static/images/utils_banner.jpg
         :target: sections/api.html
 
      :ref:`API`
@@ -82,7 +82,7 @@ Reference by category
 
   .. container:: descr
 
-     .. figure:: images/utils_banner.jpg
+     .. figure:: _static/images/utils_banner.jpg
         :target: sections/utils.html
 
      :ref:`Utils`

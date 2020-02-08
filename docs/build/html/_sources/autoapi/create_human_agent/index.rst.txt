@@ -1,6 +1,0 @@
-:mod:`create_human_agent`
-=========================
-
-.. py:module:: create_human_agent
-
-

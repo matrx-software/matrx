@@ -1,6 +1,0 @@
-:mod:`create_world_factory`
-===========================
-
-.. py:module:: create_world_factory
-
-
