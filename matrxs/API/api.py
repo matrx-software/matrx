@@ -6,7 +6,7 @@ import logging
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
-from matrxs.agents.agent_brain import Message
+from matrxs.utils.message import Message
 
 '''
 This file holds the code for the MATRXS RESTful API.
@@ -186,7 +186,7 @@ def send_userinput(agent_ids):
 def send_message():
     """ Send a message containing information to one or multiple specific agent, the agent's team, or all agents
 
-    Message as defined in agent_brain.py
+    Message as defined in matrx.utils.message
 
     Parameters
     ----------
@@ -202,6 +202,7 @@ def send_message():
 
     Returns
     -------
+        Error if API call invalid, or True if valid.
     """
     # fetch the data
     data = request.json

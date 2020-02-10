@@ -1,6 +1,6 @@
 import json
-
 import math
+import random
 import numpy as np
 
 from matrxs.agents.capabilities.capability import SenseCapability
@@ -225,3 +225,18 @@ def _perlin_noise(min_x, max_x, min_y, max_y, rng):
 def _white_noise(min_x, max_x, min_y, max_y, rng):
     noise_table = rng.normal(size=[max_x - min_x, max_y - min_y])
     return noise_table
+
+
+def gen_random_string(length):
+    """ Generates a random hexidecimal string of length 'length'.
+
+    Parameters
+    ----------
+    length
+        Length of the hexidecimal string to return.
+
+    Returns
+    -------
+        A random hexidecimal string of length 'length'.
+    """
+    return '%030x' % random.randrange(16**30)
