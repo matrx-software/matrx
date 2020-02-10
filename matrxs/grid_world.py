@@ -32,6 +32,7 @@ class GridWorld:
         self.__verbose = verbose  # Set whether we should print anything or not
         self.world_ID = world_ID # ID of this simulation world
 
+        self.__teams = {} # dictionary with team names (keys), and agents in those teams (values)
         self.__registered_agents = OrderedDict()  # The dictionary of all existing agents in the GridWorld
         self.__environment_objects = OrderedDict()  # The dictionary of all existing objects in the GridWorld
 
@@ -75,6 +76,8 @@ class GridWorld:
 
             if self.__verbose:
                 print(f"@{os.path.basename(__file__)}: Initialized the GridWorld.")
+
+
 
     def run(self, api_info):
         # initialize the gridworld
@@ -264,6 +267,22 @@ class GridWorld:
 
         return env_object.obj_id
 
+    def _register_teams(self):
+        """ Register all teams and who is in those teams.
+        An agent is always in a team, if not set by the user, a team is created with name 'agent_id' with only that
+        agent in it.
+        """
+        # loop through all agents
+        for agent in self.registered_agents:
+            # find their team name
+            team = agent.properties.team
+
+            # register the team (if not already done) and the agent in it
+            if team not in self.__teams:
+                self.__teams = []
+            self.__teams[team].append(agent.obj_id)
+
+
     def _register_logger(self, logger: GridWorldLogger):
         if self.__loggers is None:
             self.__loggers = [logger]
@@ -389,7 +408,7 @@ class GridWorld:
 
                     # preprocess all messages of the current tick
                     agent_messages = self.message_manager.preprocess_messages(self.__current_nr_ticks, agent_messages,
-                                                                              all_agent_ids)
+                                                                              all_agent_ids, self.__teams)
 
                     # go through all messages
                     for mssg in agent_messages:
@@ -661,6 +680,7 @@ class GridWorld:
 
         # Whether the action succeeded or not, we return the result
         return result
+
 
     def __set_agent_busy(self, action_name, action_kwargs, agent_id):
 

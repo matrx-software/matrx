@@ -216,6 +216,8 @@ def send_message():
     # create message
     msg = Message(content=data['message'], from_id=data['sender'], to_id=data['receiver'])
 
+    print("API: Receiver of message:", data['receiver'])
+
     # add the messages to the API global variable
     if data['sender'] not in messages:
         messages[data['sender']] = []
