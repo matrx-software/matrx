@@ -96,8 +96,6 @@ class GridWorld:
             if self.__verbose:
                 print(f"@{os.path.basename(__file__)}: Initialized the GridWorld.")
 
-
-<<<<<<< HEAD
     def fetch_initial_states(self):
         """ MATRX starts paused by default, to prime the API and any connected GUI's, we fetch the first state
         from all agents to send which can be shown while waiting for the experiment leader to press play.
@@ -122,8 +120,7 @@ class GridWorld:
         # agents have been updated
         api.next_tick()
 
-=======
->>>>>>> dev
+
 
     def run(self, api_info):
         # initialize the gridworld
@@ -464,12 +461,8 @@ class GridWorld:
             # save the current agent's state for the API
             if self.__run_matrxs_api:
                 api.add_state(agent_id=agent_id, state=filtered_agent_state,
-<<<<<<< HEAD
                               agent_inheritence_chain=agent_obj.class_inheritance,
                               world_settings=self.__get_complete_state()['World'])
-=======
-                              agent_inheritence_chain=agent_obj.class_inheritance)
->>>>>>> dev
 
             # if this agent is at its last tick of waiting on its action duration, we want to actually perform the
             # action
