@@ -7,10 +7,10 @@
 
    .. |vertical_separator| unicode:: U+02758
 
-.. figure:: /_static/images/tno_banner.png
+.. figure:: _static/images/tno_banner.png
    :width: 150%
 
-MATRXS' documentation
+MATRX documentation
 ======================
 
 Welcome! This is the documentation for Man-Agent Teaming; Rapid eXperimentation Software (MATRXS).
@@ -21,126 +21,145 @@ MATRXS a 2D-discrete testbed to facilitate Human Agent Teaming (HAT) research. T
 Getting started
 ===============
 
-+---------------------+---------------------+---------------------+---------------------+
-| :ref:`About MATRXS` | :ref:`Installation` |  :ref:`Reference`   |  :ref:`genindex`    |
-+---------------------+---------------------+---------------------+---------------------+
-| :ref:`Tutorials`    |  :ref:`F.A.Q.`      |  :ref:`search`      |  :ref:`modindex`    |
-+---------------------+---------------------+---------------------+---------------------+
+.. container:: hidden_caption
 
+   .. toctree::
+      :caption: Getting started
+      :maxdepth: 1
+
+      general_info/aboutmatrxs.rst
+      installation/installing.rst
+      tutorials/tutorials.rst
+      tutorials/examples.rst
+      reference_by_category.rst
+
+
+
+General information
+=============================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Getting started
    :hidden:
+   :maxdepth: 1
+   :caption: General Information
 
-   about/aboutmatrxs.rst
-   installation/installing.rst
-   about/tutorials.rst
-   about/FAQ.rst
+   general_info/when_to_use.rst
+   general_info/glossary.rst
+   general_info/roadmap.rst
+   general_info/faq.rst
+
+.. container:: bullet_list
+
+    * :ref:`F.A.Q.`
+    * :ref:`When to use`
+    * :ref:`Glossary`
+    * :ref:`Roadmap`
+
+
+For developers
+===============
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: For Developers
+
+   developer_info/how_to_contribute.rst
+   developer_info/changelog.rst
+
+.. container:: bullet_list
+
+   * :ref:`How to contribute`
+   * :ref:`Changelog`
+   * :ref:`genindex`
 
 
 
 
-
-Sections
-========
+.. _Reference by Category:
+Reference by Category
+================================
 .. The image ratio is: width: 350px; height: 350/4 + (2x5) ~= 98px
 .. toctree::
    :maxdepth: 2
-   :caption: Sections
+   :caption: Reference by Category
    :hidden:
 
    sections/worlds.rst
    sections/actions.rst
-   sections/brains.rst
+   sections/agents.rst
    sections/objects.rst
    sections/simgoals.rst
+   sections/api.rst
+   sections/scenarios.rst
    sections/utils.rst
-..   sections/visuals.rst
 
 
-.. .. only:: builder_html and (not singlehtml)
 
 .. container:: tocdescr
 
-  .. container:: descr
+ .. container:: descr
 
-     .. figure:: /_static/images/worlds_banner.jpg
-        :target: sections/worlds.html
+    .. figure:: _static//images/worlds_banner.jpg
+       :target: sections/worlds.html
 
-     :ref:`Worlds`
-        Learn MATRXS' way of creating worlds.
+    :ref:`Worlds`
+       Learn MATRXS' way of creating worlds.
 
-  .. container:: descr
+ .. container:: descr
 
-     .. figure:: /_static/images/brains_banner.jpg
-        :target: sections/brains.html
+    .. figure:: _static/images/brains_banner.jpg
+       :target: sections/agents.html
 
-     :ref:`Brains`
-       Check this section for a piece of the agents' minds.
+    :ref:`Agents`
+      Check this section for a piece of the agents' minds.
 
-  .. container:: descr
+ .. container:: descr
 
-     .. figure:: /_static/images/shape_banner.jpg
-        :target: sections/objects.html
+    .. figure:: _static/images/shape_banner.jpg
+       :target: sections/objects.html
 
-     :ref:`Object placement`
-        Make the world more worldlike by placing objects in it.
+    :ref:`Object placement`
+       Make the world more worldlike by placing objects in it.
 
-  .. container:: descr
+ .. container:: descr
 
-     .. figure:: /_static/images/action_banner.jpg
-        :target: sections/actions.html
+    .. figure:: _static/images/action_banner.jpg
+       :target: sections/actions.html
 
-     :ref:`Actions`
-        Agents can perform actions.
+    :ref:`Actions`
+       Agents can perform actions.
 
-  .. container:: descr
+ .. container:: descr
 
-     .. figure:: /_static/images/goal_banner.jpg
-        :target: sections/simgoals.html
+    .. figure:: _static/images/goal_banner.jpg
+       :target: sections/simgoals.html
 
-     :ref:`Simulation goals`
-        A certain goal is set for the simulation to end.
-
-  .. container:: descr
-
-     .. figure:: /_static/images/utils_banner.jpg
-        :target: sections/utils.html
-
-     :ref:`Utils`
-        Useful functions.
-
-..      .. container:: descr
-
-..         .. figure:: /_static/images/server.jpg
-            :target: sections/visuals.html
-           :ref:`Visualization`
-            Visualization by using a Flask server.
+    :ref:`Simulation goals`
+       A certain goal is set for the simulation to end.
 
 
+ .. container:: descr
 
-Resources
-=========
-* `TNO <https://tno.nl>`_
+    .. figure:: _static/images/shape_banner.jpg
+       :target: sections/scenarios.html
 
-.. Indices and tables
-   ==================
-   * :ref:`genindex`
-   * :ref:`modindex`
-   * :ref:`search`
+    :ref:`Scenarios`
+       Defining a world containing objects, agents, actions, and simulation goals.
 
 
+ .. container:: descr
 
+    .. figure:: _static/images/utils_banner.jpg
+       :target: sections/api.html
 
+    :ref:`API`
+       Connecting MATRX to other software, such as GUIs or frameworks.
 
+ .. container:: descr
 
+    .. figure:: _static/images/utils_banner.jpg
+       :target: sections/utils.html
 
-
-
-
-
-
-
-
-
+    :ref:`Utils`
+       Useful functions.

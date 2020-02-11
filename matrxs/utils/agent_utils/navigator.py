@@ -189,6 +189,9 @@ class PathPlanner:
 
 
 class AStarPlanner(PathPlanner):
+    """ A* algorithm for path planning.
+    """
+
     EUCLIDEAN_METRIC = "euclidean"
     MANHATTAN_METRIC = "manhattan"
 

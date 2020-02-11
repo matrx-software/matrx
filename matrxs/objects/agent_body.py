@@ -141,6 +141,9 @@ class AgentBody(EnvObject):
                          visualize_opacity=visualize_opacity,
                          **custom_properties)
 
+        # the GUI cannot differentiate capital letters (in the url), so make the agent ID lowercase
+        self.obj_id = self.obj_id.lower()
+
         # If there was no team name given, the Agent's body (and as an extension its Agent's brain) is part of its own
         # team which is simply its object id. For this we need to object id, which was made in the EnvObject
         # constructor, that is why we call this AFTER calling that.

@@ -547,6 +547,8 @@ class WorldBuilder:
                            visualize_opacity=visualize_opacities[idx],
                            **custom_properties[idx])
 
+
+
     def add_agent_prospect(self, location, agent, probability, name="Agent", customizable_properties=None,
                            sense_capability=None,
                            is_traversable=None, team=None, possible_actions=None,
@@ -946,11 +948,16 @@ class WorldBuilder:
         for agent, agent_avatar in avatars:
             world._register_agent(agent, agent_avatar)
 
+        # Register all teams and who is in them
+        world._register_teams()
+
         # Add all loggers if any
         for logger_class, arguments in self.loggers:
             logger = logger_class(**arguments)
             logger._set_world_nr(self.worlds_created)
             world._register_logger(logger)
+
+
 
         # Return the (successful/stable) world
         return world
@@ -1116,7 +1123,7 @@ class WorldBuilder:
         if self.run_matrxs_visualizer:
             print("Shutting down MATRXs visualizer")
             r = requests.get("http://localhost:" + str(visualization_server.port) + "/shutdown_visualizer")
-            self.matrxs_vis_process.join()
+            self.matrxs_visualizer_thread.join()
 
 
 

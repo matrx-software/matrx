@@ -114,6 +114,7 @@ def run_matrxs_visualizer(verbose):
 
     print("Starting visualization server")
     print("Initialized app:", app)
+    print("Open http://localhost:" + str(port) + "/god for a god-mode view of the active simulation.")
     vis_thread = threading.Thread(target=flask_thread)
     vis_thread.start()
     return vis_thread

@@ -29,10 +29,6 @@ import sphinx_rtd_theme
 sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath("../.."))
 
-print("\n\n -- System Path --> \n")
-for p in sys.path:
-    print(f"{p}")
-print("\n\n")
 
 # -- Project information -----------------------------------------------------
 # The full version, including alpha/beta/rc tags
@@ -43,8 +39,6 @@ copyright = '2019, The MATRXS Team at TNO.nl'
 author = 'The MATRXS Team at TNO.nl'
 
 
-
-
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -52,13 +46,21 @@ author = 'The MATRXS Team at TNO.nl'
 # ones.
 extensions = [
     'sphinx.ext.autosummary',
-    'sphinx.ext.autodoc',
+    # 'sphinx.ext.autodoc',
+    'autoapi.extension',
     'sphinx.ext.coverage',
     'numpydoc',
     'sphinx_rtd_theme',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.todo',
+    'recommonmark'
 ]
+
+# autoapi automatically creates files with documentation
+autoapi_dirs = ['../..']
+autoapi_type = 'python'
+autoapi_options = ['members', 'undoc-members', 'private-members', 'show-inheritance', 'special-members', 'show-module-summary']
+autoapi_add_toctree_entry = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -72,19 +74,12 @@ exclude_patterns = []
 # unit titles (such as .. function::).
 add_module_names = False
 
-# Auto generate the TOC elements for when using this autodoc flag (e.g. 'members')
-autodoc_default_options = {
-    'members': None,
-    'member-order': 'bysource',
-    'special-members': '__init__',
-    'undoc-members': None
-}
-
 master_doc = 'index'
 
 autodoc_member_order = 'bysource'
 
 autosummary_generate = True
+autosummary_imported_members = False
 
 html_theme_options = {
     'prev_next_buttons_location': 'bottom',
@@ -94,7 +89,8 @@ html_theme_options = {
     'titles_only': True,
 }
 
-html_logo = 'matrxslogo.png'
+html_logo = '_static/images/matrx_logo.svg'
+
 # -- Options for HTML output -------------------------------------------------
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -106,13 +102,11 @@ highlight_language = 'python3'
 # a list of builtin themes.
 
 html_theme = 'sphinx_rtd_theme'
-# html_theme = 'sphinx_modern_theme'
 
+html_static_path = ['tutorials/images', '_static', '../build/html/_static']
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['../build/_static']
-
 def setup(app):
     app.add_stylesheet("css/theme_overrides.css")

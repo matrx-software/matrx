@@ -20,7 +20,7 @@ def create_factory():
         if even:
             even = False
             start = [x, 0]
-            factory.add_agent(start, navigating_agent, name="navigate_" + str(x), visualize_shape=0, has_menu=True)
+            factory.add_agent(start, navigating_agent, name="Navigate_" + str(x), visualize_shape=0, has_menu=True)
         else:
             even = True
             start = [x, 5]
