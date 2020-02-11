@@ -14,6 +14,7 @@ from matrxs.logger.logger import GridWorldLogger
 from matrxs.objects.env_object import EnvObject
 from matrxs.objects.simple_objects import AreaTile
 from matrxs.utils.utils import get_all_classes
+from matrxs.utils.message_manager import  MessageManager
 from matrxs.API import api
 from matrxs.agents.agent_brain import AgentBrain
 
@@ -31,6 +32,7 @@ class GridWorld:
         self.__verbose = verbose  # Set whether we should print anything or not
         self.world_ID = world_ID # ID of this simulation world
 
+        self.__teams = {} # dictionary with team names (keys), and agents in those teams (values)
         self.__registered_agents = OrderedDict()  # The dictionary of all existing agents in the GridWorld
         self.__environment_objects = OrderedDict()  # The dictionary of all existing objects in the GridWorld
 
@@ -48,6 +50,7 @@ class GridWorld:
         self.__current_nr_ticks = 0  # The number of tick this GridWorld has ran already
         self.__is_initialized = False  # Whether this GridWorld is already initialized
         self.__message_buffer = {}  # dictionary of messages that need to be send to agents, with receiver ids as keys
+        self.message_manager = MessageManager() # keeps track of all messages and makes them available to the API
 
     def initialize(self, api_info):
         # Only initialize when we did not already do so
@@ -73,6 +76,8 @@ class GridWorld:
 
             if self.__verbose:
                 print(f"@{os.path.basename(__file__)}: Initialized the GridWorld.")
+
+
 
     def run(self, api_info):
         # initialize the gridworld
@@ -262,6 +267,22 @@ class GridWorld:
 
         return env_object.obj_id
 
+    def _register_teams(self):
+        """ Register all teams and who is in those teams.
+        An agent is always in a team, if not set by the user, a team is created with name 'agent_id' with only that
+        agent in it.
+        """
+        # loop through all agents
+        for agent_id, agent_body in self.registered_agents.items():
+            # find their team name
+            team = agent_body.properties['team']
+
+            # register the team (if not already done) and the agent in it
+            if team not in self.__teams:
+                self.__teams[team] = []
+            self.__teams[team].append(agent_id)
+
+
     def _register_logger(self, logger: GridWorldLogger):
         if self.__loggers is None:
             self.__loggers = [logger]
@@ -374,25 +395,23 @@ class GridWorld:
                 # Obtain all communication messages if the agent has something to say to others (only comes here when
                 # the agent is NOT busy)
                 agent_messages = agent_obj.get_messages_func(all_agent_ids)
+
+                # add any messages received from the API sent by this agent
                 if self.__run_matrxs_api:
                     if agent_id in api.messages:
-                        # preprocess the messages received via the API, and add them to the agent's messages
-                        agent_messages += AgentBrain.preprocess_messages(this_agent_id=agent_id,
-                                                                         agent_ids=all_agent_ids,
-                                                                         messages=api.messages[agent_id])
+                        agent_messages += copy.copy(api.messages[agent_id])
+
                         # clear the messages for the next tick
                         del api.messages[agent_id]
-                if len(agent_messages) > 0:  # there are messages
-                    # go through all messages
-                    for mssg in agent_messages:
-                        if mssg.to_id not in self.__message_buffer.keys():  # first message for this receiver
-                            self.__message_buffer[mssg.to_id] = [mssg]
-                        else:
-                            self.__message_buffer[mssg.to_id].append(mssg)
+
+                # preprocess all messages of the current tick of this agent
+                self.message_manager.preprocess_messages(self.__current_nr_ticks, agent_messages,
+                                                                          all_agent_ids, self.__teams)
 
             # save the current agent's state for the API
             if self.__run_matrxs_api:
-                api.add_state(agent_id=agent_id, state=filtered_agent_state, agent_inheritence_chain=agent_obj.class_inheritance)
+                api.add_state(agent_id=agent_id, state=filtered_agent_state,
+                              agent_inheritence_chain=agent_obj.class_inheritance)
 
             # if this agent is at its last tick of waiting on its action duration, we want to actually perform the
             # action
@@ -401,6 +420,14 @@ class GridWorld:
                 action_class_name, action_kwargs = agent_obj._get_duration_action()
                 # store the action in the buffer
                 action_buffer[agent_id] = (action_class_name, action_kwargs)
+
+        # put all messages of the current tick in the message buffer
+        if self.__current_nr_ticks in self.message_manager.preprocessed_messages:
+            for mssg in self.message_manager.preprocessed_messages[self.__current_nr_ticks]:
+                if mssg.to_id not in self.__message_buffer.keys():  # first message for this receiver
+                    self.__message_buffer[mssg.to_id] = [mssg]
+                else:
+                    self.__message_buffer[mssg.to_id].append(mssg)
 
 
         # save the god view state
@@ -635,6 +662,7 @@ class GridWorld:
 
         # Whether the action succeeded or not, we return the result
         return result
+
 
     def __set_agent_busy(self, action_name, action_kwargs, agent_id):
 
