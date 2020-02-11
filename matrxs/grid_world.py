@@ -273,14 +273,14 @@ class GridWorld:
         agent in it.
         """
         # loop through all agents
-        for agent in self.registered_agents:
+        for agent_id, agent_body in self.registered_agents.items():
             # find their team name
-            team = agent.properties.team
+            team = agent_body.properties['team']
 
             # register the team (if not already done) and the agent in it
             if team not in self.__teams:
-                self.__teams = []
-            self.__teams[team].append(agent.obj_id)
+                self.__teams[team] = []
+            self.__teams[team].append(agent_id)
 
 
     def _register_logger(self, logger: GridWorldLogger):
@@ -404,40 +404,14 @@ class GridWorld:
                         # clear the messages for the next tick
                         del api.messages[agent_id]
 
-                if len(agent_messages) > 0:  # there are messages
-
-                    # preprocess all messages of the current tick
-                    agent_messages = self.message_manager.preprocess_messages(self.__current_nr_ticks, agent_messages,
-                                                                              all_agent_ids, self.__teams)
-
-                    # go through all messages
-                    for mssg in agent_messages:
-                        if mssg.to_id not in self.__message_buffer.keys():  # first message for this receiver
-                            self.__message_buffer[mssg.to_id] = [mssg]
-                        else:
-                            self.__message_buffer[mssg.to_id].append(mssg)
-
-
-                # if self.__run_matrxs_api:
-                #     if agent_id in api.messages:
-                #         # preprocess the messages received via the API, and add them to the agent's messages
-                #         agent_messages += AgentBrain.preprocess_messages(this_agent_id=agent_id,
-                #                                                          agent_ids=all_agent_ids,
-                #                                                          messages=api.messages[agent_id])
-                #         # clear the messages for the next tick
-                #         del api.messages[agent_id]
-
-                # if len(agent_messages) > 0:  # there are messages
-                #     # go through all messages
-                #     for mssg in agent_messages:
-                #         if mssg.to_id not in self.__message_buffer.keys():  # first message for this receiver
-                #             self.__message_buffer[mssg.to_id] = [mssg]
-                #         else:
-                #             self.__message_buffer[mssg.to_id].append(mssg)
+                # preprocess all messages of the current tick of this agent
+                self.message_manager.preprocess_messages(self.__current_nr_ticks, agent_messages,
+                                                                          all_agent_ids, self.__teams)
 
             # save the current agent's state for the API
             if self.__run_matrxs_api:
-                api.add_state(agent_id=agent_id, state=filtered_agent_state, agent_inheritence_chain=agent_obj.class_inheritance)
+                api.add_state(agent_id=agent_id, state=filtered_agent_state,
+                              agent_inheritence_chain=agent_obj.class_inheritance)
 
             # if this agent is at its last tick of waiting on its action duration, we want to actually perform the
             # action
@@ -446,6 +420,14 @@ class GridWorld:
                 action_class_name, action_kwargs = agent_obj._get_duration_action()
                 # store the action in the buffer
                 action_buffer[agent_id] = (action_class_name, action_kwargs)
+
+        # put all messages of the current tick in the message buffer
+        if self.__current_nr_ticks in self.message_manager.preprocessed_messages:
+            for mssg in self.message_manager.preprocessed_messages[self.__current_nr_ticks]:
+                if mssg.to_id not in self.__message_buffer.keys():  # first message for this receiver
+                    self.__message_buffer[mssg.to_id] = [mssg]
+                else:
+                    self.__message_buffer[mssg.to_id].append(mssg)
 
 
         # save the god view state

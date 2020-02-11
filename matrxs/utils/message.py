@@ -7,6 +7,13 @@ class Message:
     content, its own id as the sender and (optional) a receiver. If a receiver is not given it is a message to all
     agents, including the sender.
     NOTE: this Message class is also used by the MATRXS API
+
+    Possible formats for mssg.to_id
+    "agent1"                  = individual message to agent1 + message to team "agent1" if it exists
+    ["agent1", "agent2"]      = 2 individual messages + 2 team messages if likewise named teams exist
+    "team2"                   = team message. A team message is sent to everyone in that team
+    '["agent3", "team4"]'     = team + agent message. Provided as a string via the API
+    None                      = global message. This message is send to everyone
     """
 
     def __init__(self, content, from_id, to_id=None):

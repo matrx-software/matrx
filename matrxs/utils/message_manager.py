@@ -9,15 +9,12 @@ class MessageManager():
     """
 
     def __init__(self):
-        # the messages as specified in the agent / API
-        self.messages_unprocessed = {} # all messages unprocessed
-
         # there are three types of messages
         self.global_messages = {} # messages send to everyone
         self.team_messages = {} # messages send to a team
-        self.individual_messages = {} # messages send to individual agents
+        self.private_messages = {} # messages send to individual agents
 
-        self.preprocessed_messages = {} # all the types of messages above unpacked to the corresponding individual messages
+        self.preprocessed_messages = {} # all types of messages above unpacked to the corresponding individual messages
 
 
 
@@ -39,205 +36,133 @@ class MessageManager():
                 Preprocessed messages ready for sending
             -------
             """
-        # safe the messages from this tick
-        self.messages_unprocessed[tick] = messages
 
-        # Messages can be sent from/to chats rooms: The global chat room (everyone), team rooms, or private chat rooms
-        self.global_messages[tick] = []
-        self.team_messages[tick] = {}
-        for team in teams:
-            self.team_messages[tick][team] = []
-        self.individual_messages[tick] = []
-
-        # the messages above all combined into one list
-        self.preprocessed_messages[tick] = []
-
-        # Possible input types:
-        # "agent1"
-        # ["agent1", "agent2"]
-        # "team2"
-        # '["agent3", "team4"]'
-        # None
 
         # process every message
         for mssg in messages:
-            sender_id = mssg.from_id
-            all_ids_except_me = [agent_id for agent_id in all_agent_ids if agent_id != sender_id]
+            # initialize a list for messages for this tick
+            if not tick in self.preprocessed_messages:
+                self.preprocessed_messages[tick] = []
 
             # check the message for validity
-            MessageManager.__check_message(mssg, sender_id)
+            MessageManager.__check_message(mssg, mssg.from_id)
+
+            # decode the receiver_string into agent / team / global messages, save seperatly, and split into individual
+            # messages understandable by the GridWorld
+            self._decode_message_receiver(mssg, all_agent_ids, teams, tick)
 
 
-    def _decode_message_receiver(self, mssg_to, all_agent_ids, all_ids_except_me, teams):
-        """ Processes messages directed at other agents / teams / everyone
+    def _decode_message_receiver(self, mssg, all_agent_ids, teams, tick):
+        """ Processes messages directed at other agents / teams / everyone.
+
+        These types are called private, team, and global messages.
+        Messages of each type are saved for every tick seperatly, as well as a list with all preprocessed messages
+        suitable for sending by the GridWorld.
+
+        Possible formats for mssg.to_id
+        "agent1"                  = private message to agent1 + team "agent1" if it exists
+        ["agent1", "agent2"]      = 2 private messages + team messages if likewise named teams exist
+        "team2"                   = team message sent to everyone in that team
+        '["agent3", "team4"]'     = team + agent message. Provided as a string via the API
+        None                      = global message send to everyone
 
         Parameters
         ----------
-        mssg_to
+        mssg
+            The original mssg object sent by the agent, or received via the API
+
         all_agent_ids
-        all_ids_except_me
+            List with IDs of all agents
+
         teams
+            Dict with all team names (keys), and a list with all agent IDs in that team (value)
 
-        Returns
-        -------
-
+        tick
+            Current tick of the gridworld
         """
+        all_ids_except_me = [agent_id for agent_id in all_agent_ids if agent_id != mssg.from_id]
 
-        if mssg_to is None: # global message
-            to_ids = all_ids_except_me.copy()
-            message_type = "global"
+        # if the receiver is None, it is a global message which has to be sent to everyone
+        if mssg.to_id is None: # global message
+            # create a list in memory for global messages for this tick
+            if tick not in self.global_messages:
+                self.global_messages[tick] = []
 
+            # save in global
+            global_message = Message(content=mssg.content, from_id=mssg.from_id, to_id="global")
+            self.global_messages[tick].append(global_message)
 
-            # todo: send messages
-            # todo: save in global
+            # split in sub mssgs
+            for to_id in all_ids_except_me.copy():
+                # create message
+                new_message = Message(content=mssg.content, from_id=mssg.from_id, to_id=to_id)
 
-        elif isinstance(mssg_to, list):
-            for id in mssg_to:
-                self._decode_message_receiver(mssg_to)
+                # save in prepr
+                self.preprocessed_messages[tick].append(new_message)  # all messages above combined
 
-        elif isinstance(mssg_to, str):
+        # if it is a list, decode every receiver_id in that list again
+        elif isinstance(mssg.to_id, list):
+            for receiver_id in mssg.to_id:
+                # create message
+                new_message = Message(content=mssg.content, from_id=mssg.from_id, to_id=receiver_id)
+
+                self._decode_message_receiver(new_message, all_agent_ids, teams, tick)
+
+        # a string might be: a list encoded as a string, a team, or an agent_id.
+        elif isinstance(mssg.to_id, str):
+            is_team_message = False
+
             try:
                 # check if it is a list encoded as a string (sent via API)
-                ids = eval(mssg_to)
-                self._decode_message_receiver(ids)
+                to_ids = eval(mssg.to_id)
+
+                # create a new message addressed to this list of IDs, and reprocess
+                new_message = Message(content=mssg.content, from_id=mssg.from_id, to_id=to_ids)
+                self._decode_message_receiver(new_message, all_agent_ids, teams, tick)
             except:
                 pass
 
-            # check if it is a team name
-            if mssg_to in teams.keys():
-                message_type = "team"
+            # Check if mssg_to is a teamname. Note: an agent can only send a message to a team if they are in it.
+            if mssg.to_id in teams.keys() and mssg.from_id in teams[mssg.to_id]:
+                # create a list in memory for this team for this tick
+                if tick not in self.team_messages:
+                    self.team_messages[tick] = {}
+                if mssg.to_id not in self.team_messages[tick]:
+                    self.team_messages[tick][mssg.to_id] = []
 
+                is_team_message = True
+
+                # save in team mssgs as a message for that specific team
+                self.team_messages[tick][mssg.to_id].append(mssg)
+
+
+                # split in sub mssgs for every agent in the team
+                for to_id in teams[mssg.to_id]:
+                    # create a message
+                    new_message = Message(content=mssg.content, from_id=mssg.from_id, to_id=to_id)
+
+                    # save in prepr
+                    self.preprocessed_messages[tick].append(new_message)
 
             # check if it is an agent ID (as well)
-            if mssg_to in all_agent_ids:
+            # If no team is set by the user, the agent is added to a new team with the same name as the agent's ID.
+            # As such, a message can be targeted at a team and individual agent at the same time.
+            if mssg.to_id in all_agent_ids:
+                # create a list in memory for private messages for this tick
+                if tick not in self.private_messages:
+                    self.private_messages[tick] = []
 
+                # save in private_messages mssgs
+                self.private_messages[tick].append(mssg)
 
-            to_ids = [mssg.to_id]
+                # if the message was not already saved in the preprocessed list, save it there as well
+                if not is_team_message:
+                    self.preprocessed_messages[tick].append(mssg)
 
-
-        return to_ids
-
-    def __process_message(self, agent_ids, message_type, tick, message_content):
-        """ Create message objects in the correct chat rooms for a list of agent IDs.
-
-        Parameters
-        ----------
-        ids
-            List of agent IDs
-        message_type
-            Type of message: "global", "team" or "individual"
-        """
-        for agent_id in agent_ids:
-            # Save the message to the correct message lists
-            if message_type == "individual":  # messages from individual chat rooms
-                self.individual_messages[tick].append(message_content)
-            elif message_type == "team":  # messages within team chat rooms
-                # the to_id is the team name
-                self.team_messages[tick][agent_id].append(message_content)
-            elif message_type == "global":  # messages in the global chatroom
-                self.global_messages[tick].append(message_content)
-
-
-        # todo: if sending to agent_id, make sure is not send to team instead by agent who is not in that team. Or is that allowable?
-
-        # message_type = "individual"
-        # # check the type of message
-        # if mssg.to_id is None: # global message
-        #     to_ids = all_ids_except_me.copy()
-        #     message_type = "global"
-        #
-        # elif isinstance(mssg.to_id, list):
-        #     for id in mssg.to_id:
-        #
-        # elif isinstance(mssg.to_id, str):
-        #     try:
-        #         ids = eval(ids)
-        #     except:
-        #         pass
-        #
-        #     # check if we have to send it to a team
-        #     if mssg.to_id in teams.keys():
-        #         message_type = "team"
-        #
-        #     to_ids = [mssg.to_id]
-        #
-        # elif isinstance(mssg.to_id, str)
-        #
-        # # otherwise its a list ?
-        # else:
-        #     print("mssg to id:", mssg.to_id, type(mssg.to_id))
-        #     to_ids = mssg.to_id
-
-    #     # Create a message object for each individual message
-    #     for single_to_id in to_ids:
-    #         new_message = Message(content=mssg.content, from_id=sender_id, to_id=single_to_id)
-    #
-    #         # Save the message to the correct message lists
-    #         if message_type == "individual": # messages from individual chat rooms
-    #             self.individual_messages[tick].append(new_message)
-    #         elif message_type == "team": # messages within team chat rooms
-    #             # the to_id is the team name
-    #             self.team_messages[tick][mssg.to_id].append(new_message)
-    #         elif message_type == "global": # messages in the global chatroom
-    #             self.global_messages[tick].append(new_message)
-    #
-    #         self.preprocessed_messages[tick].append(new_message) # all messages above combined
-    #
-    # return self.preprocessed_messages
 
     @staticmethod
     def __check_message(mssg, this_agent_id):
         if not isinstance(mssg, Message):
             raise Exception(f"A message to {this_agent_id} is not, nor inherits from, the class {Message.__name__}."
                             f" This is required for agents to be able to send and receive them.")
-
-    # @staticmethod
-    # def preprocess_messages_old(this_agent_id, agent_ids, messages):
-    #     """ Preprocess messages for sending, such that they can be understood by the GridWorld.
-    #     For example: if the receiver=None, this means it must be sent to all agents. This function creates a message
-    #     directed at every agent.
-    #
-    #     This is a static method such that it can also be accessed and used outside of this thread / the GridWorld loop.
-    #     Such as by the API.
-    #
-    #     Note; This method should NOT be overridden!
-    #
-    #     Parameters
-    #     ----------
-    #     this_agent_id
-    #         ID of the current agent, has to be sent as this is a static method
-    #     agent_ids
-    #         IDS of all agents known
-    #     messages
-    #         Messages which are to be processed
-    #
-    #     Returns
-    #         Preprocessd messages ready for sending
-    #     -------
-    #     """
-    #     # Filter out the agent itself from the agent id's
-    #     agent_ids = [agent_id for agent_id in agent_ids if agent_id != this_agent_id]
-    #
-    #     # Loop through all Message objects and create a dict out of each and append them to a list
-    #     preprocessed_messages = []
-    #     for mssg in messages:
-    #         # check message validity
-    #         MessageManager.__check_message(mssg, this_agent_id)
-    #
-    #         # Check if the message is None (send to all agents) or single id; if so make a list out if
-    #         if mssg.to_id is None:
-    #             to_ids = agent_ids.copy()
-    #         elif isinstance(mssg.to_id, str):
-    #             to_ids = [mssg.to_id]
-    #         else:
-    #             to_ids = mssg.to_id
-    #
-    #         # For each receiver, create a Message object that wraps the actual object
-    #         for single_to_id in to_ids:
-    #             message = Message(content=mssg, from_id=this_agent_id, to_id=single_to_id)
-    #
-    #             # Add the message object to the messages
-    #             preprocessed_messages.append(message)
-    #
-    #     return preprocessed_messages
 
