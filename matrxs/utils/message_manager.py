@@ -16,7 +16,7 @@ class MessageManager():
 
         self.preprocessed_messages = {} # all types of messages above unpacked to the corresponding individual messages
 
-
+        self.teams = None
 
     def preprocess_messages(self, tick, messages, all_agent_ids, teams):
         """ Preprocess messages for sending, such that they can be understood by the GridWorld.
@@ -36,7 +36,7 @@ class MessageManager():
                 Preprocessed messages ready for sending
             -------
             """
-
+        self.teams = teams
 
         # process every message
         for mssg in messages:

@@ -31,7 +31,9 @@ grid_size = [1, 1]
 MATRXS_info = {}
 next_tick_info = {}
 add_message_to_agent = None
-messages = {}
+received_messages = {} # messages received via the API, intended for the Gridworld
+gw_message_manager = None # the message manager of the gridworld, containing all messages of various types
+teams = None # dict with team names (keys) and IDs of agents who are in that team (values)
 # currently only one world at a time is supported
 current_world_ID = False
 
@@ -56,11 +58,41 @@ def get_info():
     """ Provides the general information on the world, contained in the world object.
 
     Returns
-        MATRXS world object, contianing general information on the world and scenario.
+        MATRXS world object, containing general information on the world and scenario.
     -------
     """
     MATRXS_info['matrxs_paused'] = matrxs_paused
     return jsonify(MATRXS_info)
+
+
+@app.route('/get_state_and_messages/<agent_id>', methods=['GET', 'POST'])
+def get_latest_state_and_messages(agent_id):
+    """ Provides both the state and messages from the latest tick for one particiular agent
+
+    Parameters
+    ----------
+    agent_id
+        The ID of the targeted agent
+    Returns
+        a dictionary containing the states under the "states" key, and the messages under the "messages" key.
+    -------
+
+    """
+    # check for validity and return an error if not valid
+    API_call_valid, error = check_states_API_request(agent_id)
+    if not API_call_valid:
+        print("API request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
+    # fetch states and messages
+    states = __fetch_states(current_tick, agent_id)
+    messages = __fetch_messages(current_tick, agent_id)
+
+    return jsonify({"states": states, "messages": messages})
+
+#########################################################################
+# MATRX fetch state API calls
+#########################################################################
 
 @app.route('/get_states/<tick>', methods=['GET', 'POST'])
 def get_states(tick):
@@ -77,12 +109,11 @@ def get_states(tick):
     """
 
     # check for validity and return an error if not valid
-    API_call_valid, error = check_API_request(tick)
+    API_call_valid, error = check_states_API_request(tick)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    print(f"Sending states from tick {tick} onwards")
     return jsonify(__fetch_states(tick))
 
 
@@ -103,12 +134,11 @@ def get_states_specific_agents(tick, agent_ids):
     -------
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_API_request(tick)
+    API_call_valid, error = check_states_API_request(tick)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    print(f"Sending states from tick {tick} onwards for agents IDs {agent_ids}")
     return jsonify(__fetch_states(tick, agent_ids))
 
 
@@ -127,18 +157,108 @@ def get_latest_state(agent_ids):
         agent as specified in 'agent_ids', indexed by their agent ID.
     -------
     """
+    return get_states_specific_agents(current_tick, agent_ids)
 
-    a = time.time()
+
+
+#########################################################################
+# MATRX fetch messages API calls
+#########################################################################
+@app.route('/get_states/<tick>', methods=['GET', 'POST'])
+def get_messages(tick):
+    """ Provides the messages of all agents from tick 'tick' onwards to current tick.
+
+    Parameters
+    ----------
+    tick
+        integer indicating from which tick onwards to send the messages.
+    Returns
+        Returns a list of length 'tick' to current_tick. For each tick (item in the list), a dictionary contains ...
+    -------
+    """
+
     # check for validity and return an error if not valid
-    API_call_valid, error = check_API_request(current_tick, agent_ids, ids_required=True)
+    API_call_valid, error = check_messages_API_request(tick)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    states = __fetch_states(current_tick, agent_ids)
+    print(f"Sending states from tick {tick} onwards")
+    return jsonify(__fetch_messages(tick))
 
-    return jsonify(states)
 
+
+@app.route('/get_messages/<tick>/<agent_id>', methods=['GET', 'POST'])
+def get_messages_specific_agent(tick, agent_id):
+    """ Provides all messages either send by or addressed to 'agent_id', from tick 'tick' onwards.
+
+    Parameters
+    ----------
+    tick
+    agent_ids
+
+    Returns
+    -------
+
+    """
+    # check for validity and return an error if not valid
+    API_call_valid, error = check_messages_API_request(current_tick, agent_id)
+    if not API_call_valid:
+        print("API request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
+    messages = __fetch_messages(tick, agent_id)
+
+    return jsonify(messages)
+
+@app.route('/get_latest_messages', methods=['GET', 'POST'])
+def get_latest_messages():
+    """ Provides all messages of the latest tick.
+
+    Parameters
+    ----------
+    agent_id
+
+    Returns
+    -------
+
+    """
+    # check for validity and return an error if not valid
+    API_call_valid, error = check_messages_API_request(current_tick)
+    if not API_call_valid:
+        print("API request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
+    messages = __fetch_messages(current_tick)
+
+    return jsonify(messages)
+
+@app.route('/get_latest_messages/<agent_id>', methods=['GET', 'POST'])
+def get_latest_messages_specific_agent(agent_id):
+    """ Provides the messages of the latest tick either send by or addressed to 'agent_id'.
+
+    Parameters
+    ----------
+    agent_id
+
+    Returns
+    -------
+
+    """
+    # check for validity and return an error if not valid
+    API_call_valid, error = check_messages_API_request(current_tick, agent_id)
+    if not API_call_valid:
+        print("API request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
+    messages = __fetch_messages(current_tick, agent_id)
+
+    return jsonify(messages)
+
+
+#########################################################################
+# MATRX userinput API calls
+#########################################################################
 
 @app.route('/send_userinput/<agent_ids>', methods=['POST'])
 def send_userinput(agent_ids):
@@ -156,7 +276,7 @@ def send_userinput(agent_ids):
     """
     global userinput
 
-    API_call_valid, error = check_API_request(current_tick, agent_ids, ids_required=True)
+    API_call_valid, error = check_states_API_request(current_tick, agent_ids, ids_required=True)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -209,7 +329,7 @@ def send_message():
     data = request.json
 
     # check validity of agent IDs
-    API_call_valid, error = check_API_request(current_tick, data['receiver'] + data['sender'], ids_required=True)
+    API_call_valid, error = check_states_API_request(current_tick, data['receiver'] + data['sender'], ids_required=True)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -219,13 +339,17 @@ def send_message():
 
     print("API: Receiver of message:", data['receiver'])
 
-    # add the messages to the API global variable
-    if data['sender'] not in messages:
-        messages[data['sender']] = []
-    messages[data['sender']].append(msg)
+    # add the received_messages to the API global variable
+    if data['sender'] not in received_messages:
+        received_messages[data['sender']] = []
+    received_messages[data['sender']].append(msg)
 
     return jsonify(True)
 
+
+#########################################################################
+# MATRX control API calls
+#########################################################################
 
 
 @app.route('/pause', methods=['GET', 'POST'])
@@ -325,7 +449,32 @@ def bad_request(e):
 # API helper methods
 #########################################################################
 
-def check_API_request(tick=None, ids=None, ids_required=False):
+
+
+def check_messages_API_request(tick=None, id=None):
+    """ Checks if the variables of the API request are valid, and if the requested information exists
+
+    Parameters
+    ----------
+    tick
+    id
+
+    Returns
+    -------
+
+    """
+    # check user input, such as tick
+    check_passed, error_message = check_input(tick)
+    if not check_passed:
+        return False, error_message
+
+
+
+
+    return True, None
+
+
+def check_states_API_request(tick=None, ids=None, ids_required=False):
     """ Checks if the variables of the API request are valid, and if the requested information exists
 
     Parameters
@@ -342,16 +491,10 @@ def check_API_request(tick=None, ids=None, ids_required=False):
     -------
 
     """
-    # check if tick is a valid format
-    # if not isinstance(tick, int):
-    try:
-        tick = int(tick)
-    except:
-        return False, {'error_code': 400, 'error_message': f'Tick has to be an integer, but is of type {type(tick)}'}
-
-    # check if the tick has actually occurred
-    if not tick in range(0, current_tick+1):
-        return False, {'error_code': 400, 'error_message': f'Indicated tick does not exist, has to be in range 0 - {current_tick}, but is {tick}'}
+    # check user input, such as tick and agent id
+    check_passed, error_message = check_input(tick)
+    if not check_passed:
+        return False, error_message
 
     # Don't throw an error if MATRXS is paused the first tick, and thus still has no states
     # if current_tick is 0 and matrxs_paused:
@@ -386,6 +529,58 @@ def check_API_request(tick=None, ids=None, ids_required=False):
 
     # all checks cleared, so return with success and no error message
     return True, None
+
+
+def check_input(tick=None, ids=None):
+
+    # check if tick is a valid format
+    if tick is not None:
+        try:
+            tick = int(tick)
+        except:
+            return False, {'error_code': 400,
+                           'error_message': f'Tick has to be an integer, but is of type {type(tick)}'}
+
+        # check if the tick has actually occurred
+        if not tick in range(0, current_tick + 1):
+            return False, {'error_code': 400,
+                           'error_message': f'Indicated tick does not exist, has to be in range 0 - {current_tick}, but is {tick}'}
+
+    return True, None
+
+
+def __fetch_messages(tick, id=None):
+    messages = {}
+    #
+    # for t in range(tick, current_tick + 1):
+    #
+    #     if tick == current_tick:
+    #         messages['global'] = gw_message_manager.global_messages[current_tick]
+    #         messages['team'] = gw_message_manager.team_messages[current_tick]
+    #         messages['private'] = gw_message_manager.private_messages[current_tick]
+    #
+    #
+    #
+    #
+    # if id is None:
+    #     for t in range(tick, current_tick + 1):
+    #
+    #     messages['global'] = gw_message_manager.global_messages[tick:]
+    #     messages['team'] = gw_message_manager.team_messages[tick:]
+    #     messages['private'] = gw_message_manager.private_messages[tick:]
+    #
+    #     self.global_messages = {}  # messages send to everyone
+    #     self.team_messages = {}  # messages send to a team
+    #     self.private_messages = {}  # messages send to individual agents
+    #
+    #     return states[tick:]
+    #
+    #
+    # received_messages
+
+    messages = "Yo"
+
+    return messages
 
 def __fetch_states(tick, ids=None):
     """ This private function fetches, filters and orders the states as specified by the tick and agent ids.
@@ -427,6 +622,8 @@ def __fetch_states(tick, ids=None):
         filtered_states.append(states_this_tick)
 
     return filtered_states
+
+
 
 
 def create_error_response(code, message):
@@ -527,7 +724,7 @@ def pop_userinput(agent_id):
 def reset_api():
     """ Reset the MATRXS API variables """
     global temp_state, userinput, matrxs_paused, matrxs_done, states, current_tick, tick_duration, grid_size
-    global MATRXS_info, next_tick_info, messages, current_world_ID
+    global MATRXS_info, next_tick_info, received_messages, current_world_ID
     temp_state = {}
     userinput = {}
     matrxs_paused = False
@@ -538,7 +735,7 @@ def reset_api():
     grid_size = [1, 1]
     MATRXS_info = {}
     next_tick_info = {}
-    messages = {}
+    received_messages = {}
     current_world_ID = False
 
 

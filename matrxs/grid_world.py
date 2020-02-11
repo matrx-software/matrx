@@ -71,6 +71,9 @@ class GridWorld:
                 api.register_world(self.world_ID)
                 api.current_tick = self.__current_nr_ticks
                 api.grid_size = self.shape
+                # point the API towards our message manager, for making messages available via the API
+                api.gw_message_manager = self.message_manager
+                api.teams = self.__teams
 
                 # init API with world info
                 api.MATRXS_info =  {
@@ -448,11 +451,11 @@ class GridWorld:
 
                 # add any messages received from the API sent by this agent
                 if self.__run_matrxs_api:
-                    if agent_id in api.messages:
-                        agent_messages += copy.copy(api.messages[agent_id])
+                    if agent_id in api.received_messages:
+                        agent_messages += copy.copy(api.received_messages[agent_id])
 
                         # clear the messages for the next tick
-                        del api.messages[agent_id]
+                        del api.received_messages[agent_id]
 
                 # preprocess all messages of the current tick of this agent
                 self.message_manager.preprocess_messages(self.__current_nr_ticks, agent_messages,
