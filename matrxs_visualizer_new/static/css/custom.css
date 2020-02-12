@@ -58,6 +58,8 @@
 #messages {
     overflow-y: auto;
     max-height: 50vh;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 .message_you {

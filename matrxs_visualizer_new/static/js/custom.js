@@ -14,7 +14,8 @@ function sendMessage() {
     var div = document.createElement("div");
     div.className = "message_you";
     div.innerHTML = message;
-    document.getElementById("messages").appendChild(div);
+    var messages = document.getElementById("messages");
+    messages.insertBefore(div, messages.firstChild);
     document.getElementById("message_input").value = null;
 }
 
@@ -170,6 +171,16 @@ function initGrid() {
 function agentAction(agent_id) {
     alert(agent_id + "_performs action");
 }
+
+var out = document.getElementById("messages");
+var c = 0;
+var add = setInterval(function() {
+    // allow 1px inaccuracy by adding 1
+    var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
+    // scroll to bottom if isScrolledToBottom
+    if(isScrolledToBottom)
+      out.scrollTop = out.scrollHeight - out.clientHeight;
+}, 1000);
 
 /*************************************
  Newly added for connecting to MATRXS
