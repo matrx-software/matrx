@@ -54,13 +54,14 @@ function initialize_grid() {
  * @param world_settings: the MATRXS World object, containing all settings of the current MATRXS World
  * @param new_tick: whether this is the first draw after a new tick/update
  */
-function draw(state, world_settings, new_tick) {
+function draw(state, world_settings, new_messages, new_tick) {
     // whether to (re)populate the dropdown menu with links to all agents
     populate_god_agent_menu = false;
 
     // parse the new word settings, and change the grid, background, and tiles based on any changes in the settings
     if (new_tick) {
         parse_world_settings(world_settings);
+        process_messages(new_messages);
     }
 
     // move the objects from last tick to another list
@@ -336,6 +337,35 @@ function update_grid_size(new_grid_size) {
 }
 
 
+/*********************************************************************
+ * Processing of new messages
+ ********************************************************************/
+function process_messages(new_messages){
+    var mssg_types = ["global", "team", "private"];
+
+    // process all messages of all types
+    mssg_types.forEach(function(mssg_type) {
+
+        // loop through the ticks in the message objects
+        Object.keys(new_messages[mssg_type]).forEach(function(tick) {
+            // skip this tick if we have no messages
+            if (new_messages[mssg_type][tick] == null) {
+                return;
+            }
+
+            // add every message of every tick
+            new_messages[mssg_type][tick].forEach(function(mssg) {
+                // add the message to the frontend
+                add_message(mssg_type, JSON.parse(mssg))
+            });
+        });
+    });
+}
+
+
+function add_message(type, message) {
+    console.log("Adding message of type ", type, " with content: ", message);
+}
 
 
 /*********************************************************************

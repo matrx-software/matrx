@@ -5,7 +5,7 @@ from matrxs.actions.move_actions import *
 
 
 def create_factory():
-    factory = WorldBuilder(random_seed=1, shape=[14, 20], tick_duration=0.1, verbose=True, run_matrxs_api=True,
+    factory = WorldBuilder(random_seed=1, shape=[14, 20], tick_duration=0.2, verbose=True, run_matrxs_api=True,
                            run_matrxs_visualizer=True, visualization_bg_clr="#f0f0f0",
                            visualization_bg_img='/images/restaurant_bg.png')
 

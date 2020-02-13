@@ -1,4 +1,4 @@
-
+import json
 from matrxs.utils.utils import gen_random_string
 
 class Message:
@@ -21,3 +21,8 @@ class Message:
         self.from_id = from_id  # the agent id who creates this message
         self.to_id = to_id  # the agent id who is the sender, when None it means all agents, including the sender
         self.message_id = gen_random_string(30) # randomly generated ID of the message
+
+    def toJSON(self):
+        """ Make this class JSON serializable, such that it can be sent as JSON via the API """
+        return json.dumps(self, default=lambda o: o.__dict__,
+                          sort_keys=True, indent=4)

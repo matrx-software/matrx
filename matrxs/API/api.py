@@ -65,9 +65,9 @@ def get_info():
     return jsonify(MATRXS_info)
 
 
-@app.route('/get_state_and_messages/<agent_id>', methods=['GET', 'POST'])
+@app.route('/get_latest_state_and_messages/<agent_id>', methods=['GET', 'POST'])
 def get_latest_state_and_messages(agent_id):
-    """ Provides both the state and messages from the latest tick for one particiular agent
+    """ Provides both the state and messages from the latest tick for one particular agent
 
     Parameters
     ----------
@@ -79,7 +79,7 @@ def get_latest_state_and_messages(agent_id):
 
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_states_API_request(agent_id)
+    API_call_valid, error = check_states_API_request(ids=[agent_id])
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -109,7 +109,7 @@ def get_states(tick):
     """
 
     # check for validity and return an error if not valid
-    API_call_valid, error = check_states_API_request(tick)
+    API_call_valid, error = check_states_API_request(tick=tick)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -134,7 +134,7 @@ def get_states_specific_agents(tick, agent_ids):
     -------
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_states_API_request(tick)
+    API_call_valid, error = check_states_API_request(tick=tick)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -178,7 +178,7 @@ def get_messages(tick):
     """
 
     # check for validity and return an error if not valid
-    API_call_valid, error = check_messages_API_request(tick)
+    API_call_valid, error = check_messages_API_request(tick=tick)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -202,7 +202,7 @@ def get_messages_specific_agent(tick, agent_id):
 
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_messages_API_request(current_tick, agent_id)
+    API_call_valid, error = check_messages_API_request(tick=current_tick, id=agent_id)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -224,7 +224,7 @@ def get_latest_messages():
 
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_messages_API_request(current_tick)
+    API_call_valid, error = check_messages_API_request(tick=current_tick)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -235,7 +235,7 @@ def get_latest_messages():
 
 @app.route('/get_latest_messages/<agent_id>', methods=['GET', 'POST'])
 def get_latest_messages_specific_agent(agent_id):
-    """ Provides the messages of the latest tick either send by or addressed to 'agent_id'.
+    """ Provides the messages of the latest tick either sent by or addressed to 'agent_id'.
 
     Parameters
     ----------
@@ -246,7 +246,7 @@ def get_latest_messages_specific_agent(agent_id):
 
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_messages_API_request(current_tick, agent_id)
+    API_call_valid, error = check_messages_API_request(tick=current_tick, id=agent_id)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -463,6 +463,7 @@ def check_messages_API_request(tick=None, id=None):
     -------
 
     """
+    tick = current_tick if tick is None else tick
     # check user input, such as tick
     check_passed, error_message = check_input(tick)
     if not check_passed:
@@ -550,35 +551,66 @@ def check_input(tick=None, ids=None):
 
 
 def __fetch_messages(tick, id=None):
-    messages = {}
-    #
-    # for t in range(tick, current_tick + 1):
-    #
-    #     if tick == current_tick:
-    #         messages['global'] = gw_message_manager.global_messages[current_tick]
-    #         messages['team'] = gw_message_manager.team_messages[current_tick]
-    #         messages['private'] = gw_message_manager.private_messages[current_tick]
-    #
-    #
-    #
-    #
-    # if id is None:
-    #     for t in range(tick, current_tick + 1):
-    #
-    #     messages['global'] = gw_message_manager.global_messages[tick:]
-    #     messages['team'] = gw_message_manager.team_messages[tick:]
-    #     messages['private'] = gw_message_manager.private_messages[tick:]
-    #
-    #     self.global_messages = {}  # messages send to everyone
-    #     self.team_messages = {}  # messages send to a team
-    #     self.private_messages = {}  # messages send to individual agents
-    #
-    #     return states[tick:]
-    #
-    #
-    # received_messages
+    """ Fetch the messages from the GridWorld MessageManager, as requested via the API call.
+    Messages to be fetched can be filtered by start tick and the agent id.
 
-    messages = "Yo"
+    Parameters
+    ----------
+    tick
+        All messages from this tick onwards to the current_tick will be collected.
+    id
+        Only messages received by or sent by this agent will be collected.
+
+    Returns
+    -------
+    Dictionary containing a 'global', 'team', and 'private' subdictionary. These subdictionaries contain a list of
+    all messages, indexed by tick number.
+
+    """
+    messages = {'global': {}, 'team': {}, 'private': {}}
+
+    # loop through all requested ticks
+    for t in range(tick, current_tick + 1):
+        # initialize the message objects to return
+        messages['global'][tick] = None
+        messages['team'][tick] = None
+        messages['private'][tick] = None
+
+        # fetch any existing global messages for this tick
+        if tick in gw_message_manager.global_messages:
+            # make the messages JSON serializable and add
+            messages['global'][tick] = [mssg.toJSON() for mssg in gw_message_manager.global_messages[tick]]
+
+        # fetch any team messages
+        if tick in gw_message_manager.team_messages:
+            # fetch all team messages
+            if id is None:
+                # make them JSON serializable
+                messages['team'][tick] = [mssg.toJSON() for mssg in gw_message_manager.team_messages[tick]]
+
+            # fetch team messages of the team of which the agent is a member
+            else:
+                for team in teams:
+                    if id in team and team in gw_message_manager.team_messages[tick]:
+                        # make the messages JSON serializable and add
+                        messages['team'][tick] = [mssg.toJSON() for mssg in gw_message_manager.team_messages[tick][team]]
+
+
+        # fetch private messages
+        if tick in gw_message_manager.private_messages:
+            # fetch all private messages
+            if id is None:
+                # make the messages JSON serializable and add
+                messages['private'][tick] = [mssg.toJSON() for mssg in gw_message_manager.private_messages[tick]]
+
+            # fetch private messages sent to or received by the specified agent
+            else:
+                messages['private'][tick] = []
+                for message in gw_message_manager.private_messages[tick]:
+                    # only private messages addressed to or sent by our agent are requested
+                    if message.from_id == id or message.to_id == id:
+                        # make the messages JSON serializable and add
+                        messages['private'][tick].append(message.toJSON())
 
     return messages
 

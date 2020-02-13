@@ -10,7 +10,8 @@
 
 // vars that will be passed to the visualizer file
 var lv_state = {}, // the latest MATRXS state
-    lv_world_settings = null;
+    lv_world_settings = null,
+    lv_messages = null;
 
 var lv_tick_duration = 0.5,
     lv_current_tick = 0,
@@ -35,7 +36,7 @@ var lv_tps = 1, // placeholder value
 // MATRXS API urls
 var lv_base_url = window.location.hostname,
     lv_init_url = 'http://' + lv_base_url + ':3001/get_info',
-    lv_update_url = 'http://' + lv_base_url + ':3001/get_latest_state/',
+    lv_update_url = 'http://' + lv_base_url + ':3001/get_latest_state_and_messages/',
     lv_send_userinput_url = 'http://' + lv_base_url + ':3001/send_userinput/',
     lv_agent_id = "";
 
@@ -205,7 +206,7 @@ function world_loop() {
 
             // redraw the screen and go to the next frame
             lv_open_update_request = false;
-            draw(lv_state, lv_world_settings, new_tick=true);
+            draw(lv_state, lv_world_settings, lv_messages, new_tick=true);
             request_new_frame();
         })
 
@@ -252,8 +253,10 @@ function get_MATRXS_update() {
     // the response has been received
     var lv_update_request = jQuery.getJSON(lv_update_url + "['" + lv_agent_id + "']", function(data) {
 
+        lv_messages = data['messages'];
+
         // decode lv_state and other info from the request
-        lv_state = data[data.length - 1][lv_agent_id]['state'];
+        lv_state = data['states'][data['states'].length - 1][lv_agent_id]['state'];
         var lv_new_tick = lv_state['World']['nr_ticks'];
         curr_tick_timestamp = lv_state['World']['curr_tick_timestamp'];
         lv_tick_duration = lv_state['World']['tick_duration'];
