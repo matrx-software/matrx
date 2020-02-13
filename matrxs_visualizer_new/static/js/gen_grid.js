@@ -111,9 +111,9 @@ function draw(state, world_settings, new_messages, new_tick) {
             obj_element = document.createElement("div");
             obj_element.className = "object";
             obj_element.id = objID;
-            obj_element.dataset.toggle = "modal";
-            obj_element.dataset.target = "#obj_modal";
-            obj_element.setAttribute("onclick", "clickObject('" + objID + "')");
+//            obj_element.dataset.toggle = "modal";
+//            obj_element.dataset.target = "#obj_modal";
+//            obj_element.setAttribute("onclick", "clickObject('" + objID + "')");
 
             // set the coordinates of the object
             move_object(obj_element, x, y);
@@ -402,6 +402,9 @@ function gen_rectangle(obj_vis_settings, obj_element, element_type="div") {
         obj_element.removeChild(obj_element.firstChild);
     }
 
+    // add a click listener for the context menu
+    add_context_menu(shape);
+
     // add the new shape
     obj_element.append(shape);
     return shape;
@@ -439,6 +442,9 @@ function gen_triangle(obj_vis_settings, obj_element) {
     while (obj_element.firstChild) {
         obj_element.removeChild(obj_element.firstChild);
     }
+
+    // add a click listener for the context menu
+    add_context_menu(shape);
 
     // add the new shape
     obj_element.append(shape);
@@ -479,7 +485,21 @@ function gen_image(obj_vis_settings, obj_element) {
     shape.style.background = "transparent";
     shape.style.opacity = obj_vis_settings["opacity"];
 
+    shape.dataset.toggle = "dropdown";
+
     return shape;
+}
+
+// add an event listener for mouse clicks, opening the context menu
+function add_context_menu(object) {
+    $(object).contextMenu({
+        menuSelector: "#contextMenu",
+        menuSelected: function (invokedOn, selectedMenu) {
+            var msg = "You selected the menu item '" + selectedMenu.text() +
+                "' on the value '" + invokedOn.text() + "'";
+            alert(msg);
+        }
+    });
 }
 
 
