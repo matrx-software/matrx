@@ -84,7 +84,7 @@ class OpenDoorAction(Action):
         -------
         OpenDoorActionResult
             The ActionResult determining the expected result of an OpenDoorAction with the given parameters.
-            Returns the following results:
+            Can return the following results:
             OpenDoorActionResult.NO_DOORS_IN_RANGE      : When no EnvObject of type Door are in range.
             OpenDoorActionResult.NOT_A_DOOR             : When the given object_id does not exist.
             OpenDoorActionResult.NOT_A_DOOR             : When the given object_id does not exist.
@@ -140,7 +140,7 @@ class CloseDoorAction(Action):
         -------
         CloseDoorActionResult
             The ActionResult determining the expected result of an CloseDoorAction with the given parameters.
-            Returns the following results:
+            Can return the following results:
             The ActionResult depicting the action's success or failure and reason for that result.
             OpenDoorActionResult.NO_OBJECT_SPECIFIED    : When no object_id was given.
             OpenDoorActionResult.RESULT_SUCCESS         : When the door is opened.
@@ -226,7 +226,11 @@ class CloseDoorActionResult(ActionResult):
         result : string
             A string representing the reason for an CloseDoorAction's (expected) success or fail.
         succeeded : boolean
-            A boolean representing the (expected) success or fail of an Action.
+            A boolean representing the (expected) success or fail of an CloseDoorAction.
+
+        See Also
+        --------
+        CloseDoorAction
 
         """
         super().__init__(result, succeeded)
@@ -258,7 +262,11 @@ class OpenDoorActionResult(ActionResult):
         result : string
             A string representing the reason for an OpenDoorAction's (expected) success or fail.
         succeeded : boolean
-            A boolean representing the (expected) success or fail of an Action.
+            A boolean representing the (expected) success or fail of an OpenDoorAction.
+
+        See Also
+        --------
+        OpenDoorAction
 
         """
         super().__init__(result, succeeded)

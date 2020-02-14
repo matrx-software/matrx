@@ -2,7 +2,28 @@ from matrxs.actions.action import Action, ActionResult
 from matrxs.objects.agent_body import AgentBody
 
 
-def act_move(grid_world, agent_id, dx, dy):
+def _act_move(grid_world, agent_id, dx, dy):
+    """ Private MATRX method.
+
+    The method that actually mutates the location of an AgentBody based on a delta-x and delta-y.
+
+    Parameters
+    ----------
+    grid_world : GridWorld
+        The GridWorld instance in which the agent resides whose location should be updated.
+    agent_id : string
+        The unique identifier for the agent whose location should be changed.
+    dx : {-1, 0, 1}
+        The delta change on the x-coordinate.
+    dy : {-1, 0, 1}
+        The delta change on the y-coordinate.
+
+    Returns
+    -------
+    MoveActionResult
+        The result of the actual change of the location of an AgentBody. Always returns a success.
+
+    """
     agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentBody)
     loc = agent_avatar.location
     new_loc = [loc[0] + dx, loc[1] + dy]
@@ -11,11 +32,64 @@ def act_move(grid_world, agent_id, dx, dy):
     return MoveActionResult(MoveActionResult.RESULT_SUCCESS, succeeded=True)
 
 
-def is_possible_movement(grid_world, agent_id, dx, dy):
-    return possible_movement(grid_world, agent_id, dx, dy)
+def _is_possible_movement(grid_world, agent_id, dx, dy):
+    """ Private MATRX method.
+
+    Wrapper around the check if a certain movement is possible.
+
+    Parameters
+    ----------
+    grid_world : GridWorld
+        The GridWorld instance in which the agent resides whose location should be updated.
+    agent_id : string
+        The unique identifier for the agent whose location should be changed.
+    dx : {-1, 0, 1}
+        The delta change on the x-coordinate.
+    dy : {-1, 0, 1}
+        The delta change on the y-coordinate.
+
+    Returns
+    -------
+    MoveActionResult
+        The expected result of performing this movement.
+
+    See Also
+    --------
+    possible_movement : The main method this method wraps.
+
+    """
+    return _possible_movement(grid_world, agent_id, dx, dy)
 
 
-def possible_movement(grid_world, agent_id, dx, dy):
+def _possible_movement(grid_world, agent_id, dx, dy):
+    """ Private MATRX method.
+
+    Checks if the delta-x and delta-y change in the agent's location is possible.
+
+    Parameters
+    ----------
+    grid_world : GridWorld
+        The GridWorld instance in which the agent resides whose location should be updated.
+    agent_id : string
+        The unique identifier for the agent whose location should be changed.
+    dx : {-1, 0, 1}
+        The delta change on the x-coordinate.
+    dy : {-1, 0, 1}
+        The delta change on the y-coordinate.
+
+    Returns
+    -------
+    MoveActionResult
+        Whether the MoveAction is expected to be possible.
+        Can return the following results:
+        The ActionResult depicting the action's success or failure and reason for that result.
+        MoveActionResult.RESULT_SUCCESS                 : When the MoveAction is possible.
+        MoveActionResult.RESULT_NO_MOVE                 : If the agent is already at the location it wishes to move to.
+        MoveActionResult.RESULT_OCCUPIED                : When the new location is occupied by an intraversable agent.
+        MoveActionResult.RESULT_NOT_PASSABLE_OBJECT     : When the new location is occupied by an intraversable object.
+        MoveActionResult.RESULT_OUT_OF_BOUNDS           : When the new location is outside the GridWorld's bounds.
+
+    """
 
     agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentBody)
     assert agent_avatar is not None
@@ -35,7 +109,7 @@ def possible_movement(grid_world, agent_id, dx, dy):
                     # get the actual agent
                     loc_obj = grid_world.registered_agents[loc_obj_id]
                     # Check if the agent that takes the move action is not that agent at that location (meaning that
-                    # for some reason the move action has no effect. If this is the case, we send the apriopriate
+                    # for some reason the move action has no effect. If this is the case, we send the appropriate
                     # result
                     if loc_obj_id == agent_id:
                         # The desired location contains a different agent and we cannot step at locations with agents
@@ -68,25 +142,128 @@ class MoveActionResult(ActionResult):
     RESULT_NOT_PASSABLE_OBJECT = 'Move action toward space which is not traversable by agent due object'
 
     def __init__(self, result, succeeded):
+        """ActionResult for a MoveAction
+
+        The results uniquely for MoveAction are (as class constants):
+        MoveActionResult.RESULT_SUCCESS                 : When the MoveAction is possible.
+        MoveActionResult.RESULT_NO_MOVE                 : If the agent is already at the location it wishes to move to.
+        MoveActionResult.RESULT_OCCUPIED                : When the new location is occupied by an intraversable agent.
+        MoveActionResult.RESULT_NOT_PASSABLE_OBJECT     : When the new location is occupied by an intraversable object.
+        MoveActionResult.RESULT_OUT_OF_BOUNDS           : When the new location is outside the GridWorld's bounds.
+
+        Parameters
+        ----------
+        result : string
+            A string representing the reason for a Move action's(expected) success or fail.
+        succeeded : boolean
+            A boolean representing the (expected) success or fail of a MoveAction.
+
+        See Also
+        --------
+        Move
+
+        """
         super().__init__(result, succeeded)
 
 
 class Move(Action):
     def __init__(self, duration_in_ticks=1):
+        """ The class wrapping all Move actions
+
+        Parameters
+        ----------
+        duration_in_ticks : int
+            The default duration of Move in ticks during which the GridWorld blocks the Agent performing other actions.
+            By default this is 1, meaning that all Move actions will take both the tick in which it was decided upon and
+            the subsequent tick. Should be zero or larger.
+
+        Attributes
+        ----------
+        dx : {-1, 0, 1}
+            The delta change on the x-coordinate.
+        dy : {-1, 0, 1}
+            The delta change on the y-coordinate.
+
+        See Also
+        --------
+        MoveNorth
+        MoveNorthEast
+        MoveEast
+        MoveSouthEast
+        MoveSouth
+        MoveSouthWest
+        MoveWest
+        MoveNorthWest
+
+        """
         super().__init__(duration_in_ticks)
         self.dx = 0
         self.dy = 0
 
     def is_possible(self, grid_world, agent_id, **kwargs):
-        result = is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+        """ Checks if the move is possible.
+
+        Relies on the private static MATRX method _is_possible_movement(...).
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance in which the agent resides whose location should be updated.
+        agent_id : string
+            The unique identifier for the agent whose location should be changed.
+        **kwargs : dictionary
+            Not used.
+
+        Returns
+        -------
+        MoveActionResult
+            Whether the MoveAction is expected to be possible.
+            Can return the following results:
+            The ActionResult depicting the action's success or failure and reason for that result.
+            MoveActionResult.RESULT_SUCCESS             : When the MoveAction is possible.
+            MoveActionResult.RESULT_NO_MOVE             : If the agent is already at the location it wishes to move to.
+            MoveActionResult.RESULT_OCCUPIED            : When the new location is occupied by an intraversable agent.
+            MoveActionResult.RESULT_NOT_PASSABLE_OBJECT : When the new location is occupied by an intraversable object.
+            MoveActionResult.RESULT_OUT_OF_BOUNDS       : When the new location is outside the GridWorld's bounds.
+
+        """
+        result = _is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
         return result
 
     def mutate(self, grid_world, agent_id, **kwargs):
-        return act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
+        """ Mutates an agent's location
+
+        Changes an agent's location property based on the self.dx and self.dy.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance in which the agent resides whose location should be updated.
+        agent_id : string
+            The unique identifier for the agent whose location should be changed.
+
+        Returns
+        -------
+        MoveActionResult
+            The result of the actual change of the location of an agent. Always returns a success.
+
+        """
+        return _act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
 
 
 class MoveNorth(Move):
     def __init__(self):
+        """ Moves the agent North.
+
+        Inherits from Move and sets the delta-x and delta-y as follows:
+        delta-x = 0
+        delta-y = -1
+
+        See Also
+        --------
+        Move
+
+        """
         super().__init__()
         self.dx = 0
         self.dy = -1
@@ -95,6 +272,17 @@ class MoveNorth(Move):
 class MoveNorthEast(Move):
 
     def __init__(self):
+        """ Moves the agent North-East.
+
+        Inherits from Move and sets the delta-x and delta-y as follows:
+        delta-x = 1
+        delta-y = -1
+
+        See Also
+        --------
+        Move
+
+        """
         super().__init__()
         self.dx = +1
         self.dy = -1
@@ -103,6 +291,17 @@ class MoveNorthEast(Move):
 class MoveEast(Move):
 
     def __init__(self):
+        """ Moves the agent East.
+
+        Inherits from Move and sets the delta-x and delta-y as follows:
+        delta-x = 1
+        delta-y = 0
+
+        See Also
+        --------
+        Move
+
+        """
         super().__init__()
         self.dx = +1
         self.dy = 0
@@ -111,6 +310,17 @@ class MoveEast(Move):
 class MoveSouthEast(Move):
 
     def __init__(self):
+        """ Moves the agent South-East.
+
+        Inherits from Move and sets the delta-x and delta-y as follows:
+        delta-x = 1
+        delta-y = 1
+
+        See Also
+        --------
+        Move
+
+        """
         super().__init__()
         self.dx = +1
         self.dy = +1
@@ -119,6 +329,17 @@ class MoveSouthEast(Move):
 class MoveSouth(Move):
 
     def __init__(self):
+        """ Moves the agent South.
+
+        Inherits from Move and sets the delta-x and delta-y as follows:
+        delta-x = 0
+        delta-y = 1
+
+        See Also
+        --------
+        Move
+
+        """
         super().__init__()
         self.dx = 0
         self.dy = +1
@@ -127,6 +348,17 @@ class MoveSouth(Move):
 class MoveSouthWest(Move):
 
     def __init__(self):
+        """ Moves the agent South-West.
+
+        Inherits from Move and sets the delta-x and delta-y as follows:
+        delta-x = -1
+        delta-y = 1
+
+        See Also
+        --------
+        Move
+
+        """
         super().__init__()
         self.dx = -1
         self.dy = +1
@@ -135,6 +367,17 @@ class MoveSouthWest(Move):
 class MoveWest(Move):
 
     def __init__(self):
+        """ Moves the agent West.
+
+        Inherits from Move and sets the delta-x and delta-y as follows:
+        delta-x = -1
+        delta-y = 0
+
+        See Also
+        --------
+        Move
+
+        """
         super().__init__()
         self.dx = -1
         self.dy = 0
@@ -143,6 +386,17 @@ class MoveWest(Move):
 class MoveNorthWest(Move):
 
     def __init__(self):
+        """ Moves the agent North-West.
+
+        Inherits from Move and sets the delta-x and delta-y as follows:
+        delta-x = -1
+        delta-y = -1
+
+        See Also
+        --------
+        Move
+
+        """
         super().__init__()
         self.dx = -1
         self.dy = -1
