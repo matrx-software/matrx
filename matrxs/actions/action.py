@@ -3,74 +3,123 @@
 class Action:
 
     def __init__(self, duration_in_ticks=1):
-        """
-        The core action class. This class is empty and should be overridden if you want to make a new action that is not
-        yet supported. You may also extend other actions, as long as their super class is this class.
+        """ The Action class.
 
-        The two methods you should override are;
-        - mutate; performs the actual mutation on the grid world
-        - is_possible; checks whether the action can be performed in the first place.
+        This class is empty and should be overridden if you want to make a new action that is not yet supported. You may
+        also extend other actions, but all MATRX' actions inherit from this class.
 
-        :param name: The name of the action. By default this should be the class name. Hence you should assign this in
-        the constructor of your custom action class to;
-        `name = self.__class__`
-        :param duration: The duration of the action. By default this is 1. For an action which takes multiple ticks and
-        blocks the user, you should assign a custom duration in the constructor of your custom action class.
+        When creating a new Action, you should always override the Action.mutate(...) and Action.is_possible(...)
+        methods.
+
+        Parameters
+        ----------
+        duration_in_ticks : int
+            The default duration of the action in ticks during which the GridWorld blocks the Agent performing other
+            actions. By default this is 1, meaning that the action will take both the tick in which it was decided upon
+            and the subsequent tick. When creating your own Action, you can override this default value. Should be zero
+            or positive.
+
+        See Also
+        --------
+        mutate : performs the actual mutation on the GridWorld
+        is_possible : returns whether the action can be performed.
+
+        Notes
+        -----
+        The duration_in_ticks only represents the default duration of an Action. It can be overridden at any time by the
+        AgentBrain with another value.
 
         """
         # number of ticks the action takes to complete
         self.duration_in_ticks = duration_in_ticks
 
     def mutate(self, grid_world, agent_id, **kwargs):
-        """
-        The core of an action. This method needs to be overridden and performs the actual action in the world.
-        As such the mutate receives the entire world as a pointer, the agent_id who performs the action and potential
-        keyword arguments unique for a specific action (e.g., an object id for the RemoveObject action).
+        """ Method that mutates GridWorld.
 
-        The mutate should always return an ActionResult, or a class that inherits from ActionResult.
+        This method receives a GridWorld instance and is allowed to mutate it according to the Action's purposes.
+        Override this method when implementing a new Action. It will be called by the GridWorld iff:
+        - An AgentBrain selected this action.
+        - The implemented is_possible(...) method returned True.
+        - The action_duration has passed.
+        - The Agent is not busy with another action.
+        - It is not the Agent's turn to take an action.
+        Hence, this method is not required to make these checks first.
 
-        The mutate will only be called when action.is_possible(...) returns True. The grid world is responsible for
-        translating an agent's returned action class name, to an action object, check if it is a possible action and
-        then call this mutate method.
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance that should be mutated according to the Action's intended purpose.
+        agent_id : string
+            The unique identifier of the agent performing this action.
+        kwargs : dictionary
+            The set of keyword arguments provided by the Agent that decided upon this action. When overriding this
+            method and setting required arguments, the GridWorld will take responsibility in checking whether the Agent
+            provided these. Hence, it is not required to do so here.
 
-        :param grid_world: A pointer to the actual world object.
-        :param agent_id: The id known in the grid world as an agent that peforms this action.
-        :param kwargs: Optional arguments for the action. You should document what these arguments are in your Python
-        doc, and ALWAYS check whether these are present and otherwise raise an exception! This eases the debugging
-        process for everyone. This check can be done in the is_possible method of the action. If done there, it can be
-        omitted here since that method is always called before mutate.
-        :return: An action result depicting the action's success or failure and reason/description of that result.
+        Returns
+        -------
+        ActionResult
+            An instance of the ActionResult class, or an inherited class thereof, which denotes whether the mutation
+            actually succeeded or not, together with the reason why not. This result is passed to the agent by the
+            GridWorld instance so that an Agent is capable of checking when and why an Action succeeded or failed.
+
+        Warnings
+        --------
+        It is important to remember that the given GridWorld instance, represents the actual world. Any change to this
+        instance are immediately reflected in the world, agent states and potential visualisations.
+
+        See Also
+        --------
+        GridWorld : Contains additional functions to make the implementation of Actions simpler.
+        ActionResult : Contains a description on how to create an ActionResult.
+
         """
         return None
 
     def is_possible(self, grid_world, agent_id, **kwargs):
-        """
-        Checks whether the action is possible in the world when performed by the given agent. This method needs to be
-        overridden, to perform this check for the action you want to implement. It returns a boolean stating whether
-        the action can be performed (True) or not (False).
+        """ Checks if the Action is possible
 
-        If the action requires any optional arguments, this method only checks whether SOME instantation of this action
-        is possible. So for example the RemoveObject action, would check if there is just one object in the entire grid
-        that could be removed. If so, the action is possible although when you state the object_id to be removed and
-        the range in which this can happen it might occur that the object is not there or not within range, still
-        resulting in a failure with an ActionResult telling you the reason.
+        This method receives the GridWorld instance to check whether the Action is possible to perform. Override this
+        method when implementing a new Action. It will be called by the GridWorld iff:
+        - An AgentBrain selected this action.
+        - The Agent is not busy with another action.
+        - It is not the Agent's turn to take an action.
+        OR
+        - An AgentBrain requested if a certain Action is possible. (Requested functionality: See Issue #46)
 
-        The environment will call this method to check whether the action's mutate method should be called or not.
-        Hence, if you notice that your action is never being performed on the world, it might be that this method
-        always returns False.
+        It is important to understand that this function does not have to guarantee the success of an Action. It might
+        be impossible to check if an Action would always succeed without actually performing the mutation. Hence, this
+        method only needs to check for general cases if the Action would succeed. The Action.mutate(...) itself also
+        returns an ActionResult which denotes the actual success or failure of the Action.
 
-        It should also return a second argument, stating why an action was failed. This is used in the ActionResult. If
-        the action is possible, this string is ignored and can simply be None. If the string is None and the action is
-        not possible, the world would use the default ActionResult.ACTION_NOT_POSSIBLE message. This string allows you
-        to signal to an agent the exact reason why an action was failed, which the agent may or may not choose to use
-        depending on your agent implementation.
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance that should be used to check if this Action is possible.
+        agent_id : string
+            The unique identifier of the agent performing this action.
+        kwargs : dictionary
+            The set of keyword arguments provided by the Agent that decided upon this action. When overriding this
+            method and setting required arguments, the GridWorld will take responsibility in checking whether the Agent
+            provided these. Hence, it is not required to do so here.
 
-        :param grid_world: A pointer to the actual world object.
-        :param agent_id: The id known in the grid world as an agent that peforms this action.
-        :return: Returns two things; a boolean signalling whether the action is possible or not, and a string telling
-        you why the action was not possible. This string is used to fill the ActionResult when the boolean was False
-        (signalling that the action is not possible). If the string is None, the default message for an impossible
-        action is used in the ActionResult. If the action is possible (the boolean is True), this string is ignored.
+        Returns
+        -------
+        ActionResult
+            The expected ActionResult when performing this Action. The ActionResult.succeeded attribute is used to check
+            if the Action is indeed possible by the GridWorld.
+
+        Warnings
+        --------
+        It is important to remember that the given GridWorld instance, represents the actual world. This method should
+        not change anything in this instance. This is reserved for the Action.mutate(...) method as any change here will
+        be reflected in the world, agent states and potential visualisations.
+
+        See Also
+        --------
+        GridWorld : Contains additional functions to make the implementation of Actions simpler.
+        ActionResult : Contains a description on how to create an ActionResult.
+
         """
         return None
 
@@ -86,5 +135,43 @@ class ActionResult:
     NO_ACTION_GIVEN = "There was no action given to perform, automatic succeed."
 
     def __init__(self, result, succeeded):
+        """ Represents the (expected) result of an Action.
+
+        This class functions as a simple wrapper around a boolean representing the success (True) or failure (False) of
+        an Action's (expected) mutation, as well as the reason for it. Both the methods  Action.is_possible(...) and
+        Action.mutate(...) return an ActionResult. With the former it represents the expected success or failure of the
+        Action, with the latter the actual success or failure.
+
+        The ActionResult class contains several generic reasons for a succeed or fail as constant attributes. These
+        reasons can be used by any custom made Action, or a new reason for the result can be given. You can also extend
+        this class with your own, which should only contain a custom set of constants representing reasons for that
+        Action's specific results. This has the advantage that an AgentBrain can directly match the ActionResult.result
+        with such a class constant.
+
+        Some ActionResult reasons are only used by the GridWorld. These are as follows:
+        ActionResult.IDLE_ACTION :          Always given when an AgentBrain decided upon returning None (the idle
+                                            action)
+        ActionResult.AGENT_WAS_REMOVED :    Always given when an agent does not exist anymore in the GridWorld.
+        ActionResult.AGENT_NOT_CAPABLE :    Always given when the Action an AgentBrain decided upon is not an Action
+                                            that  agent should be capable of.
+        ActionResult.UNKNOWN_ACTION :       Always given when the Action name an AgentBrain decided upon is not
+                                            recognized as a class name of an Action or some class inheriting from
+                                            Action. Could be caused by either that class not existing or because it
+                                            is never imported anywhere (and hence is not on the path the GridWorld
+                                            searches in).
+
+        Parameters
+        ----------
+        result : string
+            A string representing the reason for an Action's (expected) success or fail.
+        succeeded : boolean
+            A boolean representing the (expected) success or fail of an Action.
+
+        See Also
+        --------
+        Action : The super-class whose children return an ActionResult
+
+        """
+
         self.result = result
         self.succeeded = succeeded
