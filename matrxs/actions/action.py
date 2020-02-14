@@ -1,35 +1,35 @@
 
 
 class Action:
+    """ The Action class.
+
+    This class is empty and should be overridden if you want to make a new action that is not yet supported. You may
+    also extend other actions, but all MATRX' actions inherit from this class.
+
+    When creating a new Action, you should always override the Action.mutate(...) and Action.is_possible(...)
+    methods.
+
+    Parameters
+    ----------
+    duration_in_ticks : int
+        The default duration of the action in ticks during which the GridWorld blocks the Agent performing other
+        actions. By default this is 1, meaning that the action will take both the tick in which it was decided upon
+        and the subsequent tick. When creating your own Action, you can override this default value. Should be zero
+        or positive.
+
+    See Also
+    --------
+    mutate : performs the actual mutation on the GridWorld
+    is_possible : returns whether the action can be performed.
+
+    Notes
+    -----
+    The duration_in_ticks only represents the default duration of an Action. It can be overridden at any time by the
+    AgentBrain with another value.
+
+    """
 
     def __init__(self, duration_in_ticks=1):
-        """ The Action class.
-
-        This class is empty and should be overridden if you want to make a new action that is not yet supported. You may
-        also extend other actions, but all MATRX' actions inherit from this class.
-
-        When creating a new Action, you should always override the Action.mutate(...) and Action.is_possible(...)
-        methods.
-
-        Parameters
-        ----------
-        duration_in_ticks : int
-            The default duration of the action in ticks during which the GridWorld blocks the Agent performing other
-            actions. By default this is 1, meaning that the action will take both the tick in which it was decided upon
-            and the subsequent tick. When creating your own Action, you can override this default value. Should be zero
-            or positive.
-
-        See Also
-        --------
-        mutate : performs the actual mutation on the GridWorld
-        is_possible : returns whether the action can be performed.
-
-        Notes
-        -----
-        The duration_in_ticks only represents the default duration of an Action. It can be overridden at any time by the
-        AgentBrain with another value.
-
-        """
         # number of ticks the action takes to complete
         self.duration_in_ticks = duration_in_ticks
 
