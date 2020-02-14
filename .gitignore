@@ -17,3 +17,5 @@ logData.log
 *.log
 
 log_data/
+
+docs/build

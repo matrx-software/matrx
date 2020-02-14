@@ -587,11 +587,6 @@ dt.field-odd, dt.field-even {
     column-gap: 0px !important;
 }
 
-img.logo {
-    background: white !important;
-    border-radius: 5px !important;
-}
-
 .hidden-caption .toctree-wrapper .caption {
     display: none;
 }
