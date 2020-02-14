@@ -148,11 +148,22 @@ class ActionResult:
         Action's specific results. This has the advantage that an AgentBrain can directly match the ActionResult.result
         with such a class constant.
 
+        Some ActionResult reasons are only used by the GridWorld. These are as follows:
+        ActionResult.IDLE_ACTION :          Always given when an AgentBrain decided upon returning None (the idle
+                                            action)
+        ActionResult.AGENT_WAS_REMOVED :    Always given when an agent does not exist anymore in the GridWorld.
+        ActionResult.AGENT_NOT_CAPABLE :    Always given when the Action an AgentBrain decided upon is not an Action
+                                            that  agent should be capable of.
+        ActionResult.UNKNOWN_ACTION :       Always given when the Action name an AgentBrain decided upon is not
+                                            recognized as a class name of an Action or some class inheriting from
+                                            Action. Could be caused by either that class not existing or because it
+                                            is never imported anywhere (and hence is not on the path the GridWorld
+                                            searches in).
 
         Parameters
         ----------
         result : string
-            A string representing the reason for an Action's success or fail.
+            A string representing the reason for an Action's (expected) success or fail.
         succeeded : boolean
             A boolean representing the (expected) success or fail of an Action.
 
