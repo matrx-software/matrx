@@ -125,6 +125,44 @@ class Action:
 
 
 class ActionResult:
+    """ Represents the (expected) result of an Action.
+
+    This class functions as a simple wrapper around a boolean representing the success (True) or failure (False) of
+    an Action's (expected) mutation, as well as the reason for it. Both the methods  Action.is_possible(...) and
+    Action.mutate(...) return an ActionResult. With the former it represents the expected success or failure of the
+    Action, with the latter the actual success or failure.
+
+    The ActionResult class contains several generic reasons for a succeed or fail as constant attributes. These
+    reasons can be used by any custom made Action, or a new reason for the result can be given. You can also extend
+    this class with your own, which should only contain a custom set of constants representing reasons for that
+    Action's specific results. This has the advantage that an AgentBrain can directly match the ActionResult.result
+    with such a class constant.
+
+    Some ActionResult reasons are only used by the GridWorld. These are as follows:
+    ActionResult.IDLE_ACTION :          Always given when an AgentBrain decided upon returning None (the idle
+                                        action)
+    ActionResult.AGENT_WAS_REMOVED :    Always given when an agent does not exist anymore in the GridWorld.
+    ActionResult.AGENT_NOT_CAPABLE :    Always given when the Action an AgentBrain decided upon is not an Action
+                                        that  agent should be capable of.
+    ActionResult.UNKNOWN_ACTION :       Always given when the Action name an AgentBrain decided upon is not
+                                        recognized as a class name of an Action or some class inheriting from
+                                        Action. Could be caused by either that class not existing or because it
+                                        is never imported anywhere (and hence is not on the path the GridWorld
+                                        searches in).
+
+    Parameters
+    ----------
+    result : string
+        A string representing the reason for an Action's (expected) success or fail.
+    succeeded : boolean
+        A boolean representing the (expected) success or fail of an Action.
+
+    See Also
+    --------
+    Action : The super-class whose children return an ActionResult
+
+    """
+
 
     IDLE_ACTION = "The action is None, hence the agent will idle which always succeeds."
     AGENT_WAS_REMOVED = "Agent {AGENT_ID} was removed during this tick, cannot perform anymore actions."
@@ -135,43 +173,5 @@ class ActionResult:
     NO_ACTION_GIVEN = "There was no action given to perform, automatic succeed."
 
     def __init__(self, result, succeeded):
-        """ Represents the (expected) result of an Action.
-
-        This class functions as a simple wrapper around a boolean representing the success (True) or failure (False) of
-        an Action's (expected) mutation, as well as the reason for it. Both the methods  Action.is_possible(...) and
-        Action.mutate(...) return an ActionResult. With the former it represents the expected success or failure of the
-        Action, with the latter the actual success or failure.
-
-        The ActionResult class contains several generic reasons for a succeed or fail as constant attributes. These
-        reasons can be used by any custom made Action, or a new reason for the result can be given. You can also extend
-        this class with your own, which should only contain a custom set of constants representing reasons for that
-        Action's specific results. This has the advantage that an AgentBrain can directly match the ActionResult.result
-        with such a class constant.
-
-        Some ActionResult reasons are only used by the GridWorld. These are as follows:
-        ActionResult.IDLE_ACTION :          Always given when an AgentBrain decided upon returning None (the idle
-                                            action)
-        ActionResult.AGENT_WAS_REMOVED :    Always given when an agent does not exist anymore in the GridWorld.
-        ActionResult.AGENT_NOT_CAPABLE :    Always given when the Action an AgentBrain decided upon is not an Action
-                                            that  agent should be capable of.
-        ActionResult.UNKNOWN_ACTION :       Always given when the Action name an AgentBrain decided upon is not
-                                            recognized as a class name of an Action or some class inheriting from
-                                            Action. Could be caused by either that class not existing or because it
-                                            is never imported anywhere (and hence is not on the path the GridWorld
-                                            searches in).
-
-        Parameters
-        ----------
-        result : string
-            A string representing the reason for an Action's (expected) success or fail.
-        succeeded : boolean
-            A boolean representing the (expected) success or fail of an Action.
-
-        See Also
-        --------
-        Action : The super-class whose children return an ActionResult
-
-        """
-
         self.result = result
         self.succeeded = succeeded

@@ -9,21 +9,21 @@ from matrxs.objects.simple_objects import AreaTile
 
 
 class RemoveObject(Action):
+    """ Removes an object from the world.
+
+    An Action that permanently removes an EnvObject from the world, which can be any object except the agent
+    performing the action.
+
+    Parameters
+    ----------
+    duration_in_ticks : int (default=1)
+        The default duration of RemoveObject in ticks during which the GridWorld blocks the Agent performing other
+        actions. By default this is 1, meaning that the RemoveObject will take both the tick in which it was
+        decided upon and the subsequent tick. Should be zero or larger.
+
+    """
 
     def __init__(self, duration_in_ticks=1):
-        """ Removes an object from the world.
-
-        An Action that permanently removes an EnvObject from the world, which can be any object except the agent
-        performing the action.
-
-        Parameters
-        ----------
-        duration_in_ticks : int (default=1)
-            The default duration of RemoveObject in ticks during which the GridWorld blocks the Agent performing other
-            actions. By default this is 1, meaning that the RemoveObject will take both the tick in which it was
-            decided upon and the subsequent tick. Should be zero or larger.
-
-        """
         super().__init__(duration_in_ticks)
 
     def mutate(self, grid_world, agent_id, **kwargs):
@@ -129,56 +129,56 @@ class RemoveObject(Action):
 
 
 class RemoveObjectResult(ActionResult):
+    """ActionResult for a RemoveObjectAction
+
+    The results uniquely for RemoveObjectAction are (as class constants):
+        RemoveObjectResult.OBJECT_REMOVED               : If the object was successfully removed.
+        RemoveObjectResult.REMOVAL_FAILED               : If the object could not be removed by the GridWorld.
+        RemoveObjectResult.OBJECT_ID_NOT_WITHIN_RANGE   : If the object is not within specified range.
+        RemoveObjectResult.NO_OBJECTS_IN_RANGE          : If no objects are within range.
+
+    Parameters
+    ----------
+    result : string
+        A string representing the reason for a RemoveObjectAction's (expected) success or fail.
+    succeeded : boolean
+        A boolean representing the (expected) success or fail of a RemoveObjectAction.
+
+    See Also
+    --------
+    RemoveObjectAction
+
+    """
     NO_OBJECTS_IN_RANGE = "No objects were in `REMOVE_RANGE`."
     OBJECT_ID_NOT_WITHIN_RANGE = "The object with id `OBJECT_ID` is not within the range of `REMOVE_RANGE`."
     OBJECT_REMOVED = "The object with id `OBJECT_ID` is removed."
     REMOVAL_FAILED = "The object with id `OBJECT_ID` failed to be removed by the environment for some reason."
 
     def __init__(self, result, succeeded):
-        """ActionResult for a RemoveObjectAction
-
-        The results uniquely for RemoveObjectAction are (as class constants):
-            RemoveObjectResult.OBJECT_REMOVED               : If the object was successfully removed.
-            RemoveObjectResult.REMOVAL_FAILED               : If the object could not be removed by the GridWorld.
-            RemoveObjectResult.OBJECT_ID_NOT_WITHIN_RANGE   : If the object is not within specified range.
-            RemoveObjectResult.NO_OBJECTS_IN_RANGE          : If no objects are within range.
-
-        Parameters
-        ----------
-        result : string
-            A string representing the reason for a RemoveObjectAction's (expected) success or fail.
-        succeeded : boolean
-            A boolean representing the (expected) success or fail of a RemoveObjectAction.
-
-        See Also
-        --------
-        RemoveObjectAction
-
-        """
         super().__init__(result, succeeded)
 
 
 class GrabObject(Action):
+    """ Grab and hold objects.
+
+    The Action that can pick up / grab and hold EnvObjects. Cannot be performed on agents (including the agent
+    performing the action). After grabbing / picking up, the object is automatically added to the agent's inventory.
+
+    Parameters
+    ----------
+    duration_in_ticks : int (default=1)
+        The default duration of GrabObject in ticks during which the GridWorld blocks the Agent performing other
+        actions. By default this is 1, meaning that the GrabObject will take both the tick in which it was
+        decided upon and the subsequent tick. Should be zero or larger.
+
+    Notes
+    -----
+    The actual carrying mechanism of objects is implemented in the Move actions: whenever an agent moves who holds
+    objects, those objects it is holding are also moved with it.
+
+    """
 
     def __init__(self, duration_in_ticks=1):
-        """ Grab and hold objects.
-
-        The Action that can pick up / grab and hold EnvObjects. Cannot be performed on agents (including the agent
-        performing the action). After grabbing / picking up, the object is automatically added to the agent's inventory.
-
-        Parameters
-        ----------
-        duration_in_ticks : int (default=1)
-            The default duration of GrabObject in ticks during which the GridWorld blocks the Agent performing other
-            actions. By default this is 1, meaning that the GrabObject will take both the tick in which it was
-            decided upon and the subsequent tick. Should be zero or larger.
-
-        Notes
-        -----
-        The actual carrying mechanism of objects is implemented in the Move actions: whenever an agent moves who holds
-        objects, those objects it is holding are also moved with it.
-
-        """
         super().__init__(duration_in_ticks)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
@@ -376,6 +376,33 @@ class GrabObject(Action):
 
 
 class GrabObjectResult(ActionResult):
+    """ActionResult for a GrabObjectAction
+
+    The results uniquely for GrabObjectAction are (as class constants):
+        GrabObjectResult.RESULT_SUCCESS                     : When the object can be successfully grabbed.
+        GrabObjectResult.RESULT_NO_OBJECT                   : When object_id is not given.
+        GrabObjectResult.RESULT_CARRIES_OBJECT              : When the agent already carries the maximum nr. objects.
+        GrabObjectResult.NOT_IN_RANGE                       : When object_id not within range.
+        GrabObjectResult.RESULT_AGENT                       : If the object_id is that of an agent.
+        GrabObjectResult.RESULT_OBJECT_CARRIED              : When the object is already carried by another agent.
+        GrabObjectResult.RESULT_OBJECT_UNMOVABLE            : When the object is not movable.
+        GrabObjectResult.RESULT_UNKNOWN_OBJECT_TYPE         : When the object_id does not exists in the GridWorld.
+        GrabObjectResult.FAILED_TO_REMOVE_OBJECT_FROM_WORLD : When the grabbed object cannot be removed from the
+                                                              GridWorld.
+
+    Parameters
+    ----------
+    result : string
+        A string representing the reason for a GrabObjectAction's (expected) success or fail.
+    succeeded : boolean
+        A boolean representing the (expected) success or fail of a GrabObjectAction.
+
+    See Also
+    --------
+    GrabObjectAction
+
+    """
+
     FAILED_TO_REMOVE_OBJECT_FROM_WORLD = 'Grab action failed; could not remove object with id {OBJECT_ID} from grid.'
     RESULT_SUCCESS = 'Grab action success'
     NOT_IN_RANGE = 'Object not in range'
@@ -387,56 +414,30 @@ class GrabObjectResult(ActionResult):
     RESULT_OBJECT_UNMOVABLE = 'Object is not movable'
 
     def __init__(self, result, succeeded):
-        """ActionResult for a GrabObjectAction
-
-        The results uniquely for GrabObjectAction are (as class constants):
-            GrabObjectResult.RESULT_SUCCESS                     : When the object can be successfully grabbed.
-            GrabObjectResult.RESULT_NO_OBJECT                   : When object_id is not given.
-            GrabObjectResult.RESULT_CARRIES_OBJECT              : When the agent already carries the maximum nr. objects.
-            GrabObjectResult.NOT_IN_RANGE                       : When object_id not within range.
-            GrabObjectResult.RESULT_AGENT                       : If the object_id is that of an agent.
-            GrabObjectResult.RESULT_OBJECT_CARRIED              : When the object is already carried by another agent.
-            GrabObjectResult.RESULT_OBJECT_UNMOVABLE            : When the object is not movable.
-            GrabObjectResult.RESULT_UNKNOWN_OBJECT_TYPE         : When the object_id does not exists in the GridWorld.
-            GrabObjectResult.FAILED_TO_REMOVE_OBJECT_FROM_WORLD : When the grabbed object cannot be removed from the
-                                                                  GridWorld.
-
-        Parameters
-        ----------
-        result : string
-            A string representing the reason for a GrabObjectAction's (expected) success or fail.
-        succeeded : boolean
-            A boolean representing the (expected) success or fail of a GrabObjectAction.
-
-        See Also
-        --------
-        GrabObjectAction
-
-        """
         super().__init__(result, succeeded)
 
 
 class DropObject(Action):
+    """ Drop objects that are being carried.
+
+    The Action that can drop EnvObjects that are in an agent's inventory. After dropping, the object is added to the
+    GridWorld directly (instead of remaining in the agent's inventory).
+
+    Parameters
+    ----------
+    duration_in_ticks : int (default=1)
+        The default duration of DropObject in ticks during which the GridWorld blocks the Agent performing other
+        actions. By default this is 1, meaning that the DropObject will take both the tick in which it was
+        decided upon and the subsequent tick. Should be zero or larger.
+
+    Notes
+    -----
+    The actual carrying mechanism of objects is implemented in the Move actions: whenever an agent moves who holds
+    objects, those objects it is holding are also moved with it.
+
+    """
     
     def __init__(self, duration_in_ticks=1):
-        """ Drop objects that are being carried.
-
-        The Action that can drop EnvObjects that are in an agent's inventory. After dropping, the object is added to the
-        GridWorld directly (instead of remaining in the agent's inventory).
-
-        Parameters
-        ----------
-        duration_in_ticks : int (default=1)
-            The default duration of DropObject in ticks during which the GridWorld blocks the Agent performing other
-            actions. By default this is 1, meaning that the DropObject will take both the tick in which it was
-            decided upon and the subsequent tick. Should be zero or larger.
-
-        Notes
-        -----
-        The actual carrying mechanism of objects is implemented in the Move actions: whenever an agent moves who holds
-        objects, those objects it is holding are also moved with it.
-
-        """
         super().__init__(duration_in_ticks)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
@@ -724,6 +725,31 @@ class DropObject(Action):
 
 
 class DropObjectResult(ActionResult):
+    """ActionResult for a DropObjectAction.
+
+    The results uniquely for GrabObjectAction are (as class constants):
+        GrabObjectResult.RESULT_SUCCESS             : When the object is successfully dropped.
+        DropObjectAction.RESULT_NO_OBJECT           : When there is no object in the agent's inventory.
+        DropObjectAction.RESULT_NONE_GIVEN          : When the given obj_id is not being carried by the agent.
+        GrabObjectResult.RESULT_OBJECT              : When the object was intended to drop on the agent's location
+                                                      and this was not possible or when no suitable drop location
+                                                      could be found.
+        DropObjectAction.RESULT_UNKNOWN_OBJECT_TYPE :
+        GrabObjectResult.RESULT_NO_OBJECT_CARRIED   : When no objects are carried by the agent.
+
+    Parameters
+    ----------
+    result : string
+        A string representing the reason for a DropObjectAction's (expected) success or fail.
+    succeeded : boolean
+        A boolean representing the (expected) success or fail of a DropObjectAction.
+
+    See Also
+    --------
+    GrabObjectAction
+
+    """
+
     RESULT_SUCCESS = 'Drop action success'
     RESULT_NO_OBJECT = 'The item is not carried'
     RESULT_NONE_GIVEN = "'None' used as input id"
@@ -733,29 +759,5 @@ class DropObjectResult(ActionResult):
     RESULT_NO_OBJECT_CARRIED = 'Cannot drop object when none carried'
 
     def __init__(self, result, succeeded, obj_id=None):
-        """ActionResult for a DropObjectAction.
-
-        The results uniquely for GrabObjectAction are (as class constants):
-            GrabObjectResult.RESULT_SUCCESS             : When the object is successfully dropped.
-            DropObjectAction.RESULT_NO_OBJECT           : When there is no object in the agent's inventory.
-            DropObjectAction.RESULT_NONE_GIVEN          : When the given obj_id is not being carried by the agent.
-            GrabObjectResult.RESULT_OBJECT              : When the object was intended to drop on the agent's location
-                                                          and this was not possible or when no suitable drop location
-                                                          could be found.
-            DropObjectAction.RESULT_UNKNOWN_OBJECT_TYPE :
-            GrabObjectResult.RESULT_NO_OBJECT_CARRIED   : When no objects are carried by the agent.
-
-        Parameters
-        ----------
-        result : string
-            A string representing the reason for a DropObjectAction's (expected) success or fail.
-        succeeded : boolean
-            A boolean representing the (expected) success or fail of a DropObjectAction.
-
-        See Also
-        --------
-        GrabObjectAction
-
-        """
         super().__init__(result, succeeded)
         self.obj_id = obj_id
