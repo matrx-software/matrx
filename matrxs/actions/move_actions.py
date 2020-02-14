@@ -172,7 +172,7 @@ class Move(Action):
 
         Parameters
         ----------
-        duration_in_ticks : int
+        duration_in_ticks : int, optional (default=1)
             The default duration of Move in ticks during which the GridWorld blocks the Agent performing other actions.
             By default this is 1, meaning that all Move actions will take both the tick in which it was decided upon and
             the subsequent tick. Should be zero or larger.

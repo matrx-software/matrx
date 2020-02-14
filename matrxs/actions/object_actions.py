@@ -9,26 +9,48 @@ from matrxs.objects.simple_objects import AreaTile
 
 
 class RemoveObject(Action):
-    """
-    An action that allows agent to remove EnvObjects (basically ALL objects except YOURSELF) from the GridWorld
-    permanently. This includes other AgentAvatars.
-    """
 
     def __init__(self, duration_in_ticks=1):
+        """ Removes an object from the world.
+
+        An Action that permanently removes an EnvObject from the world, which can be any object except the agent
+        performing the action.
+
+        Parameters
+        ----------
+        duration_in_ticks : int (default=1)
+            The default duration of RemoveObject in ticks during which the GridWorld blocks the Agent performing other
+            actions. By default this is 1, meaning that the RemoveObject will take both the tick in which it was
+            decided upon and the subsequent tick. Should be zero or larger.
+
+        """
         super().__init__(duration_in_ticks)
 
     def mutate(self, grid_world, agent_id, **kwargs):
-        """
-        Removes the object specified in kwargs['object_id'] permanently from the grid world if within range of
-        kwargs['remove_range'] (if key exists, otherwise default range is 1).
+        """ Removes the specified object.
 
-        It does not allow you to remove itself!
+        Removes a specific EnvObject from the GridWorld. Can be any object except for the agent performing the action.
 
-        :param grid_world: The current GridWorld
-        :param agent_id: The agent that performs the action.
-        :param kwargs: Requires an 'object_id' that exists in the GridWorld and the optional 'remove_range' to specify
-        the range in which the object can be removed. If a range is not given, defaults to 1.
-        :return: An ObjectActionResult.
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance in which the object is sought according to the object_id parameter.
+        agent_id : string
+            The string representing the unique identified that represents the agent performing this action.
+        object_id : string, optional (default=None)
+            The string representing the unique identifier of the EnvObject that should be removed.
+        remove_range : int, optional (default=1)
+            The range in which the to be removed EnvObject should be in.
+
+        Returns
+        -------
+        RemoveObjectResult
+            The ActionResult depicting the action's success or failure and reason for that result.
+            Returns the following results:
+            RemoveObjectResult.OBJECT_REMOVED               : If the object was successfully removed.
+            RemoveObjectResult.REMOVAL_FAILED               : If the object could not be removed by the GridWorld.
+            RemoveObjectResult.OBJECT_ID_NOT_WITHIN_RANGE   : If the object is not within specified range.
+
         """
         assert 'object_id' in kwargs.keys()  # assert if object_id is given.
         object_id = kwargs['object_id']  # assign
@@ -64,6 +86,28 @@ class RemoveObject(Action):
                                   .replace('object_id'.upper(), str(object_id)), False)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
+        """ Checks if an object can be removed.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance in which the object is sought according to the object_id parameter.
+        agent_id : string
+            The string representing the unique identified that represents the agent performing this action.
+        object_id : string, optional (default=None)
+            The string representing the unique identifier of the EnvObject that should be removed.
+        remove_range : int, optional (default=1)
+            The range in which the to be removed EnvObject should be in.
+
+        Returns
+        -------
+        RemoveObjectResult
+            The ActionResult depicting the action's expected success or failure and reason for that result.
+            Returns the following results:
+            RemoveObjectResult.ACTION_SUCCEEDED     : If the object was successfully removed.
+            RemoveObjectResult.NO_OBJECTS_IN_RANGE  : If no objects are within range.
+
+        """
         agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentBody)  # get ourselves
         assert agent_avatar is not None  # check if we actually exist
         agent_loc = agent_avatar.location  # get our location
@@ -91,52 +135,129 @@ class RemoveObjectResult(ActionResult):
     REMOVAL_FAILED = "The object with id `OBJECT_ID` failed to be removed by the environment for some reason."
 
     def __init__(self, result, succeeded):
+        """ActionResult for a RemoveObjectAction
+
+        The results uniquely for RemoveObjectAction are (as class constants):
+            RemoveObjectResult.OBJECT_REMOVED               : If the object was successfully removed.
+            RemoveObjectResult.REMOVAL_FAILED               : If the object could not be removed by the GridWorld.
+            RemoveObjectResult.OBJECT_ID_NOT_WITHIN_RANGE   : If the object is not within specified range.
+            RemoveObjectResult.NO_OBJECTS_IN_RANGE          : If no objects are within range.
+
+        Parameters
+        ----------
+        result : string
+            A string representing the reason for a RemoveObjectAction's (expected) success or fail.
+        succeeded : boolean
+            A boolean representing the (expected) success or fail of a RemoveObjectAction.
+
+        See Also
+        --------
+        RemoveObjectAction
+
+        """
         super().__init__(result, succeeded)
 
 
 class GrabObject(Action):
-    """
-    An action that allows agent to grab EnvObjects (only objects) from the GridWorld. This
-    excludes other AgentAvatars. Grabbing automatically is followed by carrying of the object.
-    Carrying is implemented in movement actions.
-    """
 
     def __init__(self, duration_in_ticks=1):
+        """ Grab and hold objects.
+
+        The Action that can pick up / grab and hold EnvObjects. Cannot be performed on agents (including the agent
+        performing the action). After grabbing / picking up, the object is automatically added to the agent's inventory.
+
+        Parameters
+        ----------
+        duration_in_ticks : int (default=1)
+            The default duration of GrabObject in ticks during which the GridWorld blocks the Agent performing other
+            actions. By default this is 1, meaning that the GrabObject will take both the tick in which it was
+            decided upon and the subsequent tick. Should be zero or larger.
+
+        Notes
+        -----
+        The actual carrying mechanism of objects is implemented in the Move actions: whenever an agent moves who holds
+        objects, those objects it is holding are also moved with it.
+
+        """
         super().__init__(duration_in_ticks)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
-        """
-        This function checks if grabbing an object is possible.
-        For this it assumes a infinite grab range and a random object in that range
-        The check if an object is within range is done within 'mutate'
-        :param grid_world: The current GridWorld
-        :param agent_id: The agent that performes the action
-        :return:
+        """ Checks if the object can be grabbed.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance in which the object is sought according to the object_id parameter.
+        agent_id : string
+            The string representing the unique identified that represents the agent performing this action.
+        object_id : string, optional (default=None)
+            The string representing the unique identifier of the EnvObject that should be grabbed. When not given, a
+            random object within range is selected.
+        grab_range : int, optional (default=np.inf)
+            The range in which the to be grabbed EnvObject should be in.
+        max_objects : int, optional (default=np.inf)
+            The maximum of objects the agent can carry.
+
+        Returns
+        -------
+        GrabObjectResult
+            The ActionResult depicting the action's expected success or failure and reason for that result.
+            Returns the following results:
+            GrabObjectResult.RESULT_SUCCESS                 : When the object can be successfully grabbed.
+            GrabObjectResult.RESULT_NO_OBJECT               : When object_id is not given.
+            GrabObjectResult.RESULT_CARRIES_OBJECT          : When the agent already carries the maximum nr. objects.
+            GrabObjectResult.NOT_IN_RANGE                   : When object_id not within range.
+            GrabObjectResult.RESULT_AGENT                   : If the object_id is that of an agent.
+            GrabObjectResult.RESULT_OBJECT_CARRIED          : When the object is already carried by another agent.
+            GrabObjectResult.RESULT_OBJECT_UNMOVABLE        : When the object is not movable.
+            GrabObjectResult.RESULT_UNKNOWN_OBJECT_TYPE     : When the object_id does not exists in the GridWorld.
+
         """
         # Set default values check
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
         grab_range = np.inf if 'grab_range' not in kwargs else kwargs['grab_range']
         max_objects = np.inf if 'max_objects' not in kwargs else kwargs['max_objects']
 
-        return self.is_possible_grab(grid_world, agent_id=agent_id, object_id=object_id, grab_range=grab_range,
-                                     max_objects=max_objects)
+        return self._is_possible_grab(grid_world, agent_id=agent_id, object_id=object_id, grab_range=grab_range,
+                                      max_objects=max_objects)
 
     def mutate(self, grid_world, agent_id, **kwargs):
-        """
-        Picks up the object specified in kwargs['object_id']  if within range of
-        kwargs['grab_range'] (if key exists, otherwise default range is 0).
+        """ Grabs an object.
 
-        It does not allow you to grab yourself/other agents
+        Alters the properties of the agent doing the grabbing, and the object being grabbed (and carried), such that
+        the agent's inventory contains the entire object and the object being carried properties contains the agent's
+        id.
 
-        :param grid_world: The current GridWorld
-        :param agent_id: The agent that performs the action.
-        :param kwargs: An optional 'object_id' that exists in the GridWorld (if none is specified
-        a random object within range is chosen).\n
-        Optional 'grab_range' to specify the range in which the object can be removed.
-        If a range is not given, defaults to 0. \n
-        Optional 'max_objects' for the amount of objects the agent can carry.
-        If no 'max_objects' is set, default is set to 1.
-        :return: An ObjectActionResult.
+        The grabbed object is removed from the world, and will only exist inside of the agent's inventory.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance in which the object is sought according to the object_id parameter.
+        agent_id : string
+            The string representing the unique identified that represents the agent performing this action.
+        object_id : string, optional (default=None)
+            The string representing the unique identifier of the EnvObject that should be grabbed. When not given, a
+            random object within range is selected.
+        grab_range : int, optional (default=np.inf)
+            The range in which the to be grabbed EnvObject should be in.
+        max_objects : int, optional (default=np.inf)
+            The maximum of objects the agent can carry.
+
+        Returns
+        -------
+        GrabObjectResult
+            The ActionResult depicting the action's expected success or failure and reason for that result.
+            Returns the following results:
+            GrabObjectResult.RESULT_SUCCESS                         : When the grab succeeded.
+            GrabObjectResult.FAILED_TO_REMOVE_OBJECT_FROM_WORLD     : When the grabbed object cannot be removed from the
+                                                                      GridWorld.
+
+        Notes
+        -----
+        A grabbed object resides inside the inventory of an agent, not directly in the world any longer. Hence, if the
+        agent is removed, so is its inventory and all objects herein.
+
         """
 
         # Additional check
@@ -166,7 +287,41 @@ class GrabObject(Action):
 
         return GrabObjectResult(GrabObjectResult.RESULT_SUCCESS, True)
 
-    def is_possible_grab(self, grid_world, agent_id, object_id, grab_range, max_objects):
+    def _is_possible_grab(self, grid_world, agent_id, object_id, grab_range, max_objects):
+        """ Private MATRX method.
+
+        Checks if an EnvObject can be grabbed by an agent.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance in which the object is sought according to the object_id parameter.
+        agent_id : string
+            The string representing the unique identified that represents the agent performing this action.
+        object_id : string, optional (default=None)
+            The string representing the unique identifier of the EnvObject that should be grabbed. When not given, a
+            random object within range is selected.
+        grab_range : int, optional (default=np.inf)
+            The range in which the to be grabbed EnvObject should be in.
+        max_objects : int, optional (default=np.inf)
+            The maximum of objects the agent can carry.
+
+        Returns
+        -------
+        GrabObjectResult
+            The ActionResult depicting the action's expected success or failure and reason for that result.
+            Returns the following results:
+            GrabObjectResult.RESULT_SUCCESS                 : When the object can be successfully grabbed.
+            GrabObjectResult.RESULT_NO_OBJECT               : When object_id is not given.
+            GrabObjectResult.RESULT_CARRIES_OBJECT          : When the agent already carries the maximum nr. objects.
+            GrabObjectResult.NOT_IN_RANGE                   : When object_id not within range.
+            GrabObjectResult.RESULT_AGENT                   : If the object_id is that of an agent.
+            GrabObjectResult.RESULT_OBJECT_CARRIED          : When the object is already carried by another agent.
+            GrabObjectResult.RESULT_OBJECT_UNMOVABLE        : When the object is not movable.
+            GrabObjectResult.RESULT_UNKNOWN_OBJECT_TYPE     : When the object_id does not exists in the GridWorld.
+
+
+        """
         reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
         loc_agent = reg_ag.location  # Agent location
 
@@ -232,15 +387,84 @@ class GrabObjectResult(ActionResult):
     RESULT_OBJECT_UNMOVABLE = 'Object is not movable'
 
     def __init__(self, result, succeeded):
+        """ActionResult for a GrabObjectAction
+
+        The results uniquely for GrabObjectAction are (as class constants):
+            GrabObjectResult.RESULT_SUCCESS                     : When the object can be successfully grabbed.
+            GrabObjectResult.RESULT_NO_OBJECT                   : When object_id is not given.
+            GrabObjectResult.RESULT_CARRIES_OBJECT              : When the agent already carries the maximum nr. objects.
+            GrabObjectResult.NOT_IN_RANGE                       : When object_id not within range.
+            GrabObjectResult.RESULT_AGENT                       : If the object_id is that of an agent.
+            GrabObjectResult.RESULT_OBJECT_CARRIED              : When the object is already carried by another agent.
+            GrabObjectResult.RESULT_OBJECT_UNMOVABLE            : When the object is not movable.
+            GrabObjectResult.RESULT_UNKNOWN_OBJECT_TYPE         : When the object_id does not exists in the GridWorld.
+            GrabObjectResult.FAILED_TO_REMOVE_OBJECT_FROM_WORLD : When the grabbed object cannot be removed from the
+                                                                  GridWorld.
+
+        Parameters
+        ----------
+        result : string
+            A string representing the reason for a GrabObjectAction's (expected) success or fail.
+        succeeded : boolean
+            A boolean representing the (expected) success or fail of a GrabObjectAction.
+
+        See Also
+        --------
+        GrabObjectAction
+
+        """
         super().__init__(result, succeeded)
 
 
 class DropObject(Action):
     
     def __init__(self, duration_in_ticks=1):
+        """ Drop objects that are being carried.
+
+        The Action that can drop EnvObjects that are in an agent's inventory. After dropping, the object is added to the
+        GridWorld directly (instead of remaining in the agent's inventory).
+
+        Parameters
+        ----------
+        duration_in_ticks : int (default=1)
+            The default duration of DropObject in ticks during which the GridWorld blocks the Agent performing other
+            actions. By default this is 1, meaning that the DropObject will take both the tick in which it was
+            decided upon and the subsequent tick. Should be zero or larger.
+
+        Notes
+        -----
+        The actual carrying mechanism of objects is implemented in the Move actions: whenever an agent moves who holds
+        objects, those objects it is holding are also moved with it.
+
+        """
         super().__init__(duration_in_ticks)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
+        """ Checks if the object can be grabbed.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance in which the object is dropped.
+        agent_id : string
+            The string representing the unique identified that represents the agent performing this action.
+        object_id : string, optional (default=None)
+            The string representing the unique identifier of the EnvObject that should be dropped. When not given the
+            last object that was grabbed is dropped.
+        drop_range : int, optional (default=np.inf)
+            The range in which the object can be dropped.
+
+        Returns
+        -------
+        DropObjectResult
+            The ActionResult depicting the action's expected success or failure and reason for that result.
+            Returns the following results:
+            GrabObjectResult.RESULT_SUCCESS     : When the object can be successfully dropped.
+            DropObjectResult.RESULT_NO_OBJECT   : When there is no object in the agent's inventory.
+            GrabObjectResult.RESULT_NONE_GIVEN  : When the given obj_id is not being carried by the agent.
+            GrabObjectResult.RESULT_NO_OBJECT   : When no obj_id is given.
+
+        """
         reg_ag = grid_world.registered_agents[agent_id]
 
         drop_range = 1 if not 'drop_range' in kwargs else kwargs['drop_range']
@@ -253,19 +477,40 @@ class DropObject(Action):
         else:
             return DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
 
-        return self.possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id, drop_range=drop_range)
+        return self._possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id, drop_range=drop_range)
 
     def mutate(self, grid_world, agent_id, **kwargs):
-        """
-        This function drops one of the items carried by the agent.
-        It tries to drop the object within the specified drop_range around the agent,
-        trying to drop it as close to the agent as possible
+        """ Drops the carried object.
 
-        :param grid_world: pointer to current GridWorld
-        :param agent_id: agent that acts
-        :param kwargs: Optional an "object_id" can be given. If an agent is carrying
-        two or more items, this specifies which item should be dropped.
-        :return: Always True
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance in which the object is dropped.
+        agent_id : string
+            The string representing the unique identified that represents the agent performing this action.
+        object_id : string, optional (default=None)
+            The string representing the unique identifier of the EnvObject that should be dropped. When not given the
+            last object that was grabbed is dropped.
+        drop_range : int, optional (default=np.inf)
+            The range in which the object can be dropped.
+
+        Returns
+        -------
+        DropObjectResult
+            The ActionResult depicting the action's expected success or failure and reason for that result.
+            Returns the following results:
+            GrabObjectResult.RESULT_SUCCESS             : When the object is successfully dropped.
+            GrabObjectResult.RESULT_NO_OBJECT_CARRIED   : When no objects are carried by the agent.
+            GrabObjectResult.RESULT_OBJECT              : When the object was intended to drop on the agent's location
+                                                          and this was not possible or when no suitable drop location
+                                                          could be found.
+
+        Raises
+        ------
+        Exception
+            When the object is said to be dropped inside the agent's location, but the agent and object are
+            intraversable. No other intraversable objects can be on the same location.
+
         """
         reg_ag = grid_world.registered_agents[agent_id]
 
@@ -283,30 +528,54 @@ class DropObject(Action):
         # check that it is even possible to drop this object somewhere
         if not env_obj.is_traversable and not reg_ag.is_traversable and drop_range == 0:
             raise Exception(
-                f"Intraversable agent {reg_ag.obj_id} can only drop the intraversable object {env_obj.obj_id} at its own location (drop_range = 0), but this is impossible. Enlarge the drop_range for the DropAction to atleast 1")
+                f"Intraversable agent {reg_ag.obj_id} can only drop the intraversable object {env_obj.obj_id} at its "
+                f"own location (drop_range = 0), but this is impossible. Enlarge the drop_range for the DropAction to "
+                f"atleast 1")
 
         # check if we can drop it at our current location
-        curr_loc_drop_poss = self.is_drop_poss(grid_world, env_obj, reg_ag.location)
+        curr_loc_drop_poss = self._is_drop_poss(grid_world, env_obj, reg_ag.location)
 
         # drop it on the agent location if possible
         if curr_loc_drop_poss:
-            return self.act_drop(grid_world, agent=reg_ag, env_obj=env_obj, drop_loc=reg_ag.location)
+            return self._act_drop(grid_world, agent=reg_ag, env_obj=env_obj, drop_loc=reg_ag.location)
 
         # if the agent location was the only within range, return a negative action result
         elif not curr_loc_drop_poss and drop_range == 0:
             return DropObjectResult(DropObjectResult.RESULT_OBJECT, False)
 
         # Try finding other drop locations from close to further away around the agent
-        drop_loc = self.find_drop_loc(grid_world, reg_ag, env_obj, drop_range, reg_ag.location)
+        drop_loc = self._find_drop_loc(grid_world, reg_ag, env_obj, drop_range, reg_ag.location)
 
         # If we didn't find a valid drop location within range, return a negative action result
         if not drop_loc:
             return DropObjectResult(DropObjectResult.RESULT_OBJECT, False)
 
-        return self.act_drop(grid_world, agent=reg_ag, env_obj=env_obj, drop_loc=drop_loc)
+        return self._act_drop(grid_world, agent=reg_ag, env_obj=env_obj, drop_loc=drop_loc)
 
-    def act_drop(self, grid_world, agent, env_obj, drop_loc):
-        """ Drop the object """
+    def _act_drop(self, grid_world, agent, env_obj, drop_loc):
+        """ Private MATRX method.
+
+        Drops the carried object.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance in which the object is dropped.
+        agent : AgentBody
+            The AgentBody of the agent who drops the object.
+        env_obj : EnvObject
+            The EnvObject to be dropped.
+        drop_loc : [x, y]
+            The drop location.
+
+        Returns
+        -------
+        DropObjectResult
+            The ActionResult depicting the action's expected success or failure and reason for that result.
+            Returns the following results:
+            GrabObjectResult.RESULT_SUCCESS     : When the object is successfully dropped.
+
+        """
 
         # Updating properties
         agent.is_carrying.remove(env_obj)
@@ -318,18 +587,28 @@ class DropObject(Action):
 
         return DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
 
-    def find_drop_loc(self, grid_world, agent, env_obj, drop_range, start_loc):
-        """
-        Do a breadth first search starting from the agent's location to find
-        the closest valid drop location.
+    def _find_drop_loc(self, grid_world, agent, env_obj, drop_range, start_loc):
+        """ Private MATRX method.
 
-        :param grid_world: The grid_world object
-        :param reg_ag: the agent object of the agent who wants to drop the object
-        :param env_obj: the object to be dropped
-        :param drop_range: the range from our current location for which we can drop
-        the object
-        :return: False if no valid drop location can be found, otherwise the [x,y]
-        coords of the closest drop location
+        A breadth first search starting from the agent's location to find the closest valid drop location.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance in which the object is dropped.
+        agent : AgentBody
+            The AgentBody of the agent who drops the object.
+        env_obj : EnvObject
+            The EnvObject to be dropped.
+        drop_range : int
+            The range in which the object can be dropped.
+        start_loc : [x, y]
+            The location of the agent from which to start the search.
+
+        Returns
+        -------
+        boolean
+            False if no valid drop location can be found, otherwise the [x,y] coordinates of the closest drop location.
         """
         queue = collections.deque([[start_loc]])
         seen = {start_loc}
@@ -346,7 +625,7 @@ class DropObject(Action):
                 return False
 
             # check if we can drop at this location
-            if self.is_drop_poss(grid_world, env_obj, [x, y]):
+            if self._is_drop_poss(grid_world, env_obj, [x, y]):
                 return [x, y]
 
             # queue unseen neighbouring tiles
@@ -356,14 +635,26 @@ class DropObject(Action):
                     seen.add((x2, y2))
         return False
 
-    def is_drop_poss(self, grid_world, env_obj, dropLocation):
-        """
-        Check if the object can be dropped at a specific location by checking if
-        there are any intraversable objects at that location, and if the object to
-        be dropped is intraversable
-        :param grid_world: The grid_world object
-        :param env_obj: the object to be dropped
-        :param dropLocation: location to check if it is possible to drop the env_obj there
+    def _is_drop_poss(self, grid_world, env_obj, dropLocation):
+        """ Private MATRX method.
+
+
+        Check if the object can be dropped at a specific location by checking if there are any intraversable objects at
+        that location, and if the object to be dropped is intraversable
+
+        Parameters
+        ----------
+        grid_world : GridWolrd
+            The grid_world object
+        env_obj : EnvObject
+            The object to be dropped
+        dropLocation: [x, y]
+            Location to check if it is possible to drop the env_obj there.
+
+        Returns
+        -------
+        boolean
+            True when the location is a valid drop location, False otherwise.
         """
 
         # Count the intraversable objects at the current location if we would drop the
@@ -385,7 +676,33 @@ class DropObject(Action):
         else:
             return True
 
-    def possible_drop(self, grid_world, agent_id, obj_id, drop_range):
+    def _possible_drop(self, grid_world, agent_id, obj_id, drop_range):
+        """ Private MATRX method.
+
+        Checks if an EnvObject can be dropped by an agent.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The GridWorld instance in which the object is dropped.
+        agent_id : string
+            The string representing the unique identified that represents the agent performing this action.
+        obj_id : string, optional (default=None)
+            The string representing the unique identifier of the EnvObject that should be dropped.
+        drop_range : int, optional (default=np.inf)
+            The range in which the EnvObject should be dropped in.
+
+        Returns
+        -------
+        DropObjectResult
+            The ActionResult depicting the action's expected success or failure and reason for that result.
+            Returns the following results:
+            GrabObjectResult.RESULT_SUCCESS     : When the object can be successfully dropped.
+            GrabObjectResult.RESULT_NONE_GIVEN  : When the given obj_id is not being carried by the agent.
+            GrabObjectResult.RESULT_NO_OBJECT   : When no obj_id is given.
+
+
+        """
         reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
         loc_agent = reg_ag.location
         loc_obj_ids = grid_world.grid[loc_agent[1], loc_agent[0]]
@@ -416,5 +733,29 @@ class DropObjectResult(ActionResult):
     RESULT_NO_OBJECT_CARRIED = 'Cannot drop object when none carried'
 
     def __init__(self, result, succeeded, obj_id=None):
+        """ActionResult for a DropObjectAction.
+
+        The results uniquely for GrabObjectAction are (as class constants):
+            GrabObjectResult.RESULT_SUCCESS             : When the object is successfully dropped.
+            DropObjectAction.RESULT_NO_OBJECT           : When there is no object in the agent's inventory.
+            DropObjectAction.RESULT_NONE_GIVEN          : When the given obj_id is not being carried by the agent.
+            GrabObjectResult.RESULT_OBJECT              : When the object was intended to drop on the agent's location
+                                                          and this was not possible or when no suitable drop location
+                                                          could be found.
+            DropObjectAction.RESULT_UNKNOWN_OBJECT_TYPE :
+            GrabObjectResult.RESULT_NO_OBJECT_CARRIED   : When no objects are carried by the agent.
+
+        Parameters
+        ----------
+        result : string
+            A string representing the reason for a DropObjectAction's (expected) success or fail.
+        succeeded : boolean
+            A boolean representing the (expected) success or fail of a DropObjectAction.
+
+        See Also
+        --------
+        GrabObjectAction
+
+        """
         super().__init__(result, succeeded)
         self.obj_id = obj_id

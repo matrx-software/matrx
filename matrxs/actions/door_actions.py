@@ -13,7 +13,7 @@ class OpenDoorAction(Action):
 
         Parameters
         ----------
-        duration_in_ticks : int
+        duration_in_ticks : int, optional (default=1)
             The default duration of OpenDoorAction in ticks during which the GridWorld blocks the Agent performing other
             actions. By default this is 1, meaning that the OpenDoorAction will take both the tick in which it was
             decided upon and the subsequent tick. Should be zero or larger.
@@ -35,9 +35,9 @@ class OpenDoorAction(Action):
             The GridWorld instance in which the door is sought according to the object_id parameter.
         agent_id : string
             The string representing the unique identified that represents the agent performing this action.
-        object_id : string
+        object_id : string, optional (default=None)
             The string representing the unique identifier of the door that should be opened.
-        door_range : int (default=np.inf)
+        door_range : int, optional (default=np.inf)
             The maximum allowed distance between the agent and the door for the agent to be able to open that door.
 
         Returns
@@ -75,9 +75,9 @@ class OpenDoorAction(Action):
             The GridWorld instance in which the door is sought according to the object_id parameter.
         agent_id : string
             The string representing the unique identified that represents the agent performing this action.
-        object_id : string
+        object_id : string, optional (default=None)
             The string representing the unique identifier of the door that should be opened.
-        door_range : int (default=np.inf)
+        door_range : int, optional (default=np.inf)
             The maximum allowed distance between the agent and the door for the agent to be able to open that door.
 
         Returns
@@ -110,7 +110,7 @@ class CloseDoorAction(Action):
 
         Parameters
         ----------
-        duration_in_ticks : int
+        duration_in_ticks : int, optional (default=1)
             The default duration of CloseDoorAction in ticks during which the GridWorld blocks the Agent performing
             other actions. By default this is 1, meaning that the OpenDoorAction will take both the tick in which it was
             decided upon and the subsequent tick. Should be zero or larger.
@@ -131,9 +131,9 @@ class CloseDoorAction(Action):
             The GridWorld instance in which the door is sought according to the object_id parameter.
         agent_id : string
             The string representing the unique identified that represents the agent performing this action.
-        object_id : string
+        object_id : string, optional (default=None)
             The string representing the unique identifier of the door that should be opened.
-        door_range : int (default=np.inf)
+        door_range : int, optional (default=np.inf)
             The maximum allowed distance between the agent and the door for the agent to be able to open that door.
 
         Returns
@@ -172,9 +172,9 @@ class CloseDoorAction(Action):
             The GridWorld instance in which the door is sought according to the object_id parameter.
         agent_id : string
             The string representing the unique identified that represents the agent performing this action.
-        object_id : string
+        object_id : string, optional (default=None)
             The string representing the unique identifier of the door that should be opened.
-        door_range : int (default=np.inf)
+        door_range : int, optional (default=np.inf)
             The maximum allowed distance between the agent and the door for the agent to be able to open that door.
 
         Returns
@@ -286,9 +286,9 @@ def _is_possible_door_open_close(grid_world, agent_id, action_result, object_id=
     action_result : {Type[OpenDoorActionResult], Type[CloseDoorActionResult]}
         The type of the ActionResult that should be returned. Also used to determine for which kind of Action this check
         is made (OpenDoorAction or CloseDoorAction).
-    object_id : string
+    object_id : string, optional (default=None)
         The string representing the unique identifier of the door that should be opened.
-    door_range : int (default=np.inf)
+    door_range : int, optional (default=np.inf)
         The maximum allowed distance between the agent and the door for the agent to be able to open that door.
 
     Returns
