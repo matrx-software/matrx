@@ -5,12 +5,14 @@ from matrxs.objects.agent_body import AgentBody
 def _act_move(grid_world, agent_id, dx, dy):
     """ Private MATRX method.
 
-    The method that actually mutates the location of an AgentBody based on a delta-x and delta-y.
+    The method that actually mutates the location of an AgentBody based on a
+    delta-x and delta-y.
 
     Parameters
     ----------
     grid_world : GridWorld
-        The GridWorld instance in which the agent resides whose location should be updated.
+        The GridWorld instance in which the agent resides whose location
+        should be updated.
     agent_id : string
         The unique identifier for the agent whose location should be changed.
     dx : {-1, 0, 1}
@@ -21,7 +23,8 @@ def _act_move(grid_world, agent_id, dx, dy):
     Returns
     -------
     MoveActionResult
-        The result of the actual change of the location of an AgentBody. Always returns a success.
+        The result of the actual change of the location of an AgentBody.
+        Always returns a success.
 
     """
     agent_avatar = grid_world.get_env_object(agent_id, obj_type=AgentBody)
@@ -40,7 +43,8 @@ def _is_possible_movement(grid_world, agent_id, dx, dy):
     Parameters
     ----------
     grid_world : GridWorld
-        The GridWorld instance in which the agent resides whose location should be updated.
+        The GridWorld instance in which the agent resides whose location
+        should be updated.
     agent_id : string
         The unique identifier for the agent whose location should be changed.
     dx : {-1, 0, 1}
@@ -64,12 +68,14 @@ def _is_possible_movement(grid_world, agent_id, dx, dy):
 def _possible_movement(grid_world, agent_id, dx, dy):
     """ Private MATRX method.
 
-    Checks if the delta-x and delta-y change in the agent's location is possible.
+    Checks if the delta-x and delta-y change in the agent's location is
+    possible.
 
     Parameters
     ----------
     grid_world : GridWorld
-        The GridWorld instance in which the agent resides whose location should be updated.
+        The GridWorld instance in which the agent resides whose location should
+        be updated.
     agent_id : string
         The unique identifier for the agent whose location should be changed.
     dx : {-1, 0, 1}
@@ -81,13 +87,20 @@ def _possible_movement(grid_world, agent_id, dx, dy):
     -------
     MoveActionResult
         Whether the MoveAction is expected to be possible.
-        Can return the following results:
-        The ActionResult depicting the action's success or failure and reason for that result.
-        MoveActionResult.RESULT_SUCCESS                 : When the MoveAction is possible.
-        MoveActionResult.RESULT_NO_MOVE                 : If the agent is already at the location it wishes to move to.
-        MoveActionResult.RESULT_OCCUPIED                : When the new location is occupied by an intraversable agent.
-        MoveActionResult.RESULT_NOT_PASSABLE_OBJECT     : When the new location is occupied by an intraversable object.
-        MoveActionResult.RESULT_OUT_OF_BOUNDS           : When the new location is outside the GridWorld's bounds.
+        Can return the following results (see also
+        :class:`matrxs.actions.move_actions.MoveActionResult`):
+
+        * The ActionResult depicting the action's success or failure and reason
+          for that result.
+        * RESULT_SUCCESS: When the MoveAction is possible.
+        * RESULT_NO_MOVE: If the agent is already at the
+          location it wishes to move to.
+        * RESULT_OCCUPIED: When the new location is occupied
+          by an intraversable agent.
+        * RESULT_NOT_PASSABLE_OBJECT: When the new location is
+          occupied by an intraversable object.
+        * RESULT_OUT_OF_BOUNDS: When the new location is
+          outside the GridWorld's bounds.
 
     """
 
@@ -135,21 +148,28 @@ def _possible_movement(grid_world, agent_id, dx, dy):
 
 
 class MoveActionResult(ActionResult):
-    """ActionResult for a MoveAction
+    """ActionResult for a Move action
 
-    The results uniquely for MoveAction are (as class constants):
-    MoveActionResult.RESULT_SUCCESS                 : When the MoveAction is possible.
-    MoveActionResult.RESULT_NO_MOVE                 : If the agent is already at the location it wishes to move to.
-    MoveActionResult.RESULT_OCCUPIED                : When the new location is occupied by an intraversable agent.
-    MoveActionResult.RESULT_NOT_PASSABLE_OBJECT     : When the new location is occupied by an intraversable object.
-    MoveActionResult.RESULT_OUT_OF_BOUNDS           : When the new location is outside the GridWorld's bounds.
+    The results uniquely for Move action are (as class constants):
+
+    * RESULT_SUCCESS: When the MoveAction is possible.
+    * RESULT_NO_MOVE: If the agent is already at the location it wishes to move
+      to.
+    * RESULT_OCCUPIED: When the new location is occupied by an intraversable
+      agent.
+    * RESULT_NOT_PASSABLE_OBJECT: When the new location is occupied by an
+      intraversable object.
+    * RESULT_OUT_OF_BOUNDS: When the new location is outside the GridWorld's
+      bounds.
 
     Parameters
     ----------
-    result : string
-        A string representing the reason for a Move action's(expected) success or fail.
-    succeeded : boolean
-        A boolean representing the (expected) success or fail of a MoveAction.
+    result : str
+        A string representing the reason for a (expected) success
+        or fail of a :class:`matrxs.actions.move_actions.Move`.
+    succeeded : bool
+        A boolean representing the (expected) success or fail of a
+        :class:`matrxs.actions.move_actions.Move`.
 
     See Also
     --------
@@ -157,10 +177,21 @@ class MoveActionResult(ActionResult):
 
     """
 
-    RESULT_NO_MOVE = 'Move action resulted in a new location with the agent already present.'
+    """ When the move action is success. """
     RESULT_SUCCESS = 'Move action success'
+
+    """ When the agent is already at the location it tries to move to. """
+    RESULT_NO_MOVE = 'Move action resulted in a new location with the agent already present.'
+
+    """ When the move action would lead the agent outside the world bounds. """
     RESULT_OUT_OF_BOUNDS = 'Move action out of bounds'
+
+    """ When the move action would lead the agent to a location occupied by 
+    another agent. """
     RESULT_OCCUPIED = 'Move action towards occupied space'
+
+    """ When the move action would lead the agent to a location occupied by 
+    an intraversable object. """
     RESULT_NOT_PASSABLE_OBJECT = 'Move action toward space which is not traversable by agent due object'
 
     def __init__(self, result, succeeded):
@@ -168,14 +199,17 @@ class MoveActionResult(ActionResult):
 
 
 class Move(Action):
-    """ The class wrapping all Move actions
+    """ The class wrapping all Move actions.
 
     Parameters
     ----------
-    duration_in_ticks : int, optional (default=1)
-        The default duration of Move in ticks during which the GridWorld blocks the Agent performing other actions.
-        By default this is 1, meaning that all Move actions will take both the tick in which it was decided upon and
-        the subsequent tick. Should be zero or larger.
+    duration_in_ticks : int
+        Optional. Default: ``1``. Should be zero or larger.
+
+        The default duration of Move in ticks during which the
+        :class:`matrxs.grid_world.GridWorld` blocks the agent performing other
+        actions. By default this is 1, meaning that all Move actions will take
+        both the tick in which it was decided upon and the subsequent tick.
 
     Attributes
     ----------
@@ -205,28 +239,31 @@ class Move(Action):
     def is_possible(self, grid_world, agent_id, **kwargs):
         """ Checks if the move is possible.
 
-        Relies on the private static MATRX method _is_possible_movement(...).
+        Checks for the following:
+
+        * If the agent is already at the location it wishes to move to.
+        * When the new location is occupied by an intraversable agent.
+        * When the new location is occupied by an intraversable object.
+        * When the new location is outside the GridWorld's bounds.
 
         Parameters
         ----------
         grid_world : GridWorld
-            The GridWorld instance in which the agent resides whose location should be updated.
-        agent_id : string
-            The unique identifier for the agent whose location should be changed.
-        **kwargs : dictionary
+            The :class:`matrxs.grid_world.GridWorld` instance in which the
+            agent resides whose location should be updated.
+        agent_id : str
+            The unique identifier for the agent whose location should be
+            changed.
+        **kwargs : dict
             Not used.
 
         Returns
         -------
         MoveActionResult
             Whether the MoveAction is expected to be possible.
-            Can return the following results:
-            The ActionResult depicting the action's success or failure and reason for that result.
-            MoveActionResult.RESULT_SUCCESS             : When the MoveAction is possible.
-            MoveActionResult.RESULT_NO_MOVE             : If the agent is already at the location it wishes to move to.
-            MoveActionResult.RESULT_OCCUPIED            : When the new location is occupied by an intraversable agent.
-            MoveActionResult.RESULT_NOT_PASSABLE_OBJECT : When the new location is occupied by an intraversable object.
-            MoveActionResult.RESULT_OUT_OF_BOUNDS       : When the new location is outside the GridWorld's bounds.
+
+            See :class:`matrxs.actions.move_actions.MoveActionResult` for the
+            results it can contain.
 
         """
         result = _is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
@@ -235,19 +272,23 @@ class Move(Action):
     def mutate(self, grid_world, agent_id, **kwargs):
         """ Mutates an agent's location
 
-        Changes an agent's location property based on the self.dx and self.dy.
+        Changes an agent's location property based on the attributes `dx` and
+        `dy`.
 
         Parameters
         ----------
         grid_world : GridWorld
-            The GridWorld instance in which the agent resides whose location should be updated.
-        agent_id : string
-            The unique identifier for the agent whose location should be changed.
+            The :class:`matrxs.grid_world.GridWorld` instance in which the
+            agent resides whose location should be updated.
+        agent_id : str
+            The unique identifier for the agent whose location should be
+            changed.
 
         Returns
         -------
         MoveActionResult
-            The result of the actual change of the location of an agent. Always returns a success.
+            The result of the actual change of the location of an agent. Always
+            returns a success.
 
         """
         return _act_move(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
@@ -256,9 +297,11 @@ class Move(Action):
 class MoveNorth(Move):
     """ Moves the agent North.
 
-    Inherits from Move and sets the delta-x and delta-y as follows:
-    delta-x = 0
-    delta-y = -1
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
+    and delta-y as follows:
+
+    * delta-x = 0
+    * delta-y = -1
 
     See Also
     --------
@@ -274,9 +317,11 @@ class MoveNorth(Move):
 class MoveNorthEast(Move):
     """ Moves the agent North-East.
 
-    Inherits from Move and sets the delta-x and delta-y as follows:
-    delta-x = 1
-    delta-y = -1
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
+    and delta-y as follows:
+
+    * delta-x = 1
+    * delta-y = -1
 
     See Also
     --------
@@ -293,9 +338,11 @@ class MoveNorthEast(Move):
 class MoveEast(Move):
     """ Moves the agent East.
 
-    Inherits from Move and sets the delta-x and delta-y as follows:
-    delta-x = 1
-    delta-y = 0
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
+    and delta-y as follows:
+
+    * delta-x = 1
+    * delta-y = 0
 
     See Also
     --------
@@ -312,9 +359,11 @@ class MoveEast(Move):
 class MoveSouthEast(Move):
     """ Moves the agent South-East.
 
-    Inherits from Move and sets the delta-x and delta-y as follows:
-    delta-x = 1
-    delta-y = 1
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
+    and delta-y as follows:
+
+    * delta-x = 1
+    * delta-y = 1
 
     See Also
     --------
@@ -331,9 +380,11 @@ class MoveSouthEast(Move):
 class MoveSouth(Move):
     """ Moves the agent South.
 
-    Inherits from Move and sets the delta-x and delta-y as follows:
-    delta-x = 0
-    delta-y = 1
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
+    and delta-y as follows:
+
+    * delta-x = 0
+    * delta-y = 1
 
     See Also
     --------
@@ -350,9 +401,11 @@ class MoveSouth(Move):
 class MoveSouthWest(Move):
     """ Moves the agent South-West.
 
-    Inherits from Move and sets the delta-x and delta-y as follows:
-    delta-x = -1
-    delta-y = 1
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
+    and delta-y as follows:
+
+    * delta-x = -1
+    * delta-y = 1
 
     See Also
     --------
@@ -369,9 +422,11 @@ class MoveSouthWest(Move):
 class MoveWest(Move):
     """ Moves the agent West.
 
-    Inherits from Move and sets the delta-x and delta-y as follows:
-    delta-x = -1
-    delta-y = 0
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
+    and delta-y as follows:
+
+    * delta-x = -1
+    * delta-y = 0
 
     See Also
     --------
@@ -388,9 +443,11 @@ class MoveWest(Move):
 class MoveNorthWest(Move):
     """ Moves the agent North-West.
 
-    Inherits from Move and sets the delta-x and delta-y as follows:
-    delta-x = -1
-    delta-y = -1
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
+    and delta-y as follows:
+
+    * delta-x = -1
+    * delta-y = -1
 
     See Also
     --------

@@ -6,32 +6,70 @@ from matrxs.actions.door_actions import *
 from matrxs.actions.object_actions import *
 from matrxs.utils.message import Message
 
+
 class AgentBrain:
+    """ Defines the behavior of an agent.
+
+    This class is the place where all the decision logic of an agent is
+    contained. This class together with the
+    :class:`matrxs.objects.agent_body.AgentBody` class represent a full agent.
+
+    This agent brain simply selects a random action from the possible actions
+    it can do.
+
+    When you wish to create a new agent, this is the class you need
+    to extend. In specific these are the functions you should override:
+
+    * :meth:`matrxs.agents.agent_brain.initialize`
+        Called before a world starts running. Can be used to initialize
+        variables that can only be initialized after the brain is connected to
+        its body (which is done by the world).
+    * :meth:`matrxs.agents.agent_brain.filter_observations`
+        Called before deciding on an action to allow detailed and agent
+        specific filtering of the received world state.
+    * :meth:`matrxs.agents.agent_brain.decide_on_action`
+        Called to decide on an action.
+    * :meth:`matrxs.agents.agent_brain.get_log_data`
+        Called by data loggers to obtain data that should be logged from this
+        agent internal reasoning.
+
+    Attributes
+    ----------
+    action_set: [str, ...]
+        List of actions this agent can perform.
+    agent_id: str
+        The unique identified of this agent's body in the world.
+    agent_name: str
+        The name of this agent.
+    agent_properties: dict
+        A dictionary of this agent's
+        :class:`matrxs.objects.agent_body.AgentBody` properties. With as keys
+        the property name, and as value the property's value.
+
+        These can be adjusted iff they are said to be adjustable (e.g. inside
+        the attribute `keys_of_agent_writable_props`).
+    keys_of_agent_writable_props: [str, ...]
+        List of property names that this agent can adjust.
+    messages_to_send: [Message, ...]
+        List of messages this agent will send. Use the method
+        :meth:`matrxs.agents.agent_brain.AgentBrain.send_message` to append to
+        this list.
+    previous_action: str
+        The name of the previous performed or attempted action.
+    previous_action_result: ActionResult
+        The :class:`matrxs.actions.action.ActionResult` of the previously
+        performed or attempted action.
+    received_messages: [Message, ...]
+        The list of received messages.
+    rnd_gen: Random
+        The random generator for this agent.
+    rnd_seed: int
+        The random seed with which this agent's `rnd_gen` was initialized. This
+        seed is based on the master random seed given of the
+        :class:`matrxs.grid_world.GridWorld`.
+    """
 
     def __init__(self):
-        """ Defines the brain of an Agent.
-
-        The AgentBrain is the place where all the decision logic of an agent is contained. When you wish to create a new
-        agent, this is the class you need to extend. The functions you can override are the following;
-
-        - AgentBrain.initialize(): This method is called at the first tick of a new World. Can be used to initialize the
-        class with anything that requires information unavailable until the brain is connect to a body (e.g. its object
-        ID).
-
-        - AgentBrain.filter_observations(state): This method is responsible for further filtering the state received
-        from the world at each tick.
-
-        - AgentBrain.decidece_on_action(state): This method decides on the action the agent should perform. Here lies
-        the main decision logic of the agent.
-
-        - AgentBrain.get_log_data(): This method's output is provided to all Logger instances connected to the world.
-        This allows those loggers to process and/or log this data.
-
-        All other AgentBrains should inherit from this class if you want to make you own (smarter) agents. This agent
-        simply randomly selects an action from the possible actions it can do.
-
-        """
-
         # Class variables for tracking the past action and its result
         self.previous_action = None
         self.previous_action_result = None
@@ -52,36 +90,66 @@ class AgentBrain:
         self.keys_of_agent_writable_props = []
 
     def initialize(self):
-        """
-        Method called the very first time this AgentBrain is called from the world. Here you can initialize everything
-        you need for your agent to work since you can't do much in the constructor as the brain needs to be connected to
-        a GridWorld first in most cases (e.g. to get an AgentID, its random seed, etc.)
+        """ To initialize an agent's brain.
+
+        Method called at the start of a :class:`matrxs.grid_world.GridWorld`.
+
+        Here you can initialize everything you need for your agent to work
+        since you can't do much in the constructor as the brain needs to be
+        connected to a GridWorld first in most cases (e.g. to get an AgentID,
+        its random generator, etc.)
         """
 
     def filter_observations(self, state):
-        """ Filters the state received from the world further.
+        """ Filters the world state before deciding on an action.
 
-        In this method you filter the state to only those properties and objects the agent is actually supposed to see.
-        Since the grid world returns ALL properties of ALL objects within a certain range(s), but perhaps some objects
-        are obscured because they are behind walls, or an agent is not able to see some properties of certain objects.
+        In this method you filter the received world state to only those
+        properties and objects the agent is actually supposed to see.
 
-        This method is separated from the decide_on_action() method because its return value is send to the API as well
-        to allows the agent's interface to only show that knowledge the agent is aware of.
+        Currently the world returns ALL properties of ALL objects within a
+        certain range(s), as specified by :
+        class:`matrxs.agents.capabilities.capability.SenseCapability`. But
+        perhaps some objects are obscured because they are behind walls and
+        this agent is not supposed to look through walls, or an agent is not
+        able to see some properties of certain objects (e.g. colour).
 
-        A number of utility methods exist to help filter and memorize states. See <TODO>
+        The adjusted world state that this function returns is directly fed to
+        the agent's decide function. Furthermore, this returned world state is
+        also fed through the MATRX API to any visualisations.
 
-        Override this method when creating a new AgentBrain and you need to filter the state further.
+        Override this method when creating a new AgentBrain and you need to
+        filter the world state further.
 
         Parameters
         ----------
         state: dict
-            A state description containing all properties of EnvObject and sub classes that are within a certain range
-            as defined by self.sense_capability. The object id is the key, and the value is a dictionary of properties.
+            A state description containing all perceived
+            :class:`matrxs.objects.env_object.EnvObject` and objects inheriting
+            from this class within a certain range as defined by the
+            :class:`matrxs.agents.capabilities.capability.SenseCapability`.
+
+            The keys are the unique identifiers, as values the properties of
+            an object. See :class:`matrxs.objects.env_object.EnvObject` for the
+            kind of properties that are always included. It will also contain
+            all properties for more specific objects that inherit from that
+            class.
+
+            Also includes a 'world' key that describes common information about
+            the world (e.g. its size).
 
         Returns
         -------
         filtered_state : dict
-            A dictionary describing the filtered state this agent perceives of the world.
+            A dictionary similar to `state` but describing the filtered state
+            this agent perceives of the world.
+
+        Notes
+        -----
+        A future version of MATRX will include handy utility function to make
+        state filtering less of a hassle (e.g. to easily remove specific
+        objects or properties, but also ray casting to remove objects behind
+        other objects)
+
         """
 
         return state
@@ -89,35 +157,53 @@ class AgentBrain:
     def decide_on_action(self, state):
         """ Contains the decision logic of the agent.
 
-        This method determines what action the agent should perform. The GridWorld is responsible for deciding when an
-        agent can perform an action again, if so this method is called for each agent. Two things need to be determined,
-        which action and with what arguments.
+        This method determines what action the agent should perform. The
+        :class:`matrxs.grid_world.GridWorld` is responsible for deciding when
+        an agent can perform an action, if so this method is called for each
+        agent and fed with the world state from the `filter_observations`
+        method.
 
-        The action is returned simply as the class name (as a string), and the action arguments as a dictionary with the
-        keys the names of the keyword arguments. An argument that is always possible is that of action_duration, which
-        denotes how many ticks this action should take (e.g. a duration of 1, makes sure the agent has to wait 1 tick).
+        Two things need to be determined: action name and action arguments.
 
-        To quickly build a fairly intelligent agent, several utility classes and methods are available. See <TODO>.
+        The action is returned simply as the class name (as a string), and the
+        action arguments as a dictionary with the keys the names of the keyword
+        arguments. See the documentation of that action to find out which
+        arguments.
 
+        An argument that is always possible is that of action_duration, which
+        denotes how many ticks this action should take and overrides the
+        action duration set by the action implementation.
 
         Parameters
-        ==========
+        ----------
         state : dict
-        A state description containing all properties of EnvObject that are within a certain range as
-        defined by self.sense_capability. It is a list of properties in a dictionary
+        A state description as given by the agent's
+        :meth:`matrxs.agents.agent_brain.AgentBrain.filter_observation` method.
 
         Returns
-        =======
+        -------
         action_name : str
-            A string of the class name of an action that is also in self.action_set. To ensure backwards compatibility
-            you could use Action.__name__ where Action is the intended action.
+            A string of the class name of an action that is also in the
+            `action_set` class attribute. To ensure backwards compatibility
+            we advise to use Action.__name__ where Action is the intended
+            action.
 
         action_args : dict
-            A dictionary with keys any action arguments and as values the actual argument values. If a required argument
-            is missing an exception is raised, if an argument that is not used by that action a warning is printed. The
-            argument applicable to all action is `action_duration`, which sets the number ticks the agent is put on hold
-            by the GridWorld until the action's world mutation is actual performed and the agent can perform a new
-            action (a value of 0 is no wait, 1 means to wait 1 tick, etc.).
+            A dictionary with keys any action arguments and as values the
+            actual argument values. If a required argument is missing an
+            exception is raised, if an argument that is not used by that
+            action a warning is printed. The argument applicable to all action
+            is `action_duration`, which sets the number ticks the agent is put
+            on hold by the GridWorld until the action's world mutation is
+            actual performed and the agent can perform a new action (a value of
+            0 is no wait, 1 means to wait 1 tick, etc.).
+
+        Notes
+        -----
+        A future version of MATRX will include handy utility function to make
+        agent decision-making less of a hassle. Think of a
+        Belief-Desire-Intention (BDI) like structure, and perhaps even support
+        for learning agents.
         """
 
         # Send a message to a random agent
