@@ -296,8 +296,8 @@ class WorldBuilder:
             Denotes whether other agents and object can move over this agent. It also throws an exception when this is
             set to False and another object/agent with this set to False is added to the same location.
         team: optional
-            The team name. Used to group agents together. Defaults to this agent's name to signify it forms its own
-            team.
+            The team name. Used to group agents together. Defaults to this agent's name + "_team" to signify it
+            forms its own team.
         possible_actions: optional
             A list or tuple of the names of the Action classes this agent can perform. With this you can limit the
             actions this agent can perform.

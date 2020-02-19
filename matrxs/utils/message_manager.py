@@ -134,8 +134,6 @@ class MessageManager():
                 if mssg.to_id not in self.team_messages[tick]:
                     self.team_messages[tick][mssg.to_id] = []
 
-                print("Team message:", mssg.from_id, mssg.content, mssg.to_id)
-
                 is_team_message = True
 
                 # save in team mssgs as a message for that specific team
@@ -279,5 +277,3 @@ class MessageManager():
                             messages['private'][tick].append(message.toJSON())
 
         return messages
-
-

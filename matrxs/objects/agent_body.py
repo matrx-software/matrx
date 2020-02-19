@@ -145,10 +145,10 @@ class AgentBody(EnvObject):
         self.obj_id = self.obj_id.lower()
 
         # If there was no team name given, the Agent's body (and as an extension its Agent's brain) is part of its own
-        # team which is simply its object id. For this we need to object id, which was made in the EnvObject
+        # team which is simply its object id + "_team". For this we need the object id, which was made in the EnvObject
         # constructor, that is why we call this AFTER calling that.
         if team is None:
-            self.team = self.obj_id
+            self.team = self.obj_id + "_team"
         self.change_property("team", self.team)
 
     def _set_agent_busy(self, curr_tick, action_duration):
