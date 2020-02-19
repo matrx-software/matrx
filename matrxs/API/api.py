@@ -355,7 +355,7 @@ def send_message():
 
     Parameters
     ----------
-    message
+    content
         Message contents to send
     sender
         ID of (human)agent from which sent the message
@@ -372,16 +372,8 @@ def send_message():
     # fetch the data
     data = request.json
 
-    # check validity of agent IDs
-    API_call_valid, error = check_states_API_request(current_tick, data['receiver'] + data['sender'], ids_required=True)
-    if not API_call_valid:
-        print("API request not valid:", error)
-        return abort(error['error_code'], description=error['error_message'])
-
     # create message
-    msg = Message(content=data['message'], from_id=data['sender'], to_id=data['receiver'])
-
-    print("API: Receiver of message:", data['receiver'])
+    msg = Message(content=data['content'], from_id=data['sender'], to_id=data['receiver'])
 
     # add the received_messages to the API global variable
     if data['sender'] not in received_messages:

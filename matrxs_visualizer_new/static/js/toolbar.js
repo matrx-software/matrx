@@ -1,6 +1,7 @@
 // data on the MATRX API
 var matrx_url = 'http://' + window.location.hostname,
-    port = "3001";
+    port = "3001",
+    matrx_send_message_url = "send_message";
 
 
 /*********************************************************************
@@ -68,6 +69,16 @@ function toggle_stop() {
 function send_api_message(type) {
     var resp = $.ajax({
         method: "GET",
+        url: matrx_url + ":" + port + "/" + type,
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json'
+    });
+}
+
+function send_matrx_api_post_message(type, post_data) {
+    var resp = $.ajax({
+        method: "POST",
+        data: JSON.stringify(post_data),
         url: matrx_url + ":" + port + "/" + type,
         contentType: "application/json; charset=utf-8",
         dataType: 'json'
@@ -171,6 +182,21 @@ var current_chatwindow = {
     'name': 'global',
     'type': 'global'
 };
+
+/*
+ * Add a key listener to the input text box, such that the message will be sent when the user
+ * presses enter.
+ */
+var chat_input_box = document.getElementById("chat_form_input");
+if (chat_input_box != null) {
+    chat_input_box.addEventListener("keyup", function(event) {
+        event.preventDefault();
+        if (event.keyCode === 13) {
+            document.getElementById("chat_form_submit").click();
+        }
+    });
+}
+
 
 /*
  * Load the chat rooms when the user clicks the "+" chat room button
@@ -371,8 +397,31 @@ function add_message(chat_room, mssg) {
     // add the message
     var mssgs_container = document.getElementById("messages");
     mssgs_container.insertBefore(div, mssgs_container.firstChild);
-    // document.getElementById("message_input").value = null;
 }
+
+/*
+ * Send the message to MATRX
+ */
+function send_message(event) {
+    // get and validate message from input field
+    var user_message = document.getElementById("chat_form_input").value;
+    user_message = user_message.trim();
+    if (!user_message || user_message.length === 0) {
+        return;
+    }
+
+    // empty input field
+    document.getElementById("chat_form_input").value = null;
+
+    // format receiver ID
+    var receiver = current_chatwindow['name'] == "global" ? null : current_chatwindow['name'];
+
+    // send message to MATRX
+    data = {"content":user_message, "sender": lv_agent_id, "receiver": receiver}
+    console.log("Sending message to matrx:", data);
+    send_matrx_api_post_message(matrx_send_message_url, data);
+}
+
 
 
 /*

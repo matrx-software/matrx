@@ -328,7 +328,7 @@ function get_MATRXS_update() {
 /*
  * Send the object "data" to MATRXS as JSON data. The agent ID is automatically appended.
  */
-function send_data_to_MATRXS(data) {
+function send_userinput_to_MATRXS(data) {
     // send an update for every key pressed
     var lv_resp = $.ajax({
         method: "POST",

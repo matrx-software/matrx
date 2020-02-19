@@ -14,10 +14,14 @@ $(document).ready(function() {
 function checkArrowKey(e) {
     e = e || window.event;
 
-    console.log("Arrow pressed:", e);
+    // ignore the event if the user is writing in the message input field
+    if (document.getElementById("chat_form_input") === document.activeElement) {
+        return
+    }
+
+    console.log("Userinput:", e);
 
     data = [e.key];
 
-    send_data_to_MATRXS(data);
-
+    send_userinput_to_MATRXS(data);
 }

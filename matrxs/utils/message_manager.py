@@ -243,7 +243,7 @@ class MessageManager():
 
             # fetch any team messages
             if t in self.team_messages:
-                if messages['team'][t] is None:
+                if t not in messages['team']:
                     messages['team'][t] = {}
 
                 # fetch all team messages
