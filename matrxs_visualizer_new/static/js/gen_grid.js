@@ -71,7 +71,6 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
 
     // if we already processed this tick (MATRX is paused), stop and return
     if (latest_tick_processed == current_tick) {
-        console.log("Already processed tick, skipping");
         return;
     }
 

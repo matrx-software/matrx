@@ -67,7 +67,8 @@ def get_info():
 
 @app.route('/get_latest_state_and_messages/<agent_id>', methods=['GET', 'POST'])
 def get_latest_state_and_messages(agent_id):
-    """ Provides both the state and messages from the latest tick for one particular agent
+    """ Provides all most recent information from MATRX: Both the state and messages from the latest
+    tick for one particular agent, as well as the current MATRX status (paused or not).
 
     Parameters
     ----------
@@ -89,7 +90,7 @@ def get_latest_state_and_messages(agent_id):
     messages = gw_message_manager.fetch_messages(current_tick, current_tick, clean_input_ids(agent_id)[0])
     chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
 
-    return jsonify({"states": states, "messages": messages, "chatrooms": chatrooms})
+    return jsonify({"matrxs_paused": matrxs_paused, "states": states, "messages": messages, "chatrooms": chatrooms})
 
 #########################################################################
 # MATRX fetch state API calls
@@ -693,7 +694,7 @@ def __reorder_state(state):
 
 
 def add_state(agent_id, state, agent_inheritence_chain, world_settings):
-    """ aves the state of an agent for use via the API
+    """ Saves the state of an agent for use via the API
 
     Parameters
     ----------
@@ -718,7 +719,7 @@ def add_state(agent_id, state, agent_inheritence_chain, world_settings):
     if 'World' not in state:
         state['World'] = world_settings
 
-    state['World']['matrxs_paused'] = matrxs_paused
+    # state['World']['matrxs_paused'] = matrxs_paused
 
     # reorder and save the new state along with some meta information
     temp_state[agent_id] = {'state': __reorder_state(state), 'agent_inheritence_chain': agent_inheritence_chain}
