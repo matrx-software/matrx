@@ -292,9 +292,13 @@ function parse_world_settings(world_settings) {
     tps = (1.0 / world_settings['tick_duration']).toFixed(1);
     current_tick = world_settings['nr_ticks'];
 
-    // reset some things if we are visualizing a new world 
+    // reset some things if we are visualizing a new world
     if (world_ID != world_settings['world_ID']) {
-        reset_chat();
+        // if it is not the first load of a world, but a genuine transition to a new world, reset
+        // the chat
+        if (world_ID != null) {
+            reset_chat();
+        }
         populate_god_agent_menu = true;
         pop_new_chat_dropdown = true;
     }
@@ -413,13 +417,9 @@ function process_message(type, message, team=null) {
         chat_room = (message.from_id != lv_agent_id ? message.from_id : message.to_id);
     }
 
-   // console.log("Adding message of type ", type, " for chat ", chat_room, " with content: ", message);
-
-   console.log(chatrooms_added, chat_room)
    // open new chatrooms if needed, and display all old messages
    if(!(type == "global") && !chatrooms_added[type].includes(chat_room)) {
-       console.log("adding chatroom");
-       add_chatroom(chat_room, type);
+       add_chatroom(chat_room, type, set_active=false);
        // repopulate the new chat room dropdown
        populate_new_chat_dropdown(all_chatrooms);
    }
@@ -429,17 +429,36 @@ function process_message(type, message, team=null) {
        messages[chat_room] = [];
    }
    // add message to list
+   console.log("adding message to list");
    messages[chat_room].push(message);
+   console.log("messages:", messages)
 
    // add message to GUI
    if(current_chatwindow['name'] == chat_room && current_chatwindow['type'] == type) {
        add_message(chat_room, message);
    } else {
-       console.log("Add notification for chat_room:", chat_room);
+       // show the notification for the chat room
+       document.getElementById("chatroom_" + chat_room + "_notification").style.display = "inline-block";
    }
 
    // repopulate the new chat room dropdown
    pop_new_chat_dropdown = true;
+}
+
+/*
+ * On pageload, all relevant messages are request from MATRX, and sent to this function for
+ * processing and visualizing in the GUI.
+ */
+function process_mssgs_pageload(initial_mssgs, initial_chatrooms) {
+    console.log("Processing mssgs initial pageload:");
+    console.log(initial_mssgs);
+    console.log(initial_chatrooms);
+
+    // process the chatrooms
+    populate_new_chat_dropdown(initial_chatrooms);
+
+    // add every message, adding chatrooms if needed
+    process_messages(initial_mssgs);
 }
 
 

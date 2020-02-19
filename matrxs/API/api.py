@@ -97,14 +97,14 @@ def get_latest_state_and_messages(agent_id):
 
 @app.route('/get_states/<tick>', methods=['GET', 'POST'])
 def get_states(tick):
-    """ Provides the states of all agents (including the god view) from tick 'tick' onwards to current tick.
+    """ Provides the states of all agents (including the god view) from tick `tick` onwards to current tick.
 
     Parameters
     ----------
     tick
         integer indicating from which tick onwards to send the states.
     Returns
-        Returns a list of length 'tick' to current_tick. For each tick (item in the list), a dictionary contains the
+        Returns a list of length `tick` to current_tick. For each tick (item in the list), a dictionary contains the
         state for each agent existing in the simulation, indexed by their agent ID.
     -------
     """
@@ -120,7 +120,7 @@ def get_states(tick):
 
 @app.route('/get_states/<tick>/<agent_ids>', methods=['GET', 'POST'])
 def get_states_specific_agents(tick, agent_ids):
-    """ Provides the states starting from tick 'tick' to current_tick, for the agents specified in 'agent_ids'.
+    """ Provides the states starting from tick `tick` to current_tick, for the agents specified in `agent_ids`.
 
     Parameters
     ----------
@@ -130,8 +130,8 @@ def get_states_specific_agents(tick, agent_ids):
         One agent ID, or a List of agent IDs for which the states should be returned. God view = "god"
 
     Returns
-        Returns a list of length 'tick' to current_tick. For each tick (item in the list), a dictionary contains the
-        state for each agent as specified in 'agent_ids', indexed by their agent ID.
+        Returns a list of length `tick` to current_tick. For each tick (item in the list), a dictionary contains the
+        state for each agent as specified in `agent_ids`, indexed by their agent ID.
     -------
     """
     # check for validity and return an error if not valid
@@ -154,8 +154,8 @@ def get_latest_state(agent_ids):
         God view = "god"
 
     Returns
-        Returns a list of length 'tick' to current_tick. For each tick, a dictionary contains the states for each
-        agent as specified in 'agent_ids', indexed by their agent ID.
+        Returns a list of length `tick` to current_tick. For each tick, a dictionary contains the states for each
+        agent as specified in `agent_ids`, indexed by their agent ID.
     -------
     """
     return get_states_specific_agents(current_tick, agent_ids)
@@ -165,16 +165,23 @@ def get_latest_state(agent_ids):
 #########################################################################
 # MATRX fetch messages API calls
 #########################################################################
-@app.route('/get_states/<tick>', methods=['GET', 'POST'])
+@app.route('/get_messages/<tick>', methods=['GET', 'POST'])
 def get_messages(tick):
-    """ Provides the messages of all agents from tick 'tick' onwards to current tick.
+    """ Provides the messages of all agents from tick `tick` onwards to current tick. Also returns
+    the chatrooms at the latest tick.
 
     Parameters
     ----------
     tick
         integer indicating from which tick onwards to send the messages.
     Returns
-        Returns a list of length 'tick' to current_tick. For each tick (item in the list), a dictionary contains ...
+        Returns a dictionary containing `messages` and `chatrooms`. The chatrooms subdictionary
+        contains all accessible chatrooms at the latest tick. The messages subdictionary contains
+        all messages for tick `tick` to the current tick,
+        subdivided under `global`, `team`, and `private`.
+        Also see the documentation of the
+        :func:`~matrxs.utils.message_manager.MessageManager.MyClass.fetch_messages` and
+        :func:`~matrxs.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
     -------
     """
 
@@ -184,21 +191,37 @@ def get_messages(tick):
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
+    messages = gw_message_manager.fetch_messages(int(tick))
+    chatrooms = gw_message_manager.fetch_chatrooms()
+
+    print("returning:", messages)
+
     print(f"Sending states from tick {tick} onwards")
-    return jsonify(gw_message_manager.fetch_messages(tick))
+    return jsonify({"messages": messages, "chatrooms": chatrooms})
 
 
 
 @app.route('/get_messages/<tick>/<agent_id>', methods=['GET', 'POST'])
 def get_messages_specific_agent(tick, agent_id):
-    """ Provides all messages either send by or addressed to 'agent_id', from tick 'tick' onwards.
+    """ Provides all messages either send by or addressed to `agent_id`, from tick `tick` onwards.
 
     Parameters
     ----------
     tick
+        integer indicating which ticks [`tick`,current_tick] (including `tick` and current_tick)
+        the messages should be fetched from.
     agent_ids
+        The `agent_id` of the agent of whom the messages should be fetched.
+        All fetched messages are either sent to or by the agent with agent ID `agent_id`.
 
     Returns
+        Returns a dictionary containing `messages` and `chatrooms`. The chatrooms subdictionary
+        contains all accessible chatrooms at the latest tick. The messages subdictionary contains
+        all messages sent or received by `agent_id`,
+        subdivided under `global`, `team`, and `private`.
+        Also see the documentation of the
+        :func:`~matrxs.utils.message_manager.MessageManager.MyClass.fetch_messages` and
+        :func:`~matrxs.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
     -------
 
     """
@@ -208,9 +231,10 @@ def get_messages_specific_agent(tick, agent_id):
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    messages = gw_message_manager.fetch_messages(tick, agent_id)
+    messages = gw_message_manager.fetch_messages(int(tick), clean_input_ids(agent_id)[0])
+    chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
 
-    return jsonify(messages)
+    return jsonify({"messages": messages, "chatrooms": chatrooms})
 
 @app.route('/get_latest_messages', methods=['GET', 'POST'])
 def get_latest_messages():
@@ -219,8 +243,16 @@ def get_latest_messages():
     Parameters
     ----------
     agent_id
+        The `agent_id` of the agent of whom the messages should be fetched.
+        All fetched messages are either sent to or by the agent with agent ID `agent_id`.
 
     Returns
+        Returns a dictionary containing `messages` and `chatrooms`. The chatrooms subdictionary
+        contains all accessible chatrooms at the latest tick. The messages subdictionary contains
+        all messages of the latest tick, subdivided under `global`, `team`, and `private`.
+        Also see the documentation of the
+        :func:`~matrxs.utils.message_manager.MessageManager.MyClass.fetch_messages` and
+        :func:`~matrxs.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
     -------
 
     """
@@ -231,18 +263,29 @@ def get_latest_messages():
         return abort(error['error_code'], description=error['error_message'])
 
     messages = gw_message_manager.fetch_messages(current_tick)
+    chatrooms = gw_message_manager.fetch_chatrooms()
 
-    return jsonify(messages)
+    return jsonify({"messages": messages, "chatrooms": chatrooms})
+
 
 @app.route('/get_latest_messages/<agent_id>', methods=['GET', 'POST'])
 def get_latest_messages_specific_agent(agent_id):
-    """ Provides the messages of the latest tick either sent by or addressed to 'agent_id'.
+    """ Provides the messages of the latest tick either sent by or addressed to `agent_id`.
 
     Parameters
     ----------
     agent_id
+        The `agent_id` of the agent of whom the messages should be fetched.
+        All fetched messages are either sent to or by the agent with agent ID `agent_id`.
 
     Returns
+        Returns a dictionary containing `messages` and `chatrooms`. The chatrooms subdictionary
+        contains all accessible chatrooms at the latest tick, set to or by the agent with
+        ID `agent_id`. The messages subdictionary contains
+        all messages of the latest tick, subdivided under `global`, `team`, and `private`.
+        Also see the documentation of the
+        :func:`~matrxs.utils.message_manager.MessageManager.MyClass.fetch_messages` and
+        :func:`~matrxs.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
     -------
 
     """
@@ -252,9 +295,10 @@ def get_latest_messages_specific_agent(agent_id):
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    messages = gw_message_manager.fetch_messages(current_tick, agent_id)
+    messages = gw_message_manager.fetch_messages(current_tick, clean_input_ids(agent_id)[0])
+    chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
 
-    return jsonify(messages)
+    return jsonify({"messages": messages, "chatrooms": chatrooms})
 
 
 #########################################################################
@@ -579,7 +623,7 @@ def check_input(tick=None, ids=None):
 
 def __fetch_states(tick, ids=None):
     """ This private function fetches, filters and orders the states as specified by the tick and agent ids.
-    
+
     Parameters
     ----------
     tick
@@ -589,7 +633,7 @@ def __fetch_states(tick, ids=None):
         God view = "god"
     Returns
         Returns a list of length [tick:current_tick]. For each tick, a dictionary contains the states for each agent as
-        specified in 'agent_ids', indexed by their agent ID.
+        specified in `agent_ids`, indexed by their agent ID.
     -------
     """
     tick = int(tick)

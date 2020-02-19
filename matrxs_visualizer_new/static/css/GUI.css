@@ -50,6 +50,17 @@ html {
     display: flex;
 }
 
+
+/* Chat styling */
 .new_chat_option {
     cursor: pointer;
+}
+
+.chat-notification {
+    background: #ffb100;
+    border-radius: 50%;
+    height: 8px;
+    width: 8px;
+    margin-left: 5px;
+    margin-bottom: 1px;
 }

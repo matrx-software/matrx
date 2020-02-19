@@ -226,6 +226,8 @@ class MessageManager():
         """
         messages = {'global': {}, 'team': {}, 'private': {}}
 
+        print("Fetching messages for range:", list(range(tick, self.current_tick + 1)))
+
         # loop through all requested ticks
         for t in range(tick, self.current_tick + 1):
             # initialize the message objects to return

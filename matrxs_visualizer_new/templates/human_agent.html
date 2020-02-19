@@ -43,86 +43,42 @@
     </div>
 
 
-    <div class="row content-row">
+        <div class="row content-row">
 
-        <!-- Grid -->
-        <div class="col-md grid-container" id="container">
-            <!-- container id is needed for the zoom/pan package -->
-            <div id="grid"></div>
-        </div>
+            <!-- Grid -->
+            <div class="col-md grid-container" id="container">
+                <!-- container id is needed for the zoom/pan package -->
+                <div id="grid"></div>
+            </div>
 
-        <!-- Chat -->
-        <div class="collapse" id="chat">
-            <div class="container-fluid">
-                <h5>Chats</h5>
-                <div class="row">
-                    <div class="col-md-auto">
-                        <div class="contact contact_active chat_room_label" id="agent_1">Agent 1</div>
-                        <div class="contact chat_room_label" id="team">Team</div>
-                        <div class="contact chat_room_label" id="all">All</div>
-                        <div class="contact chat_room_label" id="new_chat">+</div>
-                    </div>
-                    <div class="col-md-auto">
-                        <div id="messages">
-                            <div class="message_you">Yo agent 1</div>
-                            <div class="message_other">What up human?</div>
+            <!-- Chat -->
+            <div class="collapse" id="chat">
+                <div class="container-fluid">
+                    <h5>Chats</h5>
+                    <div class="row">
+                        <div class="col-md-auto" id="chat_rooms_list">
+                            <div class="contact contact_active" id="chatroom_global" onclick="chatroom_click(event)">Global<span class="chat-notification" id="chatroom_global_notification"></span></div>
+                            <div class="contact" id="new_chat_button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">+</div>
+                            <div id="new_chat_dropdown" class="dropdown-menu"></div>
                         </div>
-                        <input class="form-control" id="message_input" placeholder="Type a message">
-                        <button type="button" class="btn btn-primary" onclick="sendMessage()">Send</button>
+                        <div class="col-md-auto">
+                            <div id="messages">
+                            </div>
+                            <input class="form-control" id="message_input" placeholder="Type a message">
+                            <button type="button" class="btn btn-primary" onclick="sendMessage()">Send</button>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
-    </div>
 
 
-    <!-- Modal -->
-    <div class="modal fade" id="agent_modal" tabindex="-1" role="dialog" aria-labelledby="agent_modal_label" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="agent_modal_label"></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
+        <!-- Context menu -->
+        <div class="dropdown-menu" id="contextMenu" style="display:none">
+          <a class="dropdown-item" href="#">Action 1</a>
+          <a class="dropdown-item" href="#">Action 2</a>
         </div>
-    </div>
-
-        <!-- Modal -->
-    <div class="modal fade" id="object_model" tabindex="-1" role="dialog" aria-labelledby="object_modal_label" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="object_modal_label"></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Context menu -->
-    <div class="dropdown-menu" id="contextMenu" style="display:none">
-      <a class="dropdown-item" href="#">Action 1</a>
-      <a class="dropdown-item" href="#">Action 2</a>
-    </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
