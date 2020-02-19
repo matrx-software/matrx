@@ -369,7 +369,7 @@ function open_chatroom(chat_room, chat_room_type) {
     // display messages of this chat room, if any
     if (Object.keys(messages).includes(chat_room)) {
         messages[chat_room].forEach(function(message) {
-            add_message(chat_room, message);
+            add_message(chat_room, message, chat_room_type);
         });
     }
 }
@@ -377,22 +377,34 @@ function open_chatroom(chat_room, chat_room_type) {
 /*
  * Add an individual message to the specified chat room
  */
-function add_message(chat_room, mssg) {
-    mssg_content = mssg.content.trim(); // remove whitespace
-    // console.log("Adding message:", mssg_content, " from ", mssg.from_id, " to ", mssg.to_id);
-
+function add_message(chat_room, mssg, type) {
+    // cleanup and validate the input
+    mssg_content = mssg.content.trim();
     if (!mssg_content || mssg_content.length === 0) {
         return;
     }
 
     var div = document.createElement("div");
-    div.innerHTML = mssg_content;
     div.className = "message_you"; // by default assume we sent this message
 
     // check if sent or received this message
     if (mssg.from_id != lv_agent_id) {
         div.className = "message_other";
+
+        // display the sender name if it is a team or global chat message from someone else
+        if (type == "global" || type == "team") {
+            console.log("adding sender");
+            var mssg_sender = document.createElement('span');
+            mssg_sender.className = "chat-mssg-sender";
+            mssg_sender.appendChild(document.createTextNode(mssg.from_id + ": "));
+            div.appendChild(mssg_sender);
+        }
     }
+
+    // add the message content
+    div.appendChild(document.createTextNode(mssg_content));
+
+
 
     // add the message
     var mssgs_container = document.getElementById("messages");

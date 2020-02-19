@@ -396,8 +396,15 @@ function process_messages(new_messages) {
                     });
                 });
 
-                // private / global messages are all directly listed under tick
-            } else {
+
+            // skip private messages for the god view, as there is no good method (yet) to display
+            // these, seeing as the ID of the other is normally used as chatroom name, but the
+            // "god" view wants to see every private conversation
+            } else if (mssg_type == "private" && lv_agent_id == "god") {
+                return;
+
+            // private / global messages are all directly listed under tick
+            } {
                 // add every message of every tick
                 new_messages[mssg_type][tick].forEach(function(mssg) {
                     process_message(mssg_type, JSON.parse(mssg));
@@ -442,9 +449,15 @@ function process_message(type, message, team = null) {
     // add message to list
     messages[chat_room].push(message);
 
+    console.log("Message:", message, " type ", type, " chat_room ", chat_room);
+
+    if (type == "global") {
+        console.log("adding global message");
+    }
+
     // add message to GUI
     if (current_chatwindow['name'] == chat_room && current_chatwindow['type'] == type) {
-        add_message(chat_room, message);
+        add_message(chat_room, message, type);
     } else {
         // show the notification for the chat room
         document.getElementById("chatroom_" + chat_room + "_notification").style.display = "inline-block";

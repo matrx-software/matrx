@@ -202,3 +202,7 @@ h5 {
 .object:hover {
     cursor: pointer;
 }
+
+.chat-mssg-sender {
+    font-weight: bold;
+}
