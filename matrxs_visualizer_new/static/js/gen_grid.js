@@ -404,7 +404,7 @@ function process_messages(new_messages) {
                 return;
 
             // private / global messages are all directly listed under tick
-            } {
+            } else {
                 // add every message of every tick
                 new_messages[mssg_type][tick].forEach(function(mssg) {
                     process_message(mssg_type, JSON.parse(mssg));
