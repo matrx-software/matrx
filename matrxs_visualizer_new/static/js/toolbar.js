@@ -1,4 +1,3 @@
-
 // data on the MATRX API
 var matrx_url = 'http://' + window.location.hostname,
     port = "3001";
@@ -17,12 +16,14 @@ var start_button = document.getElementById("start_button"),
  * Synchronizes the play/pause button with the current value of MATRXS
  */
 function sync_play_button(matrxs_paused) {
+
+    console.log("syncing play/pause button, matrxs_paused:", matrxs_paused);
     // hide the play button and show the pause button
-    if(!matrxs_paused) {
+    if (!matrxs_paused) {
         start_button.classList.add("hidden");
         pause_button.classList.remove("hidden");
 
-    // vice versa
+        // vice versa
     } else {
         start_button.classList.remove("hidden");
         pause_button.classList.add("hidden");
@@ -30,7 +31,9 @@ function sync_play_button(matrxs_paused) {
 }
 
 start_button.addEventListener("click", toggle_start, false);
+
 function toggle_start() {
+    console.log("pressed play");
     // hide / unhide the correct button
     start_button.classList.toggle("hidden");
     pause_button.classList.toggle("hidden");
@@ -40,7 +43,9 @@ function toggle_start() {
 }
 
 pause_button.addEventListener("click", toggle_pause, false);
+
 function toggle_pause() {
+    console.log("pressed pause");
     // hide / unhide the correct button
     start_button.classList.toggle("hidden");
     pause_button.classList.toggle("hidden");
@@ -51,6 +56,7 @@ function toggle_pause() {
 
 
 stop_button.addEventListener("click", toggle_stop, false);
+
 function toggle_stop() {
     send_api_message("stop");
 }
@@ -63,7 +69,7 @@ function send_api_message(type) {
     var resp = $.ajax({
         method: "GET",
         url: matrx_url + ":" + port + "/" + type,
-        contentType:"application/json; charset=utf-8",
+        contentType: "application/json; charset=utf-8",
         dataType: 'json'
     });
 }
@@ -116,11 +122,11 @@ function populate_agent_menu(state) {
             img.src = window.location.origin + agent['img_name'];
             agent_preview.append(img);
 
-        // otherwise, use the the agent shape and colour as a preview
+            // otherwise, use the the agent shape and colour as a preview
         } else {
 
             // add the css for the corresponding agent shape
-            switch(agent['visualization']['shape']) {
+            switch (agent['visualization']['shape']) {
                 case 0:
                     agent_preview.setAttribute("style", "background-color: " + agent['visualization']['colour'] + ';');
                     break;
@@ -137,7 +143,7 @@ function populate_agent_menu(state) {
         var list_item = document.createElement('a');
         list_item.classList.add('dropdown-item');
         list_item.append(agent_preview);
-        list_item.appendChild( document.createTextNode(agentType + ": " + agent["obj_id"]));
+        list_item.appendChild(document.createTextNode(agentType + ": " + agent["obj_id"]));
         list_item.href = '/' + agentType + '/' + agent["obj_id"]
         list_item.setAttribute('target', '_blank'); // open in a new tab
 
@@ -151,13 +157,20 @@ function populate_agent_menu(state) {
 /*********************************************************************
  * Chat
  ********************************************************************/
-
+var showing_chat = false;
 // which chatrooms are added and have a tab
-var chatrooms_added = {"global": null, "team":[], "private":[]};
+var chatrooms_added = {
+    "global": null,
+    "team": [],
+    "private": []
+};
 // all the possible chatrooms
 var all_chatrooms = {};
 // the currently opened chatroom
-var current_chatwindow = {'name': 'global', 'type': 'global'};
+var current_chatwindow = {
+    'name': 'global',
+    'type': 'global'
+};
 
 /*
  * Load the chat rooms when the user clicks the "+" chat room button
@@ -173,8 +186,6 @@ function populate_new_chat_dropdown(matrx_chatrooms) {
         dropdown.removeChild(dropdown.firstChild);
     }
 
-    // console.log("all chatrooms:", all_chatrooms);
-    
     // get chatroom options
     var private_chatroom_options = all_chatrooms['private'].filter(n => !chatrooms_added['private'].includes(n));
     var team_chatroom_options = all_chatrooms['team'].filter(n => !chatrooms_added['team'].includes(n));
@@ -186,7 +197,7 @@ function populate_new_chat_dropdown(matrx_chatrooms) {
         var list_item = document.createElement('a');
         list_item.classList.add('dropdown-item');
         list_item.classList.add('new_chat_option');
-        list_item.appendChild( document.createTextNode(chat_name)); // name
+        list_item.appendChild(document.createTextNode(chat_name)); // name
         list_item.chat_name = chat_name;
         list_item.room_type = "private";
         list_item.addEventListener('click', function(event) {
@@ -208,7 +219,7 @@ function populate_new_chat_dropdown(matrx_chatrooms) {
         var list_item = document.createElement('a');
         list_item.classList.add('dropdown-item');
         list_item.classList.add('new_chat_option');
-        list_item.appendChild( document.createTextNode(chat_name)); // name
+        list_item.appendChild(document.createTextNode(chat_name)); // name
         list_item.chat_name = chat_name;
         list_item.room_type = "team";
 
@@ -226,11 +237,24 @@ function populate_new_chat_dropdown(matrx_chatrooms) {
     });
 }
 
+
+/*
+ * Hide or show the chat, when the chat button is pressed in the toolbar
+ */
+function chatToggle() {
+    showing_chat = !showing_chat;
+    if (showing_chat) {
+        document.getElementById("chat_button").className = "btn btn-secondary";
+    } else {
+        document.getElementById("chat_button").className = "btn btn-dark";
+    }
+}
+
 /*
  * Add a chat room to the GUI
  */
-function add_chatroom(chat_name, room_type, set_active=true) {
-    console.log("Adding chatroom ", chat_name, room_type);
+function add_chatroom(chat_name, room_type, set_active = true) {
+    console.log("Adding", room_type, "chatroom:", chat_name);
 
     // set the previously open chatroom to inactive
     if (set_active) {
@@ -249,9 +273,9 @@ function add_chatroom(chat_name, room_type, set_active=true) {
     new_chatroom.room_type = room_type;
     new_chatroom.classList.add('contact');
     if (set_active) {
-        new_chatroom.classList.add('contact_active');    // set the clicked chatroom to active
+        new_chatroom.classList.add('contact_active'); // set the clicked chatroom to active
     }
-    new_chatroom.appendChild( document.createTextNode(chat_name)); // name
+    new_chatroom.appendChild(document.createTextNode(chat_name)); // name
 
     // add a hidden (by default) notification circle, for when new messages have arrived in this
     // chat room while it is unopened
@@ -260,9 +284,6 @@ function add_chatroom(chat_name, room_type, set_active=true) {
     chat_room_notification.id = "chatroom_" + chat_name + "_notification";
     chat_room_notification.style.display = "none";
     new_chatroom.appendChild(chat_room_notification);
-
-
-    console.log("addin")
 
     // When the user clicks on an added chat room, open it and display the messages
     new_chatroom.addEventListener('click', chatroom_click);
@@ -303,9 +324,12 @@ function open_chatroom(chat_room, chat_room_type) {
     chat_room = chat_room.replace("chatroom_", "");
 
     // set the chat room as selected
-    current_chatwindow = {'name': chat_room, 'type': chat_room_type};
+    current_chatwindow = {
+        'name': chat_room,
+        'type': chat_room_type
+    };
 
-    console.log("Opening chatroom", chat_room , " of type ", chat_room_type);
+    console.log("Opening", chat_room_type, "chatroom: ", chat_room);
 
     // hide the notification of new messages for our goal chat room
     document.getElementById("chatroom_" + chat_room + "_notification").style.display = "none";
@@ -315,8 +339,6 @@ function open_chatroom(chat_room, chat_room_type) {
     while (mssgs_container.firstChild) {
         mssgs_container.removeChild(mssgs_container.firstChild);
     }
-
-    console.log("All known messages:", messages);
 
     // display messages of this chat room, if any
     if (Object.keys(messages).includes(chat_room)) {
@@ -358,10 +380,10 @@ function add_message(chat_room, mssg) {
  */
 function reset_chat() {
     // remove the chat room buttons
-    chatrooms_added['team'].forEach(function( chat_room) {
+    chatrooms_added['team'].forEach(function(chat_room) {
         document.getElementById("chatroom_" + chat_room).remove();
     })
-    chatrooms_added['private'].forEach(function( chat_room) {
+    chatrooms_added['private'].forEach(function(chat_room) {
         document.getElementById("chatroom_" + chat_room).remove();
     })
 
@@ -372,8 +394,153 @@ function reset_chat() {
     }
 
     // reset the vars
-    chatrooms_added = {"global": null, "team":[], "private":[]};
+    chatrooms_added = {
+        "global": null,
+        "team": [],
+        "private": []
+    };
     all_chatrooms = {};
-    current_chatwindow = {'name': 'global', 'type': 'global'};
+    current_chatwindow = {
+        'name': 'global',
+        'type': 'global'
+    };
     messages = {};
+}
+
+
+
+/*********************************************************************
+ * Drawing tools
+ ********************************************************************/
+// Called when draw button is clicked. Enables/disables draw function
+var draw_activated = false;
+
+// Called when erase button is clicked. Enables/disables erase function
+var erase_activated = false;
+
+/*
+ * Change class of all tiles so that they are highlighted when hovered
+ */
+function add_draw_erase_classes(class_name) {
+    var tiles = document.getElementsByClassName("tile");
+    for (var i = 0; i < tiles.length; i++) {
+        tiles[i].className = "tile " + class_name;
+    }
+    var objects = document.getElementsByClassName("object");
+    for (var i = 0; i < objects.length; i++) {
+        objects[i].className = "object " + class_name;
+    }
+}
+
+/*
+ * Change class of all tiles so that they are no longer highlighted when hovered
+ */
+function remove_draw_erase_classes() {
+    var tiles = document.getElementsByClassName("tile");
+    for (var i = 0; i < tiles.length; i++) {
+        tiles[i].className = "tile";
+    }
+    var objects = document.getElementsByClassName("object");
+    for (var i = 0; i < objects.length; i++) {
+        objects[i].className = "object";
+    }
+}
+
+/*
+ * Toggle drawing mode when the button is pressed
+ */
+function drawToggle() {
+    if (erase_activated) { // If the erase function is active, disable it
+        eraseToggle();
+    }
+    draw_activated = !draw_activated;
+    if (draw_activated) {
+        document.getElementById("draw_button").className = "btn btn-secondary";
+        add_draw_erase_classes("draw_mode");
+    } else {
+        document.getElementById("draw_button").className = "btn btn-dark";
+        remove_draw_erase_classes();
+    }
+}
+
+/*
+ * Toggle erase mode when the button is pressed
+ */
+function eraseToggle() {
+    if (draw_activated) { // If the draw function is active, disable it
+        drawToggle();
+    }
+    erase_activated = !erase_activated;
+    if (erase_activated) {
+        document.getElementById("erase_button").className = "btn btn-secondary";
+        add_draw_erase_classes("erase_mode");
+    } else {
+        document.getElementById("erase_button").className = "btn btn-dark";
+        remove_draw_erase_classes();
+    }
+}
+
+/*
+ * Called when a tile is clicked. Draws/erases the tile and starts drag function that allows the
+ * user to draw/erase multiple tiles while holding the left mouse button
+ */
+function startDrawErase(tile_id) {
+    if (draw_activated) {
+        drawTile(tile_id);
+        startDrawDrag();
+    }
+    if (erase_activated) {
+        eraseTile(tile_id);
+        startEraseDrag();
+    }
+}
+
+/*
+ * Determines what happens when a tile is selected for drawing / erasing
+ */
+function drawTile(tile_id) {
+    if (draw_activated) {
+        var tile = document.getElementById(tile_id);
+        tile.style.backgroundColor = "crimson";
+    }
+}
+
+/*
+ * Sets mouse event listeners for drawing  by dragging the mouse
+ */
+function startDrawDrag() {
+    var tiles = document.getElementsByClassName("tile");
+    for (var i = 0; i < tiles.length; i++) {
+        tiles[i].setAttribute("onmouseenter", "drawTile(id)");
+    }
+}
+
+/*
+ * Remove the mouse listeners for drawing / erasing by dragging the mouse
+ */
+function stopDrag() {
+    var tiles = document.getElementsByClassName("tile");
+    for (var i = 0; i < tiles.length; i++) {
+        tiles[i].setAttribute("onmouseenter", "");
+    }
+}
+
+/*
+ * Determine what happens when a tile is clicked for erasing
+ */
+function eraseTile(tile_id) {
+    if (erase_activated) {
+        var tile = document.getElementById(tile_id);
+        tile.style.backgroundColor = "";
+    }
+}
+
+/*
+ * Sets mouse event listeners for erasing by dragging the mouse
+ */
+function startEraseDrag() {
+    var tiles = document.getElementsByClassName("tile");
+    for (var i = 0; i < tiles.length; i++) {
+        tiles[i].setAttribute("onmouseenter", "eraseTile(id)");
+    }
 }

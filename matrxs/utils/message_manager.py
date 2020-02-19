@@ -18,9 +18,9 @@ class MessageManager():
 
         self.agents = None
         self.teams = None
-        self.current_tick = 0
+        self.current_available_tick = 0
 
-    def preprocess_messages(self, tick, messages, all_agent_ids, teams, current_tick):
+    def preprocess_messages(self, tick, messages, all_agent_ids, teams):
         """ Preprocess messages for sending, such that they can be understood by the GridWorld.
             For example: if the receiver=None, this means it must be sent to all agents. This function creates a message
             directed at every agent.
@@ -34,16 +34,17 @@ class MessageManager():
             all_agent_ids
                 IDs of all the agents
 
+
             Returns
                 Preprocessed messages ready for sending
             -------
             """
         self.teams = teams
         self.agents = all_agent_ids
-        self.current_tick = current_tick
 
         # process every message
         for mssg in messages:
+
             # initialize a list for messages for this tick
             if not tick in self.preprocessed_messages:
                 self.preprocessed_messages[tick] = []
@@ -206,13 +207,15 @@ class MessageManager():
 
 
 
-    def fetch_messages(self, tick, id=None):
+    def fetch_messages(self, tick_from, tick_to, id=None):
         """ Fetch messages, optionally filtered by start tick and/or agent id.
 
         Parameters
         ----------
-        tick
-            All messages from this tick onwards to the current_tick will be collected.
+        tick_from
+            All messages from `tick_from` onwards to (including) `tick_to` will be collected.
+        tick_to
+            All messages from `tick_from` onwards to (including) `tick_to` will be collected.
         id
             Only messages received by or sent by this agent will be collected.
 
@@ -226,56 +229,50 @@ class MessageManager():
         """
         messages = {'global': {}, 'team': {}, 'private': {}}
 
-        print("Fetching messages for range:", list(range(tick, self.current_tick + 1)))
-
         # loop through all requested ticks
-        for t in range(tick, self.current_tick + 1):
+        for t in range(tick_from, tick_to + 1):
             # initialize the message objects to return
-            messages['global'][tick] = None
-            messages['team'][tick] = None
-            messages['private'][tick] = None
+            # messages['global'][t] = None
+            # messages['team'][t] = None
+            # messages['private'][t] = None
 
-            # fetch any existing global messages for this tick
-            if tick in self.global_messages:
+            # fetch any existing glolbal messages for this tick
+            if t in self.global_messages:
                 # make the messages JSON serializable and add
-                messages['global'][tick] = [mssg.toJSON() for mssg in self.global_messages[tick]]
+                messages['global'][t] = [mssg.toJSON() for mssg in self.global_messages[t]]
 
             # fetch any team messages
-            if tick in self.team_messages:
-                if messages['team'][tick] is None:
-                    messages['team'][tick] = {}
+            if t in self.team_messages:
+                if messages['team'][t] is None:
+                    messages['team'][t] = {}
 
                 # fetch all team messages
                 if id is None:
                     # make them JSON serializable
-                    messages['team'][tick] = [mssg.toJSON() for mssg in self.team_messages[tick]]
+                    messages['team'][t] = [mssg.toJSON() for mssg in self.team_messages[t]]
 
                 # fetch team messages of the team of which the agent is a member
                 else:
                     for team in self.teams:
-                        if (id in team or id == "god") and team in self.team_messages[tick]:
-                            # if not tick in messages['team']:
-                            #     messages['team'][tick] = {}
+                        if (id in team or id == "god") and team in self.team_messages[t]:
                             # make the messages JSON serializable and add
-                            messages['team'][tick][team] = [mssg.toJSON() for mssg in self.team_messages[tick][team]]
-
-
+                            messages['team'][t][team] = [mssg.toJSON() for mssg in self.team_messages[t][team]]
 
 
             # fetch private messages
-            if tick in self.private_messages:
+            if t in self.private_messages:
                 # fetch all private messages
                 if id is None:
                     # make the messages JSON serializable and add
-                    messages['private'][tick] = [mssg.toJSON() for mssg in self.private_messages[tick]]
+                    messages['private'][t] = [mssg.toJSON() for mssg in self.private_messages[t]]
 
                 # fetch private messages sent to or received by the specified agent
                 else:
-                    messages['private'][tick] = []
-                    for message in self.private_messages[tick]:
+                    messages['private'][t] = []
+                    for message in self.private_messages[t]:
                         # only private messages addressed to or sent by our agent are requested
                         if message.from_id == id or message.to_id == id or id == "god":
                             # make the messages JSON serializable and add
-                            messages['private'][tick].append(message.toJSON())
+                            messages['private'][t].append(message.toJSON())
 
         return messages

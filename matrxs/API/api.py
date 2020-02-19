@@ -86,7 +86,7 @@ def get_latest_state_and_messages(agent_id):
 
     # fetch states and messages
     states = __fetch_states(current_tick, agent_id)
-    messages = gw_message_manager.fetch_messages(current_tick, clean_input_ids(agent_id)[0])
+    messages = gw_message_manager.fetch_messages(current_tick, current_tick, clean_input_ids(agent_id)[0])
     chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
 
     return jsonify({"states": states, "messages": messages, "chatrooms": chatrooms})
@@ -191,12 +191,10 @@ def get_messages(tick):
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    messages = gw_message_manager.fetch_messages(int(tick))
+    messages = gw_message_manager.fetch_messages(int(tick), current_tick)
     chatrooms = gw_message_manager.fetch_chatrooms()
 
-    print("returning:", messages)
 
-    print(f"Sending states from tick {tick} onwards")
     return jsonify({"messages": messages, "chatrooms": chatrooms})
 
 
@@ -226,12 +224,12 @@ def get_messages_specific_agent(tick, agent_id):
 
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_messages_API_request(tick=current_tick, id=agent_id)
+    API_call_valid, error = check_messages_API_request(tick=tick, id=agent_id)
     if not API_call_valid:
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    messages = gw_message_manager.fetch_messages(int(tick), clean_input_ids(agent_id)[0])
+    messages = gw_message_manager.fetch_messages(int(tick), current_tick, clean_input_ids(agent_id)[0])
     chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
 
     return jsonify({"messages": messages, "chatrooms": chatrooms})
@@ -262,7 +260,7 @@ def get_latest_messages():
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    messages = gw_message_manager.fetch_messages(current_tick)
+    messages = gw_message_manager.fetch_messages(current_tick, current_tick)
     chatrooms = gw_message_manager.fetch_chatrooms()
 
     return jsonify({"messages": messages, "chatrooms": chatrooms})
@@ -295,7 +293,7 @@ def get_latest_messages_specific_agent(agent_id):
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    messages = gw_message_manager.fetch_messages(current_tick, clean_input_ids(agent_id)[0])
+    messages = gw_message_manager.fetch_messages(current_tick, current_tick, clean_input_ids(agent_id)[0])
     chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
 
     return jsonify({"messages": messages, "chatrooms": chatrooms})

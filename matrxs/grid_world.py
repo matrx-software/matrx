@@ -463,7 +463,7 @@ class GridWorld:
 
                 # preprocess all messages of the current tick of this agent
                 self.message_manager.preprocess_messages(self.__current_nr_ticks, agent_messages,
-                                                         all_agent_ids, self.__teams, self.__current_nr_ticks)
+                                                         all_agent_ids, self.__teams)
 
             # save the current agent's state for the API
             if self.__run_matrxs_api:

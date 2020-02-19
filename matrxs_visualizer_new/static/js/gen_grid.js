@@ -12,7 +12,7 @@ Parses the MATRXS state and generates and updates the grid
 var animation_duration_perc = 0.8;
 
 // Variables that will be parsed from the World settings
-var tps = null;
+var tps = null,
     current_tick = null,
     world_ID = null,
     grid_size = null;
@@ -31,7 +31,8 @@ var firstDraw = true,
     navbar = null,
     animation_duration_s = null, // is calculated based on animation_duration_perc and tps.
     populate_god_agent_menu = null, // keep track of any new agents
-    pop_new_chat_dropdown = null;
+    pop_new_chat_dropdown = null,
+    latest_tick_processed = null;
 
 // tracked HTML objects
 var saved_prev_objs = {}, // obj containing the IDs of objects and their visualization settings of the previous tick
@@ -64,12 +65,18 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
     populate_god_agent_menu = false;
     pop_new_chat_dropdown = false
 
-    // parse the new word settings, and change the grid, background, and tiles based on any changes in the settings
-    if (new_tick) {
-        parse_world_settings(world_settings);
-        process_messages(new_messages);
-//        console.log("New tick with data:", new_messages, accessible_chatrooms);
+    // parse the new word settings, and change the grid, background, and tiles based on any changes
+    // in the settings
+    parse_world_settings(world_settings);
+
+    // if we already processed this tick (MATRX is paused), stop and return
+    if (latest_tick_processed == current_tick) {
+        console.log("Already processed tick, skipping");
+        return;
     }
+
+    // process any messages received
+    process_messages(new_messages);
 
     // move the objects from last tick to another list
     saved_prev_objs = saved_objs;
@@ -95,17 +102,18 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
         // fetch bg img if defined
         var obj_img = null;
         if (Object.keys(obj).includes('img_name')) {
-            obj_img =  obj['img_name'];
+            obj_img = obj['img_name'];
         }
 
         // save visualization settings for this object
-        var obj_vis_settings = {"img": obj_img,
-                            "shape": obj['visualization']['shape'],
-                            "size": obj['visualization']['size'], // percentage how much of tile is filled
-                            "colour": hexToRgba(obj['visualization']['colour'], obj['visualization']['opacity']),
-                            "opacity": obj['visualization']['opacity'],
-                            "dimension": tile_size // width / height of the tile
-                            };
+        var obj_vis_settings = {
+            "img": obj_img,
+            "shape": obj['visualization']['shape'],
+            "size": obj['visualization']['size'], // percentage how much of tile is filled
+            "colour": hexToRgba(obj['visualization']['colour'], obj['visualization']['opacity']),
+            "opacity": obj['visualization']['opacity'],
+            "dimension": tile_size // width / height of the tile
+        };
 
         var obj_element = null; // the html element of this object
         var animate_movement = false; // whether any x,y position changes should be animated
@@ -118,9 +126,6 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             obj_element = document.createElement("div");
             obj_element.className = "object";
             obj_element.id = objID;
-//            obj_element.dataset.toggle = "modal";
-//            obj_element.dataset.target = "#obj_modal";
-//            obj_element.setAttribute("onclick", "clickObject('" + objID + "')");
 
             // set the coordinates of the object
             move_object(obj_element, x, y);
@@ -132,12 +137,12 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             grid.append(obj_element);
 
             // add this agent to the dropdown list
-            if(obj_element.hasOwnProperty('isAgent')) {
+            if (obj_element.hasOwnProperty('isAgent')) {
                 populate_god_agent_menu = true;
                 pop_new_chat_dropdown = true;
             }
 
-        // we already generated this object in a previous tick
+            // we already generated this object in a previous tick
         } else {
             // fetch the object from html
             obj_element = document.getElementById(objID);
@@ -154,11 +159,11 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
 
             // if nothing changed in the visualisation setting of this obj, we don't need
             // to (re)style the object
-            if (compare_objects(saved_prev_objs[objID],  obj_vis_settings)) {
+            if (compare_objects(saved_prev_objs[objID], obj_vis_settings)) {
                 style_object = false;
 
                 // repopulate the agent list, when the visualization settings changed of an agent
-                if(obj_element.hasOwnProperty('isAgent')) {
+                if (obj_element.hasOwnProperty('isAgent')) {
                     populate_god_agent_menu = true;
                     pop_new_chat_dropdown = true;
                 }
@@ -189,7 +194,9 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
         saved_objs[objID] = obj_vis_settings;
 
         // remove this item from our list of tracked objs from the previous tick
-        saved_prev_obj_keys = saved_prev_obj_keys.filter(function(e) { return e !== objID })
+        saved_prev_obj_keys = saved_prev_obj_keys.filter(function(e) {
+            return e !== objID
+        })
     });
 
     // any objects present in the previous tick but not present in the current
@@ -208,10 +215,13 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
         populate_new_chat_dropdown(accessible_chatrooms);
     }
 
+    // mark this tick as processed (in the case the user paused MATRX)
+    latest_tick_processed = current_tick;
+
     // Draw the FPS to the canvas as last so it's drawn on top
     // TODO: draw tps?
-//    ctx.fillStyle = "#ff0000";
-//    ctx.fillText("TPS: " + tps, 65, 20);
+    //    ctx.fillStyle = "#ff0000";
+    //    ctx.fillText("TPS: " + tps, 65, 20);
 }
 
 
@@ -220,6 +230,7 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
  *************************************************************************************/
 
 window.addEventListener("resize", fix_grid_size);
+
 function fix_grid_size() {
 
     // calc and fix the new tile size, given the maximum possible dimensions of the grid
@@ -336,7 +347,7 @@ function draw_bg() {
     // change bg colour if needed
     if (prev_bg_colour != bg_colour) {
         prev_bg_colour = bg_colour;
-        grid.style.backgroundColor =  bg_colour;
+        grid.style.backgroundColor = bg_colour;
     }
 
     // change bg image if needed
@@ -365,7 +376,7 @@ function update_grid_size(new_grid_size) {
  * Process the object containing messages of various types, received from MATRX, and process them
  * into individual messages.
  */
-function process_messages(new_messages){
+function process_messages(new_messages) {
     var mssg_types = ["global", "team", "private"];
 
     // process all messages of all types
@@ -377,16 +388,16 @@ function process_messages(new_messages){
             if (new_messages[mssg_type][tick] == null) {
                 return;
 
-            // Team messages go one layer deeper, divided into teams, before getting to the messgs
+                // Team messages go one layer deeper, divided into teams, before getting to the messgs
             } else if (mssg_type == "team") {
                 Object.keys(new_messages[mssg_type][tick]).forEach(function(team) {
                     // add every message of every tick
-                    (new_messages[mssg_type][tick][team]).forEach( function(mssg) {
+                    (new_messages[mssg_type][tick][team]).forEach(function(mssg) {
                         process_message(mssg_type, JSON.parse(mssg), team);
                     });
                 });
 
-            // private / global messages are all directly listed under tick
+                // private / global messages are all directly listed under tick
             } else {
                 // add every message of every tick
                 new_messages[mssg_type][tick].forEach(function(mssg) {
@@ -400,7 +411,7 @@ function process_messages(new_messages){
 /*
  * Process an individual message
  */
-function process_message(type, message, team=null) {
+function process_message(type, message, team = null) {
 
     var chat_room = null;
 
@@ -408,41 +419,40 @@ function process_message(type, message, team=null) {
     if (type == "team" && team != null) {
         chat_room = team;
 
-    // global messages go in the global chat
+        // global messages go in the global chat
     } else if (type == "global") {
         chat_room = "global";
 
-    // for private messages, the chat room's name is that of the ID of the other agent
+        // for private messages, the chat room's name is that of the ID of the other agent
     } else if (type == "private") {
         chat_room = (message.from_id != lv_agent_id ? message.from_id : message.to_id);
     }
 
-   // open new chatrooms if needed, and display all old messages
-   if(!(type == "global") && !chatrooms_added[type].includes(chat_room)) {
-       add_chatroom(chat_room, type, set_active=false);
-       // repopulate the new chat room dropdown
-       populate_new_chat_dropdown(all_chatrooms);
-   }
+    // open new chatrooms if needed, and display all old messages
+    if (!(type == "global") && !chatrooms_added[type].includes(chat_room)) {
+        add_chatroom(chat_room, type, set_active = false);
+        // repopulate the new chat room dropdown
+        populate_new_chat_dropdown(all_chatrooms);
+    }
 
-   // add chat_room if needed
-   if (!Object.keys(messages).includes(chat_room)) {
-       messages[chat_room] = [];
-   }
-   // add message to list
-   console.log("adding message to list");
-   messages[chat_room].push(message);
-   console.log("messages:", messages)
+    // add chat_room if needed
+    if (!Object.keys(messages).includes(chat_room)) {
+        messages[chat_room] = [];
+    }
 
-   // add message to GUI
-   if(current_chatwindow['name'] == chat_room && current_chatwindow['type'] == type) {
-       add_message(chat_room, message);
-   } else {
-       // show the notification for the chat room
-       document.getElementById("chatroom_" + chat_room + "_notification").style.display = "inline-block";
-   }
+    // add message to list
+    messages[chat_room].push(message);
 
-   // repopulate the new chat room dropdown
-   pop_new_chat_dropdown = true;
+    // add message to GUI
+    if (current_chatwindow['name'] == chat_room && current_chatwindow['type'] == type) {
+        add_message(chat_room, message);
+    } else {
+        // show the notification for the chat room
+        document.getElementById("chatroom_" + chat_room + "_notification").style.display = "inline-block";
+    }
+
+    // repopulate the new chat room dropdown
+    pop_new_chat_dropdown = true;
 }
 
 /*
@@ -473,7 +483,7 @@ function process_mssgs_pageload(initial_mssgs, initial_chatrooms) {
  * @param {HTML Element} obj_element: contains the HTML element of the object
  * @param {String} element_type: (optional) can be used to specify what type of HTML element should be added
  */
-function gen_rectangle(obj_vis_settings, obj_element, element_type="div") {
+function gen_rectangle(obj_vis_settings, obj_element, element_type = "div") {
     var size = obj_vis_settings['size'];
 
     // if the object has a smaller size than 1, we create a centered subobject
@@ -497,7 +507,9 @@ function gen_rectangle(obj_vis_settings, obj_element, element_type="div") {
     }
 
     // add a click listener for the context menu
-    add_context_menu(shape);
+    if (lv_agent_type != "agent") {
+        add_context_menu(shape);
+    }
 
     // add the new shape
     obj_element.append(shape);
@@ -538,7 +550,9 @@ function gen_triangle(obj_vis_settings, obj_element) {
     }
 
     // add a click listener for the context menu
-    add_context_menu(shape);
+    if (lv_agent_type != "agent") {
+        add_context_menu(shape);
+    }
 
     // add the new shape
     obj_element.append(shape);
@@ -570,7 +584,7 @@ function gen_circle(obj_vis_settings, obj_element) {
  */
 function gen_image(obj_vis_settings, obj_element) {
     // add a rectangular "img" HTML element
-    var shape = gen_rectangle(obj_vis_settings, obj_element, element_type="img");
+    var shape = gen_rectangle(obj_vis_settings, obj_element, element_type = "img");
 
     // set the image source
     shape.setAttribute("src", obj_vis_settings["img"]);
@@ -588,7 +602,7 @@ function gen_image(obj_vis_settings, obj_element) {
 function add_context_menu(object) {
     $(object).contextMenu({
         menuSelector: "#contextMenu",
-        menuSelected: function (invokedOn, selectedMenu) {
+        menuSelected: function(invokedOn, selectedMenu) {
             var msg = "You selected the menu item '" + selectedMenu.text() +
                 "' on the value '" + invokedOn.text() + "'";
             alert(msg);
@@ -661,20 +675,20 @@ function hexToRgba(hex, opacity) {
 /**
  * Compares two objects on equality
  */
-function compare_objects(o1, o2){
+function compare_objects(o1, o2) {
     if (o1 === undefined || o2 === undefined) {
         return false;
     }
-    for(var p in o1){
-        if(o1.hasOwnProperty(p)){
-            if(o1[p] !== o2[p]){
+    for (var p in o1) {
+        if (o1.hasOwnProperty(p)) {
+            if (o1[p] !== o2[p]) {
                 return false;
             }
         }
     }
-    for(var p in o2){
-        if(o2.hasOwnProperty(p)){
-            if(o1[p] !== o2[p]){
+    for (var p in o2) {
+        if (o2.hasOwnProperty(p)) {
+            if (o1[p] !== o2[p]) {
                 return false;
             }
         }

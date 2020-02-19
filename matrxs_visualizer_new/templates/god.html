@@ -58,15 +58,13 @@
                 <div class="row">
                     <div class="col-md-auto" id="chat_rooms_list">
                         <div class="contact contact_active" id="chatroom_global" onclick="chatroom_click(event)">Global<span class="chat-notification" id="chatroom_global_notification"></span></div>
-                        <div class="contact" id="new_chat_button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">+</div>
+                        <div class="contact" id="new_chat_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">+</div>
                         <div id="new_chat_dropdown" class="dropdown-menu"></div>
                     </div>
                     <div class="col-md-auto">
                         <div id="messages">
-                            <div class="message_other">What up human?</div>
-                            <div class="message_you">Yo agent 1</div>
                         </div>
-                        <!-- "God" is not an agent, only a view, and as such cannot send messages --> 
+                        <!-- "God" is not an agent, only a view, and as such cannot send messages -->
                         <!-- <input class="form-control" id="message_input" placeholder="Type a message">
                         <button type="button" class="btn btn-primary" onclick="sendMessage()">Send</button> -->
                     </div>
@@ -79,8 +77,8 @@
 
     <!-- Context menu -->
     <div class="dropdown-menu" id="contextMenu" style="display:none">
-      <a class="dropdown-item" href="#">Action 1</a>
-      <a class="dropdown-item" href="#">Action 2</a>
+        <a class="dropdown-item" href="#">Action 1</a>
+        <a class="dropdown-item" href="#">Action 2</a>
     </div>
 
     <!-- Optional JavaScript -->
@@ -91,7 +89,6 @@
 
     <!-- Custom JavaScript -->
     <script src="/js/toolbar.js"></script>
-    <script src="/js/custom.js"></script>
     <script src="/js/context_menu.js"></script>
     <!--    <script src="/dist/zoom-pan-master/public/bundle.min.js"></script>-->
     <script type="text/javascript" src="/js/gen_grid.js"></script>

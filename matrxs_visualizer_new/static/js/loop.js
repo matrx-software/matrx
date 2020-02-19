@@ -41,7 +41,7 @@ var lv_base_url = window.location.hostname,
     lv_send_userinput_url = 'http://' + lv_base_url + ':3001/send_userinput/',
     lv_sync_messages_url = 'http://' + lv_base_url + ':3001/get_messages/',
     lv_agent_id = "",
-    lv_type = null;
+    lv_agent_type = null;
 
 
 console.log("lv_send_userinput_url:", lv_send_userinput_url);
@@ -96,16 +96,8 @@ function init() {
         // if MATRXS is running, change the start/pause button to match that
         sync_play_button(lv_matrxs_paused);
 
-
-        // get the messages for all agents (god view), or this specific agent (human-agent)
-        if (lv_type == "god" || lv_type == "human-agent") {
-            initial_mssgs_sync();
-
-        // agents don't need to wait for messages, and can start with the visualization
-        } else {
-            // start the visualization loop
-            world_loop();
-        }
+        // get the messages for all agents (god view), or this specific agent (human-agent / agent)
+        initial_mssgs_sync();
     });
 
     // if the request gave an error, print to console and try again
@@ -126,9 +118,9 @@ function initial_connect() {
 
     var lv_path = window.location.pathname;
     // get the view type ("" for god, "agent" or "human-agent") from the URL
-    lv_type = lv_path.substring(0, lv_path.lastIndexOf('/'));
-    if (lv_type != "") {
-        lv_type = lv_type.substring(1)
+    lv_agent_type = lv_path.substring(0, lv_path.lastIndexOf('/'));
+    if (lv_agent_type != "") {
+        lv_agent_type = lv_agent_type.substring(1)
     };
     // Get the agent ID from the url (e.g. "god", "agent_0123", etc.)
     var lv_ID = lv_path.substring(lv_path.lastIndexOf('/') + 1).toLowerCase();
@@ -137,12 +129,12 @@ function initial_connect() {
 
 
     // check if this view is for the god view, agent, or human-agent, and get the correct urls
-    if (lv_type == "" && lv_ID == "god") {
-        lv_type = "god";
+    if (lv_agent_type == "" && lv_ID == "god") {
+        lv_agent_type = "god";
         console.log("This is the god view");
-    } else if (lv_type == "agent") {
+    } else if (lv_agent_type == "agent") {
         console.log("This view is for an Agent with ID:", lv_agent_id);
-    } else if (lv_type == "human-agent") {
+    } else if (lv_agent_type == "human-agent") {
         console.log("This view is for a Human Agent with ID:", lv_agent_id);
     }
 
@@ -174,12 +166,12 @@ function parse_initial_state(data) {
 function initial_mssgs_sync() {
     // preprare the url
     var lv_temp_url = lv_sync_messages_url + "0";
-    if (lv_type == "human-agent") {
+    if (lv_agent_type == "human-agent") {
         lv_temp_url += "/" + lv_agent_id;
     }
 
     // fetch the messages
-    var mssgs_request = jQuery.getJSON(lv_sync_messages_url + "0");
+    var mssgs_request = jQuery.getJSON(lv_temp_url);
 
     // start the world_loop if the request was succesfull
     mssgs_request.done(function(data2) {
@@ -245,15 +237,15 @@ function world_loop() {
 
             // redraw the screen and go to the next frame
             lv_open_update_request = false;
-            draw(lv_state, lv_world_settings, lv_messages, lv_chatrooms, new_tick=true);
+            draw(lv_state, lv_world_settings, lv_messages, lv_chatrooms, new_tick = true);
             request_new_frame();
         })
 
         // if the request gave an error, print to console and try to reinitialize
         lv_update_request.fail(function(data) {
-//        lv_update_request.fail(function(jqxhr, textStatus, error) {
-//            var err = textStatus + ", " + error;
-//            console.log( "Error: " + err );
+            //        lv_update_request.fail(function(jqxhr, textStatus, error) {
+            //            var err = textStatus + ", " + error;
+            //            console.log( "Error: " + err );
 
             console.log("Could not connect to MATRXS API.");
             console.log("Provided error:", data.responseJSON)
@@ -270,15 +262,15 @@ function request_new_frame() {
     window.requestAnimationFrame(world_loop);
 
     // method 2
-//    var elapsed_time = Date.now() - lv_timestamp;
-//    var wait = lv_msPerFrame - elapsed_time;
-//    if ( wait < 0 ) {
-//        wait = 0;
-//    }
-//    console.log("Elapsed time:", elapsed_time, " wait:", wait);
+    //    var elapsed_time = Date.now() - lv_timestamp;
+    //    var wait = lv_msPerFrame - elapsed_time;
+    //    if ( wait < 0 ) {
+    //        wait = 0;
+    //    }
+    //    console.log("Elapsed time:", elapsed_time, " wait:", wait);
 
     // draw next frame in x milliseconds to achieve 60fps
-//    setTimeout(world_loop, wait);
+    //    setTimeout(world_loop, wait);
 }
 
 
@@ -291,7 +283,7 @@ function get_MATRXS_update() {
     // the get request is async, meaning the (success) function is only executed when
     // the response has been received
     var lv_update_request = jQuery.getJSON(lv_update_url + "['" + lv_agent_id + "']", function(data) {
-//        console.log("Received update request:", lv_update_request);
+        //        console.log("Received update request:", lv_update_request);
         lv_messages = data['messages'];
         lv_chatrooms = data['chatrooms'];
 
@@ -314,7 +306,9 @@ function get_MATRXS_update() {
         // calc how long we have to wait before fetching the next tick. This is calculated as
         // tick_duration - delay + a small buffer (15ms)
         lv_wait_for_next_tick = lv_tick_duration * 1000 - lv_delay + 15;
-        if (lv_wait_for_next_tick <= 0) { lv_wait_for_next_tick = lv_tick_duration * 1000;}
+        if (lv_wait_for_next_tick <= 0) {
+            lv_wait_for_next_tick = lv_tick_duration * 1000;
+        }
 
         // note our new current tick
         lv_current_tick = lv_new_tick;

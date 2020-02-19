@@ -43,42 +43,43 @@
     </div>
 
 
-        <div class="row content-row">
+    <div class="row content-row">
 
-            <!-- Grid -->
-            <div class="col-md grid-container" id="container">
-                <!-- container id is needed for the zoom/pan package -->
-                <div id="grid"></div>
-            </div>
+        <!-- Grid -->
+        <div class="col-md grid-container" id="container">
+            <!-- container id is needed for the zoom/pan package -->
+            <div id="grid"></div>
+        </div>
 
-            <!-- Chat -->
-            <div class="collapse" id="chat">
-                <div class="container-fluid">
-                    <h5>Chats</h5>
-                    <div class="row">
-                        <div class="col-md-auto" id="chat_rooms_list">
-                            <div class="contact contact_active" id="chatroom_global" onclick="chatroom_click(event)">Global<span class="chat-notification" id="chatroom_global_notification"></span></div>
-                            <div class="contact" id="new_chat_button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">+</div>
-                            <div id="new_chat_dropdown" class="dropdown-menu"></div>
+        <!-- Chat -->
+        <div class="collapse" id="chat">
+            <div class="container-fluid">
+                <h5>Chats</h5>
+                <div class="row">
+                    <div class="col-md-auto" id="chat_rooms_list">
+                        <div class="contact contact_active" id="chatroom_global" onclick="chatroom_click(event)">Global<span class="chat-notification" id="chatroom_global_notification"></span></div>
+                        <div class="contact" id="new_chat_button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">+</div>
+                        <div id="new_chat_dropdown" class="dropdown-menu"></div>
+                    </div>
+                    <div class="col-md-auto">
+                        <div id="messages">
                         </div>
-                        <div class="col-md-auto">
-                            <div id="messages">
-                            </div>
-                            <input class="form-control" id="message_input" placeholder="Type a message">
-                            <button type="button" class="btn btn-primary" onclick="sendMessage()">Send</button>
-                        </div>
+                        <input class="form-control" id="message_input" placeholder="Type a message">
+                        <button type="button" class="btn btn-primary" onclick="sendMessage()">Send</button>
                     </div>
                 </div>
             </div>
-
         </div>
 
+    </div>
 
-        <!-- Context menu -->
-        <div class="dropdown-menu" id="contextMenu" style="display:none">
-          <a class="dropdown-item" href="#">Action 1</a>
-          <a class="dropdown-item" href="#">Action 2</a>
-        </div>
+
+    <!-- Context menu -->
+    <div class="dropdown-menu" id="contextMenu" style="display:none">
+        <a class="dropdown-item" href="#">Action 1</a>
+        <a class="dropdown-item" href="#">Action 2</a>
+    </div>
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -88,8 +89,8 @@
 
     <!-- Custom JavaScript -->
     <script src="/js/toolbar.js"></script>
-    <script src="/js/custom.js"></script>
     <script src="/js/context_menu.js"></script>
+
     <script type="text/javascript" src="/js/gen_grid.js"></script>
     <script type="text/javascript" src="/js/loop.js"></script>
     <script type="text/javascript" src="/js/human_agent.js"></script>
