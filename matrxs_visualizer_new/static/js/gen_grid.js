@@ -16,7 +16,8 @@ var tps = null;
     current_tick = null,
     world_ID = null,
     grid_size = null;
-    vis_settings = null;
+    vis_settings = null,
+    messages = {"private": [], "global":[], "team": []};
 
 // Visualization settings
 var prev_bg_image = null,
@@ -29,7 +30,8 @@ var firstDraw = true,
     tile_size = null, // in Pixels. tiles are always square, so width and height are the same
     navbar = null,
     animation_duration_s = null, // is calculated based on animation_duration_perc and tps.
-    populate_god_agent_menu = null;
+    populate_god_agent_menu = null, // keep track of any new agents
+    pop_new_chat_dropdown = null;
 
 // tracked HTML objects
 var saved_prev_objs = {}, // obj containing the IDs of objects and their visualization settings of the previous tick
@@ -52,16 +54,21 @@ function initialize_grid() {
  * Generate the grid and all its objects
  * @param state: the MATRXS state
  * @param world_settings: the MATRXS World object, containing all settings of the current MATRXS World
+ * @param new_messages: object containing lists with "private", "team", and "global" messages for the current agent
+ * @param accessible_chatrooms: object containing the "private", "teams" and "global" chatrooms accessible by the
+ *                              current agent.
  * @param new_tick: whether this is the first draw after a new tick/update
  */
-function draw(state, world_settings, new_messages, new_tick) {
+function draw(state, world_settings, new_messages, accessible_chatrooms, new_tick) {
     // whether to (re)populate the dropdown menu with links to all agents
     populate_god_agent_menu = false;
+    pop_new_chat_dropdown = false
 
     // parse the new word settings, and change the grid, background, and tiles based on any changes in the settings
     if (new_tick) {
         parse_world_settings(world_settings);
         process_messages(new_messages);
+//        console.log("New tick with data:", new_messages, accessible_chatrooms);
     }
 
     // move the objects from last tick to another list
@@ -127,6 +134,7 @@ function draw(state, world_settings, new_messages, new_tick) {
             // add this agent to the dropdown list
             if(obj_element.hasOwnProperty('isAgent')) {
                 populate_god_agent_menu = true;
+                pop_new_chat_dropdown = true;
             }
 
         // we already generated this object in a previous tick
@@ -152,6 +160,7 @@ function draw(state, world_settings, new_messages, new_tick) {
                 // repopulate the agent list, when the visualization settings changed of an agent
                 if(obj_element.hasOwnProperty('isAgent')) {
                     populate_god_agent_menu = true;
+                    pop_new_chat_dropdown = true;
                 }
             }
         }
@@ -192,6 +201,11 @@ function draw(state, world_settings, new_messages, new_tick) {
     // (re)populate the dropdown menu with links to all agents
     if (lv_agent_id == "god" && populate_god_agent_menu) {
         populate_agent_menu(state);
+    }
+
+    // update the list with accessible chatrooms
+    if (pop_new_chat_dropdown) {
+        populate_new_chat_dropdown(accessible_chatrooms);
     }
 
     // Draw the FPS to the canvas as last so it's drawn on top
@@ -280,6 +294,7 @@ function parse_world_settings(world_settings) {
 
     if (world_ID != world_settings['world_ID']) {
         populate_god_agent_menu = true;
+        pop_new_chat_dropdown = true;
     }
     world_ID = world_settings['world_ID'];
 
@@ -355,6 +370,8 @@ function process_messages(new_messages){
 
             // add every message of every tick
             new_messages[mssg_type][tick].forEach(function(mssg) {
+
+                // TODO: check if team, if so, go one layer deeper and send team along
                 // add the message to the frontend
                 add_message(mssg_type, JSON.parse(mssg))
             });
@@ -363,8 +380,28 @@ function process_messages(new_messages){
 }
 
 
-function add_message(type, message) {
-    console.log("Adding message of type ", type, " with content: ", message);
+function add_message(type, message, team=null) {
+
+    console.log("Message:", message);
+//    console.log("Adding message of type ", type, " for chat ", chat_name, " with content: ", message);
+//
+//    // add message to list
+//    messages['type'].append(message);
+//
+//    // get the chatroom name,
+//    var chatroom_name = message.from_id if message.from_id != lv_agent_id else message.to_id;
+//
+//    // open new chatrooms if needed
+//    if(!type == "global" && !open_new_chatrooms[type].includes(target_id)) {
+//        open_new_chatroom(type, chat_room_name);
+//    }
+//
+//    // add message to GUI - or not?
+//
+//    // repopulate the new chat room dropdown
+//    pop_new_chat_dropdown = true;
+
+    // ad
 }
 
 

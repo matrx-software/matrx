@@ -11,7 +11,8 @@
 // vars that will be passed to the visualizer file
 var lv_state = {}, // the latest MATRXS state
     lv_world_settings = null,
-    lv_messages = null;
+    lv_messages = null, // the messages received by the current agent of the current tick
+    lv_chatrooms = null; // the accessible chatrooms for the current agent
 
 var lv_tick_duration = 0.5,
     lv_current_tick = 0,
@@ -206,7 +207,7 @@ function world_loop() {
 
             // redraw the screen and go to the next frame
             lv_open_update_request = false;
-            draw(lv_state, lv_world_settings, lv_messages, new_tick=true);
+            draw(lv_state, lv_world_settings, lv_messages, lv_chatrooms, new_tick=true);
             request_new_frame();
         })
 
@@ -252,8 +253,9 @@ function get_MATRXS_update() {
     // the get request is async, meaning the (success) function is only executed when
     // the response has been received
     var lv_update_request = jQuery.getJSON(lv_update_url + "['" + lv_agent_id + "']", function(data) {
-
+//        console.log("Received update request:", lv_update_request);
         lv_messages = data['messages'];
+        lv_chatrooms = data['chatrooms'];
 
         // decode lv_state and other info from the request
         lv_state = data['states'][data['states'].length - 1][lv_agent_id]['state'];

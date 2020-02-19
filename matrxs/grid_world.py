@@ -119,6 +119,10 @@ class GridWorld:
         api.add_state(agent_id="god", state=self.__get_complete_state(), agent_inheritence_chain="god",
                       world_settings=api.MATRXS_info)
 
+        # initialize the message manager
+        self.message_manager.agents = self.__registered_agents.keys()
+        self.message_manager.teams = self.__teams
+
         # make the information of this tick available via the API, after all
         # agents have been updated
         api.next_tick()
@@ -459,7 +463,7 @@ class GridWorld:
 
                 # preprocess all messages of the current tick of this agent
                 self.message_manager.preprocess_messages(self.__current_nr_ticks, agent_messages,
-                                                                          all_agent_ids, self.__teams)
+                                                         all_agent_ids, self.__teams, self.__current_nr_ticks)
 
             # save the current agent's state for the API
             if self.__run_matrxs_api:

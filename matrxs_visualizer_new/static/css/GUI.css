@@ -49,3 +49,7 @@ html {
     padding: .4rem 1.5rem;
     display: flex;
 }
+
+.new_chat_option {
+    cursor: pointer;
+}

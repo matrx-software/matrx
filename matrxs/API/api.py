@@ -86,9 +86,10 @@ def get_latest_state_and_messages(agent_id):
 
     # fetch states and messages
     states = __fetch_states(current_tick, agent_id)
-    messages = __fetch_messages(current_tick, agent_id)
+    messages = gw_message_manager.fetch_messages(current_tick, clean_input_ids(agent_id)[0])
+    chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
 
-    return jsonify({"states": states, "messages": messages})
+    return jsonify({"states": states, "messages": messages, "chatrooms": chatrooms})
 
 #########################################################################
 # MATRX fetch state API calls
@@ -184,7 +185,7 @@ def get_messages(tick):
         return abort(error['error_code'], description=error['error_message'])
 
     print(f"Sending states from tick {tick} onwards")
-    return jsonify(__fetch_messages(tick))
+    return jsonify(gw_message_manager.fetch_messages(tick))
 
 
 
@@ -207,7 +208,7 @@ def get_messages_specific_agent(tick, agent_id):
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    messages = __fetch_messages(tick, agent_id)
+    messages = gw_message_manager.fetch_messages(tick, agent_id)
 
     return jsonify(messages)
 
@@ -229,7 +230,7 @@ def get_latest_messages():
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    messages = __fetch_messages(current_tick)
+    messages = gw_message_manager.fetch_messages(current_tick)
 
     return jsonify(messages)
 
@@ -251,7 +252,7 @@ def get_latest_messages_specific_agent(agent_id):
         print("API request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    messages = __fetch_messages(current_tick, agent_id)
+    messages = gw_message_manager.fetch_messages(current_tick, agent_id)
 
     return jsonify(messages)
 
@@ -450,6 +451,34 @@ def bad_request(e):
 #########################################################################
 
 
+def clean_input_ids(ids):
+    """ Clean a received API variable ids to valid Python code
+
+    Parameters
+    ----------
+    ids
+        Can be a string (1 agent id), string encoded list (containing agent ids), list with agent ids, or None
+
+    Returns
+    -------
+        None or list with string agent IDs
+
+    """
+    if ids is None:
+        return None
+
+    try:
+        ids = eval(ids)
+    except:
+        pass
+
+    # if it is a list
+    if isinstance(ids, list):
+        return ids
+
+    if isinstance(ids, str):
+        return [ids]
+
 
 def check_messages_API_request(tick=None, id=None):
     """ Checks if the variables of the API request are valid, and if the requested information exists
@@ -468,9 +497,6 @@ def check_messages_API_request(tick=None, id=None):
     check_passed, error_message = check_input(tick)
     if not check_passed:
         return False, error_message
-
-
-
 
     return True, None
 
@@ -550,69 +576,6 @@ def check_input(tick=None, ids=None):
     return True, None
 
 
-def __fetch_messages(tick, id=None):
-    """ Fetch the messages from the GridWorld MessageManager, as requested via the API call.
-    Messages to be fetched can be filtered by start tick and the agent id.
-
-    Parameters
-    ----------
-    tick
-        All messages from this tick onwards to the current_tick will be collected.
-    id
-        Only messages received by or sent by this agent will be collected.
-
-    Returns
-    -------
-    Dictionary containing a 'global', 'team', and 'private' subdictionary. These subdictionaries contain a list of
-    all messages, indexed by tick number.
-
-    """
-    messages = {'global': {}, 'team': {}, 'private': {}}
-
-    # loop through all requested ticks
-    for t in range(tick, current_tick + 1):
-        # initialize the message objects to return
-        messages['global'][tick] = None
-        messages['team'][tick] = None
-        messages['private'][tick] = None
-
-        # fetch any existing global messages for this tick
-        if tick in gw_message_manager.global_messages:
-            # make the messages JSON serializable and add
-            messages['global'][tick] = [mssg.toJSON() for mssg in gw_message_manager.global_messages[tick]]
-
-        # fetch any team messages
-        if tick in gw_message_manager.team_messages:
-            # fetch all team messages
-            if id is None:
-                # make them JSON serializable
-                messages['team'][tick] = [mssg.toJSON() for mssg in gw_message_manager.team_messages[tick]]
-
-            # fetch team messages of the team of which the agent is a member
-            else:
-                for team in teams:
-                    if id in team and team in gw_message_manager.team_messages[tick]:
-                        # make the messages JSON serializable and add
-                        messages['team'][tick] = [mssg.toJSON() for mssg in gw_message_manager.team_messages[tick][team]]
-
-
-        # fetch private messages
-        if tick in gw_message_manager.private_messages:
-            # fetch all private messages
-            if id is None:
-                # make the messages JSON serializable and add
-                messages['private'][tick] = [mssg.toJSON() for mssg in gw_message_manager.private_messages[tick]]
-
-            # fetch private messages sent to or received by the specified agent
-            else:
-                messages['private'][tick] = []
-                for message in gw_message_manager.private_messages[tick]:
-                    # only private messages addressed to or sent by our agent are requested
-                    if message.from_id == id or message.to_id == id:
-                        # make the messages JSON serializable and add
-                        messages['private'][tick].append(message.toJSON())
-
-    return messages
 
 def __fetch_states(tick, ids=None):
     """ This private function fetches, filters and orders the states as specified by the tick and agent ids.
@@ -654,9 +617,6 @@ def __fetch_states(tick, ids=None):
         filtered_states.append(states_this_tick)
 
     return filtered_states
-
-
-
 
 def create_error_response(code, message):
     """ Creates an error code with a custom message """

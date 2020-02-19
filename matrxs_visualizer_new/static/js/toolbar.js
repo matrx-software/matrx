@@ -138,3 +138,106 @@ function populate_agent_menu(state) {
         dropdown.append(list_item);
     });
 }
+
+
+// which chatrooms are added and have a tab
+var chatrooms_added = {"global": null, "team":[], "private":[]};
+// all the possible chatrooms
+var all_chatrooms = {};
+// the currently opened chatroom
+var current_chatwindow = {'name': 'global', 'type': 'global'};
+
+/*
+ * Load the chat rooms when the user clicks the "+" chat room button
+ */
+function populate_new_chat_dropdown(matrx_chatrooms) {
+    all_chatrooms = matrx_chatrooms;
+    console.log(matrx_chatrooms);
+
+    console.log("Initializing new chat rooms dropdown");
+
+    // get the dropdown from html
+    var dropdown = document.getElementById('new_chat_dropdown');
+
+    // remove old items
+    while (dropdown.firstChild) {
+        dropdown.removeChild(dropdown.firstChild);
+    }
+
+    // get chatroom options
+    var private_chatroom_options = all_chatrooms['private'].filter(n => !chatrooms_added['private'].includes(n));
+    var team_chatroom_options = all_chatrooms['team'].filter(n => !chatrooms_added['team'].includes(n));
+
+    // add private chat room options
+    private_chatroom_options.forEach(function(chat_name) {
+
+        // create a new dropdown item and add the preview and agent name
+        var list_item = document.createElement('a');
+        list_item.classList.add('dropdown-item');
+        list_item.classList.add('new_chat_option');
+        list_item.appendChild( document.createTextNode(chat_name)); // name
+        list_item.chat_name = chat_name;
+        list_item.room_type = "private";
+        list_item.addEventListener('click', add_chatroom); // click listener
+
+        // add the agent to the dropdown list
+        dropdown.append(list_item);
+    });
+
+    // add team chat room options
+    team_chatroom_options.forEach(function(chat_name) {
+
+        // create a new dropdown item and add the preview and agent name
+        var list_item = document.createElement('a');
+        list_item.classList.add('dropdown-item');
+        list_item.classList.add('new_chat_option');
+        list_item.appendChild( document.createTextNode(chat_name)); // name
+        list_item.chat_name = chat_name;
+        list_item.room_type = "team";
+        list_item.addEventListener('click', add_chatroom); // click listener
+
+        // add the agent to the dropdown list
+        dropdown.append(list_item);
+    });
+
+}
+
+
+/*
+ * Add a chat room to the GUI
+ */
+function add_chatroom(event) {
+    console.log("Adding chatroom ", event.currentTarget.chat_name, event.currentTarget.room_type);
+
+    // set the previously open chatroom to inactive
+    document.getElementsByClassName("contact_active")[0].className = "contact";
+
+    var chatrooms = document.getElementById("chat_rooms_list");
+    var global_chatroom = document.getElementById("chatroom_global");
+
+    // create a new item and add the chatroom to the list
+    var new_chatroom = document.createElement('div');
+    new_chatroom.id = event.currentTarget.chat_name;
+    new_chatroom.classList.add('contact');
+    new_chatroom.classList.add('contact_active');    // set the clicked chatroom to active
+    new_chatroom.appendChild( document.createTextNode(event.currentTarget.chat_name)); // name
+//    list_item.addEventListener('click', add_chatroom); // click listener
+
+    // add the new chatroom before the global chatroom
+    chatrooms.insertBefore(new_chatroom, global_chatroom);
+
+    // note that we opened this chatroom
+    chatrooms_added[event.currentTarget.room_type].push(event.currentTarget.chat_name);
+    open_chatroom(event.currentTarget.chat_name, event.currentTarget.room_type);
+
+    // repopulate the new chat room dropdown
+    populate_new_chat_dropdown(all_chatrooms)
+}
+
+
+/*
+ * The user clicked on a chat room. Open it and display the messages.
+ */
+function open_chatroom(chat_room, chat_room_type) {
+    current_chatwindow = {'name': chat_room, 'type': chat_room_type};
+}

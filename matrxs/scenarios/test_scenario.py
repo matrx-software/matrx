@@ -6,7 +6,7 @@ from matrxs.actions.move_actions import *
 
 
 def create_factory():
-    factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.3, verbose=False, simulation_goal=500,
+    factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.1, verbose=False, simulation_goal=500,
                            run_matrxs_api=True, run_matrxs_visualizer=True, visualization_bg_clr="#000000",
                            visualization_bg_img="/static/images/soesterberg_luchtfoto.jpg")
 
