@@ -170,7 +170,7 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
         }
 
         // set the visualization depth of this object
-        obj_element.style.zIndex = obj['vis_depth'];
+        obj_element.style.zIndex = obj['visualization']['depth'];
 
         // if we need to style this object, e.g. because it's new or visualiation settings changed,
         // regenerate the specfic object shape with its settings
