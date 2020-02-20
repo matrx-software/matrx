@@ -17,3 +17,7 @@ logData.log
 *.log
 
 log_data/
+
+# ignore generated documentation files
+docs/build
+docs/source/sections/_generated_autodoc
