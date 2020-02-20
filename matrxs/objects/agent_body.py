@@ -125,8 +125,8 @@ class AgentBody(EnvObject):
         self.__current_action_args = None
 
         # Denotes the last action performed by the agent, at what tick and how long it must take. Set to -infinite, such
-        # that the agent is need deemed 'busy' at tick 0.
-        self.__last_action_duration_data = {"duration_in_ticks": -np.Inf, "tick": -np.Inf, "action_name": None,
+        # that the agent is not deemed 'busy' at tick 0. Edit: changed from -inf to 1000000, to be JSON serializable
+        self.__last_action_duration_data = {"duration_in_ticks": -1000000, "tick": -1000000, "action_name": None,
                                             "action_result": None}
 
         # We set a placeholder for the 'team' property so that it can be found in self.properties
@@ -145,10 +145,10 @@ class AgentBody(EnvObject):
         self.obj_id = self.obj_id.lower()
 
         # If there was no team name given, the Agent's body (and as an extension its Agent's brain) is part of its own
-        # team which is simply its object id. For this we need to object id, which was made in the EnvObject
+        # team which is simply its object id + "_team". For this we need the object id, which was made in the EnvObject
         # constructor, that is why we call this AFTER calling that.
         if team is None:
-            self.team = self.obj_id
+            self.team = self.obj_id + "_team"
         self.change_property("team", self.team)
 
     def _set_agent_busy(self, curr_tick, action_duration):

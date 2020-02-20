@@ -12,7 +12,7 @@ For visualization, see the seperate MATRXS visualization folder / package.
 
 debug = True
 port = 3000
-app = Flask(__name__, template_folder='static/templates')
+app = Flask(__name__, template_folder='templates', static_folder='static/')
 
 
 #########################################################################
@@ -72,6 +72,23 @@ def god_view():
     return render_template('god.html')
 
 
+@app.route('/')
+@app.route('/start')
+def start_view():
+    """
+    Route for the 'start' view which shows information about the current scenario, including links to all agents.
+
+    Returns
+    -------
+    str
+        The template for this view.
+
+    """
+    return render_template('start.html')
+
+
+
+
 @app.route('/shutdown_visualizer', methods=['GET', 'POST'])
 def shutdown():
     """ Shuts down the visualizer by stopping the Flask thread
@@ -114,7 +131,6 @@ def run_matrxs_visualizer(verbose):
 
     print("Starting visualization server")
     print("Initialized app:", app)
-    print("Open http://localhost:" + str(port) + "/god for a god-mode view of the active simulation.")
     vis_thread = threading.Thread(target=flask_thread)
     vis_thread.start()
     return vis_thread
