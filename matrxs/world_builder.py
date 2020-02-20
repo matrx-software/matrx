@@ -23,7 +23,7 @@ from matrxs.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
 
 # addons
 from matrxs.API import api
-from matrxs_visualizer_new import visualization_server
+from matrxs_visualizer import visualization_server
 
 class WorldBuilder:
 
