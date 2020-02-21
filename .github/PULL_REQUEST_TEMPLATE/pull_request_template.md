@@ -3,7 +3,7 @@ name: Pull Request
 about: Make a pull request!
 title: Descriptive title
 labels: needs-review
-assignees: ''
+assignees: jwaa, thaije
 
 ---
 
