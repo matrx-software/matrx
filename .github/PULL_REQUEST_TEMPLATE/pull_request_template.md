@@ -13,6 +13,12 @@ Please refer to the Issue(s) this Pull Request addresses. This should be an Issu
 For example: #89-Create-a-pull-request-template
 -->
 
+### Those responsible
+<!--
+Please refer to the people that were responsible for the work that is being merged.
+For example: @jwaa, @thaije
+-->
+
 
 ### Description
 <!-- 
