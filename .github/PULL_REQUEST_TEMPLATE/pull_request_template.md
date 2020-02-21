@@ -1,3 +1,12 @@
+---
+name: Pull Request
+about: Make a pull request!
+title: Descriptive title
+labels: needs-review
+assignees: ''
+
+---
+
 ### Related Issue
 <!--- 
 Please refer to the Issue(s) this Pull Request addresses. This should be an Issue that is ready for implementation. 
