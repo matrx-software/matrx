@@ -1,7 +1,7 @@
-from matrxs.agents.agent_brain import AgentBrain
+from matrx.agents.agent_brain import AgentBrain
 
-from matrxs.actions.object_actions import GrabObject
-from matrxs.actions.door_actions import *
+from matrx.actions.object_actions import GrabObject
+from matrx.actions.door_actions import *
 
 
 class HumanAgentBrain(AgentBrain):

@@ -2,9 +2,9 @@ import copy
 from typing import Union
 import random
 
-from matrxs.actions.door_actions import *
-from matrxs.actions.object_actions import *
-from matrxs.utils.message import Message
+from matrx.actions.door_actions import *
+from matrx.actions.object_actions import *
+from matrx.utils.message import Message
 
 class AgentBrain:
 

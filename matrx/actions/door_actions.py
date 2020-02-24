@@ -1,7 +1,7 @@
 import numpy as np
 
-from matrxs.actions.action import Action, ActionResult
-from matrxs.objects.simple_objects import Door
+from matrx.actions.action import Action, ActionResult
+from matrx.objects.simple_objects import Door
 
 
 class OpenDoorAction(Action):

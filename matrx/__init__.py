@@ -14,4 +14,4 @@ for loader, module_name, is_pkg in pkgutil.walk_packages(__path__):
 ######
 
 # Set package attributes
-name = "MATRXS: Man-Agent Teaming - Rapid Experimentation Software"
+name = "MATRX: Man-Agent Teaming - Rapid Experimentation Software"
