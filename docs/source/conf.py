@@ -34,9 +34,9 @@ sys.path.insert(0, os.path.abspath("../.."))
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
 
-project = 'MATRXS %s Manual' % release
-copyright = '2019, The MATRXS Team at TNO.nl'
-author = 'The MATRXS Team at TNO.nl'
+project = 'MATRX %s Manual' % release
+copyright = '2019, The MATRX Team at TNO.nl'
+author = 'The MATRX Team at TNO.nl'
 
 
 # -- General configuration ---------------------------------------------------

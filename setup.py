@@ -5,14 +5,14 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="matrxs",
+    name="matrx",
     version="0.0.6",
-    author="The MATRXS Development team at TNO.nl",
+    author="The MATRX Development team at TNO.nl",
     author_email="jasper.vanderwaa@tno.nl",
     description="A Python package for the rapid development of autonomous systems and human-agent teaming concepts.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://ci.tno.nl/gitlab/matrxs/matrxs",
+    url="https://github.com/matrx/MATRX",
     packages=setuptools.find_packages(),
     license="MIT License",
     classifiers=[

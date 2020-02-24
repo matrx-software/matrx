@@ -70,4 +70,4 @@ described above. The other actions follow similar steps. They can be added accor
 
             # Return the action from the Navigator
             return move_action, {}
-For the full code example, including the other action states, see the MATRXS GitHub page.
+For the full code example, including the other action states, see the MATRX GitHub page.

@@ -2,4 +2,4 @@
 
 2D-discrete testbed to facilitate HAT-research, with SAIL connection
 
-For documentation see the readthedocs at [matrxs.readthedocs.io/](https://matrxs.readthedocs.io/).
+For documentation see the readthedocs at [matrx.readthedocs.io/](https://matrx.readthedocs.io/).

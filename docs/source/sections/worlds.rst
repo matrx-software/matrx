@@ -4,12 +4,12 @@
 Worlds
 ======
 
-The MATRXS simulation needs worlds in which certain properties are set in order to simulate the desired events. The classes
+The MATRX simulation needs worlds in which certain properties are set in order to simulate the desired events. The classes
 below ensure such worlds can be built.
 
 
 .. autosummary::
    :toctree: _generated_autodoc
 
-    matrxs.world_builder.WorldBuilder
-    matrxs.grid_world.GridWorld
+    matrx.world_builder.WorldBuilder
+    matrx.grid_world.GridWorld

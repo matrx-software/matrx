@@ -7,7 +7,7 @@ Utils
 .. autosummary::
    :toctree: _generated_autodoc
 
-    matrxs.utils.utils
-    matrxs.utils.agent_utils.navigator
-    matrxs.utils.agent_utils.state_tracker
-    matrxs.utils.agent_utils.task_manager
+    matrx.utils.utils
+    matrx.utils.agent_utils.navigator
+    matrx.utils.agent_utils.state_tracker
+    matrx.utils.agent_utils.task_manager

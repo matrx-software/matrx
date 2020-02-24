@@ -1,4 +1,4 @@
-.. MATRXS documentation master file, created by
+.. MATRX documentation master file, created by
    sphinx-quickstart on Fri Jul 26 09:03:28 2019.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
@@ -13,9 +13,9 @@
 MATRX documentation
 ======================
 
-Welcome! This is the documentation for Man-Agent Teaming; Rapid eXperimentation Software (MATRXS).
+Welcome! This is the documentation for Man-Agent Teaming; Rapid eXperimentation Software (MATRX).
 
-MATRXS a 2D-discrete testbed to facilitate Human Agent Teaming (HAT) research. The original use case in MATRXS is an urban search and rescue operation in which pairs of a human and an autonomous system have to locate and rescue victims. However, MATRXS is very versatile and can, therefore, also be used in many other cases.
+MATRX a 2D-discrete testbed to facilitate Human Agent Teaming (HAT) research. The original use case in MATRX is an urban search and rescue operation in which pairs of a human and an autonomous system have to locate and rescue victims. However, MATRX is very versatile and can, therefore, also be used in many other cases.
 
 
 Getting started
@@ -27,7 +27,7 @@ Getting started
       :caption: Getting started
       :maxdepth: 1
 
-      general_info/aboutmatrxs.rst
+      general_info/aboutmatrx.rst
       installation/installing.rst
       tutorials/tutorials.rst
       tutorials/examples.rst
@@ -104,7 +104,7 @@ Reference by Category
        :target: sections/worlds.html
 
     :ref:`Worlds`
-       Learn MATRXS' way of creating worlds.
+       Learn MATRX' way of creating worlds.
 
  .. container:: descr
 

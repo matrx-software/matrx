@@ -28,4 +28,4 @@ Documentation
 | Open the file that matches your category, e.g. for a new agent that is /docs/source/sections/agents.rst.
 | Add your new class to the list in similar fashion as the other already present classes.
 | Check if your changes worked as you expected locally before pushing (see the question above).
-| Push your changes and create a merge request for your branch to dev, after which matrxs.readthedocs.io will be automatically updated with your changes.
+| Push your changes and create a merge request for your branch to dev, after which matrx.readthedocs.io will be automatically updated with your changes.
