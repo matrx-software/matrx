@@ -10,15 +10,15 @@ import numpy as np
 from numpy.random.mtrand import RandomState
 
 from matrx.agents.agent_brain import AgentBrain
-from matrx.agents.capabilities.capability import SenseCapability
+from matrx.agents.capabilities import SenseCapability
 from matrx.agents.human_agent_brain import HumanAgentBrain
 from matrx.grid_world import GridWorld
 from matrx.logger.logger import GridWorldLogger
-from matrx.objects.agent_body import AgentBody
+from matrx.objects import AgentBody
 from matrx.objects.env_object import EnvObject
 from matrx.utils import utils
 from matrx.utils.utils import get_inheritence_path, get_default_value, _get_line_coords, create_sense_capability
-from matrx.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
+from matrx.objects import Wall, Door, AreaTile, SmokeTile
 from matrx.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
 
 # addons

@@ -3,7 +3,7 @@ import math
 import random
 import numpy as np
 
-from matrx.agents.capabilities.capability import SenseCapability
+from matrx.agents.capabilities import SenseCapability
 
 object_counter = 0
 

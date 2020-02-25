@@ -1,5 +1,4 @@
-from matrx.objects.env_object import EnvObject
-
+from matrx.objects import EnvObject
 
 class Battery(EnvObject):
 

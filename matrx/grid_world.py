@@ -12,7 +12,7 @@ import gevent
 from matrx.actions.object_actions import *
 from matrx.logger.logger import GridWorldLogger
 from matrx.objects.env_object import EnvObject
-from matrx.objects.simple_objects import AreaTile
+from matrx.objects import AreaTile
 from matrx.utils.utils import get_all_classes
 from matrx.utils.message_manager import  MessageManager
 from matrx.API import api

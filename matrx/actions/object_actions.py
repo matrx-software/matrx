@@ -2,10 +2,10 @@ import collections
 
 import numpy as np
 
-from matrx.actions.action import Action, ActionResult
+from matrx.actions import Action, ActionResult
 from matrx.utils.utils import get_distance
-from matrx.objects.agent_body import AgentBody
-from matrx.objects.simple_objects import AreaTile
+from matrx.objects import AgentBody
+from matrx.objects import AreaTile
 
 
 class RemoveObject(Action):

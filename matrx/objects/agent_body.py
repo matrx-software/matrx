@@ -1,7 +1,7 @@
-from matrx.agents.capabilities.capability import SenseCapability
-from matrx.actions.action import Action, ActionResult
+from matrx.agents.capabilities import SenseCapability
+from matrx.actions import Action, ActionResult
 from matrx.utils.utils import get_all_classes
-from matrx.objects.env_object import EnvObject
+from matrx.objects import EnvObject
 import numpy as np
 
 
