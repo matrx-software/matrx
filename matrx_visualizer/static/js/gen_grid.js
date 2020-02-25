@@ -302,6 +302,10 @@ function parse_world_settings(world_settings) {
     tps = (1.0 / world_settings['tick_duration']).toFixed(1);
     current_tick = world_settings['nr_ticks'];
 
+    if (current_tick > latest_tick_processed + 1) {
+        console.log("Dropped frame, current tick:", current_tick, " last tick processed: ", latest_tick_processed);
+    }
+
     // reset some things if we are visualizing a new world
     if (world_ID != world_settings['world_ID']) {
         // if it is not the first load of a world, but a genuine transition to a new world, reset
