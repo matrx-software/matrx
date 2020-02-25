@@ -560,7 +560,7 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
     if gw_message_manager is None:
         return False, {'error_code': 400,
                            'error_message': f'MATRX hasn\'t started yet.'}
-    
+
     # check user input, such as tick and agent id
     check_passed, error_message = check_input(tick)
     if not check_passed:
