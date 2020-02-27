@@ -34,28 +34,6 @@ Getting started
       reference_by_category.rst
 
 
-
-General information
-=============================
-
-.. toctree::
-   :hidden:
-   :maxdepth: 1
-   :caption: General Information
-
-   general_info/when_to_use.rst
-   general_info/glossary.rst
-   general_info/roadmap.rst
-   general_info/faq.rst
-
-.. container:: bullet_list
-
-    * :ref:`F.A.Q.`
-    * :ref:`When to use`
-    * :ref:`Glossary`
-    * :ref:`Roadmap`
-
-
 For developers
 ===============
 
