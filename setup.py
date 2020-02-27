@@ -12,7 +12,7 @@ setuptools.setup(
     description="A Python package for the rapid development of autonomous systems and human-agent teaming concepts.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/matrx/MATRX",
+    url="https://github.com/matrx-software/matrx",
     packages=setuptools.find_packages(),
     license="MIT License",
     classifiers=[
