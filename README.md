@@ -1,5 +1,9 @@
 # Testbed
 
+
+<img src="https://www.matrx-software.com/wp-content/uploads/2020/02/matrx_logo.svg" height="100">
+
+
 MATRX; Accelerating human-agent teaming research together.
 
 MATRX is a 2D-discrete testbed meant to facilitate, accelerate and benchmark research on how systems and humans can and should collaborate. To remedy the lack of a team task library for HAT research, we developed the Human-Agent Teaming Rapid Experimentation Software package, or MATRX for short. MATRX’s main purpose is to provide a suite of team tasks with one or multiple properties important to HAT research (e.g. varying team size, decision speed or inter-team dependencies). In addition to these premade tasks, MATRX facilitates the rapid development of new team tasks. 
