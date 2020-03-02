@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="matrx",
-    version="0.0.7",
+    version="0.0.9",
     author="The MATRX Development team at TNO.nl",
     author_email="info@matrx-software.com",
     description="A Python package for the rapid development of autonomous systems and human-agent teaming concepts.",
@@ -37,5 +37,8 @@ setuptools.setup(
                        'flask-cors>=3.0.0',
                        'numpydoc>=0.9.1'
     ],
-
+    package_data={
+        "matrx_visualizer": ["mockup/**/*", "templates/**/*", "static/**/*"],
+    },
+    include_package_data=True,
 )
