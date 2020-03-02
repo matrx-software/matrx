@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="matrx",
-    version="0.0.9",
+    version="0.0.92",
     author="The MATRX Development team at TNO.nl",
     author_email="info@matrx-software.com",
     description="A Python package for the rapid development of autonomous systems and human-agent teaming concepts.",
@@ -39,6 +39,7 @@ setuptools.setup(
     ],
     package_data={
         "matrx_visualizer": ["mockup/**/*", "templates/**/*", "static/**/*"],
+        "matrx": ["scenarios/defaults.json"],
     },
     include_package_data=True,
 )
