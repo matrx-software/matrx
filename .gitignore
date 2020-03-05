@@ -1,3 +1,8 @@
+.pypirc
+build/
+dist/
+matrx.egg-info/
+
 .idea/
 old/
 agents/__pycache__/

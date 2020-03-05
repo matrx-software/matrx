@@ -21,13 +21,14 @@ var lv_tick_duration = 0.5,
     lv_first_tick = true;
 
 // save the timestamp of our first tick, which we use to match the clock of MATRX and the visualizer
-var lv_MATRX_timestamp_start = null,
-    lv_vis_timestamp_start = null,
-    lv_world_ID = null, // ID of the world we received when initializing
+var lv_world_ID = null, // ID of the world we received when initializing
     lv_new_world_ID = null, // ID of the world for which we received a tick
     lv_reinitialize_vis = false, // whether to reinitialize the visualization
     lv_wait_for_next_tick = 0, // how long to wait before sending a new request to MATRX for a new state
-    lv_matrx_paused = false;
+    lv_matrx_paused = false,
+    lv_fps = 0,
+    lv_this_second = null,
+    lv_frames_this_second = null;
 
 var lv_tps = 1, // placeholder value
     lv_msPerFrame = (1.0 / 60) * 1000, // placeholder
@@ -198,6 +199,18 @@ function initial_mssgs_sync() {
 function world_loop() {
     lv_timestamp = Date.now();
 
+    // keep track of number of frames per second
+    if (lv_this_second == null) {
+        lv_this_second = Date.now();
+    } else if( (Date.now() - lv_this_second) > 1000) {
+        lv_fps = lv_frames_this_second;
+        console.log("Fps: ", lv_fps);
+        lv_frames_this_second = 0;
+        lv_this_second = Date.now();
+    } else {
+        lv_frames_this_second++;
+    }
+
     // Check if we need to fetch an update from MATRX
     var lv_to_update_or_not_to_update = Date.now() > lv_last_update + lv_wait_for_next_tick && !lv_open_update_request;
     var lv_update_request = false
@@ -231,9 +244,6 @@ function world_loop() {
             // the visualization and MATRX
             if (lv_first_tick) {
                 lv_first_tick = false;
-                // save the timestamp of our first tick, which we use to match the clock of MATRX and the visualizer
-                lv_MATRX_timestamp_start = curr_tick_timestamp;
-                lv_vis_timestamp_start = curr_tick_timestamp;
             }
 
             // redraw the screen and go to the next frame
@@ -300,15 +310,12 @@ function get_MATRX_update() {
         // check what the ID of this world is. Is it still the same world we were expecting, or a different world?
         lv_new_world_ID = lv_state['World']['world_ID'];
 
-        // Calculate the delay between when MATRX sent the tick and the visualizer received the tick
-        // The calculation takes a (potential) difference in time between MATRX and the visualizer into account
-        var lv_delay = (Date.now() - lv_vis_timestamp_start) - (curr_tick_timestamp - lv_MATRX_timestamp_start);
+        // we request more often than the lv_tick_duration, as to not miss any ticks
+        lv_wait_for_next_tick = lv_tick_duration * 1000 * 0.6;
 
-        // calc how long we have to wait before fetching the next tick. This is calculated as
-        // tick_duration - delay + a small buffer (15ms)
-        lv_wait_for_next_tick = lv_tick_duration * 1000 - lv_delay + 15;
-        if (lv_wait_for_next_tick <= 0) {
-            lv_wait_for_next_tick = lv_tick_duration * 1000;
+        // request at least every half second
+        if (lv_wait_for_next_tick > 500) {
+            lv_wait_for_next_tick = 500;
         }
 
         // note our new current tick

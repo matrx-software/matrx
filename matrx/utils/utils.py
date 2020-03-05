@@ -2,6 +2,7 @@ import json
 import math
 import random
 import numpy as np
+import pkg_resources
 
 from matrx.agents.capabilities import SenseCapability
 
@@ -83,8 +84,9 @@ def get_default_value(class_name, property_name):
 
 
 def __load_defaults():
-    file_path = "matrx/scenarios/defaults.json"
-    return load_json(file_path)
+    file_path = "../scenarios/defaults.json"
+    full_path = pkg_resources.resource_filename(__name__, file_path)
+    return load_json(full_path)
 
 
 def load_scenario(scenario_file):
