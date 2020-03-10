@@ -5,7 +5,7 @@ Implementing an agent
 ===========================
 
 
-Agent brains in MATRXS are used to give meaning to the actions an agent takes in the environment. By implementing an
+Agent brains in MATRX are used to give meaning to the actions an agent takes in the environment. By implementing an
 agent brain, the logic and decision processes of the agent are determined. You can decide what action the agent will take
 given a certain situation by creating a new behavior class based on the AgentBrain class.
 

@@ -11,10 +11,10 @@ to implement an agent brain to know how.
 .. autosummary::
    :toctree: _generated_autodoc
 
-   matrxs.agents.agent_brain
-   matrxs.agents.agent_brain.AgentBrain
-   matrxs.agents.human_agent_brain.HumanAgentBrain
-   matrxs.agents.patrolling_agent.PatrollingAgentBrain
+   matrx.agents.agent_brain
+   matrx.agents.agent_brain.AgentBrain
+   matrx.agents.human_agent_brain.HumanAgentBrain
+   matrx.agents.patrolling_agent.PatrollingAgentBrain
 
 
 
@@ -23,4 +23,4 @@ Sense capabilities of an agent:
 .. autosummary::
    :toctree: _generated_autodoc
 
-   matrxs.agents.capabilities.capability
+   matrx.agents.capabilities.capability

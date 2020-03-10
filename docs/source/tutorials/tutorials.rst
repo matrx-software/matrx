@@ -4,7 +4,7 @@
 Tutorials
 =========
 
-If you are wondering how to start using MATRXS or just want to get some hands-on experience, the following tutorials
+If you are wondering how to start using MATRX or just want to get some hands-on experience, the following tutorials
 might be where you want to start.
 
 The basics
@@ -21,7 +21,7 @@ The basics
        agent_implementation.rst
 
 
-BlocksWorld in MATRXS
+BlocksWorld in MATRX
 ----------------------------
 
 Inspired by `BlocksWorld for Teams (BW4T) <https://github.com/eishub/BW4T>`_ the tutorials in this section serve as
@@ -36,4 +36,4 @@ examples of scenarios that simulate teaming tasks in a block world.
        bw4t_part1.rst
        bw4t_part2.rst
 
-Once more MATRXS tutorials are available, you can find them here.
+Once more MATRX tutorials are available, you can find them here.

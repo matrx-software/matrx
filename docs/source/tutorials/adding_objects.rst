@@ -5,13 +5,13 @@ Adding objects
 
 Before your agent is able to perform sensible actions, your simulation likely needs objects that the agent can
 interact with. In this tutorial, we will add (simple) objects to the grid world and let an agent interact with them. How
-to set up the world environment and add an agent has been treated in :ref:`Creating your MATRXS world`, so if anything
+to set up the world environment and add an agent has been treated in :ref:`Creating your MATRX world`, so if anything
 regarding these methods is unclear, check out the corresponding tutorial.
 
 Simple objects
 --------------
 
-Simple objects in MATRXS range from square blocks to smoke tiles. In this tutorial, we will deal with simple blocks,
+Simple objects in MATRX range from square blocks to smoke tiles. In this tutorial, we will deal with simple blocks,
 but adding the other objects is done in similar ways.
 
 In your world factory, add the following line and adjust the parameters (x,y, color) to your liking.
@@ -25,9 +25,9 @@ changed into, for example, a triangle ('visualize_shape').
 
 Rooms
 -----
-Many real-life situations that can be simulated involve some sort of buildings. The option to add 'buildings' to MATRXS
+Many real-life situations that can be simulated involve some sort of buildings. The option to add 'buildings' to MATRX
 has, therefore, been added. These are available as rooms. At the moment, rooms can only be square or rectangular. To
-add a room to your MATRXS world, add the following to your factory.
+add a room to your MATRX world, add the following to your factory.
 
 .. code-block:: python
 

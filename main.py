@@ -1,5 +1,5 @@
-from matrxs.API import api
-from matrxs.scenarios import simple_scenario, test_scenario, new_vis_test
+from matrx.api import api
+from matrx.scenarios import simple_scenario, test_scenario, new_vis_test
 
 if __name__ == "__main__":
 
@@ -7,12 +7,12 @@ if __name__ == "__main__":
     # future) through a UI.
     factory = new_vis_test.create_factory()
 
-    # startup world-overarching MATRXS scripts, such as the API and/or visualizer if requested
+    # startup world-overarching MATRX scripts, such as the api and/or visualizer if requested
     factory.startup()
 
     # run each world
     for world in factory.worlds():
         world.run(factory.api_info)
 
-    # stop MATRXS scripts such as the API and visualizer (if used)
+    # stop MATRX scripts such as the api and visualizer (if used)
     factory.stop()

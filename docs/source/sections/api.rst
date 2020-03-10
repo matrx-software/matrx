@@ -8,6 +8,6 @@ API
 .. autosummary::
    :toctree: _generated_autodoc
 
-    matrxs.API
-    matrxs.API.api
-    matrxs.API.logMatrx
+    matrx.API
+    matrx.API.api
+    matrx.API.logMatrx

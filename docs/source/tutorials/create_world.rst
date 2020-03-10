@@ -1,11 +1,11 @@
-.. _Creating your MATRXS world:
+.. _Creating your MATRX world:
 
 
-Creating your MATRXS world
+Creating your MATRX world
 ==========================
 
-In order to use MATRXS, a world must be created. In this tutorial, all aspects of creating such a world will be
-demonstrated. Everything that is demonstrated can also be found in the MATRXS package under `Examples'.
+In order to use MATRX, a world must be created. In this tutorial, all aspects of creating such a world will be
+demonstrated. Everything that is demonstrated can also be found in the MATRX package under `Examples'.
 
 Setting the world
 -----------------
@@ -77,7 +77,7 @@ available to visually represent the agent in the simulation. To use a different 
 Adding the autonomous agent works approximately the same as adding a human agent, but using `.add\_agent'
 instead of `.add\_human\_agent'. In a similar way, objects like walls can also be added.
 
-Now, we can try and run our simple MATRXS simulation. We create our `main.py' like below. We can choose to run multiple
+Now, we can try and run our simple MATRX simulation. We create our `main.py' like below. We can choose to run multiple
 worlds simultaneously, but for now we run only one instance. Do not forget to import all necessary modules and classes!
 
 .. code-block:: python

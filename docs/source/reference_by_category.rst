@@ -28,7 +28,7 @@ Reference by category
         :target: sections/worlds.html
 
      :ref:`Worlds`
-        Learn MATRXS' way of creating worlds.
+        Learn MATRX' way of creating worlds.
 
   .. container:: descr
 
