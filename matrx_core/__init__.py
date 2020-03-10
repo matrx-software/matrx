@@ -1,7 +1,6 @@
-from .world_builder import *
-from .utils import *
 from .grid_world import *
-
+from .utils import *
+from .world_builder import *
 
 __docformat__ = "restructuredtext"
 

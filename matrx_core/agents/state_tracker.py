@@ -1,6 +1,6 @@
 import numpy as np
 
-from matrx.utils import get_distance
+from matrx_core.utils import get_distance
 
 
 class StateTracker:

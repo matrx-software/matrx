@@ -1,6 +1,6 @@
 import json
 
-from matrx.utils import gen_random_string
+from matrx_core.utils import gen_random_string
 
 
 class Message:

@@ -1,6 +1,6 @@
-from matrx.actions.object_actions import GrabObject
-from matrx.actions.door_actions import OpenDoorAction, CloseDoorAction
-from matrx.agents.agent_brain import AgentBrain
+from matrx_core.actions.object_actions import GrabObject
+from matrx_core.actions.door_actions import OpenDoorAction, CloseDoorAction
+from matrx_core.agents.agent_brain import AgentBrain
 import numpy as np
 
 

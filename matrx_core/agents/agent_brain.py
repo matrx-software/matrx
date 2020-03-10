@@ -2,9 +2,9 @@ import copy
 from typing import Union
 import random
 import numpy as np
-from matrx.actions.object_actions import GrabObject, RemoveObject
-from matrx.actions.door_actions import OpenDoorAction, CloseDoorAction
-from matrx.agents.message import Message
+from matrx_core.actions.object_actions import GrabObject, RemoveObject
+from matrx_core.actions.door_actions import OpenDoorAction, CloseDoorAction
+from matrx_core.agents.message import Message
 
 def func1():
     pass
