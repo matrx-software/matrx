@@ -1,5 +1,4 @@
 from matrx.logger.logger import GridWorldLogger
-from matrx.grid_world import GridWorld
 
 
 class LogDuration(GridWorldLogger):
@@ -8,7 +7,7 @@ class LogDuration(GridWorldLogger):
         super().__init__(save_path=save_path, file_name=file_name_prefix, file_extension=file_extension,
                          delimiter=delimeter, log_strategy=self.LOG_ON_LAST_TICK)
 
-    def log(self, grid_world: GridWorld, agent_data: dict):
+    def log(self, grid_world, agent_data):
         log_statement = {
             "tick": grid_world.current_nr_ticks
         }

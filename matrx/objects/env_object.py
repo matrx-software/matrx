@@ -1,4 +1,4 @@
-import matrx.scenarios.defaults as defaults
+import matrx.defaults as defaults
 
 
 class EnvObject:

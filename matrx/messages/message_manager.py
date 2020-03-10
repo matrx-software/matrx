@@ -1,4 +1,4 @@
-from matrx.agents.agent_brain import Message
+from matrx.messages.message import Message
 
 
 class MessageManager:

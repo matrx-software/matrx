@@ -10,7 +10,7 @@ import numpy as np
 
 from matrx.agents.agent_brain import AgentBrain
 from matrx.agents.capabilities.capability import SenseCapability
-from matrx.agents.human_agent import HumanAgentBrain
+from matrx.agents.agent_types.human_agent import HumanAgentBrain
 from matrx.grid_world import GridWorld
 from matrx.logger.logger import GridWorldLogger
 from matrx.objects.agent_body import AgentBody
@@ -18,9 +18,9 @@ from matrx.objects.env_object import EnvObject, _get_inheritence_path
 from matrx import utils
 from matrx.agents.capabilities.capability import create_sense_capability
 from matrx.objects.standard_objects import Wall, Door, AreaTile, SmokeTile
-from matrx.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
+from matrx.goals.goals import LimitedTimeGoal, UseCaseGoal
 
-import matrx.scenarios.defaults as defaults
+import matrx.defaults as defaults
 
 # addons
 from matrx.API import api
@@ -101,10 +101,10 @@ class WorldBuilder:
             raise ValueError(f"The given random_seed {random_seed} should be an Int and bigger or equal to 1.")
 
         # Check if the simulation_goal is a SimulationGoal, an int or a list or tuple of SimulationGoal
-        if not isinstance(simulation_goal, SimulationGoal) and not isinstance(simulation_goal, int) \
+        if not isinstance(simulation_goal, UseCaseGoal) and not isinstance(simulation_goal, int) \
                 and not (isinstance(simulation_goal, Iterable) and (sum(1 for _ in simulation_goal)) > 0):
-            raise ValueError(f"The given simulation_goal {simulation_goal} should be of type {SimulationGoal.__name__} "
-                             f"or a list/tuple of {SimulationGoal.__name__}, or it should be an int denoting the max"
+            raise ValueError(f"The given simulation_goal {simulation_goal} should be of type {UseCaseGoal.__name__} "
+                             f"or a list/tuple of {UseCaseGoal.__name__}, or it should be an int denoting the max"
                              f"number of ticks the world should run (negative for infinite).")
 
         # Check the background color
