@@ -8,7 +8,7 @@ setuptools.setup(
     name="matrx",
     version="0.0.92",
     author="The MATRX Development team at TNO.nl",
-    author_email="info@matrx-software.com",
+    author_email="info@matrx_core-software.com",
     description="A Python package for the rapid development of autonomous systems and human-agent teaming concepts.",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -39,7 +39,6 @@ setuptools.setup(
     ],
     package_data={
         "matrx_visualizer": ["mockup/**/*", "templates/**/*", "static/**/*"],
-        "matrx": ["scenarios/defaults.json"],
     },
     include_package_data=True,
 )
