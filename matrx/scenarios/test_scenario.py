@@ -1,8 +1,8 @@
-from matrx_core.agents.human_agent_brain import HumanAgentBrain
-from matrx_core.agents.patrolling_agent import PatrollingAgentBrain
-from matrx_core.logger.log_agent_actions import LogActions
-from matrx_core.world_builder import WorldBuilder
-from matrx_core.actions.move_actions import *
+from matrx.agents.human_agent_brain import HumanAgentBrain
+from matrx.agents.patrolling_agent import PatrollingAgentBrain
+from matrx.logger.log_agent_actions import LogActions
+from matrx.world_builder import WorldBuilder
+from matrx.actions.move_actions import *
 
 
 def create_factory():

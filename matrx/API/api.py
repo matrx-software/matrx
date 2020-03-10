@@ -6,7 +6,7 @@ import logging
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
-from matrx_core.agents.message import Message
+from matrx.agents.message import Message
 
 '''
 This file holds the code for the MATRX RESTful API.
@@ -181,8 +181,8 @@ def get_messages(tick):
         all messages for tick `tick` to the current tick,
         subdivided under `global`, `team`, and `private`.
         Also see the documentation of the
-        :func:`~matrx_core.utils.message_manager.MessageManager.MyClass.fetch_messages` and
-        :func:`~matrx_core.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
+        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_messages` and
+        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
     -------
     """
 
@@ -219,8 +219,8 @@ def get_messages_specific_agent(tick, agent_id):
         all messages sent or received by `agent_id`,
         subdivided under `global`, `team`, and `private`.
         Also see the documentation of the
-        :func:`~matrx_core.utils.message_manager.MessageManager.MyClass.fetch_messages` and
-        :func:`~matrx_core.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
+        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_messages` and
+        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
     -------
 
     """
@@ -250,8 +250,8 @@ def get_latest_messages():
         contains all accessible chatrooms at the latest tick. The messages subdictionary contains
         all messages of the latest tick, subdivided under `global`, `team`, and `private`.
         Also see the documentation of the
-        :func:`~matrx_core.utils.message_manager.MessageManager.MyClass.fetch_messages` and
-        :func:`~matrx_core.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
+        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_messages` and
+        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
     -------
 
     """
@@ -283,8 +283,8 @@ def get_latest_messages_specific_agent(agent_id):
         ID `agent_id`. The messages subdictionary contains
         all messages of the latest tick, subdivided under `global`, `team`, and `private`.
         Also see the documentation of the
-        :func:`~matrx_core.utils.message_manager.MessageManager.MyClass.fetch_messages` and
-        :func:`~matrx_core.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
+        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_messages` and
+        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
     -------
 
     """
@@ -351,7 +351,7 @@ def send_userinput(agent_ids):
 def send_message():
     """ Send a message containing information to one or multiple specific agent, the agent's team, or all agents
 
-    Message as defined in matrx_core.utils.message
+    Message as defined in matrx.utils.message
 
     Parameters
     ----------

@@ -1,7 +1,7 @@
-from matrx_core.agents.capabilities.capability import SenseCapability
-from matrx_core.actions.action import Action
-from matrx_core.utils import get_all_classes
-from matrx_core.objects.env_object import EnvObject
+from matrx.agents.capabilities.capability import SenseCapability
+from matrx.actions.action import Action
+from matrx.utils import get_all_classes
+from matrx.objects.env_object import EnvObject
 
 
 class AgentBody(EnvObject):

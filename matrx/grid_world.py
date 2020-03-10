@@ -7,13 +7,13 @@ import copy
 
 import gevent
 
-from matrx_core.actions.object_actions import *
-from matrx_core.logger.logger import GridWorldLogger
-from matrx_core.objects.env_object import EnvObject
-from matrx_core.objects.standard_objects import AreaTile
-from matrx_core.utils import get_all_classes
-from matrx_core.agents.message_manager import  MessageManager
-from matrx_core.API import api
+from matrx.actions.object_actions import *
+from matrx.logger.logger import GridWorldLogger
+from matrx.objects.env_object import EnvObject
+from matrx.objects.standard_objects import AreaTile
+from matrx.utils import get_all_classes
+from matrx.agents.message_manager import  MessageManager
+from matrx.API import api
 
 
 class GridWorld:

@@ -1,4 +1,4 @@
-from matrx_core.objects.env_object import EnvObject
+from matrx.objects.env_object import EnvObject
 
 
 class SquareBlock(EnvObject):

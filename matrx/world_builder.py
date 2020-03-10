@@ -7,23 +7,23 @@ import requests
 import numpy as np
 from numpy.random.mtrand import RandomState
 
-from matrx_core.agents.agent_brain import AgentBrain
-from matrx_core.agents.capabilities.capability import SenseCapability
-from matrx_core.agents.human_agent_brain import HumanAgentBrain
-from matrx_core.grid_world import GridWorld
-from matrx_core.logger.logger import GridWorldLogger
-from matrx_core.objects import AgentBody
-from matrx_core.objects.env_object import EnvObject
-from matrx_core import utils
-from matrx_core.utils import get_inheritence_path, _get_line_coords
-from matrx_core.agents.capabilities.capability import create_sense_capability
-from matrx_core.objects.standard_objects import Wall, Door, AreaTile, SmokeTile
-from matrx_core.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
+from matrx.agents.agent_brain import AgentBrain
+from matrx.agents.capabilities.capability import SenseCapability
+from matrx.agents.human_agent_brain import HumanAgentBrain
+from matrx.grid_world import GridWorld
+from matrx.logger.logger import GridWorldLogger
+from matrx.objects import AgentBody
+from matrx.objects.env_object import EnvObject
+from matrx import utils
+from matrx.utils import get_inheritence_path, _get_line_coords
+from matrx.agents.capabilities.capability import create_sense_capability
+from matrx.objects.standard_objects import Wall, Door, AreaTile, SmokeTile
+from matrx.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
 
-import matrx_core.scenarios.defaults as defaults
+import matrx.scenarios.defaults as defaults
 
 # addons
-from matrx_core.API import api
+from matrx.API import api
 from matrx_visualizer import visualization_server
 
 class WorldBuilder:
@@ -72,13 +72,13 @@ class WorldBuilder:
 
         This creates a WorldBuilder that creates world of a certain size (here 10 by 10);
 
-            >>> from matrx_core.world_builder import WorldBuilder
+            >>> from matrx.world_builder import WorldBuilder
             >>> WorldBuilder(shape=(10, 10))
 
         To create a WorldBuilder with a black background, a tick duration as fast as possible and with a different
         master random seed;
 
-            >>> from matrx_core.world_builder import WorldBuilder
+            >>> from matrx.world_builder import WorldBuilder
             >>> WorldBuilder(shape=(10, 10), random_seed=42, tick_duration=-1, visualization_bg_clr="#000000")
 
         """

@@ -1,5 +1,5 @@
-from matrx_core.utils import next_obj_id, get_inheritence_path
-import matrx_core.scenarios.defaults as defaults
+from matrx.utils import next_obj_id, get_inheritence_path
+import matrx.scenarios.defaults as defaults
 
 
 class EnvObject:

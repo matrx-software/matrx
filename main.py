@@ -1,5 +1,5 @@
-from matrx_core.API import api
-from matrx_core.scenarios import simple_scenario, test_scenario, new_vis_test
+from matrx.API import api
+from matrx.scenarios import simple_scenario, test_scenario, new_vis_test
 
 if __name__ == "__main__":
 

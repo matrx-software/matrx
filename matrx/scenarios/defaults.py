@@ -1,4 +1,4 @@
-from matrx_core.sim_goals.sim_goal import LimitedTimeGoal
+from matrx.sim_goals.sim_goal import LimitedTimeGoal
 
 ######################
 # AgentBody defaults #

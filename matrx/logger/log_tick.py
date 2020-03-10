@@ -1,5 +1,5 @@
-from matrx_core.logger.logger import GridWorldLogger
-from matrx_core.grid_world import GridWorld
+from matrx.logger.logger import GridWorldLogger
+from matrx.grid_world import GridWorld
 
 
 class LogDuration(GridWorldLogger):
