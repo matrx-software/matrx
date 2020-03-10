@@ -171,6 +171,7 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
 
         // set the visualization depth of this object
         obj_element.style.zIndex = obj['visualization']['depth'];
+//        obj_element.style.zIndex = 0;
 
         // if we need to style this object, e.g. because it's new or visualiation settings changed,
         // regenerate the specfic object shape with its settings
@@ -654,7 +655,7 @@ function draw_bg_tiles() {
             // set position and z-index
             var pos_x = x * tile_size;
             var pos_y = y * tile_size;
-            tile.style = "left:" + pos_x + "px; top:" + pos_y + "px; width: " + tile_size + "px; height: " + tile_size + "px; z-index: 0;"
+            tile.style = "left:" + pos_x + "px; top:" + pos_y + "px; width: " + tile_size + "px; height: " + tile_size + "px; z-index: 0;";
 
             // add to grid
             grid.append(tile);
