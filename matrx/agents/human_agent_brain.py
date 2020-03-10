@@ -75,7 +75,7 @@ class HumanAgentBrain(AgentBrain):
 
         The function overwrites the default get_action() function for normal agents,
         and instead executes the action commanded by the user, which is received
-        via the API from e.g. a visualization interface.
+        via the api from e.g. a visualization interface.
 
         Note; This method should NOT be overridden!
 
@@ -84,7 +84,7 @@ class HumanAgentBrain(AgentBrain):
         :param agent_properties: The properties of the agent, which might have been changed by the
         environment as a result of actions of this or other agents.
         :param agent_id: the ID of this agent
-        :param userinput: any userinput given by the user for this human agent via the API
+        :param userinput: any userinput given by the user for this human agent via the api
         :return: The filtered state of this agent, the agent properties which the agent might have changed,
         and an action string, which is the class name of one of the actions in the Action package.
         """
