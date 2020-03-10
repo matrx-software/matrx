@@ -1,4 +1,4 @@
-from matrx.agents.human_agent_brain import HumanAgentBrain
+from matrx.agents.human_agent import HumanAgentBrain
 from matrx.agents.patrolling_agent import PatrollingAgentBrain
 from matrx.logger.log_agent_actions import LogActions
 from matrx.world_builder import WorldBuilder

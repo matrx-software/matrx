@@ -33,7 +33,7 @@ class Door(EnvObject):
         :param closed_colour: Colour when closed
         """
 
-        # Whether the door is by default open or closed is stored in the defaults.json and obtained like this;
+        # Whether the door is by default open or closed is stored in the defaults.py and obtained like this;
         self.is_open = is_open
 
         # We save the colours for open and close and assign the appriopriate value based on current state
@@ -132,7 +132,7 @@ class Battery(EnvObject):
         two default properties that are unique to this object; start_energy_level, and energy_decay. These are added
         as properties by passing them as keyword arguments to the constructor of EnvObject. In addition this constructor
         also makes a current_enery_level attribute which is also treated as a property by giving it to the EnvObject
-        constructor as well. All other properties are obtained from the defaults.json as defined for all EnvObject,
+        constructor as well. All other properties are obtained from the defaults.py as defined for all EnvObject,
         except for the size (which is set to be 0.25) and the colour (which is a shade of green turning to red based on
         the current_energy_level).
 

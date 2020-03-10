@@ -1,5 +1,5 @@
-from matrx_core.actions.action import Action, ActionResult
-from matrx_core.objects.agent_body import AgentBody
+from matrx.actions.action import Action, ActionResult
+from matrx.objects.agent_body import AgentBody
 
 
 def _act_move(grid_world, agent_id, dx, dy):

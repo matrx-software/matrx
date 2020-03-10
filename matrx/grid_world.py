@@ -11,8 +11,8 @@ from matrx.actions.object_actions import *
 from matrx.logger.logger import GridWorldLogger
 from matrx.objects.env_object import EnvObject
 from matrx.objects.standard_objects import AreaTile
-from matrx.utils import get_all_classes
-from matrx.agents.message_manager import  MessageManager
+from matrx.messages import MessageManager
+from matrx.objects.agent_body import _get_all_classes
 from matrx.API import api
 
 
@@ -33,7 +33,7 @@ class GridWorld:
         self.__environment_objects = OrderedDict()  # The dictionary of all existing objects in the GridWorld
 
         # Get all actions within all currently imported files
-        self.__all_actions = get_all_classes(Action, omit_super_class=True)
+        self.__all_actions = _get_all_classes(Action, omit_super_class=True)
 
         # Initialise an empty grid, a simple 2D array with ID's
         self.__grid = np.array([[None for _ in range(shape[0])] for _ in range(shape[1])])

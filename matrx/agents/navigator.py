@@ -2,8 +2,8 @@ import heapq
 from collections import OrderedDict
 
 import numpy as np
-from matrx_core.agents.state_tracker import StateTracker
-from matrx_core.actions.move_actions import *
+from matrx.agents.state_tracker import StateTracker
+from matrx.actions.move_actions import *
 
 
 class Navigator:
