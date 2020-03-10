@@ -1,5 +1,5 @@
-from matrx_core.agents import PatrollingAgentBrain
-from matrx_core.logger import LogActions
+from matrx_core.agents.patrolling_agent import PatrollingAgentBrain
+from matrx_core.logger.log_agent_actions import LogActions
 from matrx_core.world_builder import WorldBuilder
 
 

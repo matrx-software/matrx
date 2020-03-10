@@ -1,10 +1,6 @@
-import json
 import math
 import random
 import numpy as np
-import pkg_resources
-
-from matrx_core.agents.capabilities.capability import SenseCapability
 
 object_counter = 0
 
