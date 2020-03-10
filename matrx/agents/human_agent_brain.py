@@ -1,7 +1,6 @@
+from matrx.actions import GrabObject, OpenDoorAction, CloseDoorAction
 from matrx.agents.agent_brain import AgentBrain
-
-from matrx.actions.object_actions import GrabObject
-from matrx.actions.door_actions import *
+import numpy as np
 
 
 class HumanAgentBrain(AgentBrain):

@@ -1,5 +1,5 @@
-from matrx.utils.utils import get_default_value
-from matrx.utils.utils import next_obj_id, get_inheritence_path
+from matrx.utils import get_default_value, next_obj_id, get_inheritence_path
+
 
 
 class EnvObject:

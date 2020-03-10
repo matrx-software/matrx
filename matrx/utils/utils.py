@@ -4,7 +4,7 @@ import random
 import numpy as np
 import pkg_resources
 
-from matrx.agents.capabilities import SenseCapability
+from matrx.agents import SenseCapability
 
 object_counter = 0
 

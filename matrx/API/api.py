@@ -6,7 +6,7 @@ import logging
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
-from matrx.utils.message import Message
+from matrx.utils import Message
 
 '''
 This file holds the code for the MATRX RESTful API.
