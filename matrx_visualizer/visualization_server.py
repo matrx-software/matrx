@@ -3,9 +3,9 @@ import logging
 from flask import Flask, render_template, request, jsonify
 
 '''
-This file holds the code for the MATRX RESTful API. 
+This file holds the code for the MATRX RESTful api. 
 External scripts can send POST and/or GET requests to retrieve state, tick and other information, and send 
-userinput or other information to MATRX. The API is a Flask (Python) webserver.
+userinput or other information to MATRX. The api is a Flask (Python) webserver.
 
 For visualization, see the seperate MATRX visualization folder / package.
 '''

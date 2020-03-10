@@ -22,7 +22,7 @@ from matrx.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
 from matrx.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
 
 # addons
-from matrx.API import api
+from matrx.api import api
 from matrx_visualizer import visualization_server
 
 class WorldBuilder:
@@ -49,9 +49,9 @@ class WorldBuilder:
             The goal or goals of the world, either a single SimulationGoal, a list of such or a positive non-zero
             integer to denote the maximum number of 'ticks' the world(s) have to run. Defaults to 1000.
         run_matrx_api : bool, optional
-            Whether to run the MATRX API
+            Whether to run the MATRX api
         run_matrx_visualizer : bool, optional
-            Whether to run the default MATRX visualizer, this requires the API to be run
+            Whether to run the default MATRX visualizer, this requires the api to be run
         visualization_bg_clr : str, optional
             The color of the world when visualized using MATRX' own visualisation server. A string representation of
             hexadecimal color. Defaults to "#C2C2C2" (light grey).
@@ -126,7 +126,7 @@ class WorldBuilder:
 
         if not run_matrx_api and run_matrx_visualizer:
             raise ValueError(f"Run_matrx_api is set to False while run_matrx_visualizer is set to True. The MATRX "
-                             f"visualizer requires the API to work, so this is not possible.")
+                             f"visualizer requires the api to work, so this is not possible.")
 
         # Set our random number generator
         self.rng = np.random.RandomState(random_seed)
@@ -136,7 +136,7 @@ class WorldBuilder:
         # Set our logger place holders
         self.loggers = []
 
-        # initialize an API variables
+        # initialize an api variables
         self.run_matrx_api = run_matrx_api
         self.api_info = {   "run_matrx_api": run_matrx_api,
                             "api_thread": False }
@@ -1100,7 +1100,7 @@ class WorldBuilder:
 
 
     def startup(self):
-        """ Start any world-overarching MATRX scripts, such as, if requested, the API or MATRX visualization.
+        """ Start any world-overarching MATRX scripts, such as, if requested, the api or MATRX visualization.
         Returns
         -------
         """
@@ -1111,12 +1111,12 @@ class WorldBuilder:
             self.matrx_visualizer_thread = visualization_server.run_matrx_visualizer(self.verbose)
 
     def stop(self):
-        """ Stop any world-overarching MATRX scripts, such as, if started, the API or MATRX visualization.
+        """ Stop any world-overarching MATRX scripts, such as, if started, the api or MATRX visualization.
         Returns
         -------
         """
         if self.run_matrx_api:
-            print("Shutting down Matrx API")
+            print("Shutting down Matrx api")
             r = requests.get("http://localhost:" + str(api.port) + "/shutdown_API")
             self.api_info["api_thread"].join()
 
