@@ -1,5 +1,5 @@
-from matrx.utils import get_default_value, next_obj_id, get_inheritence_path
-
+from matrx.utils import next_obj_id, get_inheritence_path
+import matrx.scenarios.defaults as defaults
 
 
 class EnvObject:
@@ -89,23 +89,25 @@ class EnvObject:
         # with the second last element being EnvObject. Any elements before that are custom EnvObject class names.
         self.class_inheritance = get_inheritence_path(class_callable)
 
-        # Load defaults if not given. We do this loading this low-level (instead of for example in the WorldFactory) for
-        # users to make it easier to build/extend their own WorldFactory and this way they do not have to deal with this
-        # It also helps if users want to create a GridWorld without using the WorldFactory.
+        # Load defaults if not given. We do this loading this low-level (
+        # instead of for example in the WorldFactory) for users to make it
+        # easier to build/extend their own WorldFactory and this way they do
+        # not have to deal with this.
         if is_traversable is None:
-            is_traversable = get_default_value(class_name="EnvObject", property_name="is_traversable")
+            is_traversable = defaults.ENVOBJECT_IS_TRAVERSABLE
         if visualize_size is None:
-            visualize_size = get_default_value(class_name="EnvObject", property_name="visualize_size")
+            visualize_size = defaults.ENVOBJECT_VIS_SIZE
         if visualize_shape is None:
-            visualize_shape = get_default_value(class_name="EnvObject", property_name="visualize_shape")
+            visualize_shape = defaults.ENVOBJECT_VIS_SHAPE
         if visualize_colour is None:
-            visualize_colour = get_default_value(class_name="EnvObject", property_name="visualize_colour")
+            visualize_colour = defaults.ENVOBJECT_VIS_COLOUR
         if visualize_opacity is None:
-            visualize_opacity = get_default_value(class_name="EnvObject", property_name="visualize_opacity")
+            visualize_opacity = defaults.ENVOBJECT_VIS_OPACITY
         if visualize_depth is None:
-            visualize_depth = get_default_value(class_name="EnvObject", property_name="visualize_depth")
+            visualize_depth = defaults.ENVOBJECT_VIS_DEPTH
         if is_movable is None:
-            is_movable = get_default_value(class_name="EnvObject", property_name="is_movable")
+            is_movable = defaults.ENVOBJECT_IS_MOVABLE
+
 
         # Set the mandatory properties
         self.visualize_depth = visualize_depth

@@ -17,9 +17,11 @@ from matrx.logger.logger import GridWorldLogger
 from matrx.objects import AgentBody
 from matrx.objects.env_object import EnvObject
 from matrx.utils import utils
-from matrx.utils.utils import get_inheritence_path, get_default_value, _get_line_coords, create_sense_capability
+from matrx.utils.utils import get_inheritence_path, _get_line_coords, create_sense_capability
 from matrx.objects import Wall, Door, AreaTile, SmokeTile
 from matrx.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
+
+import matrx.scenarios.defaults as defaults
 
 # addons
 from matrx.API import api
@@ -352,21 +354,21 @@ class WorldBuilder:
         # Load the defaults for any variable that is not defined
         # Obtain any defaults from the defaults.json file if not set already.
         if is_traversable is None:
-            is_traversable = get_default_value(class_name="AgentBody", property_name="is_traversable")
+            is_traversable = defaults.AGENTBODY_IS_TRAVERSABLE
         if visualize_size is None:
-            visualize_size = get_default_value(class_name="AgentBody", property_name="visualize_size")
+            visualize_size = defaults.AGENTBODY_VIS_SIZE
         if visualize_shape is None:
-            visualize_shape = get_default_value(class_name="AgentBody", property_name="visualize_shape")
+            visualize_shape = defaults.AGENTBODY_VIS_SHAPE
         if visualize_colour is None:
-            visualize_colour = get_default_value(class_name="AgentBody", property_name="visualize_colour")
+            visualize_colour = defaults.AGENTBODY_VIS_COLOUR
         if visualize_opacity is None:
-            visualize_opacity = get_default_value(class_name="AgentBody", property_name="visualize_opacity")
+            visualize_opacity = defaults.AGENTBODY_VIS_OPACITY
         if visualize_depth is None:
-            visualize_depth = get_default_value(class_name="AgentBody", property_name="visualize_depth")
+            visualize_depth = defaults.AGENTBODY_VIS_DEPTH
         if possible_actions is None:
-            possible_actions = get_default_value(class_name="AgentBody", property_name="possible_actions")
+            possible_actions = defaults.AGENTBODY_POSSIBLE_ACTIONS
         if is_movable is None:
-            is_movable = get_default_value(class_name="AgentBody", property_name="is_movable")
+            is_movable = defaults.AGENTBODY_IS_MOVABLE
 
         # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
         # objects with infinite range).
@@ -578,7 +580,7 @@ class WorldBuilder:
 
         # Load default parameters if not passed
         if is_movable is None:
-            is_movable = get_default_value(class_name="EnvObject", property_name="is_movable")
+            is_movable = defaults.ENVOBJECT_IS_MOVABLE
 
         # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
         # objects with infinite range).
@@ -705,21 +707,21 @@ class WorldBuilder:
         # Load the defaults for any variable that is not defined
         # Obtain any defaults from the defaults.json file if not set already.
         if is_traversable is None:
-            is_traversable = get_default_value(class_name="AgentBody", property_name="is_traversable")
+            is_traversable = defaults.AGENTBODY_IS_TRAVERSABLE
         if visualize_size is None:
-            visualize_size = get_default_value(class_name="AgentBody", property_name="visualize_size")
+            visualize_size = defaults.AGENTBODY_VIS_SIZE
         if visualize_shape is None:
-            visualize_shape = get_default_value(class_name="AgentBody", property_name="visualize_shape")
+            visualize_shape = defaults.AGENTBODY_VIS_SHAPE
         if visualize_colour is None:
-            visualize_colour = get_default_value(class_name="AgentBody", property_name="visualize_colour")
+            visualize_colour = defaults.AGENTBODY_VIS_COLOUR
         if visualize_opacity is None:
-            visualize_opacity = get_default_value(class_name="AgentBody", property_name="visualize_opacity")
+            visualize_opacity = defaults.AGENTBODY_VIS_OPACITY
         if visualize_depth is None:
-            visualize_depth = get_default_value(class_name="AgentBody", property_name="visualize_depth")
+            visualize_depth = defaults.AGENTBODY_VIS_DEPTH
         if possible_actions is None:
-            possible_actions = get_default_value(class_name="AgentBody", property_name="possible_actions")
+            possible_actions = defaults.AGENTBODY_POSSIBLE_ACTIONS
         if is_movable is None:
-            is_movable = get_default_value(class_name="AgentBody", property_name="is_movable")
+            is_movable = defaults.AGENTBODY_IS_MOVABLE
 
         # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
         # objects with infinite range).
