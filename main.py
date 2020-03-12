@@ -1,4 +1,4 @@
-from matrx.api import api
+import os
 from matrx.scenarios import simple_scenario, test_scenario, new_vis_test
 
 if __name__ == "__main__":
@@ -8,7 +8,8 @@ if __name__ == "__main__":
     factory = new_vis_test.create_factory()
 
     # startup world-overarching MATRX scripts, such as the api and/or visualizer if requested
-    factory.startup()
+    media_folder = os.path.dirname(os.path.realpath(__file__)) # set our path for media files to our current folder
+    factory.startup(media_folder=media_folder)
 
     # run each world
     for world in factory.worlds():

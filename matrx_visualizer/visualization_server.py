@@ -1,6 +1,6 @@
 import threading
 import logging
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 
 '''
 This file holds the code for the MATRX RESTful api. 
@@ -12,8 +12,10 @@ For visualization, see the seperate MATRX visualization folder / package.
 
 debug = True
 port = 3000
-app = Flask(__name__, template_folder='templates', static_folder='static/')
+app = Flask(__name__, template_folder='templates')
 
+# the path to the media folder of the user (outside of the MATRX package)
+ext_media_folder = ""
 
 #########################################################################
 # Visualization server routes
@@ -105,6 +107,21 @@ def shutdown():
     return jsonify(True)
 
 
+@app.route('/fetch_external_media/<path:filename>')
+def external_media(filename):
+    """ Facilitate the use of images in the visualization outside of the static folder
+
+    Parameters
+    ----------
+    filename
+        path to the image file in the external media folder of the user.
+
+    Returns
+    -------
+        Returns the url (relative from the website root) to that file
+    """
+    return send_from_directory(ext_media_folder, filename, as_attachment=True)
+
 
 #########################################################################
 # Visualization Flask methods
@@ -121,13 +138,14 @@ def flask_thread():
 
     app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
 
-def run_matrx_visualizer(verbose):
+def run_matrx_visualizer(verbose, media_folder):
     """
     Creates a seperate Python thread in which the visualization server (Flask) is started, serving the JS visualization
     :return: MATRX visualization Python thread
     """
-    global debug
+    global debug, ext_media_folder
     debug = verbose
+    ext_media_folder = media_folder
 
     print("Starting visualization server")
     print("Initialized app:", app)

@@ -130,7 +130,7 @@ function populate_agent_menu(state) {
         // use the image as the agent preview
         if (Object.keys(agent).includes('img_name')) {
             var img = new Image();
-            img.src = window.location.origin + agent['img_name'];
+            img.src = window.location.origin + fix_img_url(agent['img_name']);
             agent_preview.append(img);
 
             // otherwise, use the the agent shape and colour as a preview
