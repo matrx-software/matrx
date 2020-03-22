@@ -7,6 +7,7 @@ from typing import Callable, Union, Iterable
 import requests
 
 import numpy as np
+from docutils.nodes import warning
 from numpy.random.mtrand import RandomState
 
 from matrx.agents.agent_brain import AgentBrain
@@ -1099,16 +1100,27 @@ class WorldBuilder:
         pass
 
 
-    def startup(self):
+    def startup(self, media_folder=None):
         """ Start any world-overarching MATRX scripts, such as, if requested, the api or MATRX visualization.
         Returns
         -------
         """
+        # startup the MATRX API if requested
         if self.run_matrx_api:
             self.api_info["api_thread"] = api.run_api(self.verbose)
 
+        # check that the MATRX API is set to True if the MATRX visualizer is requested
+        elif self.run_matrx_visualizer:
+            raise Exception("The MATRX visualizer requires the MATRX API to work. Currently, run_matrx_visualizer=True"
+                            " while run_matrx_api=False")
+
+        # startup the MATRX visualizer if requested
         if self.run_matrx_visualizer:
-            self.matrx_visualizer_thread = visualization_server.run_matrx_visualizer(self.verbose)
+            self.matrx_visualizer_thread = visualization_server.run_matrx_visualizer(self.verbose, media_folder)
+
+        # warn the user if they forgot to turn on the MATRX visualizer
+        elif media_folder is not None:
+            warnings.warn("Set media folder path for MATRX visualizer, but run_matrx_visualizer is set to False")
 
     def stop(self):
         """ Stop any world-overarching MATRX scripts, such as, if started, the api or MATRX visualization.

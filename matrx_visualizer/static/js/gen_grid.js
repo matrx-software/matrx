@@ -101,7 +101,7 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
         // fetch bg img if defined
         var obj_img = null;
         if (Object.keys(obj).includes('img_name')) {
-            obj_img = obj['img_name'];
+            obj_img = fix_img_url(obj['img_name']);
         }
 
         // save visualization settings for this object
