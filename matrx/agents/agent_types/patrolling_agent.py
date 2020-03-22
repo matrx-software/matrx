@@ -28,20 +28,6 @@ class PatrollingAgentBrain(AgentBrain):
     def decide_on_action(self, state):
         from matrx.messages.message import Message
 
-        # Send a message to a random agent
-        agents = []
-        for obj_id, obj in state.items():
-
-            if obj_id is "World":  # Skip the world properties
-                continue
-
-            classes = obj['class_inheritance']
-            if AgentBrain.__name__ in classes:  # the object is an agent to which we can send our message
-                agents.append(obj)
-        selected_agent = self.rnd_gen.choice(agents)
-        message_content = f"Hello, my name is {self.agent_name}"
-        self.send_message(Message(content=message_content, from_id=self.agent_id, to_id=selected_agent['obj_id']))
-
         move_action = self.navigator.get_move_action(self.state_tracker)
 
         return move_action, {"action_duration": self.move_speed}
