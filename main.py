@@ -1,11 +1,11 @@
-from matrx.API import api
-from matrx.use_cases import simple_case, test_case, new_vis_test
+import os
+from matrx.use_cases import vis_test
 
 if __name__ == "__main__":
 
     # By creating scripts that return a factory, we can define infinite number of use cases and select them (in the
     # future) through a UI.
-    factory = new_vis_test.create_factory()
+    factory = vis_test.create_builder()
 
     # startup world-overarching MATRX scripts, such as the api and/or visualizer if requested
     media_folder = os.path.dirname(os.path.realpath(__file__)) # set our path for media files to our current folder
