@@ -1,6 +1,6 @@
 from matrx.agents.agent_brain import AgentBrain
-from matrx.utils.agent_utils.navigator import Navigator
-from matrx.utils.agent_utils.state_tracker import StateTracker
+from matrx.agents.agent_utils.navigator import Navigator
+from matrx.agents.agent_utils.state_tracker import StateTracker
 
 
 class PatrollingAgentBrain(AgentBrain):
@@ -26,8 +26,7 @@ class PatrollingAgentBrain(AgentBrain):
         return state
 
     def decide_on_action(self, state):
-        from matrx.utils.message import Message
-        import random
+        from matrx.messages.message import Message
 
         # Send a message to a random agent
         agents = []

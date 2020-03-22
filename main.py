@@ -1,5 +1,5 @@
-import os
-from matrx.scenarios import simple_scenario, test_scenario, new_vis_test
+from matrx.API import api
+from matrx.use_cases import simple_case, test_case, new_vis_test
 
 if __name__ == "__main__":
 

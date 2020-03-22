@@ -2,7 +2,7 @@ import heapq
 from collections import OrderedDict
 
 import numpy as np
-from matrx.utils.agent_utils.state_tracker import StateTracker
+from matrx.agents.agent_utils.state_tracker import StateTracker
 from matrx.actions.move_actions import *
 
 

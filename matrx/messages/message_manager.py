@@ -1,6 +1,7 @@
-from matrx.agents.agent_brain import  Message
+from matrx.messages.message import Message
 
-class MessageManager():
+
+class MessageManager:
     """ A manager inside the GirdWorld that tracks the received and send messages between agents and their teams.
 
         This gives provides several advantages;

@@ -56,3 +56,24 @@ class SenseCapability(Capability):
             A dictionary with as keys the object types and values the distances.
         """
         return self.__detectable_objects.copy()
+
+
+def create_sense_capability(objects_to_perceive, range_to_perceive_them_in):
+    # Check if range and objects are the same length
+    assert len(objects_to_perceive) == len(range_to_perceive_them_in)
+
+    # Check if lists are empty, if so return a capability to see all at any range
+    if len(objects_to_perceive) == 0:
+        return SenseCapability({"*": np.inf})
+
+    # Create sense dictionary
+    sense_dict = {}
+    for idx, obj_class in enumerate(objects_to_perceive):
+        perceive_range = range_to_perceive_them_in[idx]
+        if perceive_range is None:
+            perceive_range = np.inf
+        sense_dict[obj_class] = perceive_range
+
+    sense_capability = SenseCapability(sense_dict)
+
+    return sense_capability

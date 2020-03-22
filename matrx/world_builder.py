@@ -1,30 +1,31 @@
 import inspect
-import os
-import sys
 import warnings
 from collections import OrderedDict
 from typing import Callable, Union, Iterable
 import requests
 
-import numpy as np
-from docutils.nodes import warning
+
 from numpy.random.mtrand import RandomState
+import numpy as np
 
 from matrx.agents.agent_brain import AgentBrain
 from matrx.agents.capabilities.capability import SenseCapability
-from matrx.agents.human_agent_brain import HumanAgentBrain
+from matrx.agents.agent_types.human_agent import HumanAgentBrain
 from matrx.grid_world import GridWorld
 from matrx.logger.logger import GridWorldLogger
 from matrx.objects.agent_body import AgentBody
-from matrx.objects.env_object import EnvObject
-from matrx.utils import utils
-from matrx.utils.utils import get_inheritence_path, get_default_value, _get_line_coords, create_sense_capability
-from matrx.objects.simple_objects import Wall, Door, AreaTile, SmokeTile
-from matrx.sim_goals.sim_goal import LimitedTimeGoal, SimulationGoal
+from matrx.objects.env_object import EnvObject, _get_inheritence_path
+from matrx import utils
+from matrx.agents.capabilities.capability import create_sense_capability
+from matrx.objects.standard_objects import Wall, Door, AreaTile, SmokeTile
+from matrx.goals.goals import LimitedTimeGoal, UseCaseGoal
+
+import matrx.defaults as defaults
 
 # addons
 from matrx.api import api
 from matrx_visualizer import visualization_server
+
 
 class WorldBuilder:
 
@@ -100,10 +101,10 @@ class WorldBuilder:
             raise ValueError(f"The given random_seed {random_seed} should be an Int and bigger or equal to 1.")
 
         # Check if the simulation_goal is a SimulationGoal, an int or a list or tuple of SimulationGoal
-        if not isinstance(simulation_goal, SimulationGoal) and not isinstance(simulation_goal, int) \
+        if not isinstance(simulation_goal, UseCaseGoal) and not isinstance(simulation_goal, int) \
                 and not (isinstance(simulation_goal, Iterable) and (sum(1 for _ in simulation_goal)) > 0):
-            raise ValueError(f"The given simulation_goal {simulation_goal} should be of type {SimulationGoal.__name__} "
-                             f"or a list/tuple of {SimulationGoal.__name__}, or it should be an int denoting the max"
+            raise ValueError(f"The given simulation_goal {simulation_goal} should be of type {UseCaseGoal.__name__} "
+                             f"or a list/tuple of {UseCaseGoal.__name__}, or it should be an int denoting the max"
                              f"number of ticks the world should run (negative for infinite).")
 
         # Check the background color
@@ -274,7 +275,7 @@ class WorldBuilder:
         factory generates a GridWorld instance, it contains an AgentBody connected to the given AgentBrain.
 
         All keyword parameters default to None. Which means that their values are obtained from the
-        "scenarios/defaults.json" file under the segment AgentBody.
+        "defaults.py" file under the segment AgentBody.
 
         Parameters
         ----------
@@ -351,23 +352,23 @@ class WorldBuilder:
                                  name)
 
         # Load the defaults for any variable that is not defined
-        # Obtain any defaults from the defaults.json file if not set already.
+        # Obtain any defaults from the defaults.py file if not set already.
         if is_traversable is None:
-            is_traversable = get_default_value(class_name="AgentBody", property_name="is_traversable")
+            is_traversable = defaults.AGENTBODY_IS_TRAVERSABLE
         if visualize_size is None:
-            visualize_size = get_default_value(class_name="AgentBody", property_name="visualize_size")
+            visualize_size = defaults.AGENTBODY_VIS_SIZE
         if visualize_shape is None:
-            visualize_shape = get_default_value(class_name="AgentBody", property_name="visualize_shape")
+            visualize_shape = defaults.AGENTBODY_VIS_SHAPE
         if visualize_colour is None:
-            visualize_colour = get_default_value(class_name="AgentBody", property_name="visualize_colour")
+            visualize_colour = defaults.AGENTBODY_VIS_COLOUR
         if visualize_opacity is None:
-            visualize_opacity = get_default_value(class_name="AgentBody", property_name="visualize_opacity")
+            visualize_opacity = defaults.AGENTBODY_VIS_OPACITY
         if visualize_depth is None:
-            visualize_depth = get_default_value(class_name="AgentBody", property_name="visualize_depth")
+            visualize_depth = defaults.AGENTBODY_VIS_DEPTH
         if possible_actions is None:
-            possible_actions = get_default_value(class_name="AgentBody", property_name="possible_actions")
+            possible_actions = defaults.AGENTBODY_POSSIBLE_ACTIONS
         if is_movable is None:
-            is_movable = get_default_value(class_name="AgentBody", property_name="is_movable")
+            is_movable = defaults.AGENTBODY_IS_MOVABLE
 
         # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
         # objects with infinite range).
@@ -379,7 +380,7 @@ class WorldBuilder:
             customizable_properties = []
 
         # Check if the agent is not of HumanAgent, if so; use the add_human_agent method
-        inh_path = get_inheritence_path(agent_brain.__class__)
+        inh_path = _get_inheritence_path(agent_brain.__class__)
         if 'HumanAgent' in inh_path:
             Exception(f"You are adding an agent that is or inherits from HumanAgent with the name {name}. Use "
                       f"factory.add_human_agent to add such agents.")
@@ -413,7 +414,7 @@ class WorldBuilder:
         """Adds a group of agents as a single team (meaning that their 'team' property all have the given team name).
 
         All parameters except for the `locations` and `agent_brain` defaults to `None`. Which means that their values
-        are obtained from the "scenarios/defaults.json" file under the segment AgentBody.
+        are obtained from the "defaults.py" file under the segment AgentBody.
 
         Parameters
         ----------
@@ -579,7 +580,7 @@ class WorldBuilder:
 
         # Load default parameters if not passed
         if is_movable is None:
-            is_movable = get_default_value(class_name="EnvObject", property_name="is_movable")
+            is_movable = defaults.ENVOBJECT_IS_MOVABLE
 
         # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
         # objects with infinite range).
@@ -704,23 +705,23 @@ class WorldBuilder:
                 raise Exception(f"A human agent with the name {name} was already added. Agent names should be unique.",
                                 name)
         # Load the defaults for any variable that is not defined
-        # Obtain any defaults from the defaults.json file if not set already.
+        # Obtain any defaults from the defaults.py file if not set already.
         if is_traversable is None:
-            is_traversable = get_default_value(class_name="AgentBody", property_name="is_traversable")
+            is_traversable = defaults.AGENTBODY_IS_TRAVERSABLE
         if visualize_size is None:
-            visualize_size = get_default_value(class_name="AgentBody", property_name="visualize_size")
+            visualize_size = defaults.AGENTBODY_VIS_SIZE
         if visualize_shape is None:
-            visualize_shape = get_default_value(class_name="AgentBody", property_name="visualize_shape")
+            visualize_shape = defaults.AGENTBODY_VIS_SHAPE
         if visualize_colour is None:
-            visualize_colour = get_default_value(class_name="AgentBody", property_name="visualize_colour")
+            visualize_colour = defaults.AGENTBODY_VIS_COLOUR
         if visualize_opacity is None:
-            visualize_opacity = get_default_value(class_name="AgentBody", property_name="visualize_opacity")
+            visualize_opacity = defaults.AGENTBODY_VIS_OPACITY
         if visualize_depth is None:
-            visualize_depth = get_default_value(class_name="AgentBody", property_name="visualize_depth")
+            visualize_depth = defaults.AGENTBODY_VIS_DEPTH
         if possible_actions is None:
-            possible_actions = get_default_value(class_name="AgentBody", property_name="possible_actions")
+            possible_actions = defaults.AGENTBODY_POSSIBLE_ACTIONS
         if is_movable is None:
-            is_movable = get_default_value(class_name="AgentBody", property_name="is_movable")
+            is_movable = defaults.AGENTBODY_IS_MOVABLE
 
         # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
         # objects with infinite range).
@@ -732,7 +733,7 @@ class WorldBuilder:
             customizable_properties = []
 
         # Check if the agent is of HumanAgent, if not; use the add_agent method
-        inh_path = get_inheritence_path(agent.__class__)
+        inh_path = _get_inheritence_path(agent.__class__)
         if 'HumanAgent' not in inh_path:
             Exception(f"You are adding an agent that does not inherit from HumanAgent with the name {name}. Use "
                       f"factory.add_agent to add autonomous agents.")
@@ -1172,3 +1173,116 @@ class RandomProperty:
 
     def reset(self):
         self.selected_values = set()
+
+
+
+
+
+def _get_line_coords(p1, p2):
+    line_coords = []
+
+    x1 = int(p1[0])
+    x2 = int(p2[0])
+    y1 = int(p1[1])
+    y2 = int(p2[1])
+
+    is_steep = abs(y2 - y1) > abs(x2 - x1)
+    if is_steep:
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
+
+    rev = False
+    if x1 > x2:
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+        rev = True
+
+    deltax = x2 - x1
+    deltay = abs(y2 - y1)
+    error = int(deltax / 2)
+    y = y1
+
+    if y1 < y2:
+        ystep = 1
+    else:
+        ystep = -1
+    for x in range(x1, x2 + 1):
+        if is_steep:
+            line_coords.append((y, x))
+        else:
+            line_coords.append((x, y))
+        error -= deltay
+        if error < 0:
+            y += ystep
+            error += deltax
+    # Reverse the list if the coordinates were reversed
+    if rev:
+        line_coords.reverse()
+
+    return line_coords
+
+
+def _perlin_noise(min_x, max_x, min_y, max_y, rng):
+    """
+    Source; https://stackoverflow.com/questions/42147776/producing-2d-perlin-noise-with-numpy
+    Parameters
+    ----------
+    min_x
+    max_x
+    min_y
+    max_y
+    seed
+
+    Returns
+    -------
+
+    """
+
+    def lerp(a, b, x):
+        """linear interpolation"""
+        return a + x * (b - a)
+
+    def fade(t):
+        """6t^5 - 15t^4 + 10t^3"""
+        return 6 * t ** 5 - 15 * t ** 4 + 10 * t ** 3
+
+    def gradient(h, x, y):
+        """grad converts h to the right gradient vector and return the dot product with (x,y)"""
+        vectors = np.array([[0, 1], [0, -1], [1, 0], [-1, 0]])
+        g = vectors[h % 4]
+        return g[:, :, 0] * x + g[:, :, 1] * y
+
+    # Create coordinate grid
+    x_steps = int(max_x - min_x)
+    y_steps = int(max_y - min_y)
+    y, x = np.meshgrid(np.linspace(min_x, max_x, x_steps, endpoint=False),
+                       np.linspace(min_y, max_y, y_steps, endpoint=False))
+
+    # permutation table
+    p = np.arange(256, dtype=int)
+    rng.shuffle(p)
+    p = np.stack([p, p]).flatten()
+    # coordinates of the top-left
+    noise_size = 1
+    xi = np.array([np.array([int(i / noise_size) * noise_size] * x_steps) for i, _ in enumerate(range(x.shape[0]))])
+    yi = np.array([np.array([int(i / noise_size) * noise_size] * x_steps) for i, _ in enumerate(range(y.shape[0]))])
+    # internal coordinates
+    xf = x - xi
+    yf = y - yi
+    # fade factors
+    u = fade(xf)
+    v = fade(yf)
+    # noise components
+    n00 = gradient(p[p[xi] + yi], xf, yf)
+    n01 = gradient(p[p[xi] + yi + 1], xf, yf - 1)
+    n11 = gradient(p[p[xi + 1] + yi + 1], xf - 1, yf - 1)
+    n10 = gradient(p[p[xi + 1] + yi], xf - 1, yf)
+    # combine noises
+    x1 = lerp(n00, n10, u)
+    x2 = lerp(n01, n11, u)
+    return lerp(x1, x2, v)
+
+
+def _white_noise(min_x, max_x, min_y, max_y, rng):
+    noise_table = rng.normal(size=[max_x - min_x, max_y - min_y])
+    return noise_table

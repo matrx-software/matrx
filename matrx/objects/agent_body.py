@@ -1,8 +1,6 @@
 from matrx.agents.capabilities.capability import SenseCapability
-from matrx.actions.action import Action, ActionResult
-from matrx.utils.utils import get_all_classes
+from matrx.actions.action import Action
 from matrx.objects.env_object import EnvObject
-import numpy as np
 
 
 class AgentBody(EnvObject):
@@ -58,24 +56,24 @@ class AgentBody(EnvObject):
         :param name: String Defaults to "Agent". The name of the agent, does not need to be unique.
         :param is_human_agent: Boolean. Defaults to False. Boolean to signal that the agent represented by this Agent's
         body is a human controlled agent.
-        :param customizable_properties: List. Optional, default obtained from defaults.json. The list of attribute names
+        :param customizable_properties: List. Optional, default obtained from defaults.py. The list of attribute names
         that can be customized by other objects (including Agent's body and as an extension any Agent).
-        :param is_traversable: Boolean. Optional, default obtained from defaults.json. Signals whether other objects can
+        :param is_traversable: Boolean. Optional, default obtained from defaults.py. Signals whether other objects can
         be placed on top of this object.
-        :param carried_by: List. Optional, default obtained from defaults.json. A list of who is carrying this object.
+        :param carried_by: List. Optional, default obtained from defaults.py. A list of who is carrying this object.
         :param team: The team name the agent is part of. Defaults to the team name similar to the Agent's body unique
         ID, as such denoting that by default each Agent's body belongs to its own team and as an extension so does its
         "brain" the Agent.
 
-        :param visualize_size: Float. Optional, default obtained from defaults.json. A visualization property used by
+        :param visualize_size: Float. Optional, default obtained from defaults.py. A visualization property used by
         the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualization (e.g. a
         value of 0.5 is half of a square, object is in the center, a value of 2 is twice the square's size centered on
         its location.)
-        :param visualize_shape: Int. Optional, default obtained from defaults.json. A visualization property used by the
+        :param visualize_shape: Int. Optional, default obtained from defaults.py. A visualization property used by the
         Visualizer. Denotes the shape of the object in the visualization.
-        :param visualize_colour: Hexcode string. Optional, default obtained from defaults.json. A visualization property
+        :param visualize_colour: Hexcode string. Optional, default obtained from defaults.py. A visualization property
         used by the Visualizer. Denotes the
-        :param visualize_depth: Integer. Optional, default obtained from defaults.json. A visualization property that
+        :param visualize_depth: Integer. Optional, default obtained from defaults.py. A visualization property that
         is used by the Visualizer to draw objects in layers.
         :param visualize_opacity: Integer. Opacity of object. Between 0.0 and 1.0.
         :param **custom_properties: Optional. Any other keyword arguments. All these are treated as custom attributes.
@@ -114,7 +112,7 @@ class AgentBody(EnvObject):
 
         # Parse the action_set property if set to the wildcard "*" denoting all actions
         if self.action_set == "*":
-            self.action_set = list(get_all_classes(Action, omit_super_class=True).keys())
+            self.action_set = list(_get_all_classes(Action, omit_super_class=True).keys())
 
         # Defines an agent is blocked by an action which takes multiple time steps. Is updated based on the speed with
         # which an agent can perform actions.
@@ -382,3 +380,27 @@ class AgentBody(EnvObject):
     @property
     def is_blocked(self):
         return self.__is_blocked
+
+
+def _get_all_classes(class_, omit_super_class=False):
+    # Include given class or not
+    if omit_super_class:
+        subclasses = set()
+    else:
+        subclasses = {class_}
+
+    # Go through all child classes
+    work = [class_]
+    while work:
+        parent = work.pop()
+        for child in parent.__subclasses__():
+            if child not in subclasses:
+                subclasses.add(child)
+                work.append(child)
+
+    # Create a dict out of it
+    act_dict = {}
+    for action_class in subclasses:
+        act_dict[action_class.__name__] = action_class
+
+    return act_dict

@@ -1,5 +1,4 @@
-from matrx.utils.utils import get_default_value
-from matrx.utils.utils import next_obj_id, get_inheritence_path
+import matrx.defaults as defaults
 
 
 class EnvObject:
@@ -23,7 +22,7 @@ class EnvObject:
         action.
 
         A few properties are mandatory for the GridWorld, some Actions and the Visualizer to function. These are
-        keyword arguments (e.g. is_traversable). If these are not set, they are obtained from the defaults.json file.
+        keyword arguments (e.g. is_traversable). If these are not set, they are obtained from the defaults.py file.
 
         This class specific allows you to create any object you desire that only differs in the properties it holds. For
         example both a simple block or complex object such as a 'fire' can be modeled with this class. They only differ
@@ -47,24 +46,24 @@ class EnvObject:
 
         :param name: String. Mandatory. The name of object, does not need to be unique.
         :param location: List or tuple of length two. Mandatory. The location of the object in the grid world.
-        :param customizable_properties: List. Optional, default obtained from defaults.json. The list of attribute names
+        :param customizable_properties: List. Optional, default obtained from defaults.py. The list of attribute names
         that can be customized by other objects (including AgentAvatars and as an extension any Agent).
-        :param is_traversable: Boolean. Optional, default obtained from defaults.json. Signals whether other objects can
+        :param is_traversable: Boolean. Optional, default obtained from defaults.py. Signals whether other objects can
         be placed on top of this object.
-        :param carried_by: List. Optional, default obtained from defaults.json. A list of who is carrying this object.
+        :param carried_by: List. Optional, default obtained from defaults.py. A list of who is carrying this object.
         :param class_callable: Callable class. Optional, defaults to EnvObject. This is required to make a distinction
         between what kind of object is actually seen or visualized. The last element is always the lowest level class,
         whereas the first element is always EnvObject and everything in between are potential other classes in the
         inheritance chain.
-        :param visualize_size: Float. Optional, default obtained from defaults.json. A visualization property used by
+        :param visualize_size: Float. Optional, default obtained from defaults.py. A visualization property used by
         the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualization (e.g. a
         value of 0.5 is half of a square, object is in the center, a value of 2 is twice the square's size centered on
         its location.)
-        :param visualize_shape: Int. Optional, default obtained from defaults.json. A visualization property used by the
+        :param visualize_shape: Int. Optional, default obtained from defaults.py. A visualization property used by the
         Visualizer. Denotes the shape of the object in the visualization. 0=Rectangle, 1=Triangle, 2=Circle
-        :param visualize_colour: Hexcode string. Optional, default obtained from defaults.json. A visualization property
+        :param visualize_colour: Hexcode string. Optional, default obtained from defaults.py. A visualization property
         used by the Visualizer. Denotes the colour of the object in visualization.
-        :param visualize_depth: Integer. Optional, default obtained from defaults.json. A visualization property that
+        :param visualize_depth: Integer. Optional, default obtained from defaults.py. A visualization property that
         is used by the Visualizer to draw objects in layers.
         :param visualize_opacity: Integer. Opacity of the object. From 0.0 to 1.0.
         :param **custom_properties: Optional. Any other keyword arguments. All these are treated as custom attributes.
@@ -76,7 +75,7 @@ class EnvObject:
 
         # Obtain a unique ID based on a global object counter, if not already set as an attribute in a super class
         if not hasattr(self, "obj_id"):
-            self.obj_id = f"{self.obj_name}_{next_obj_id()}"
+            self.obj_id = f"{self.obj_name}_{_next_obj_id()}"
 
         # Make customizable_properties mutable if not given.
         if customizable_properties is None:
@@ -87,25 +86,27 @@ class EnvObject:
         # Set the class trace based on the given callable class object. This is required to make a distinction between
         # what kind of object is actually seen or visualized. The last element is always the lowest level class Object,
         # with the second last element being EnvObject. Any elements before that are custom EnvObject class names.
-        self.class_inheritance = get_inheritence_path(class_callable)
+        self.class_inheritance = _get_inheritence_path(class_callable)
 
-        # Load defaults if not given. We do this loading this low-level (instead of for example in the WorldFactory) for
-        # users to make it easier to build/extend their own WorldFactory and this way they do not have to deal with this
-        # It also helps if users want to create a GridWorld without using the WorldFactory.
+        # Load defaults if not given. We do this loading this low-level (
+        # instead of for example in the WorldFactory) for users to make it
+        # easier to build/extend their own WorldFactory and this way they do
+        # not have to deal with this.
         if is_traversable is None:
-            is_traversable = get_default_value(class_name="EnvObject", property_name="is_traversable")
+            is_traversable = defaults.ENVOBJECT_IS_TRAVERSABLE
         if visualize_size is None:
-            visualize_size = get_default_value(class_name="EnvObject", property_name="visualize_size")
+            visualize_size = defaults.ENVOBJECT_VIS_SIZE
         if visualize_shape is None:
-            visualize_shape = get_default_value(class_name="EnvObject", property_name="visualize_shape")
+            visualize_shape = defaults.ENVOBJECT_VIS_SHAPE
         if visualize_colour is None:
-            visualize_colour = get_default_value(class_name="EnvObject", property_name="visualize_colour")
+            visualize_colour = defaults.ENVOBJECT_VIS_COLOUR
         if visualize_opacity is None:
-            visualize_opacity = get_default_value(class_name="EnvObject", property_name="visualize_opacity")
+            visualize_opacity = defaults.ENVOBJECT_VIS_OPACITY
         if visualize_depth is None:
-            visualize_depth = get_default_value(class_name="EnvObject", property_name="visualize_depth")
+            visualize_depth = defaults.ENVOBJECT_VIS_DEPTH
         if is_movable is None:
-            is_movable = get_default_value(class_name="EnvObject", property_name="is_movable")
+            is_movable = defaults.ENVOBJECT_IS_MOVABLE
+
 
         # Set the mandatory properties
         self.visualize_depth = visualize_depth
@@ -261,3 +262,19 @@ class EnvObject:
         Here to protect the 'properties' variable. It does not do anything and should not do anything!
         """
         pass
+
+
+object_counter = 0
+
+
+def _next_obj_id():
+    global object_counter
+    res = object_counter
+    object_counter += 1
+    return res
+
+
+def _get_inheritence_path(callable_class):
+    parents = callable_class.mro()
+    parents = [str(p.__name__) for p in parents]
+    return parents
