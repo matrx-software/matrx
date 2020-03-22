@@ -5,7 +5,7 @@ class MessageManager:
     """ A manager inside the GirdWorld that tracks the received and send messages between agents and their teams.
 
         This gives provides several advantages;
-        - an easier connection between Core, API and Front-end for messages (e.g. to differentiate between messages send between agents and to teams in the Front-end through a simple API call: 'get_team_messages').
+        - an easier connection between Core, api and Front-end for messages (e.g. to differentiate between messages send between agents and to teams in the Front-end through a simple api call: 'get_team_messages').
         - an easy way to log communication (as the messages are easily obtained from a GridWorld instance, through some methods).
     """
 
@@ -31,7 +31,7 @@ class MessageManager:
             tick
                 Current tick of the gridworld
             messages
-                All messages sent from the agent brains in the gridworld, and received via the API
+                All messages sent from the agent brains in the gridworld, and received via the api
             all_agent_ids
                 IDs of all the agents
 
@@ -69,13 +69,13 @@ class MessageManager:
         "agent1"                  = private message to agent1 + team "agent1" if it exists
         ["agent1", "agent2"]      = 2 private messages + team messages if likewise named teams exist
         "team2"                   = team message sent to everyone in that team
-        '["agent3", "team4"]'     = team + agent message. Provided as a string via the API
+        '["agent3", "team4"]'     = team + agent message. Provided as a string via the api
         None                      = global message send to everyone
 
         Parameters
         ----------
         mssg
-            The original mssg object sent by the agent, or received via the API
+            The original mssg object sent by the agent, or received via the api
 
         all_agent_ids
             List with IDs of all agents
@@ -119,7 +119,7 @@ class MessageManager:
             is_team_message = False
 
             try:
-                # check if it is a list encoded as a string (sent via API)
+                # check if it is a list encoded as a string (sent via api)
                 to_ids = eval(mssg.to_id)
 
                 # create a new message addressed to this list of IDs, and reprocess

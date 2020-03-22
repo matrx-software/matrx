@@ -46,7 +46,7 @@ class GridWorld:
         self.__current_nr_ticks = 0  # The number of tick this GridWorld has ran already
         self.__is_initialized = False  # Whether this GridWorld is already initialized
         self.__message_buffer = {}  # dictionary of messages that need to be send to agents, with receiver ids as keys
-        self.message_manager = MessageManager() # keeps track of all messages and makes them available to the API
+        self.message_manager = MessageManager() # keeps track of all messages and makes them available to the api
 
     def initialize(self, api_info):
         # Only initialize when we did not already do so
@@ -57,21 +57,21 @@ class GridWorld:
             for agent_body in self.__registered_agents.values():
                 agent_body.brain_initialize_func()
 
-            # set the API variables
+            # set the api variables
             self.api_info = api_info
             self.__run_matrx_api = self.api_info['run_matrx_api']
             if self.__run_matrx_api:
-                # initialize this world in the API
+                # initialize this world in the api
                 api.reset_api()
                 api.tick_duration = self.__tick_duration
                 api.register_world(self.world_ID)
                 api.current_tick = self.__current_nr_ticks
                 api.grid_size = self.shape
-                # point the API towards our message manager, for making messages available via the API
+                # point the api towards our message manager, for making messages available via the api
                 api.gw_message_manager = self.message_manager
                 api.teams = self.__teams
 
-                # init API with world info
+                # init api with world info
                 api.MATRX_info =  {
                     "nr_ticks": self.__current_nr_ticks,
                     "curr_tick_timestamp": int(round(time.time() * 1000)),
@@ -96,7 +96,7 @@ class GridWorld:
                 print(f"@{os.path.basename(__file__)}: Initialized the GridWorld.")
 
     def fetch_initial_states(self):
-        """ MATRX starts paused by default, to prime the API and any connected GUI's, we fetch the first state
+        """ MATRX starts paused by default, to prime the api and any connected GUI's, we fetch the first state
         from all agents to send which can be shown while waiting for the experiment leader to press play.
         """
         for agent_id, agent_obj in self.__registered_agents.items():
@@ -106,7 +106,7 @@ class GridWorld:
             # filter other things from the agent state
             filtered_agent_state = agent_obj.filter_observations(state)
 
-            # save the current agent's state for the API
+            # save the current agent's state for the api
             api.add_state(agent_id=agent_id, state=filtered_agent_state,
                           agent_inheritence_chain=agent_obj.class_inheritance,
                           world_settings=api.MATRX_info)
@@ -119,7 +119,7 @@ class GridWorld:
         self.message_manager.agents = self.__registered_agents.keys()
         self.message_manager.teams = self.__teams
 
-        # make the information of this tick available via the API, after all
+        # make the information of this tick available via the api, after all
         # agents have been updated
         api.next_tick()
 
@@ -135,13 +135,13 @@ class GridWorld:
         while not is_done:
 
             if self.__run_matrx_api and api.matrx_paused:
-                print("MATRX paused through API")
+                print("MATRX paused through api")
                 gevent.sleep(1)
             else:
                 is_done, tick_duration = self.__step()
 
             if self.__run_matrx_api and api.matrx_done:
-                print("Scenario stopped through API")
+                print("Scenario stopped through api")
                 break
 
 
@@ -383,7 +383,7 @@ class GridWorld:
 
         # initialize a temporary dictionary in which all states of this tick
         # will be saved. After all agents have been updated, the new tick info
-        # will be made accessible via the API.
+        # will be made accessible via the api.
         if self.__run_matrx_api:
             api.temp_state = {}
 
@@ -407,10 +407,10 @@ class GridWorld:
             # because then we want to do that action. If not busy, call its get_action function.
             if agent_obj._check_agent_busy(curr_tick=self.__current_nr_ticks):
 
-                # only do the filter observation method to be able to update the agent's state to the API
+                # only do the filter observation method to be able to update the agent's state to the api
                 filtered_agent_state = agent_obj.filter_observations(state)
 
-                # save the current agent's state for the API
+                # save the current agent's state for the api
                 if self.__run_matrx_api:
                     api.add_state(agent_id=agent_id, state=filtered_agent_state,
                                   agent_inheritence_chain=agent_obj.class_inheritance,
@@ -418,7 +418,7 @@ class GridWorld:
 
             else:  # agent is not busy
 
-                # Any received data from the API for this HumanAgent is send along to the get_action function
+                # Any received data from the api for this HumanAgent is send along to the get_action function
                 if agent_obj.is_human_agent:
                     usrinp = None
                     if self.__run_matrx_api and agent_id in api.userinput:
@@ -449,7 +449,7 @@ class GridWorld:
                 # the agent is NOT busy)
                 agent_messages = agent_obj.get_messages_func(all_agent_ids)
 
-                # add any messages received from the API sent by this agent
+                # add any messages received from the api sent by this agent
                 if self.__run_matrx_api:
                     if agent_id in api.received_messages:
                         agent_messages += copy.copy(api.received_messages[agent_id])
@@ -461,7 +461,7 @@ class GridWorld:
                 self.message_manager.preprocess_messages(self.__current_nr_ticks, agent_messages,
                                                          all_agent_ids, self.__teams)
 
-            # save the current agent's state for the API
+            # save the current agent's state for the api
             if self.__run_matrx_api:
                 api.add_state(agent_id=agent_id, state=filtered_agent_state,
                               agent_inheritence_chain=agent_obj.class_inheritance,
@@ -489,7 +489,7 @@ class GridWorld:
             api.add_state(agent_id="god", state=self.__get_complete_state(), agent_inheritence_chain="god",
                           world_settings=self.__get_complete_state()['World'])
 
-            # make the information of this tick available via the API, after all
+            # make the information of this tick available via the api, after all
             # agents have been updated
             api.next_tick()
             api.current_tick = self.__current_nr_ticks

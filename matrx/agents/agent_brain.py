@@ -67,7 +67,7 @@ class AgentBrain:
         Since the grid world returns ALL properties of ALL objects within a certain range(s), but perhaps some objects
         are obscured because they are behind walls, or an agent is not able to see some properties of certain objects.
 
-        This method is separated from the decide_on_action() method because its return value is send to the API as well
+        This method is separated from the decide_on_action() method because its return value is send to the api as well
         to allows the agent's interface to only show that knowledge the agent is aware of.
 
         A number of utility methods exist to help filter and memorize states. See <TODO>
@@ -424,7 +424,7 @@ class AgentBrain:
     #     directed at every agent.
     #
     #     This is a static method such that it can also be accessed and used outside of this thread / the GridWorld loop.
-    #     Such as by the API.
+    #     Such as by the api.
     #
     #     Note; This method should NOT be overridden!
     #

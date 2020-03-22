@@ -29,13 +29,11 @@ setuptools.setup(
     ],
     install_requires=['Flask>=1.0.2',
                       'Flask-SocketIO>=3.3.2',
-                       'numpy>=1.15.4',
-                       'requests>=2.21.0',
-                       'colour>=0.1.5',
-                       'jsonpickle>=1.2',
-                       'gevent>=1.4.0',
-                       'flask-cors>=3.0.0',
-                       'numpydoc>=0.9.1'
+                      'numpy>=1.15.4',
+                      'requests>=2.21.0',
+                      'colour>=0.1.5',
+                      'gevent>=1.4.0',
+                      'flask-cors>=3.0.0'
     ],
     package_data={
         "matrx_visualizer": ["mockup/**/*", "templates/**/*", "static/**/*"],
