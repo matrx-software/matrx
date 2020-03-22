@@ -134,7 +134,7 @@ class AgentBrain:
                 agents.append(obj)
         selected_agent = self.rnd_gen.choice(agents)
         message_content = f"Hello, my name is {self.agent_name}"
-        # self.send_message(Message(content=message_content, from_id=self.agent_id, to_id=selected_agent['obj_id']))
+        self.send_message(Message(content=message_content, from_id=self.agent_id, to_id=selected_agent['obj_id']))
 
         # Select a random action
         if self.action_set:
@@ -416,15 +416,14 @@ class AgentBrain:
         self.rnd_seed = seed
         self.rnd_gen = np.random.RandomState(self.rnd_seed)
 
-
     # @staticmethod
     # def preprocess_messages(this_agent_id, agent_ids, messages):
     #     """ Preprocess messages for sending, such that they can be understood by the GridWorld.
     #     For example: if the receiver=None, this means it must be sent to all agents. This function creates a message
     #     directed at every agent.
     #
-    #     This is a static method such that it can also be accessed and used outside of this thread / the GridWorld loop.
-    #     Such as by the api.
+    #     This is a static method such that it can also be accessed and used outside of this thread / the GridWorld
+    #     loop. Such as by the api.
     #
     #     Note; This method should NOT be overridden!
     #
@@ -467,7 +466,6 @@ class AgentBrain:
     #
     #     return preprocessed_messages
 
-
     def _get_messages(self, all_agent_ids):
         """ Retrieves all message objects the agent has made in a tick, and returns those to the GridWorld for sending.
         It then removes all these messages!
@@ -475,17 +473,21 @@ class AgentBrain:
         This method is called by the GridWorld.
 
         Note; This method should NOT be overridden!
+
         Parameters
         ----------
         all_agent_ids
-            IDs of all agents
+            IDs of all agents+
+
         Returns
+        -------
             A list of message objects with a generic content, the sender (this agent's id) and optionally a
             receiver.
-        -------
+
         """
         # # preproccesses messages such that they can be understand by the gridworld
-        # preprocessed_messages = self.preprocess_messages(this_agent_id=self.agent_id, agent_ids=all_agent_ids, messages=self.messages_to_send)
+        # preprocessed_messages = self.preprocess_messages(this_agent_id=self.agent_id, agent_ids=all_agent_ids,
+        # messages=self.messages_to_send)
 
         send_messages = copy.copy(self.messages_to_send)
 
@@ -526,5 +528,3 @@ class AgentBrain:
         if not isinstance(mssg, Message):
             raise Exception(f"A message to {this_agent_id} is not, nor inherits from, the class {Message.__name__}."
                             f" This is required for agents to be able to send and receive them.")
-
-

@@ -94,10 +94,11 @@ class Wall(EnvObject):
 
 class AreaTile(EnvObject):
 
-    def __init__(self, location, name="AreaTile", visualize_colour="#8ca58c", visualize_depth=None, visualize_opacity=1.0):
+    def __init__(self, location, name="AreaTile", visualize_colour="#8ca58c", visualize_depth=None,
+                 visualize_opacity=1.0):
         """
-        A simple AreaTile object. Is always traversable, not movable, the colour can be set but has otherwise the default EnvObject
-        property values. Can be used to define different areas in the GridWorld.
+        A simple AreaTile object. Is always traversable, not movable, the colour can be set but has otherwise the
+        default EnvObject property values. Can be used to define different areas in the GridWorld.
         :param location: The location of the area.
         :param name: The name, default "AreaTile".
         :param visualize_colour: hex colour code for tile
@@ -108,7 +109,8 @@ class AreaTile(EnvObject):
 
 
 class SmokeTile(AreaTile):
-    def __init__(self, location, name="SmokeTile", visualize_colour="#b7b7b7", visualize_opacity=0.8, visualize_depth=101):
+    def __init__(self, location, name="SmokeTile", visualize_colour="#b7b7b7", visualize_opacity=0.8,
+                 visualize_depth=101):
         """
         An object representing one tile of smoke. Is always traversable, not movable,
         and square shaped. Can be transparent.
@@ -120,8 +122,7 @@ class SmokeTile(AreaTile):
         """
         visualize_depth = 101 if visualize_depth is None else visualize_depth
         super().__init__(name=name, location=location, visualize_colour=visualize_colour,
-                        visualize_opacity=visualize_opacity, visualize_depth=visualize_depth)
-
+                         visualize_opacity=visualize_opacity, visualize_depth=visualize_depth)
 
 
 class Battery(EnvObject):

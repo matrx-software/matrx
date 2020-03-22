@@ -23,7 +23,7 @@ class Message:
         self.to_id = to_id  # the agent id who is the sender, when None it means all agents, including the sender
         self.message_id = self.__gen_random_string()  # randomly generated ID of the message
 
-    def toJSON(self):
+    def to_json(self):
         """ Make this class JSON serializable, such that it can be sent as JSON via the api """
         return json.dumps(self, default=lambda o: o.__dict__,
                           sort_keys=True, indent=4)

@@ -208,7 +208,8 @@ class AStarPlanner(PathPlanner):
         """
         A star algorithm, returns the shortest path to get from goal to start.
         Uses an 2D numpy array, with 0 being traversable, anything else (e.g. 1) not traversable
-        Implementation from: https://www.analytics-link.com/single-post/2018/09/14/Applying-the-A-Path-Finding-Algorithm-in-Python-Part-1-2D-square-grid
+        Implementation from:
+        https://www.analytics-link.com/single-post/2018/09/14/Applying-the-A-Path-Finding-Algorithm-in-Python-Part-1-2D-square-grid
         """
 
         # possible movements

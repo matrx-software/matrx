@@ -67,8 +67,7 @@ class HumanAgentBrain(AgentBrain):
         else:
             self.key_action_map = key_action_map
 
-
-    def _get_action(self, state, agent_properties, agent_id, userinput):
+    def _get_action(self, state, agent_properties, agent_id, user_input):
         """
         The function the environment calls. The environment receives this function object and calls it when it is time
         for this agent to select an action.
@@ -84,7 +83,7 @@ class HumanAgentBrain(AgentBrain):
         :param agent_properties: The properties of the agent, which might have been changed by the
         environment as a result of actions of this or other agents.
         :param agent_id: the ID of this agent
-        :param userinput: any userinput given by the user for this human agent via the api
+        :param user_input: any user input given by the user for this human agent via the api
         :return: The filtered state of this agent, the agent properties which the agent might have changed,
         and an action string, which is the class name of one of the actions in the Action package.
         """
@@ -95,8 +94,8 @@ class HumanAgentBrain(AgentBrain):
         # first filter the state to only show things this particular agent can see
         filtered_state = self.filter_observations(state)
 
-        # only keep userinput which is actually connected to an agent action
-        usrinput = self.filter_userinput(userinput)
+        # only keep user input which is actually connected to an agent action
+        usrinput = self.filter_user_input(user_input)
 
         # Call the method that decides on an action
         action, action_kwargs = self.decide_on_action(filtered_state, usrinput)
@@ -108,8 +107,7 @@ class HumanAgentBrain(AgentBrain):
         # action if needed.
         return filtered_state, self.agent_properties, action, action_kwargs
 
-
-    def decide_on_action(self, state, usrinput):
+    def decide_on_action(self, state, user_input):
         """ Contains the decision logic of the agent.
 
         This method determines what action the human agent will perform. The GridWorld is responsible for deciding when
@@ -120,11 +118,8 @@ class HumanAgentBrain(AgentBrain):
         keys the names of the keyword arguments. An argument that is always possible is that of action_duration, which
         denotes how many ticks this action should take (e.g. a duration of 1, makes sure the agent has to wait 1 tick).
 
-        To quickly build a fairly intelligent (human) agent, several utility classes and methods are available.
-        See <TODO>.
-
         Note; this function of the human_agent_brain overwrites the decide_on_action() function of the default agent,
-        also providing the usrinput.
+        also providing the user input.
 
 
         Parameters
@@ -133,7 +128,7 @@ class HumanAgentBrain(AgentBrain):
             A state description containing all properties of EnvObject that are within a certain range as
             defined by self.sense_capability. It is a list of properties in a dictionary
 
-        usrinput: list
+        user_input: list
             A dictionary containing the key presses of the user, intended for controlling thus human agent.
 
         Returns
@@ -153,11 +148,11 @@ class HumanAgentBrain(AgentBrain):
         action_kwargs = {}
 
         # if no keys were pressed, do nothing
-        if usrinput is None or usrinput == []:
+        if user_input is None or user_input == []:
             return None, {}
 
         # take the latest pressed key (for now), and fetch the action associated with that key
-        pressed_keys = usrinput[-1]
+        pressed_keys = user_input[-1]
         action = self.key_action_map[pressed_keys]
 
         # if the user chose a grab action, choose an object within a grab_range of 1
@@ -215,7 +210,6 @@ class HumanAgentBrain(AgentBrain):
 
         return action, action_kwargs
 
-
     def filter_observations(self, state):
         """
         All our agent work through the OODA-loop paradigm; first you observe, then you orient/pre-process, followed by
@@ -236,12 +230,12 @@ class HumanAgentBrain(AgentBrain):
         """
         return state
 
-    def filter_userinput(self, userinput):
+    def filter_user_input(self, user_input):
         """
         From the received userinput, only keep those which are actually Connected
         to a specific agent action
         """
-        if userinput is None:
+        if user_input is None:
             return []
         possible_key_presses = list(self.key_action_map.keys())
-        return list(set(possible_key_presses) & set(userinput))
+        return list(set(possible_key_presses) & set(user_input))

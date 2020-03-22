@@ -45,10 +45,10 @@ def create_builder():
         's': MoveSouth.__name__,
         'a': MoveWest.__name__
     }
-    factory.add_human_agent([5,5], HumanAgentBrain(), name="human",
+    factory.add_human_agent([5, 5], HumanAgentBrain(), name="human",
                             key_action_map=key_action_map, img_name="/static/images/transparent.png")
 
-    factory.add_human_agent([6,6], HumanAgentBrain(), name="human2",
+    factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
                             key_action_map=key_action_map, img_name="/img/agent_external.gif")
 
     return factory
