@@ -1,5 +1,5 @@
 import os
-from matrx.use_cases import vis_test
+from matrx.cases import vis_test
 
 if __name__ == "__main__":
 
