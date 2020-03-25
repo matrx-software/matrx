@@ -49,6 +49,6 @@ def create_builder():
                             key_action_map=key_action_map, img_name="/static/images/transparent.png")
 
     factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
-                            key_action_map=key_action_map, img_name="/img/agent_external.gif")
+                            key_action_map=key_action_map, img_name="/static/images/agent.gif")
 
     return factory
