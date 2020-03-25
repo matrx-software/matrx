@@ -1,29 +1,28 @@
 import numpy as np
 
-from matrx.actions.action import Action, ActionResult
-from matrx.objects.standard_objects import Door
+from matrxs.actions.action import Action, ActionResult
+from matrxs.objects.simple_objects import Door
 
 
 class OpenDoorAction(Action):
+    """ Action that opens doors.
+
+    The action that opens a specific door within a given range from the agent.
+
+    Parameters
+    ----------
+    duration_in_ticks : int
+        Optional, default: ``1``. Should be zero or larger.
+
+        The default duration of this action in ticks during which the
+        :class:`matrxs.grid_world.GridWorld` blocks the
+        :class:`matrxs.agents.agent.Agent` performing other actions. By default
+        this is 1, meaning that this action  will take both the tick in which
+        it was decided upon and the subsequent tick.
+
+    """
 
     def __init__(self, duration_in_ticks=1):
-        """ Action that opens doors.
-
-        The action that opens a specific door within a given range from the agent.
-
-        Parameters
-        ----------
-        duration_in_ticks : int
-            Optional, default: ``1``. Should be zero or larger.
-
-            The default duration of this action in ticks during which the
-            :class:`matrxs.grid_world.GridWorld` blocks the
-            :class:`matrxs.agents.agent.Agent` performing other actions. By default
-            this is 1, meaning that this action  will take both the tick in which
-            it was decided upon and the subsequent tick.
-
-        """
-
         super().__init__(duration_in_ticks)
 
     def mutate(self, grid_world, agent_id, **kwargs):
@@ -124,23 +123,23 @@ class OpenDoorAction(Action):
 
 
 class CloseDoorAction(Action):
+    """ Action that opens doors.
+
+    The action that closes a specific door within a given range from the agent.
+
+    Parameters
+    ----------
+    duration_in_ticks : int
+        Optional. Default: ``1``. Should be zero or larger.
+
+        The default duration of this action in ticks during which the
+        :class:`matrxs.grid_world.GridWorld` blocks the agent performing
+        other actions. By default this is 1, meaning that this action will take
+        both the tick in which it was decided upon and the subsequent tick.
+
+    """
 
     def __init__(self, duration_in_ticks=1):
-        """ Action that opens doors.
-
-        The action that closes a specific door within a given range from the agent.
-
-        Parameters
-        ----------
-        duration_in_ticks : int
-            Optional. Default: ``1``. Should be zero or larger.
-
-            The default duration of this action in ticks during which the
-            :class:`matrxs.grid_world.GridWorld` blocks the agent performing
-            other actions. By default this is 1, meaning that this action will take
-            both the tick in which it was decided upon and the subsequent tick.
-
-        """
         super().__init__(duration_in_ticks)
 
     def mutate(self, grid_world, agent_id, **kwargs):
@@ -240,87 +239,125 @@ class CloseDoorAction(Action):
 
 
 class CloseDoorActionResult(ActionResult):
+    """ ActionResult for the CloseDoorAction.
+
+    The results uniquely for
+    :class:`matrxs.actions.action.door_actions.CloseDoorAction` are (as class
+    constants):
+
+    * RESULT_SUCCESS: When the action is a success.
+    * NO_DOORS_IN_RANGE: When no door objects are within the specified range.
+    * NOT_IN_RANGE: When the given `object_id` is not within the specified
+      range.
+    * NOT_A_DOOR: When the given `object_id` does not exist.
+    * DOOR_ALREADY_CLOSED: When the door is already closed.
+    * DOOR_BLOCKED: When another object is at the door's location.
+    * NO_OBJECT_SPECIFIED: When `object_id` is not given.
+
+    Parameters
+    ----------
+    result : str
+        A string representing the reason for the (expected) success or fail of
+        a :class:`matrxs.actions.door_actions.CloseDoorAction`.
+    succeeded : bool
+        A boolean representing the (expected) success or fail of a
+        :class:`matrxs.actions.door_actions.CloseDoorAction`.
+
+    See Also
+    --------
+    CloseDoorAction
+
+    """
+
+    """Result when the CloseDoorAction is a success. """
     RESULT_SUCCESS = "Door was succesfully closed."
+
+    """Result when no Door objects are within the specified range. """
     NO_DOORS_IN_RANGE = "No door found in range"
+
+    """Result when the given object_id is not within the specified range. """
     NOT_IN_RANGE = "Specified door is not within range."
-    NOT_A_DOOR = "CloseDoor action could not be performed, as object isn't a door"
-    RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
+
+    """Result wen the given object_id does not exist. """
+    NOT_A_DOOR = "CloseDoor action could not be performed, as object isn't " \
+                 "a door"
+
+    """Result not used. """
+    RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown ' \
+                                 'what to do'
+
+    """Result when the Door is already closed. """
     DOOR_ALREADY_CLOSED = "Can't close door, door is already closed."
-    DOOR_BLOCKED = "Can't close door, object or agent is blocking the door opening."
+
+    """Result when another object is at the Door's location. """
+    DOOR_BLOCKED = "Can't close door, object or agent is blocking the door " \
+                   "opening."
+
+    """Result when object_id is not given. """
     NO_OBJECT_SPECIFIED = "No object_id of a door specified to close."
 
     def __init__(self, result, succeeded):
-        """ ActionResult for the CloseDoorAction.
-
-        The results uniquely for
-        :class:`matrxs.actions.action.door_actions.CloseDoorAction` are (as class
-        constants):
-
-        * RESULT_SUCCESS: When the action is a success.
-        * NO_DOORS_IN_RANGE: When no door objects are within the specified range.
-        * NOT_IN_RANGE: When the given `object_id` is not within the specified
-          range.
-        * NOT_A_DOOR: When the given `object_id` does not exist.
-        * DOOR_ALREADY_CLOSED: When the door is already closed.
-        * DOOR_BLOCKED: When another object is at the door's location.
-        * NO_OBJECT_SPECIFIED: When `object_id` is not given.
-
-        Parameters
-        ----------
-        result : str
-            A string representing the reason for the (expected) success or fail of
-            a :class:`matrxs.actions.door_actions.CloseDoorAction`.
-        succeeded : bool
-            A boolean representing the (expected) success or fail of a
-            :class:`matrxs.actions.door_actions.CloseDoorAction`.
-
-        See Also
-        --------
-        CloseDoorAction
-
-        """
         super().__init__(result, succeeded)
 
 
 class OpenDoorActionResult(ActionResult):
+    """ ActionResult for the OpenDoorAction.
+
+    The results uniquely for
+    :class:`matrxs.actions.door_actions.OpenDoorAction` are (as class
+    constants):
+
+    * RESULT_SUCCESS: When the action is a success.
+    * NO_DOORS_IN_RANGE: When no door objects are within the specified range.
+    * NOT_IN_RANGE: When the given `object_id` is not within the specified
+      range.
+    * NOT_A_DOOR: When the given `object_id` does not exist.
+    * DOOR_ALREADY_OPEN: When the door is already open.
+    * NO_OBJECT_SPECIFIED: When `object_id` is not given.
+
+    Parameters
+    ----------
+    result : str
+        A string representing the reason for the (expected) success or fail of
+        an :class:`matrxs.actions.door_actions.OpenDoorAction`.
+    succeeded : bool
+        A boolean representing the (expected) success or fail of an
+        :class:`matrxs.actions.door_actions.OpenDoorAction`.
+
+    See Also
+    --------
+    OpenDoorAction
+
+    """
+
+    """Result when the OpenDoorAction is a success. """
     RESULT_SUCCESS = "Door was successfully opened."
+
+    """Result when no Door objects are within the specified range. """
     NO_DOORS_IN_RANGE = "No door found in range"
+
+    """Result when the given object_id is not within the specified range. """
     NOT_IN_RANGE = "Specified door is not within range."
-    NOT_A_DOOR = "OpenDoor action could not be performed, as object isn't a door"
-    RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown what to do'
+
+    """Result when the given object_id does not exist. """
+    NOT_A_DOOR = "OpenDoor action could not be performed, as object isn't " \
+                 "a door"
+
+    """Result not used. """
+    RESULT_UNKNOWN_OBJECT_TYPE = 'obj_id is no Agent and no Object, unknown ' \
+                                 'what to do'
+
+    """Result when the Door is already open. """
     DOOR_ALREADY_OPEN = "Can't open door, door is already open"
-    DOOR_BLOCKED = "Can't close door, object or agent is blocking the door opening."
+
+    """Result not used. """
+    DOOR_BLOCKED = "Can't close door, object or agent is blocking the door " \
+                   "opening."
+
+    """Result when object_id is not given. """
     NO_OBJECT_SPECIFIED = "No object_id of a door specified to open."
 
     def __init__(self, result, succeeded):
-        """ ActionResult for the OpenDoorAction.
-
-        The results uniquely for
-        :class:`matrxs.actions.door_actions.OpenDoorAction` are (as class
-        constants):
-
-        * RESULT_SUCCESS: When the action is a success.
-        * NO_DOORS_IN_RANGE: When no door objects are within the specified range.
-        * NOT_IN_RANGE: When the given `object_id` is not within the specified
-          range.
-        * NOT_A_DOOR: When the given `object_id` does not exist.
-        * DOOR_ALREADY_OPEN: When the door is already open.
-        * NO_OBJECT_SPECIFIED: When `object_id` is not given.
-
-        Parameters
-        ----------
-        result : str
-            A string representing the reason for the (expected) success or fail of
-            an :class:`matrxs.actions.door_actions.OpenDoorAction`.
-        succeeded : bool
-            A boolean representing the (expected) success or fail of an
-            :class:`matrxs.actions.door_actions.OpenDoorAction`.
-
-        See Also
-        --------
-        OpenDoorAction
-
-        """
         super().__init__(result, succeeded)
 
 

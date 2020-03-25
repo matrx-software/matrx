@@ -2,10 +2,10 @@ import collections
 
 import numpy as np
 
-from matrx.actions.action import Action, ActionResult
-from matrx.utils import get_distance
-from matrx.objects.agent_body import AgentBody
-from matrx.objects.standard_objects import AreaTile
+from matrxs.actions.action import Action, ActionResult
+from matrxs.utils.utils import get_distance
+from matrxs.objects.agent_body import AgentBody
+from matrxs.objects.simple_objects import AreaTile
 
 
 class RemoveObject(Action):
@@ -847,6 +847,7 @@ class DropObject(Action):
             * RESULT_NONE_GIVEN: When the given obj_id is not being carried by
               the agent.
             * RESULT_NO_OBJECT: When no obj_id is given.
+
 
         """
         reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
