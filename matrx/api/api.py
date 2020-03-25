@@ -227,7 +227,7 @@ def get_messages_specific_agent(tick, agent_id):
 
     """
     # check for validity and return an error if not valid
-    api_call_valid, error = check_messages_API_request(tick=tick, id=agent_id)
+    api_call_valid, error = check_messages_API_request(tick=tick, agent_id=agent_id)
     if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -286,7 +286,7 @@ def get_latest_messages_specific_agent(agent_id):
 
     """
     # check for validity and return an error if not valid
-    api_call_valid, error = check_messages_API_request(tick=current_tick, id=agent_id)
+    api_call_valid, error = check_messages_API_request(tick=current_tick, agent_id=agent_id)
     if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -507,12 +507,14 @@ def clean_input_ids(ids):
         return [ids]
 
 
-def check_messages_API_request(tick=None):
+def check_messages_API_request(tick=None, agent_id=None):
     """ Checks if the variables of the api request are valid, and if the requested information exists
 
     Parameters
     ----------
     tick
+
+    agent_id
 
     Returns
     -------

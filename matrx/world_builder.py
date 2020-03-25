@@ -961,7 +961,7 @@ class WorldBuilder:
     def __create_grid_world(self):
         args = self.world_settings
         # create a world ID in the shape of "world_" + world number + seeded random int
-        args['world_ID'] = f"world_{self.worlds_created}"
+        args['world_id'] = f"world_{self.worlds_created}"
         world = GridWorld(**args)
         return world
 

@@ -424,7 +424,7 @@ class GridWorld:
 
                     filtered_agent_state, agent_properties, action_class_name, action_kwargs = \
                         agent_obj.get_action_func(state=state, agent_properties=agent_obj.properties, agent_id=agent_id,
-                                                  userinput=usrinp)
+                                                  user_input=usrinp)
                 else:  # not a HumanAgent
 
                     # perform the agent's get_action method (goes through filter_observations and decide_on_action)
