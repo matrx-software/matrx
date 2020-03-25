@@ -13,10 +13,14 @@ class OpenDoorAction(Action):
 
         Parameters
         ----------
-        duration_in_ticks : int, optional (default=1)
-            The default duration of OpenDoorAction in ticks during which the GridWorld blocks the Agent performing other
-            actions. By default this is 1, meaning that the OpenDoorAction will take both the tick in which it was
-            decided upon and the subsequent tick. Should be zero or larger.
+        duration_in_ticks : int
+            Optional, default: ``1``. Should be zero or larger.
+
+            The default duration of this action in ticks during which the
+            :class:`matrxs.grid_world.GridWorld` blocks the
+            :class:`matrxs.agents.agent.Agent` performing other actions. By default
+            this is 1, meaning that this action  will take both the tick in which
+            it was decided upon and the subsequent tick.
 
         """
 
@@ -25,28 +29,41 @@ class OpenDoorAction(Action):
     def mutate(self, grid_world, agent_id, **kwargs):
         """ Opens a door in the world.
 
-        Mutates a Door object's door_status in the GridWorld to be open (and as such passable). It does so only if the
-        Door object id exists (given as the object_id parameter) and the Door is within range (which is 1 by default, or
-        overridden by a door_range parameter).
+        Mutates the `door_status` of an
+        :class:`matrxs.objects.simple_objects.Door` in the
+        :class:`matrxs.grid_world.GridWorld` to be open (and as such passable).
+        It does so only if the `object_id` exists, is a
+        :class:`matrxs.objects.simple_objects.Door`, and is within
+        `door_range`.
 
         Parameters
         ----------
         grid_world : GridWorld
-            The GridWorld instance in which the door is sought according to the object_id parameter.
-        agent_id : string
-            The string representing the unique identified that represents the agent performing this action.
-        object_id : string, optional (default=None)
-            The string representing the unique identifier of the door that should be opened.
-        door_range : int, optional (default=np.inf)
-            The maximum allowed distance between the agent and the door for the agent to be able to open that door.
+            The :class:`matrxs.grid_world.GridWorld` instance in which the
+            door is sought according to the `object_id` parameter.
+        agent_id : str
+            The string representing the unique identifier that represents the
+            agent performing this action.
+        object_id : st
+            Optional. Default: ``None``
+
+            The string representing the unique identifier of the door that
+            should be opened.
+        door_range : int
+            Optional. Default: ``np.inf``
+
+            The maximum allowed distance between the agent and the door for
+            the agent to be able to open that door.
 
         Returns
         -------
         OpenDoorActionResult
-            The ActionResult depicting the action's success or failure and reason for that result.
-            Returns the following results:
-            OpenDoorActionResult.NO_OBJECT_SPECIFIED    : When no object_id was given.
-            OpenDoorActionResult.RESULT_SUCCESS         : When the door is opened.
+            The ActionResult depicting the action's success or failure and
+            reason for that result.
+
+            See :class:`matrxs.actions.simple_objects.OpenDoorActionResult` for
+            the results it can return.
+
         """
 
         # fetch options
@@ -72,25 +89,30 @@ class OpenDoorAction(Action):
         Parameters
         ----------
         grid_world : GridWorld
-            The GridWorld instance in which the door is sought according to the object_id parameter.
-        agent_id : string
-            The string representing the unique identified that represents the agent performing this action.
-        object_id : string, optional (default=None)
-            The string representing the unique identifier of the door that should be opened.
-        door_range : int, optional (default=np.inf)
-            The maximum allowed distance between the agent and the door for the agent to be able to open that door.
+            The :class:`matrxs.grid_world.GridWorld` instance in which the door
+             is sought according to the `object_id` parameter.
+        agent_id : str
+            The string representing the unique identifier that represents the
+            agent performing this action.
+        object_id : str
+            Optional. Default: ``None``
+
+            The string representing the unique identifier of the door that
+            should be opened.
+        door_range : int
+            Optional. Default: ``np.inf``
+
+            The maximum allowed distance between the agent and the door for
+            the agent to be able to open that door.
 
         Returns
         -------
         OpenDoorActionResult
-            The ActionResult determining the expected result of an OpenDoorAction with the given parameters.
-            Can return the following results:
-            OpenDoorActionResult.NO_DOORS_IN_RANGE      : When no EnvObject of type Door are in range.
-            OpenDoorActionResult.NOT_A_DOOR             : When the given object_id does not exist.
-            OpenDoorActionResult.NOT_A_DOOR             : When the given object_id does not exist.
-            OpenDoorActionResult.NOT_IN_RANGE           : When the given object_id it not within range.
-            OpenDoorActionResult.DOOR_ALREADY_OPEN      : When the Door object is already open.
-            OpenDoorActionResult.SUCCESS                : When the door can be successfully opened.
+            Depicts the action's expected success or failure and reason for
+            that result.
+
+            See :class:`matrxs.actions.simple_objects.OpenDoorActionResult` for
+            the results it can return.
 
         """
         # fetch options
@@ -104,16 +126,19 @@ class OpenDoorAction(Action):
 class CloseDoorAction(Action):
 
     def __init__(self, duration_in_ticks=1):
-        """ Action that closes doors.
+        """ Action that opens doors.
 
         The action that closes a specific door within a given range from the agent.
 
         Parameters
         ----------
-        duration_in_ticks : int, optional (default=1)
-            The default duration of CloseDoorAction in ticks during which the GridWorld blocks the Agent performing
-            other actions. By default this is 1, meaning that the OpenDoorAction will take both the tick in which it was
-            decided upon and the subsequent tick. Should be zero or larger.
+        duration_in_ticks : int
+            Optional. Default: ``1``. Should be zero or larger.
+
+            The default duration of this action in ticks during which the
+            :class:`matrxs.grid_world.GridWorld` blocks the agent performing
+            other actions. By default this is 1, meaning that this action will take
+            both the tick in which it was decided upon and the subsequent tick.
 
         """
         super().__init__(duration_in_ticks)
@@ -121,29 +146,40 @@ class CloseDoorAction(Action):
     def mutate(self, grid_world, agent_id, **kwargs):
         """ Closes a door in the world.
 
-        Mutates a Door object's door_status in the GridWorld to be closed (and as such not passable). It does so only if
-        the Door object id exists (given as the object_id parameter) and the Door is within range (which is 1 by
-        default, or overridden by a door_range parameter).
+        Mutates the `door_status` of an
+        :class:`matrxs.objects.simple_objects.Door` in the
+        :class:`matrxs.grid_world.GridWorld` to be closed (and as such not
+        passable). It does so only if the `object_id` exists, is a
+        :class:`matrxs.objects.simple_objects.Door`, and is within
+        `door_range`.
 
         Parameters
         ----------
         grid_world : GridWorld
-            The GridWorld instance in which the door is sought according to the object_id parameter.
-        agent_id : string
-            The string representing the unique identified that represents the agent performing this action.
-        object_id : string, optional (default=None)
-            The string representing the unique identifier of the door that should be opened.
-        door_range : int, optional (default=np.inf)
-            The maximum allowed distance between the agent and the door for the agent to be able to open that door.
+            The :class:`matrxs.grid_world.GridWorld` instance in which the
+            door is sought according to the `object_id` parameter.
+        agent_id : str
+            The string representing the unique identifier that represents the
+            agent performing this action.
+        object_id : st
+            Optional. Default: ``None``
+
+            The string representing the unique identifier of the door that
+            should be closed.
+        door_range : int
+            Optional. Default: ``np.inf``
+
+            The maximum allowed distance between the agent and the door for
+            the agent to be able to close that door.
 
         Returns
         -------
-        CloseDoorActionResult
-            The ActionResult determining the expected result of an CloseDoorAction with the given parameters.
-            Can return the following results:
-            The ActionResult depicting the action's success or failure and reason for that result.
-            OpenDoorActionResult.NO_OBJECT_SPECIFIED    : When no object_id was given.
-            OpenDoorActionResult.RESULT_SUCCESS         : When the door is opened.
+        OpenDoorActionResult
+            Depicts the action's success or failure and reason for that result.
+
+            See :class:`matrxs.actions.simple_objects.CloseDoorActionResult`
+            for the results it can return.
+
         """
 
         # fetch options
@@ -164,31 +200,35 @@ class CloseDoorAction(Action):
         return result
 
     def is_possible(self, grid_world, agent_id, **kwargs):
-        """Check if the OpenDoorAction is possible.
+        """Check if the CloseDoorAction is possible.
 
         Parameters
         ----------
         grid_world : GridWorld
-            The GridWorld instance in which the door is sought according to the object_id parameter.
-        agent_id : string
-            The string representing the unique identified that represents the agent performing this action.
-        object_id : string, optional (default=None)
-            The string representing the unique identifier of the door that should be opened.
-        door_range : int, optional (default=np.inf)
-            The maximum allowed distance between the agent and the door for the agent to be able to open that door.
+            The :class:`matrxs.grid_world.GridWorld` instance in which the door
+             is sought according to the `object_id` parameter.
+        agent_id : str
+            The string representing the unique identifier that represents the
+            agent performing this action.
+        object_id : str
+            Optional. Default: ``None``
+
+            The string representing the unique identifier of the door that
+            should be closed.
+        door_range : int
+            Optional. Default: ``np.inf``
+
+            The maximum allowed distance between the agent and the door for
+            that agent to be able to close that door.
 
         Returns
         -------
         OpenDoorActionResult
-            The ActionResult determining the expected result of an CloseDoorAction with the given parameters.
-            Returns the following results:
-            CloseDoorActionResult.NO_DOORS_IN_RANGE      : When no EnvObject of type Door are in range.
-            CloseDoorActionResult.NOT_A_DOOR             : When the given object_id does not exist.
-            CloseDoorActionResult.NOT_A_DOOR             : When the given object_id does not exist.
-            CloseDoorActionResult.NOT_IN_RANGE           : When the given object_id it not within range.
-            CloseDoorActionResult.DOOR_ALREADY_CLOSED    : When the Door object is already closed.
-            CloseDoorActionResult.DOOR_BLOCKED           : When there is another object at the Door's location.
-            CloseDoorActionResult.SUCCESS                : When the door can be successfully opened.
+            Depicts the action's expected success or failure and reason for
+            that result.
+
+            See :class:`matrxs.actions.door_actions.CloseDoorActionResult`
+            for the results it can return.
 
         """
         # fetch options
@@ -210,23 +250,29 @@ class CloseDoorActionResult(ActionResult):
     NO_OBJECT_SPECIFIED = "No object_id of a door specified to close."
 
     def __init__(self, result, succeeded):
-        """ ActionResult for the CloseDoorAction
+        """ ActionResult for the CloseDoorAction.
 
-        The results uniquely for CloseDoorAction are (as class constants):
-        CloseDoorActionResult.RESULT_SUCCESS         : When the CloseDoorAction is a success.
-        CloseDoorActionResult.NO_DOORS_IN_RANGE      : When no Door objects are within the specified range.
-        CloseDoorActionResult.NOT_IN_RANGE           : When the given object_id is not within the specified range.
-        CloseDoorActionResult.NOT_A_DOOR             : When the given object_id does not exist.
-        CloseDoorActionResult.DOOR_ALREADY_CLOSED    : When the Door is already closed.
-        CloseDoorActionResult.DOOR_BLOCKED           : When another object is at the Door's location.
-        CloseDoorActionResult.NO_OBJECT_SPECIFIED    : When object_id is not given.
+        The results uniquely for
+        :class:`matrxs.actions.action.door_actions.CloseDoorAction` are (as class
+        constants):
+
+        * RESULT_SUCCESS: When the action is a success.
+        * NO_DOORS_IN_RANGE: When no door objects are within the specified range.
+        * NOT_IN_RANGE: When the given `object_id` is not within the specified
+          range.
+        * NOT_A_DOOR: When the given `object_id` does not exist.
+        * DOOR_ALREADY_CLOSED: When the door is already closed.
+        * DOOR_BLOCKED: When another object is at the door's location.
+        * NO_OBJECT_SPECIFIED: When `object_id` is not given.
 
         Parameters
         ----------
-        result : string
-            A string representing the reason for an CloseDoorAction's (expected) success or fail.
-        succeeded : boolean
-            A boolean representing the (expected) success or fail of an CloseDoorAction.
+        result : str
+            A string representing the reason for the (expected) success or fail of
+            a :class:`matrxs.actions.door_actions.CloseDoorAction`.
+        succeeded : bool
+            A boolean representing the (expected) success or fail of a
+            :class:`matrxs.actions.door_actions.CloseDoorAction`.
 
         See Also
         --------
@@ -247,22 +293,28 @@ class OpenDoorActionResult(ActionResult):
     NO_OBJECT_SPECIFIED = "No object_id of a door specified to open."
 
     def __init__(self, result, succeeded):
-        """ ActionResult for the OpenDoorAction
+        """ ActionResult for the OpenDoorAction.
 
-        The results uniquely for OpenDoorAction are (as class constants):
-        OpenDoorActionResult.RESULT_SUCCESS         : When the OpenDoorAction is a success.
-        OpenDoorActionResult.NO_DOORS_IN_RANGE      : When no Door objects are within the specified range.
-        OpenDoorActionResult.NOT_IN_RANGE           : When the given object_id is not within the specified range.
-        OpenDoorActionResult.NOT_A_DOOR             : When the given object_id does not exist.
-        OpenDoorActionResult.DOOR_ALREADY_OPEN      : When the Door is already open.
-        OpenDoorActionResult.NO_OBJECT_SPECIFIED    : When object_id is not given.
+        The results uniquely for
+        :class:`matrxs.actions.door_actions.OpenDoorAction` are (as class
+        constants):
+
+        * RESULT_SUCCESS: When the action is a success.
+        * NO_DOORS_IN_RANGE: When no door objects are within the specified range.
+        * NOT_IN_RANGE: When the given `object_id` is not within the specified
+          range.
+        * NOT_A_DOOR: When the given `object_id` does not exist.
+        * DOOR_ALREADY_OPEN: When the door is already open.
+        * NO_OBJECT_SPECIFIED: When `object_id` is not given.
 
         Parameters
         ----------
-        result : string
-            A string representing the reason for an OpenDoorAction's (expected) success or fail.
-        succeeded : boolean
-            A boolean representing the (expected) success or fail of an OpenDoorAction.
+        result : str
+            A string representing the reason for the (expected) success or fail of
+            an :class:`matrxs.actions.door_actions.OpenDoorAction`.
+        succeeded : bool
+            A boolean representing the (expected) success or fail of an
+            :class:`matrxs.actions.door_actions.OpenDoorAction`.
 
         See Also
         --------
@@ -275,27 +327,39 @@ class OpenDoorActionResult(ActionResult):
 def _is_possible_door_open_close(grid_world, agent_id, action_result, object_id=None, door_range=np.inf):
     """ Private MATRX method.
 
-    Checks if a door can be opened/closed with the given OpenDoorAction / CloseDoorAction parameters respectively.
+    Checks if a door can be opened/closed based on the given `action_result`
+    parameter.
 
     Parameters
     ----------
     grid_world : GridWorld
-        The GridWorld instance in which the door is sought according to the object_id parameter.
-    agent_id : string
-        The string representing the unique identified that represents the agent performing this action.
+        The :class:`matrxs.grid_world.GridWorld` instance in which the door is
+         sought according to the `object_id` parameter.
+    agent_id : str
+        The string representing the unique identified that represents the agent
+        performing this action.
     action_result : {Type[OpenDoorActionResult], Type[CloseDoorActionResult]}
-        The type of the ActionResult that should be returned. Also used to determine for which kind of Action this check
-        is made (OpenDoorAction or CloseDoorAction).
-    object_id : string, optional (default=None)
-        The string representing the unique identifier of the door that should be opened.
-    door_range : int, optional (default=np.inf)
-        The maximum allowed distance between the agent and the door for the agent to be able to open that door.
+        The type of the :class:`matrxs.actions.action.ActionResult` that should
+        be returned. Also used to determine for which kind of
+        :class:`matrxs.actions.action.Action` this check is made (
+        :class:`matrxs.actions.door_actions.OpenDoorAction` or
+        :class:`matrxs.actions.door_actions.CloseDoorAction`).
+    object_id : str,
+        Optional. Default: `None`
+
+        The string representing the unique identifier of the door that should
+        be opened.
+    door_range : int
+        Optional. Default: `np.inf`
+        The maximum allowed distance between the agent and the door for the
+        agent to be able to open or close that door.
 
     Returns
     -------
     ActionResult : {Type[OpenDoorActionResult], Type[CloseDoorActionResult]}
-        Returns either an OpenDoorActionResult or CloseDoorActionResult (depends on the parameter action_result) that
-        contains whether the respective action is possible or not.
+        Returns either an OpenDoorActionResult or CloseDoorActionResult
+        (depends on the parameter action_result) that contains whether the
+        respective action is possible or not.
 
     """
     reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
