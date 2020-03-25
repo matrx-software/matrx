@@ -57,10 +57,12 @@ extensions = [
 ]
 
 # autoapi automatically creates files with documentation
+# See: https://sphinx-autoapi.readthedocs.io/en/latest/reference/config.html
 autoapi_dirs = ['../..']
 autoapi_type = 'python'
-autoapi_options = ['members', 'undoc-members', 'private-members', 'show-inheritance', 'special-members', 'show-module-summary']
+autoapi_options = ['members', 'inherited-members', 'show-inheritance']
 autoapi_add_toctree_entry = False
+autoapi_python_class_content = "class"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

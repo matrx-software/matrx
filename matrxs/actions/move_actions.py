@@ -1,5 +1,5 @@
-from matrx.actions.action import Action, ActionResult
-from matrx.objects.agent_body import AgentBody
+from matrxs.actions.action import Action, ActionResult
+from matrxs.objects.agent_body import AgentBody
 
 
 def _act_move(grid_world, agent_id, dx, dy):
@@ -308,7 +308,6 @@ class MoveNorth(Move):
     Move
 
     """
-
     def __init__(self):
         super().__init__()
         self.dx = 0

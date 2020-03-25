@@ -2,10 +2,10 @@ import collections
 
 import numpy as np
 
-from matrx.actions.action import Action, ActionResult
-from matrx.utils import get_distance
-from matrx.objects.agent_body import AgentBody
-from matrx.objects.standard_objects import AreaTile
+from matrxs.actions.action import Action, ActionResult
+from matrxs.utils.utils import get_distance
+from matrxs.objects.agent_body import AgentBody
+from matrxs.objects.simple_objects import AreaTile
 
 
 class RemoveObject(Action):
@@ -87,16 +87,16 @@ class RemoveObject(Action):
         for obj in objects_in_range:  # loop through all objects in range
             if obj == object_id:  # if object is in that list
                 success = grid_world.remove_from_grid(object_id)  # remove it, success is whether GridWorld succeeded
-                if success:  # if we succeeded in removal return the appropriate ActionResult
-                    return RemoveObjectResult(RemoveObjectResult.OBJECT_REMOVED.replace('object_id'.upper(),
-                                                                                        str(object_id)), True)
+                if success:  # if we succeeded in removal return the appriopriate ActionResult
+                    return RemoveObjectResult(RemoveObjectResult.OBJECT_REMOVED \
+                                              .replace('object_id'.upper(), str(object_id)), True)
                 else:  # else we return a failure due to the GridWorld removal failed
-                    return RemoveObjectResult(RemoveObjectResult.REMOVAL_FAILED.replace('object_id'.upper(),
-                                                                                        str(object_id)), False)
+                    return RemoveObjectResult(RemoveObjectResult.REMOVAL_FAILED \
+                                              .replace('object_id'.upper(), str(object_id)), False)
 
         # If the object was not in range, or no objects were in range we return that the object id was not in range
-        return RemoveObjectResult(RemoveObjectResult.OBJECT_ID_NOT_WITHIN_RANGE
-                                  .replace('remove_range'.upper(), str(remove_range))
+        return RemoveObjectResult(RemoveObjectResult.OBJECT_ID_NOT_WITHIN_RANGE \
+                                  .replace('remove_range'.upper(), str(remove_range)) \
                                   .replace('object_id'.upper(), str(object_id)), False)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
@@ -266,8 +266,8 @@ class GrabObject(Action):
         grab_range = np.inf if 'grab_range' not in kwargs else kwargs['grab_range']
         max_objects = np.inf if 'max_objects' not in kwargs else kwargs['max_objects']
 
-        return _is_possible_grab(grid_world, agent_id=agent_id, object_id=object_id, grab_range=grab_range,
-                                 max_objects=max_objects)
+        return self._is_possible_grab(grid_world, agent_id=agent_id, object_id=object_id, grab_range=grab_range,
+                                      max_objects=max_objects)
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """ Grabs an object.
@@ -348,6 +348,109 @@ class GrabObject(Action):
 
         return GrabObjectResult(GrabObjectResult.RESULT_SUCCESS, True)
 
+    def _is_possible_grab(self, grid_world, agent_id, object_id, grab_range, max_objects):
+        """ Private MATRX method.
+
+        Checks if an :class:`matrxs.objects.env_object.EnvObject` can be
+        grabbed by an agent.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The :class:`matrxs.grid_world.GridWorld` instance in which the
+            object is sought according to the `object_id` parameter.
+        agent_id: str
+            The string representing the unique identified that represents the
+             agent performing this action.
+        object_id: str
+            Optional. Default: ``None``
+
+            The string representing the unique identifier of the
+            :class:`matrxs.objects.env_object.EnvObject` that should be
+            grabbed. When not given, a random object within range is selected.
+        grab_range : int
+            Optional. Default: ``np.inf``
+
+            The range in which the to be grabbed
+            :class:`matrxs.objects.env_object.EnvObject` should be in.
+        max_objects : int
+            Optional. Default: ``np.inf``
+
+            The maximum of objects the agent can carry.
+
+        Returns
+        -------
+        GrabObjectResult
+            Depicts the action's expected success or failure and reason for
+            that result.
+
+            Can contain the following results:
+
+            * RESULT_SUCCESS: When the object can be successfully grabbed.
+            * RESULT_NO_OBJECT : When `object_id` is not given.
+            * RESULT_CARRIES_OBJECT: When the agent already carries the maximum
+              nr. objects.
+            * NOT_IN_RANGE: When `object_id` not within range.
+            * RESULT_AGENT: If the `object_id` is that of an agent.
+            * RESULT_OBJECT_CARRIED: When the object is already carried by
+              another agent.
+            * RESULT_OBJECT_UNMOVABLE: When the object is not movable.
+            * RESULT_UNKNOWN_OBJECT_TYPE: When the `object_id` does not exists
+              in the :class:`matrxs.grid_world.GridWorld`.
+
+        """
+        reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
+        loc_agent = reg_ag.location  # Agent location
+
+        if object_id is None:
+            return GrabObjectResult(GrabObjectResult.RESULT_NO_OBJECT, False)
+
+        # Already carries an object
+        if len(reg_ag.is_carrying) >= max_objects:
+            return GrabObjectResult(GrabObjectResult.RESULT_CARRIES_OBJECT, False)
+
+        # Go through all objects at the desired locations
+        objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type="*", sense_range=grab_range)
+        objects_in_range.pop(agent_id)
+
+        # Set random object in range
+        if not object_id:
+            # Remove all non objects from the list
+            for obj in list(objects_in_range.keys()):
+                if obj not in grid_world.environment_objects.keys():
+                    objects_in_range.pop(obj)
+
+            # Select a random object
+            if objects_in_range:
+                object_id = grid_world.rnd_gen.choice(list(objects_in_range.keys()))
+            else:
+                return GrabObjectResult(GrabObjectResult.NOT_IN_RANGE, False)
+
+        # Check if object is in range
+        if object_id not in objects_in_range:
+            return GrabObjectResult(GrabObjectResult.NOT_IN_RANGE, False)
+
+        # Check if object_id is the id of an agent
+        if object_id in grid_world.registered_agents.keys():
+            # If it is an agent at that location, grabbing is not possible
+            return GrabObjectResult(GrabObjectResult.RESULT_AGENT, False)
+
+        # Check if it is an object
+        if object_id in grid_world.environment_objects.keys():
+            env_obj = grid_world.environment_objects[object_id]  # Environment object
+            # Check if the object is not carried by another agent
+            if len(env_obj.carried_by) != 0:
+                return GrabObjectResult(GrabObjectResult.RESULT_OBJECT_CARRIED.replace("{AGENT_ID}",
+                                                                                              str(env_obj.carried_by)),
+                                               False)
+            elif not env_obj.properties["is_movable"]:
+                return GrabObjectResult(GrabObjectResult.RESULT_OBJECT_UNMOVABLE, False)
+            else:
+                # Success
+                return GrabObjectResult(GrabObjectResult.RESULT_SUCCESS, False)
+        else:
+            return GrabObjectResult(GrabObjectResult.RESULT_UNKNOWN_OBJECT_TYPE, False)
+
 
 class GrabObjectResult(ActionResult):
     """ActionResult for a GrabObjectAction
@@ -421,27 +524,27 @@ class GrabObjectResult(ActionResult):
 class DropObject(Action):
     """ Drops a carried object.
 
-        The action that can drop an :class:`matrxs.objects.env_object.EnvObject`
-        that is in an agent's inventory. After dropping, the object is added to the
-        :class:`matrxs.grid_world.GridWorld`.
+    The action that can drop an :class:`matrxs.objects.env_object.EnvObject`
+    that is in an agent's inventory. After dropping, the object is added to the
+    :class:`matrxs.grid_world.GridWorld`.
 
-        Parameters
-        ----------
-        duration_in_ticks : int
-            Optional. Default: ``1``. Should be zero or larger.
+    Parameters
+    ----------
+    duration_in_ticks : int
+        Optional. Default: ``1``. Should be zero or larger.
 
-            The default duration of the action in ticks during which the
-            :class:`matrxs.grid_world.GridWorld` blocks the agent performing other
-            actions. By default this is 1, meaning that the action will take both
-            the tick in which it was decided upon and the subsequent tick.
+        The default duration of the action in ticks during which the
+        :class:`matrxs.grid_world.GridWorld` blocks the agent performing other
+        actions. By default this is 1, meaning that the action will take both
+        the tick in which it was decided upon and the subsequent tick.
 
-        Notes
-        -----
-        The actual carrying mechanism of objects is implemented in the
-        :class:`matrxs.actions.move_actions.Move` actions: whenever an agent moves
-        who holds objects, those objects it is holding are also moved with it.
+    Notes
+    -----
+    The actual carrying mechanism of objects is implemented in the
+    :class:`matrxs.actions.move_actions.Move` actions: whenever an agent moves
+    who holds objects, those objects it is holding are also moved with it.
 
-        """
+    """
     
     def __init__(self, duration_in_ticks=1):
         super().__init__(duration_in_ticks)
@@ -483,7 +586,7 @@ class DropObject(Action):
         """
         reg_ag = grid_world.registered_agents[agent_id]
 
-        drop_range = 1 if 'drop_range' not in kwargs else kwargs['drop_range']
+        drop_range = 1 if not 'drop_range' in kwargs else kwargs['drop_range']
 
         # If no object id is given, the last item is dropped
         if 'object_id' in kwargs:
@@ -493,7 +596,7 @@ class DropObject(Action):
         else:
             return DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
 
-        return _possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id, drop_range=drop_range)
+        return self._possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id, drop_range=drop_range)
 
     def mutate(self, grid_world, agent_id, **kwargs):
         """ Drops the carried object.
@@ -539,7 +642,7 @@ class DropObject(Action):
         reg_ag = grid_world.registered_agents[agent_id]
 
         # fetch range from kwargs
-        drop_range = 1 if 'drop_range' not in kwargs else kwargs['drop_range']
+        drop_range = 1 if not 'drop_range' in kwargs else kwargs['drop_range']
 
         # If no object id is given, the last item is dropped
         if 'object_id' in kwargs:
@@ -557,11 +660,11 @@ class DropObject(Action):
                 f"atleast 1")
 
         # check if we can drop it at our current location
-        curr_loc_drop_poss = _is_drop_poss(grid_world, env_obj, reg_ag.location)
+        curr_loc_drop_poss = self._is_drop_poss(grid_world, env_obj, reg_ag.location)
 
         # drop it on the agent location if possible
         if curr_loc_drop_poss:
-            return _act_drop(grid_world, agent=reg_ag, env_obj=env_obj, drop_loc=reg_ag.location)
+            return self._act_drop(grid_world, agent=reg_ag, env_obj=env_obj, drop_loc=reg_ag.location)
 
         # if the agent location was the only within range, return a negative action result
         elif not curr_loc_drop_poss and drop_range == 0:
@@ -574,7 +677,99 @@ class DropObject(Action):
         if not drop_loc:
             return DropObjectResult(DropObjectResult.RESULT_OBJECT, False)
 
-        return _act_drop(grid_world, agent=reg_ag, env_obj=env_obj, drop_loc=drop_loc)
+        return self._act_drop(grid_world, agent=reg_ag, env_obj=env_obj, drop_loc=drop_loc)
+
+    def _act_drop(self, grid_world, agent, env_obj, drop_loc):
+        """ Private MATRX method.
+
+        Drops the carried object.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The :class:`matrxs.grid_world.GridWorld` instance in which the
+            object is dropped.
+        agent : AgentBody
+            The :class:`matrxs.objects.agent_body.AgentBody` of the agent who
+            drops the object.
+        env_obj : EnvObject
+            The :class:`matrxs.objects.env_object.EnvObject` to be dropped.
+        drop_loc : [x, y]
+            The drop location.
+
+        Returns
+        -------
+        DropObjectResult
+            The :class:`matrxs.actions.action.ActionResult` depicting the
+            action's expected success or failure and reason for that result.
+
+            Returns the following results:
+
+            * RESULT_SUCCESS: When the object is successfully dropped.
+
+        """
+
+        # Updating properties
+        agent.is_carrying.remove(env_obj)
+        env_obj.carried_by.remove(agent.obj_id)
+
+        # We return the object to the grid location we are standing at
+        env_obj.location = drop_loc
+        grid_world._register_env_object(env_obj)
+
+        return DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
+
+    def _find_drop_loc(self, grid_world, agent, env_obj, drop_range, start_loc):
+        """ Private MATRX method.
+
+        A breadth first search starting from the agent's location to find the
+        closest valid drop location.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The :class:`matrxs.grid_world.GridWorld` instance in which the
+            object is dropped.
+        agent : AgentBody
+            The :class:`matrxs.objects.agent_body.AgentBody` of the agent who
+            drops the object.
+        env_obj : EnvObject
+            The :class:`matrxs.objects.env_object.EnvObject` to be dropped.
+        drop_range : int
+            The range in which the object can be dropped.
+        start_loc : [x, y]
+            The location of the agent from which to start the search.
+
+        Returns
+        -------
+        boolean
+            False if no valid drop location can be found, otherwise the [x,y]
+            coordinates of the closest drop location.
+        """
+        queue = collections.deque([[start_loc]])
+        seen = {start_loc}
+
+        width = grid_world.shape[0]
+        height = grid_world.shape[1]
+
+        while queue:
+            path = queue.popleft()
+            x, y = path[-1]
+
+            # check if we are still within drop_range
+            if get_distance([x, y], start_loc) > drop_range:
+                return False
+
+            # check if we can drop at this location
+            if self._is_drop_poss(grid_world, env_obj, [x, y]):
+                return [x, y]
+
+            # queue unseen neighbouring tiles
+            for x2, y2 in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if 0 <= x2 < width and 0 <= y2 < height and (x2, y2) not in seen:
+                    queue.append(path + [(x2, y2)])
+                    seen.add((x2, y2))
+        return False
 
     def _is_drop_poss(self, grid_world, env_obj, dropLocation):
         """ Private MATRX method.
@@ -618,9 +813,65 @@ class DropObject(Action):
         else:
             return True
 
+    def _possible_drop(self, grid_world, agent_id, obj_id, drop_range):
+        """ Private MATRX method.
+
+        Checks if an :class:`matrxs.objects.env_object.EnvObject` can be
+        dropped by an agent.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The :class:`matrxs.grid_world.GridWorld` instance in which the
+            object is dropped.
+        agent_id: str
+            The string representing the unique identified that represents the
+            agent performing this action.
+        obj_id: str
+            The string representing the unique identifier of the
+            :class:`matrxs.objects.env_object.EnvObject` that should be
+            dropped.
+        drop_range : int
+            The range in which the :class:`matrxs.objects.env_object.EnvObject`
+            should be dropped in.
+
+        Returns
+        -------
+        DropObjectResult
+            The :class:`matrxs.actions.action.ActionResult` depicting the
+            action's expected success or failure and reason for that result.
+
+            Returns the following results:
+
+            * RESULT_SUCCESS: When the object can be successfully dropped.
+            * RESULT_NONE_GIVEN: When the given obj_id is not being carried by
+              the agent.
+            * RESULT_NO_OBJECT: When no obj_id is given.
+
+
+        """
+        reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
+        loc_agent = reg_ag.location
+        loc_obj_ids = grid_world.grid[loc_agent[1], loc_agent[0]]
+
+        # No object given
+        if not obj_id:
+            return DropObjectResult(DropObjectResult.RESULT_NONE_GIVEN, False)
+
+        # No object with that name
+        if not (obj_id in reg_ag.is_carrying):
+            return DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
+
+        if len(loc_obj_ids) == 1:
+            return DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
+
+        # TODO: incorporate is_possible check from DropAction.mutate is_possible here
+
+        return True, DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
+
 
 class DropObjectResult(ActionResult):
-    """ ActionResult for a DropObjectAction.
+    """ActionResult for a DropObjectAction.
 
     The results uniquely for GrabObjectAction are (as class constants):
 
@@ -674,253 +925,3 @@ class DropObjectResult(ActionResult):
     def __init__(self, result, succeeded, obj_id=None):
         super().__init__(result, succeeded)
         self.obj_id = obj_id
-
-
-def _is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
-    """ Private MATRX method.
-
-    Checks if an :class:`matrxs.objects.env_object.EnvObject` can be
-    grabbed by an agent.
-
-    Parameters
-    ----------
-    grid_world : GridWorld
-        The :class:`matrxs.grid_world.GridWorld` instance in which the
-        object is sought according to the `object_id` parameter.
-    agent_id: str
-        The string representing the unique identified that represents the
-         agent performing this action.
-    object_id: str
-        Optional. Default: ``None``
-
-        The string representing the unique identifier of the
-        :class:`matrxs.objects.env_object.EnvObject` that should be
-        grabbed. When not given, a random object within range is selected.
-    grab_range : int
-        Optional. Default: ``np.inf``
-
-        The range in which the to be grabbed
-        :class:`matrxs.objects.env_object.EnvObject` should be in.
-    max_objects : int
-        Optional. Default: ``np.inf``
-
-        The maximum of objects the agent can carry.
-
-    Returns
-    -------
-    GrabObjectResult
-        Depicts the action's expected success or failure and reason for
-        that result.
-
-        Can contain the following results:
-
-        * RESULT_SUCCESS: When the object can be successfully grabbed.
-        * RESULT_NO_OBJECT : When `object_id` is not given.
-        * RESULT_CARRIES_OBJECT: When the agent already carries the maximum
-          nr. objects.
-        * NOT_IN_RANGE: When `object_id` not within range.
-        * RESULT_AGENT: If the `object_id` is that of an agent.
-        * RESULT_OBJECT_CARRIED: When the object is already carried by
-          another agent.
-        * RESULT_OBJECT_UNMOVABLE: When the object is not movable.
-        * RESULT_UNKNOWN_OBJECT_TYPE: When the `object_id` does not exists
-          in the :class:`matrxs.grid_world.GridWorld`.
-
-    """
-
-    reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
-    loc_agent = reg_ag.location  # Agent location
-
-    if object_id is None:
-        return GrabObjectResult(GrabObjectResult.RESULT_NO_OBJECT, False)
-
-    # Already carries an object
-    if len(reg_ag.is_carrying) >= max_objects:
-        return GrabObjectResult(GrabObjectResult.RESULT_CARRIES_OBJECT, False)
-
-    # Go through all objects at the desired locations
-    objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type="*", sense_range=grab_range)
-    objects_in_range.pop(agent_id)
-
-    # Set random object in range
-    if not object_id:
-        # Remove all non objects from the list
-        for obj in list(objects_in_range.keys()):
-            if obj not in grid_world.environment_objects.keys():
-                objects_in_range.pop(obj)
-
-        # Select a random object
-        if objects_in_range:
-            object_id = grid_world.rnd_gen.choice(list(objects_in_range.keys()))
-        else:
-            return GrabObjectResult(GrabObjectResult.NOT_IN_RANGE, False)
-
-    # Check if object is in range
-    if object_id not in objects_in_range:
-        return GrabObjectResult(GrabObjectResult.NOT_IN_RANGE, False)
-
-    # Check if object_id is the id of an agent
-    if object_id in grid_world.registered_agents.keys():
-        # If it is an agent at that location, grabbing is not possible
-        return GrabObjectResult(GrabObjectResult.RESULT_AGENT, False)
-
-    # Check if it is an object
-    if object_id in grid_world.environment_objects.keys():
-        env_obj = grid_world.environment_objects[object_id]  # Environment object
-        # Check if the object is not carried by another agent
-        if len(env_obj.carried_by) != 0:
-            return GrabObjectResult(GrabObjectResult.RESULT_OBJECT_CARRIED.replace("{AGENT_ID}",
-                                                                                   str(env_obj.carried_by)),
-                                    False)
-        elif not env_obj.properties["is_movable"]:
-            return GrabObjectResult(GrabObjectResult.RESULT_OBJECT_UNMOVABLE, False)
-        else:
-            # Success
-            return GrabObjectResult(GrabObjectResult.RESULT_SUCCESS, False)
-    else:
-        return GrabObjectResult(GrabObjectResult.RESULT_UNKNOWN_OBJECT_TYPE, False)
-
-
-def _act_drop(grid_world, agent, env_obj, drop_loc):
-    """ Private MATRX method.
-
-        Drops the carried object.
-
-        Parameters
-        ----------
-        grid_world : GridWorld
-            The :class:`matrxs.grid_world.GridWorld` instance in which the
-            object is dropped.
-        agent : AgentBody
-            The :class:`matrxs.objects.agent_body.AgentBody` of the agent who
-            drops the object.
-        env_obj : EnvObject
-            The :class:`matrxs.objects.env_object.EnvObject` to be dropped.
-        drop_loc : [x, y]
-            The drop location.
-
-        Returns
-        -------
-        DropObjectResult
-            The :class:`matrxs.actions.action.ActionResult` depicting the
-            action's expected success or failure and reason for that result.
-
-            Returns the following results:
-
-            * RESULT_SUCCESS: When the object is successfully dropped.
-
-        """
-
-    # Updating properties
-    agent.is_carrying.remove(env_obj)
-    env_obj.carried_by.remove(agent.obj_id)
-
-    # We return the object to the grid location we are standing at
-    env_obj.location = drop_loc
-    grid_world._register_env_object(env_obj)
-
-    return DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
-
-
-def _is_drop_poss(grid_world, env_obj, drop_location):
-    """ Private MATRX method.
-
-    A breadth first search starting from the agent's location to find the
-    closest valid drop location.
-
-    Parameters
-    ----------
-    grid_world : GridWorld
-        The :class:`matrxs.grid_world.GridWorld` instance in which the
-        object is dropped.
-    agent : AgentBody
-        The :class:`matrxs.objects.agent_body.AgentBody` of the agent who
-        drops the object.
-    env_obj : EnvObject
-        The :class:`matrxs.objects.env_object.EnvObject` to be dropped.
-    drop_range : int
-        The range in which the object can be dropped.
-    start_loc : [x, y]
-        The location of the agent from which to start the search.
-
-    Returns
-    -------
-    boolean
-        False if no valid drop location can be found, otherwise the [x,y]
-        coordinates of the closest drop location.
-    """
-
-    # Count the intraversable objects at the current location if we would drop the
-    # object here
-    objs_at_loc = grid_world.get_objects_in_range(drop_location, object_type="*", sense_range=0)
-
-    # Remove area objects from the list
-    for key in list(objs_at_loc.keys()):
-        if AreaTile.__name__ in objs_at_loc[key].class_inheritance:
-            objs_at_loc.pop(key)
-
-    in_trav_objs_count = 1 if not env_obj.is_traversable else 0
-    in_trav_objs_count += len([obj for obj in objs_at_loc if not objs_at_loc[obj].is_traversable])
-
-    # check if we would have an in_traversable object and other objects in
-    # the same location (which is impossible)
-    if in_trav_objs_count >= 1 and (len(objs_at_loc) + 1) >= 2:
-        return False
-    else:
-        return True
-
-
-def _possible_drop(grid_world, agent_id, obj_id, drop_range):
-    """ Private MATRX method.
-
-    Checks if an :class:`matrxs.objects.env_object.EnvObject` can be
-    dropped by an agent.
-
-    Parameters
-    ----------
-    grid_world : GridWorld
-        The :class:`matrxs.grid_world.GridWorld` instance in which the
-        object is dropped.
-    agent_id: str
-        The string representing the unique identified that represents the
-        agent performing this action.
-    obj_id: str
-        The string representing the unique identifier of the
-        :class:`matrxs.objects.env_object.EnvObject` that should be
-        dropped.
-    drop_range : int
-        The range in which the :class:`matrxs.objects.env_object.EnvObject`
-        should be dropped in.
-
-    Returns
-    -------
-    DropObjectResult
-        The :class:`matrxs.actions.action.ActionResult` depicting the
-        action's expected success or failure and reason for that result.
-
-        Returns the following results:
-
-        * RESULT_SUCCESS: When the object can be successfully dropped.
-        * RESULT_NONE_GIVEN: When the given obj_id is not being carried by
-          the agent.
-        * RESULT_NO_OBJECT: When no obj_id is given.
-
-    """
-    reg_ag = grid_world.registered_agents[agent_id]  # Registered Agent
-    loc_agent = reg_ag.location
-    loc_obj_ids = grid_world.grid[loc_agent[1], loc_agent[0]]
-
-    # No object given
-    if not obj_id:
-        return DropObjectResult(DropObjectResult.RESULT_NONE_GIVEN, False)
-
-    # No object with that name
-    if not (obj_id in reg_ag.is_carrying):
-        return DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
-
-    if len(loc_obj_ids) == 1:
-        return DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
-
-    # TODO: incorporate is_possible check from DropAction.mutate is_possible here
-
-    return True, DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
