@@ -1,18 +1,19 @@
-from matrxs.API import api
-from matrxs.scenarios import simple_scenario, test_scenario
+from matrx.API import api
+from matrx.use_cases import simple_case, test_case, new_vis_test
 
 if __name__ == "__main__":
 
     # By creating scripts that return a factory, we can define infinite number of use cases and select them (in the
     # future) through a UI.
-    factory = test_scenario.create_factory()
+    factory = new_vis_test.create_factory()
 
-    # startup world-overarching MATRXS scripts, such as the API and/or visualizer if requested
-    factory.startup()
+    # startup world-overarching MATRX scripts, such as the api and/or visualizer if requested
+    media_folder = os.path.dirname(os.path.realpath(__file__)) # set our path for media files to our current folder
+    factory.startup(media_folder=media_folder)
 
     # run each world
     for world in factory.worlds():
         world.run(factory.api_info)
 
-    # stop MATRXS scripts such as the API and visualizer (if used)
+    # stop MATRX scripts such as the api and visualizer (if used)
     factory.stop()

@@ -5,14 +5,14 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="matrxs",
-    version="0.0.6",
-    author="The MATRXS Development team at TNO.nl",
-    author_email="jasper.vanderwaa@tno.nl",
+    name="matrx",
+    version="0.0.93",
+    author="The MATRX Development team at TNO.nl",
+    author_email="info@matrx-software.com",
     description="A Python package for the rapid development of autonomous systems and human-agent teaming concepts.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://ci.tno.nl/gitlab/matrxs/matrxs",
+    url="https://matrx-software.com/",
     packages=setuptools.find_packages(),
     license="MIT License",
     classifiers=[
@@ -27,4 +27,16 @@ setuptools.setup(
         "Intended Audience :: Science/Research",
         "Environment :: Web Environment"
     ],
+    install_requires=['Flask>=1.0.2',
+                      'Flask-SocketIO>=3.3.2',
+                      'numpy>=1.15.4',
+                      'requests>=2.21.0',
+                      'colour>=0.1.5',
+                      'gevent>=1.4.0',
+                      'flask-cors>=3.0.0'
+    ],
+    package_data={
+        "matrx_visualizer": ["mockup/**/*", "templates/**/*", "static/**/*"],
+    },
+    include_package_data=True,
 )

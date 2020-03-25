@@ -1,0 +1,66 @@
+html {
+    height: 100%;
+}
+
+#grid {
+    position: relative;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#grid .tile,
+#grid .object,
+#grid .object .shape {
+    position:absolute;
+}
+
+/* Logo */
+
+#matrx_logo {
+    width: 103px;
+    height: 43px;
+    border-radius: 2px;
+    padding: 2px 5px;
+}
+
+
+/* Toggle the start button to pause or vice versa if pressed */
+.hidden {
+    display: none;
+}
+
+.agent_menu_preview,
+.god_preview {
+    display: inline-block;
+    margin-right: 10px;
+    width: 30px;
+    height: 30px;
+}
+
+.agent_menu_preview img {
+    max-height: 30px;
+    max-width: 30px;
+    height: auto;
+    width: auto;
+}
+
+#agent_dropdown .dropdown-item,
+#view_mode .dropdown-item {
+    padding: .4rem 1.5rem;
+    display: flex;
+}
+
+
+/* Chat styling */
+.new_chat_option {
+    cursor: pointer;
+}
+
+.chat-notification {
+    background: #ffb100;
+    border-radius: 50%;
+    height: 8px;
+    width: 8px;
+    margin-left: 5px;
+    margin-bottom: 1px;
+}

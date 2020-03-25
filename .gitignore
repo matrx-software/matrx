@@ -1,3 +1,8 @@
+.pypirc
+build/
+dist/
+matrx.egg-info/
+
 .idea/
 old/
 agents/__pycache__/
@@ -18,6 +23,6 @@ logData.log
 
 log_data/
 
-docs/build/
-
-docs/source/sections/_generated_autodoc/
+# ignore generated documentation files
+docs/build
+docs/source/sections/_generated_autodoc

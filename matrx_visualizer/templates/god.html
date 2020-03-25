@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="/static/images/X.ico">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/static/dist/bootstrap/bootstrap-4.4.1.min.css" crossorigin="anonymous">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/GUI.css">
+
+    <!-- Font Awesome icons -->
+    <link rel="stylesheet" href="/static/dist/fontawesome-free-5.12.0-web/css/all.css">
+
+    <title>God view</title>
+</head>
+
+<body>
+
+    <!-- Toolbar -->
+    <div id="matrx-toolbar" class="row toolbar bg-dark">
+        <div class="col-sm">
+            <img src="/static/images/matrx_logo_light.svg" alt="MATRX" id="matrx_logo">
+            <button type="button" class="btn btn-dark" id="start_button"><i class="fas fa-play text-light"></i></button>
+            <button type="button" class="btn btn-dark hidden" id="pause_button"><i class="fas fa-pause text-light"></i></button>
+            <button type="button" class="btn btn-dark" id="stop_button"><i class="fas fa-stop text-light"></i></button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-users"></i></button>
+                <div id="agent_dropdown" class="dropdown-menu">
+                </div>
+            </div>
+        </div>
+        <div class="col-sm" align="right">
+            <button type="button" class="btn btn-dark" id="chat_button" onclick="chatToggle()" data-toggle="collapse" data-target="#chat" aria-expanded="true" aria-controls="chat"><i class="fas fa-comments text-light"></i></button>
+            <button type="button" class="btn btn-dark" id="draw_button" onclick="drawToggle()"><i class="fas fa-pencil-alt text-light"></i></button>
+            <button type="button" class="btn btn-dark" id="erase_button" onclick="eraseToggle()"><i class="fas fa-eraser text-light"></i></button>
+        </div>
+    </div>
+
+
+    <div class="row content-row">
+
+        <!-- Grid -->
+        <div class="col-md grid-container" id="container">
+            <!-- container id is needed for the zoom/pan package -->
+            <div id="grid"></div>
+        </div>
+
+        <!-- Chat -->
+        <div class="collapse" id="chat">
+            <div class="container-fluid">
+                <h5>Chats</h5>
+                <div class="row">
+                    <div class="col-md-auto" id="chat_rooms_list">
+                        <div class="contact contact_active" id="chatroom_global" onclick="chatroom_click(event)">Global<span class="chat-notification" id="chatroom_global_notification"></span></div>
+                        <div class="contact" id="new_chat_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">+</div>
+                        <div id="new_chat_dropdown" class="dropdown-menu"></div>
+                    </div>
+                    <div class="col-md-auto">
+                        <div id="messages">
+                        </div>
+                        <!-- "God" is not an agent, only a view, and as such cannot send messages -->
+                        <!-- <input class="form-control" id="message_input" placeholder="Type a message">
+                        <button type="button" class="btn btn-primary" onclick="sendMessage()">Send</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Context menu -->
+    <div class="dropdown-menu" id="contextMenu" style="display:none">
+        <a class="dropdown-item" href="#">Action 1</a>
+        <a class="dropdown-item" href="#">Action 2</a>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="/static/dist/jquery/jquery-3.4.1.min.js"></script>
+    <script src="/static/dist/popper/popper-1.16.0.js"></script>
+    <script src="/static/dist/bootstrap/bootstrap-4.4.1.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="/static/js/util.js"></script>
+    <script src="/static/js/toolbar.js"></script>
+    <script src="/static/js/context_menu.js"></script>
+    <!--    <script src="/dist/zoom-pan-master/public/bundle.min.js"></script>-->
+    <script type="text/javascript" src="/static/js/gen_grid.js"></script>
+    <script type="text/javascript" src="/static/js/loop.js"></script>
+</body>
+
+</html>

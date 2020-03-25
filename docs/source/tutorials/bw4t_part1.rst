@@ -13,11 +13,11 @@ In this scenario, there are 4 rooms, each containing a certain color of blocks. 
 cannot see what is inside a room before the door is opened. Together, the agents have to deliver a sequence of blocks
 to a designated delivery area. The sequence is specified by the user. Once all blocks in the sequence have successfully
 been delivered, the simulation is over. Another version of this scenario is when the rooms contain several blocks which do
-not have the same color. This requires some tweaking of the situation described in this tutorial. Check the MATRXS repository
+not have the same color. This requires some tweaking of the situation described in this tutorial. Check the MATRX repository
 for an example of 'randomly' colored blocks in rooms.
 
 The image below shows what the scene created during the tutorial looks like. Having trouble building this world? Check
-the basic tutorials :ref:`Creating your MATRXS world` and :ref:`Adding objects`. Important for this particular solution
+the basic tutorials :ref:`Creating your MATRX world` and :ref:`Adding objects`. Important for this particular solution
 to solving the block sequence delivery is to name the rooms in the scenario according to the color of blocks the room
 contains. In other words: make sure the word 'red' is in your room name when the room contains red blocks. The same goes
 for the doors and blocks.
@@ -29,7 +29,7 @@ for the doors and blocks.
 Brain initialization
 --------------------
 After having created the objects in the scenario, it is time to add the block-gathering agents. We will do so by creating
-a new .py file in the MATRXS folder 'agents'. The skeleton of this agent brain contains the class initialization, the
+a new .py file in the MATRX folder 'agents'. The skeleton of this agent brain contains the class initialization, the
 method for filtering observations, and the method for deciding on an action. See 'AgentBrain' in Section :ref:`Agents` for
 an overview of methods used in an agent's brain.
 

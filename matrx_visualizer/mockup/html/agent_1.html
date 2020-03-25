@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/custom.css">
+
+    <!-- Font Awesome icons -->
+    <link rel="stylesheet" href="../dist/fontawesome-free-5.12.0-web/css/all.css">
+
+    <title>MATRX</title>
+  </head>
+  <body>
+
+    <!-- Toolbar -->
+    <div class="row toolbar bg-dark">
+      <div class="col-sm">
+        <img src="../images/matrx_logo.png" alt="MATRX" style="width:103px;height:43px;">
+        <button type="button" class="btn btn-dark"><i class="fas fa-play text-light"></i></button>
+        <button type="button" class="btn btn-dark"><i class="fas fa-stop text-light"></i></button>
+        <div class="btn-group">
+          <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-users"></i></button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="agent_1.html">Agent 1</a>
+            <a class="dropdown-item" href="agent_2.html">Agent 2</a>
+            <a class="dropdown-item" href="team_1.html">Team 1</a>
+            <a class="dropdown-item" href="god.html">God</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm" align="right">
+        <button type="button" class="btn btn-dark" id="chat_button" onclick="chatToggle()" data-toggle="collapse" data-target="#chat" aria-expanded="false" aria-controls="chat"><i class="fas fa-comments text-light"></i></button>
+        <button type="button" class="btn btn-dark" id="draw_button" onclick="drawToggle()"><i class="fas fa-pencil-alt text-light"></i></button>
+        <button type="button" class="btn btn-dark" id="erase_button" onclick="eraseToggle()"><i class="fas fa-eraser text-light"></i></button>
+      </div>
+    </div>
+
+
+
+      <div class="row">
+
+        <!-- Grid -->
+        <div class="col-md" id="container"> <!-- container id is needed for the zoom/pan package -->
+          <div id="grid"></div>
+        </div>
+
+        <!-- Chat -->
+        <div class="collapse" id="chat">
+          <div class="container-fluid">
+            <h5>Chats</h5>
+            <div class="row">
+              <div class="col-md-auto">
+                <div class="contact contact_active" id="agent_1" onclick="selectContact(id)">Agent 1</div>
+                <div class="contact" id="agent_2" onclick="selectContact(id)">Agent 2</div>
+                <div class="contact" id="team" onclick="selectContact(id)">Team</div>
+                <div class="contact" id="all" onclick="selectContact(id)">All</div>
+              </div>
+              <div class="col-md-auto">
+                <div id="messages">
+                  <div class="message_you">Yo agent 1</div>
+                  <div class="message_other">What up human?</div>
+                </div>
+                <textarea class="form-control" id="message_input" rows="3" placeholder="Type a message"></textarea>
+                <button type="button" class="btn btn-primary" onclick="sendMessage()">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Context menu -->
+        <div class="dropdown-menu" id="contextMenu" style="display:none" >
+          <a class="dropdown-item" href="#">Action 1</a>
+          <a class="dropdown-item" href="#">Action 2</a>
+        </div>
+
+      </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="../js/custom.js"></script>
+    <script src="../dist/zoom-pan-master/public/bundle.min.js"></script>
+    <script src="../js/init_grid2.js"></script>
+    <script src="../js/context_menu.js"></script>
+
+  </body>
+
+</html>

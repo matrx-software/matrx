@@ -91,7 +91,7 @@ html_theme_options = {
     'titles_only': True,
 }
 
-html_logo = '_static/images/matrx_logo.svg'
+html_logo = '_static/images/matrx_logo_light.svg'
 
 # -- Options for HTML output -------------------------------------------------
 # The name of the Pygments (syntax highlighting) style to use.
