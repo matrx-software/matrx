@@ -25,14 +25,14 @@ port = 3001
 # states is a list of length 'current_tick' with a dictionary containing all states of that tick, indexed by agent_id
 states = []
 current_tick = 0
-tick_duration = 0.0
+tick_duration = 0.5
 grid_size = [1, 1]
 MATRX_info = {}
 next_tick_info = {}
 add_message_to_agent = None
-received_messages = {} # messages received via the api, intended for the Gridworld
-gw_message_manager = None # the message manager of the gridworld, containing all messages of various types
-teams = None # dict with team names (keys) and IDs of agents who are in that team (values)
+received_messages = {}  # messages received via the api, intended for the Gridworld
+gw_message_manager = None  # the message manager of the gridworld, containing all messages of various types
+teams = None  # dict with team names (keys) and IDs of agents who are in that team (values)
 # currently only one world at a time is supported
 current_world_ID = False
 
@@ -44,12 +44,11 @@ temp_state = {}
 userinput = {}
 matrx_paused = False
 matrx_done = False
-tick_duration = 0.5
+
 
 #########################################################################
 # api connection methods
 #########################################################################
-
 
 
 @app.route('/get_info', methods=['GET', 'POST'])
@@ -73,23 +72,25 @@ def get_latest_state_and_messages(agent_id):
     ----------
     agent_id
         The ID of the targeted agent
+
     Returns
-        a dictionary containing the states under the "states" key, and the messages under the "messages" key.
     -------
+        a dictionary containing the states under the "states" key, and the messages under the "messages" key.
 
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_states_API_request(ids=[agent_id])
-    if not API_call_valid:
+    api_call_valid, error = check_states_API_request(ids=[agent_id])
+    if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
     # fetch states and messages
-    states = __fetch_states(current_tick, agent_id)
+    states_ = __fetch_states(current_tick, agent_id)
     messages = gw_message_manager.fetch_messages(current_tick, current_tick, clean_input_ids(agent_id)[0])
     chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
 
-    return jsonify({"matrx_paused": matrx_paused, "states": states, "messages": messages, "chatrooms": chatrooms})
+    return jsonify({"matrx_paused": matrx_paused, "states": states_, "messages": messages, "chatrooms": chatrooms})
+
 
 #########################################################################
 # MATRX fetch state api calls
@@ -103,15 +104,17 @@ def get_states(tick):
     ----------
     tick
         integer indicating from which tick onwards to send the states.
+
     Returns
+    -------
         Returns a list of length `tick` to current_tick. For each tick (item in the list), a dictionary contains the
         state for each agent existing in the simulation, indexed by their agent ID.
-    -------
+
     """
 
     # check for validity and return an error if not valid
-    API_call_valid, error = check_states_API_request(tick=tick)
-    if not API_call_valid:
+    api_call_valid, error = check_states_API_request(tick=tick)
+    if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
@@ -130,13 +133,14 @@ def get_states_specific_agents(tick, agent_ids):
         One agent ID, or a List of agent IDs for which the states should be returned. God view = "god"
 
     Returns
+    -------
         Returns a list of length `tick` to current_tick. For each tick (item in the list), a dictionary contains the
         state for each agent as specified in `agent_ids`, indexed by their agent ID.
-    -------
+
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_states_API_request(tick=tick)
-    if not API_call_valid:
+    api_call_valid, error = check_states_API_request(tick=tick)
+    if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
@@ -154,12 +158,12 @@ def get_latest_state(agent_ids):
         God view = "god"
 
     Returns
+    -------
         Returns a list of length `tick` to current_tick. For each tick, a dictionary contains the states for each
         agent as specified in `agent_ids`, indexed by their agent ID.
-    -------
+
     """
     return get_states_specific_agents(current_tick, agent_ids)
-
 
 
 #########################################################################
@@ -174,7 +178,9 @@ def get_messages(tick):
     ----------
     tick
         integer indicating from which tick onwards to send the messages.
+
     Returns
+    -------
         Returns a dictionary containing `messages` and `chatrooms`. The chatrooms subdictionary
         contains all accessible chatrooms at the latest tick. The messages subdictionary contains
         all messages for tick `tick` to the current tick,
@@ -182,21 +188,18 @@ def get_messages(tick):
         Also see the documentation of the
         :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_messages` and
         :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
-    -------
     """
 
     # check for validity and return an error if not valid
-    API_call_valid, error = check_messages_API_request(tick=tick)
-    if not API_call_valid:
+    api_call_valid, error = check_messages_API_request(tick=tick)
+    if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
     messages = gw_message_manager.fetch_messages(int(tick), current_tick)
     chatrooms = gw_message_manager.fetch_chatrooms()
 
-
     return jsonify({"messages": messages, "chatrooms": chatrooms})
-
 
 
 @app.route('/get_messages/<tick>/<agent_id>', methods=['GET', 'POST'])
@@ -208,11 +211,12 @@ def get_messages_specific_agent(tick, agent_id):
     tick
         integer indicating which ticks [`tick`,current_tick] (including `tick` and current_tick)
         the messages should be fetched from.
-    agent_ids
+    agent_id
         The `agent_id` of the agent of whom the messages should be fetched.
         All fetched messages are either sent to or by the agent with agent ID `agent_id`.
 
     Returns
+    -------
         Returns a dictionary containing `messages` and `chatrooms`. The chatrooms subdictionary
         contains all accessible chatrooms at the latest tick. The messages subdictionary contains
         all messages sent or received by `agent_id`,
@@ -220,12 +224,11 @@ def get_messages_specific_agent(tick, agent_id):
         Also see the documentation of the
         :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_messages` and
         :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
-    -------
 
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_messages_API_request(tick=tick, id=agent_id)
-    if not API_call_valid:
+    api_call_valid, error = check_messages_API_request(tick=tick, agent_id=agent_id)
+    if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
@@ -234,15 +237,10 @@ def get_messages_specific_agent(tick, agent_id):
 
     return jsonify({"messages": messages, "chatrooms": chatrooms})
 
+
 @app.route('/get_latest_messages', methods=['GET', 'POST'])
 def get_latest_messages():
     """ Provides all messages of the latest tick.
-
-    Parameters
-    ----------
-    agent_id
-        The `agent_id` of the agent of whom the messages should be fetched.
-        All fetched messages are either sent to or by the agent with agent ID `agent_id`.
 
     Returns
         Returns a dictionary containing `messages` and `chatrooms`. The chatrooms subdictionary
@@ -255,8 +253,8 @@ def get_latest_messages():
 
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_messages_API_request(tick=current_tick)
-    if not API_call_valid:
+    api_call_valid, error = check_messages_API_request(tick=current_tick)
+    if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
@@ -277,6 +275,7 @@ def get_latest_messages_specific_agent(agent_id):
         All fetched messages are either sent to or by the agent with agent ID `agent_id`.
 
     Returns
+    -------
         Returns a dictionary containing `messages` and `chatrooms`. The chatrooms subdictionary
         contains all accessible chatrooms at the latest tick, set to or by the agent with
         ID `agent_id`. The messages subdictionary contains
@@ -284,12 +283,11 @@ def get_latest_messages_specific_agent(agent_id):
         Also see the documentation of the
         :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_messages` and
         :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
-    -------
 
     """
     # check for validity and return an error if not valid
-    API_call_valid, error = check_messages_API_request(tick=current_tick, id=agent_id)
-    if not API_call_valid:
+    api_call_valid, error = check_messages_API_request(tick=current_tick, agent_id=agent_id)
+    if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
@@ -300,7 +298,7 @@ def get_latest_messages_specific_agent(agent_id):
 
 
 #########################################################################
-# MATRX userinput api calls
+# MATRX user input api calls
 #########################################################################
 
 @app.route('/send_userinput/<agent_ids>', methods=['POST'])
@@ -313,14 +311,15 @@ def send_userinput(agent_ids):
         ID(s) of the human agent(s) to which the data should be passed.
 
     Returns
+    -------
         returns True if the data was valid (right now always)
     -------
 
     """
     global userinput
 
-    API_call_valid, error = check_states_API_request(current_tick, agent_ids, ids_required=True)
-    if not API_call_valid:
+    api_call_valid, error = check_states_API_request(current_tick, agent_ids, ids_required=True)
+    if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
@@ -333,7 +332,7 @@ def send_userinput(agent_ids):
     # fetch the data from the request object
     data = request.json
 
-    # add each pressed key as userinput for each specified human agent
+    # add each pressed key as user input for each specified human agent
     for agent_id in agent_ids:
         for pressed_key in data:
 
@@ -346,23 +345,12 @@ def send_userinput(agent_ids):
 
     return jsonify(True)
 
+
 @app.route('/send_message', methods=['POST'])
 def send_message():
-    """ Send a message containing information to one or multiple specific agent, the agent's team, or all agents
+    """ Send a message containing information to one or multiple specific agent, the agent's team, or all agents.
 
     Message as defined in matrx.utils.message
-
-    Parameters
-    ----------
-    content
-        Message contents to send
-    sender
-        ID of (human)agent from which sent the message
-    receiver
-        ID(s) (human)agents which will receive the message. Multiple options available:
-        ID or list of agent IDs (JS/Python) =   send to specific agent(s)
-        null (JS)       = None (Python)     =   send to all agents
-        teamname (JS / Python)              =   send to everyone in the team
 
     Returns
     -------
@@ -402,6 +390,7 @@ def pause_MATRX():
     else:
         return jsonify(False)
 
+
 @app.route('/start', methods=['GET', 'POST'])
 def start_MATRX():
     """ Starts / unpauses the MATRX simulation
@@ -418,6 +407,7 @@ def start_MATRX():
     else:
         return jsonify(False)
 
+
 @app.route('/stop', methods=['GET', 'POST'])
 def stop_MATRX():
     """ Stops MATRX scenario
@@ -430,18 +420,20 @@ def stop_MATRX():
     matrx_done = True
     return jsonify(True)
 
+
 @app.route('/change_tick_duration/<tick_dur>', methods=['GET', 'POST'])
 def change_MATRX_speed(tick_dur):
     """ Change the tick duration / simulation speed of MATRX
 
     Parameters
     ----------
-    tick_duration
+    tick_dur
         The duration of 1 tick
 
     Returns
-        True if successfully changed tick speed (400 error if tick_duration not valid)
     -------
+        True if successfully changed tick speed (400 error if tick_duration not valid)
+
     """
     # check if the passed value is a float / int, and return an error if not
     try:
@@ -469,6 +461,7 @@ def shutdown():
     func()
     print("api server shutting down...")
     return jsonify(True)
+
 
 #########################################################################
 # Errors
@@ -514,13 +507,14 @@ def clean_input_ids(ids):
         return [ids]
 
 
-def check_messages_API_request(tick=None, id=None):
+def check_messages_API_request(tick=None, agent_id=None):
     """ Checks if the variables of the api request are valid, and if the requested information exists
 
     Parameters
     ----------
     tick
-    id
+
+    agent_id
 
     Returns
     -------
@@ -528,7 +522,7 @@ def check_messages_API_request(tick=None, id=None):
     """
     if gw_message_manager is None:
         return False, {'error_code': 400,
-                           'error_message': f'MATRX hasn\'t started yet.'}
+                       'error_message': f'MATRX hasn\'t started yet.'}
 
     tick = current_tick if tick is None else tick
     # check user input, such as tick
@@ -550,15 +544,18 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
         string with 1 agent ID, or list of agent IDS
     ids_required
         Whether IDS are required
+
     Returns
-        Success (Boolean indicating whether it is valid or not), Error (if any, prodiving the type and a message)
-        See for the error codes https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.0/com.ibm.qradar.doc/c_rest_api_errors.html
     -------
+        Success (Boolean indicating whether it is valid or not), Error (if any, prodiving the type and a message)
+        See for the error codes:
+        https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.0/com.ibm.qradar.doc/c_rest_api_errors.html
+
 
     """
     if gw_message_manager is None:
         return False, {'error_code': 400,
-                           'error_message': f'MATRX hasn\'t started yet.'}
+                       'error_message': f'MATRX hasn\'t started yet.'}
 
     # check user input, such as tick and agent id
     check_passed, error_message = check_input(tick)
@@ -577,10 +574,9 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
             ids = eval(ids)
         except:
             pass
-            # return False, {'error_code': 400, 'error_message': f'Provided IDs are not of valid format. Provides IDs is of '
-            #                                                    f'type {type(ids)} but should be either of type string for '
-            #                                                        f'requesting states of 1 agent (e.g. "god"), or a list of '
-            #                                                        f'IDs(string) for requesting states of multiple agents'}
+            # return False, {'error_code': 400, 'error_message': f'Provided IDs are not of valid format. Provides IDs
+            # is of ' f'type {type(ids)} but should be either of type string for ' f'requesting states of 1 agent (
+            # e.g. "god"), or a list of ' f'IDs(string) for requesting states of multiple agents'}
 
         # check if the api was reset during this time
         if len(states) is 0:
@@ -589,19 +585,19 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
 
         # check if the provided ids exist for all requested ticks
         ids = [ids] if isinstance(ids, str) else ids
-        for t in range(tick, current_tick+1):
+        for t in range(tick, current_tick + 1):
             for id in ids:
                 if id not in states[t]:
                     return False, {'error_code': 400,
-                                   'error_message': f'Trying to fetch the state for agent with ID "{id}" for tick {t}, but '
-                                                    f'no data on that agent exists for that tick. Is the agent ID correct?'}
+                                   'error_message': f'Trying to fetch the state for agent with ID "{id}" for tick {t}, '
+                                                    f'but no data on that agent exists for that tick. Is the agent ID '
+                                                    f'correct?'}
 
     # all checks cleared, so return with success and no error message
     return True, None
 
 
 def check_input(tick=None, ids=None):
-
     # check if tick is a valid format
     if tick is not None:
         try:
@@ -613,10 +609,10 @@ def check_input(tick=None, ids=None):
         # check if the tick has actually occurred
         if not tick in range(0, current_tick + 1):
             return False, {'error_code': 400,
-                           'error_message': f'Indicated tick does not exist, has to be in range 0 - {current_tick}, but is {tick}'}
+                           'error_message': f'Indicated tick does not exist, has to be in range 0 - {current_tick}, '
+                                            f'but is {tick}'}
 
     return True, None
-
 
 
 def __fetch_states(tick, ids=None):
@@ -629,10 +625,12 @@ def __fetch_states(tick, ids=None):
     ids
         Id(s) from agents/god for which to return the states. Either a single agent ID or a list of agent IDs.
         God view = "god"
+
     Returns
+    -------
         Returns a list of length [tick:current_tick]. For each tick, a dictionary contains the states for each agent as
         specified in `agent_ids`, indexed by their agent ID.
-    -------
+
     """
     tick = int(tick)
 
@@ -648,24 +646,24 @@ def __fetch_states(tick, ids=None):
 
     # create a list containing the states from tick to current_tick containing the states of all desired agents/god
     filtered_states = []
-    for t in range(tick, current_tick+1):
+    for t in range(tick, current_tick + 1):
         states_this_tick = {}
 
         # add each agent's state for this tick
-        for id in ids:
-            states_this_tick[id] = states[t][id]
+        for agent_id in ids:
+            states_this_tick[agent_id] = states[t][agent_id]
 
         # save the states of all filtered agents for this tick
         filtered_states.append(states_this_tick)
 
     return filtered_states
 
+
 def create_error_response(code, message):
     """ Creates an error code with a custom message """
     response = jsonify({'message': message})
     response.status_code = code
     return response
-
 
 
 def __reorder_state(state):
@@ -675,16 +673,17 @@ def __reorder_state(state):
     ----------
     state
          The world state, a dictionary with object IDs as keys
+
     Returns
-        The world state, JSON serializable
     -------
+        The world state, JSON serializable
     """
     new_state = copy.copy(state)
 
     # loop through all objects in the state
     for objID, obj in state.items():
 
-        if not objID is "World":
+        if objID is not "World":
             # make the sense capability JSON serializable
             if "sense_capability" in obj:
                 new_state[objID]["sense_capability"] = str(obj["sense_capability"])
@@ -724,7 +723,6 @@ def add_state(agent_id, state, agent_inheritence_chain, world_settings):
     temp_state[agent_id] = {'state': __reorder_state(state), 'agent_inheritence_chain': agent_inheritence_chain}
 
 
-
 def next_tick():
     """ Proceed to the next tick, publicizing data of the new tick via the api (the new states).
     -------
@@ -748,8 +746,9 @@ def pop_userinput(agent_id):
         ID of the agent for which to return the userinput
 
     Returns
-        A list of keys pressed. See this link for the encoding of keys: https://developer.mozilla.org/nl/docs/Web/API/KeyboardEvent/key/Key_Values
     -------
+        A list of keys pressed. See this link for the encoding of keys:
+        https://developer.mozilla.org/nl/docs/Web/API/KeyboardEvent/key/Key_Values
     """
     global userinput
     return userinput.pop(agent_id, None)
@@ -773,8 +772,7 @@ def reset_api():
     current_world_ID = False
 
 
-
-def register_world(world_ID):
+def register_world(world_id):
     """ Register a new simulation world
 
     At the moment simulation of only one world at a time is supported, so this calling this function will discard
@@ -782,12 +780,12 @@ def register_world(world_ID):
 
     Parameters
     ----------
-    world_ID
+    world_id
         The ID of the world
     -------
     """
     global current_world_ID
-    current_world_ID = world_ID
+    current_world_ID = world_id
 
 
 #########################################################################
@@ -805,8 +803,8 @@ def flask_thread():
     app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
 
 
-def run_api(verbose):
-    """ Creates a seperate Python thread in which the api (Flask) is started
+def run_api(verbose=False):
+    """ Creates a separate Python thread in which the api (Flask) is started
     Returns
         MATRX api Python thread
     -------
@@ -816,9 +814,10 @@ def run_api(verbose):
     debug = verbose
 
     print("Initialized app:", app)
-    API_thread = threading.Thread(target=flask_thread)
-    API_thread.start()
-    return API_thread
+    api_thread = threading.Thread(target=flask_thread)
+    api_thread.start()
+    return api_thread
+
 
 if __name__ == "__main__":
     run_api()

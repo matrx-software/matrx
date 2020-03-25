@@ -13,22 +13,22 @@ from matrx.objects.env_object import EnvObject
 from matrx.objects.standard_objects import AreaTile
 from matrx.messages.message_manager import MessageManager
 from matrx.objects.agent_body import _get_all_classes
-from matrx.API import api
+from matrx.api import api
 
 
 class GridWorld:
 
     def __init__(self, shape, tick_duration, simulation_goal, rnd_seed=1,
-                 visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False, world_ID=False):
-        self.__tick_duration = tick_duration  # How long each tick should take (process sleeps until thatr time is passed)
+                 visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False, world_id=False):
+        self.__tick_duration = tick_duration  # How long each tick should take (process sleeps until this time passed)
         self.__simulation_goal = simulation_goal  # The simulation goal, the simulation end when this/these are reached
         self.__shape = shape  # The width and height of the GridWorld
         self.__visualization_bg_clr = visualization_bg_clr  # The background color of the visualisation
         self.__visualization_bg_img = visualization_bg_img  # The background image of the visualisation
         self.__verbose = verbose  # Set whether we should print anything or not
-        self.world_ID = world_ID # ID of this simulation world
+        self.world_id = world_id  # ID of this simulation world
 
-        self.__teams = {} # dictionary with team names (keys), and agents in those teams (values)
+        self.__teams = {}  # dictionary with team names (keys), and agents in those teams (values)
         self.__registered_agents = OrderedDict()  # The dictionary of all existing agents in the GridWorld
         self.__environment_objects = OrderedDict()  # The dictionary of all existing objects in the GridWorld
 
@@ -38,6 +38,8 @@ class GridWorld:
         # Initialise an empty grid, a simple 2D array with ID's
         self.__grid = np.array([[None for _ in range(shape[0])] for _ in range(shape[1])])
 
+        self.__api_info = None  # Dict containing info about the API instance
+        self.__run_matrx_api = False  # Bool if API is running
         self.__loggers = []  # a list of GridWorldLogger use to log the data
         self.__is_done = False  # Whether the simulation is done (goal(s) reached)
         self.__rnd_seed = rnd_seed  # The random seed of this GridWorld
@@ -46,7 +48,7 @@ class GridWorld:
         self.__current_nr_ticks = 0  # The number of tick this GridWorld has ran already
         self.__is_initialized = False  # Whether this GridWorld is already initialized
         self.__message_buffer = {}  # dictionary of messages that need to be send to agents, with receiver ids as keys
-        self.message_manager = MessageManager() # keeps track of all messages and makes them available to the api
+        self.message_manager = MessageManager()  # keeps track of all messages and makes them available to the api
 
     def initialize(self, api_info):
         # Only initialize when we did not already do so
@@ -58,13 +60,13 @@ class GridWorld:
                 agent_body.brain_initialize_func()
 
             # set the api variables
-            self.api_info = api_info
-            self.__run_matrx_api = self.api_info['run_matrx_api']
+            self.__api_info = api_info
+            self.__run_matrx_api = self.__api_info['run_matrx_api']
             if self.__run_matrx_api:
                 # initialize this world in the api
                 api.reset_api()
                 api.tick_duration = self.__tick_duration
-                api.register_world(self.world_ID)
+                api.register_world(self.world_id)
                 api.current_tick = self.__current_nr_ticks
                 api.grid_size = self.shape
                 # point the api towards our message manager, for making messages available via the api
@@ -72,12 +74,12 @@ class GridWorld:
                 api.teams = self.__teams
 
                 # init api with world info
-                api.MATRX_info =  {
+                api.MATRX_info = {
                     "nr_ticks": self.__current_nr_ticks,
                     "curr_tick_timestamp": int(round(time.time() * 1000)),
                     "grid_shape": self.__shape,
                     "tick_duration": self.tick_duration,
-                    "world_ID": self.world_ID,
+                    "world_ID": self.world_id,
                     "vis_settings": {
                         "vis_bg_clr": self.__visualization_bg_clr,
                         "vis_bg_img": self.__visualization_bg_img
@@ -123,8 +125,6 @@ class GridWorld:
         # agents have been updated
         api.next_tick()
 
-
-
     def run(self, api_info):
         # initialize the gridworld
         self.initialize(api_info)
@@ -143,7 +143,6 @@ class GridWorld:
             if self.__run_matrx_api and api.matrx_done:
                 print("Scenario stopped through api")
                 break
-
 
     def get_env_object(self, requested_id, obj_type=None):
         obj = None
@@ -217,7 +216,7 @@ class GridWorld:
 
             # Remove agent
             success = self.__registered_agents.pop(object_id,
-                                                 default=False)  # if it exists, we get it otherwise False
+                                                   default=False)  # if it exists, we get it otherwise False
 
         # Else, check if it is an object
         elif object_id in self.__environment_objects.keys():
@@ -230,7 +229,7 @@ class GridWorld:
 
             # Remove object
             success = self.__environment_objects.pop(object_id,
-                                                   default=False)  # if it exists, we get it otherwise False
+                                                     default=False)  # if it exists, we get it otherwise False
         else:
             success = False  # Object type not specified
 
@@ -327,7 +326,6 @@ class GridWorld:
             if team not in self.__teams:
                 self.__teams[team] = []
             self.__teams[team].append(agent_id)
-
 
     def _register_logger(self, logger: GridWorldLogger):
         if self.__loggers is None:
@@ -426,7 +424,7 @@ class GridWorld:
 
                     filtered_agent_state, agent_properties, action_class_name, action_kwargs = \
                         agent_obj.get_action_func(state=state, agent_properties=agent_obj.properties, agent_id=agent_id,
-                                                  userinput=usrinp)
+                                                  user_input=usrinp)
                 else:  # not a HumanAgent
 
                     # perform the agent's get_action method (goes through filter_observations and decide_on_action)
@@ -482,7 +480,6 @@ class GridWorld:
                     self.__message_buffer[mssg.to_id] = [mssg]
                 else:
                     self.__message_buffer[mssg.to_id].append(mssg)
-
 
         # save the god view state
         if self.__run_matrx_api:
@@ -542,8 +539,8 @@ class GridWorld:
         self.__curr_tick_duration = tick_duration.total_seconds()
 
         if self.__verbose:
-            print(
-                f"@{os.path.basename(__file__)}: Tick {self.__current_nr_ticks} took {tick_duration.total_seconds()} seconds.")
+            print(f"@{os.path.basename(__file__)}: Tick {self.__current_nr_ticks} took {tick_duration.total_seconds()} "
+                  f"seconds.")
 
         return self.__is_done, self.__curr_tick_duration
 
@@ -602,7 +599,7 @@ class GridWorld:
             "curr_tick_timestamp": int(round(time.time() * 1000)),
             "grid_shape": self.__shape,
             "tick_duration": self.tick_duration,
-            "world_ID": self.world_ID,
+            "world_ID": self.world_id,
             "vis_settings": {
                 "vis_bg_clr": self.__visualization_bg_clr,
                 "vis_bg_img": self.__visualization_bg_img
@@ -636,7 +633,7 @@ class GridWorld:
             "grid_shape": self.__shape,
             "tick_duration": self.tick_duration,
             "team_members": team_members,
-            "world_ID": self.world_ID,
+            "world_ID": self.world_id,
             "vis_settings": {
                 "vis_bg_clr": self.__visualization_bg_clr,
                 "vis_bg_img": self.__visualization_bg_img
@@ -711,7 +708,6 @@ class GridWorld:
         # Whether the action succeeded or not, we return the result
         return result
 
-
     def __set_agent_busy(self, action_name, action_kwargs, agent_id):
 
         # Check if the action_name is None, in which case we simply idle for one tick
@@ -739,7 +735,7 @@ class GridWorld:
 
         # The agent is now busy performing this action
         self.__registered_agents[agent_id]._set_agent_busy(curr_tick=self.current_nr_ticks,
-                                                         action_duration=duration_in_ticks)
+                                                           action_duration=duration_in_ticks)
 
         # Set the action and result in the agent so we know where the agent is busy with. In addition this is appended
         # to its properties so others know what agent did)
@@ -766,10 +762,6 @@ class GridWorld:
 
     def __warn(self, warn_str):
         return f"[@{self.__current_nr_ticks}] {warn_str}"
-
-    @property
-    def messages_send_previous_tick(self):
-        return self.__messages_send_previous_tick
 
     @property
     def registered_agents(self):

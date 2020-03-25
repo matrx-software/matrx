@@ -32,30 +32,30 @@ class StateTracker:
     def update(self, state):
 
         # Update all of the objects decays
-        for id in self.__decay_values.keys():
-            self.__decay_values[id] -= self.__decay
+        for obj_id in self.__decay_values.keys():
+            self.__decay_values[obj_id] -= self.__decay
 
         # Check if we need to remove an object
         temp_decay_values = list(self.__decay_values.items()).copy()
-        for id, decay in temp_decay_values:
+        for obj_id, decay in temp_decay_values:
             if decay < 0:
-                self.__memorized_state.pop(id)
-                self.__decay_values.pop(id)
+                self.__memorized_state.pop(obj_id)
+                self.__decay_values.pop(obj_id)
 
         # Loop over the given state and update our memorized state
-        for id, properties in state.items():
+        for obj_id, properties in state.items():
             # the object is new for our memory, previously forgotten or already in our memory and we update it
-            self.__memorized_state[id] = properties
-            self.__decay_values[id] = 1.0  # (re)set the memory decay
+            self.__memorized_state[obj_id] = properties
+            self.__decay_values[obj_id] = 1.0  # (re)set the memory decay
 
         # Now check if there is an object that we memorized to be at some place we should still be able to perceive but
         # did not find that object there
         sense_capability = state[self.agent_id]['sense_capability']  # get the agent's sense capability
         agent_loc = state[self.agent_id]['location']  # get the agent's location
         temp_memorized_state = list(self.__memorized_state.items()).copy()
-        for id, properties in temp_memorized_state:
+        for obj_id, properties in temp_memorized_state:
             # We only remove it if it is also not in the given state (since then we updated it just now!)
-            if id in state.keys():
+            if obj_id in state.keys():
                 continue
 
             # Get the location, distance and object class
@@ -73,8 +73,8 @@ class StateTracker:
 
             # check if obj is in range and is not in state anymore
             if distance <= perceive_range:
-                self.__memorized_state.pop(id)
-                self.__decay_values.pop(id)
+                self.__memorized_state.pop(obj_id)
+                self.__decay_values.pop(obj_id)
 
         return self.get_memorized_state()
 
@@ -82,16 +82,15 @@ class StateTracker:
         map_size = self.__memorized_state['World']['grid_shape']
         traverse_map = np.array([[int(not inverted) for _ in range(map_size[1])] for _ in range(map_size[0])])
 
-        for id, properties in self.__memorized_state.items():
+        for obj_id, properties in self.__memorized_state.items():
 
-            if id == "World":
+            if obj_id == "World":
                 continue
 
             loc = properties['location']
 
             # if another object on that location is intraversable, don't overwrite it
-            if (traverse_map[loc[0], loc[1]] == 0 and not inverted) or \
-                (traverse_map[loc[0], loc[1]] == 1 and inverted):
+            if (traverse_map[loc[0], loc[1]] == 0 and not inverted) or (traverse_map[loc[0], loc[1]] == 1 and inverted):
                 continue
 
             # add the traversability to the map

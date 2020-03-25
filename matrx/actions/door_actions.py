@@ -182,9 +182,7 @@ class CloseDoorAction(Action):
 
         """
 
-        # fetch options
-        door_range = 1 if 'door_range' not in kwargs else kwargs['door_range']
-        # object_id is required
+        # object_id is required (the is_possible method already ensured us that the object is within door_range)
         object_id = None if 'object_id' not in kwargs else kwargs['object_id']
         if object_id is None:
             result = CloseDoorActionResult(CloseDoorActionResult.NO_OBJECT_SPECIFIED, False)

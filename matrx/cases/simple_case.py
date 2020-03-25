@@ -3,8 +3,7 @@ from matrx.logger.log_agent_actions import LogActions
 from matrx.world_builder import WorldBuilder
 
 
-
-def create_factory():
+def create_builder():
     factory = WorldBuilder(random_seed=1, shape=[15, 15], tick_duration=0.2, verbose=True, run_matrx_api=True,
                            run_matrx_visualizer=True)
 

@@ -4,7 +4,6 @@ from collections import OrderedDict
 from typing import Callable, Union, Iterable
 import requests
 
-
 from numpy.random.mtrand import RandomState
 import numpy as np
 
@@ -40,7 +39,7 @@ class WorldBuilder:
 
         Parameters
         ----------
-        shape : tuple
+        shape : tuple, list
             Denotes the width and height of the world you create.
         tick_duration : float, optional
             The duration of a single 'tick' or loop in the game-loop of the world you create. Defaults to 0.5.
@@ -115,8 +114,9 @@ class WorldBuilder:
 
         # Check if the background image is a path
         if visualization_bg_img is not None and not isinstance(visualization_bg_img, str):
-            raise ValueError(f"The given visualization_bg_img {visualization_bg_img} should be of type str denoting a path"
-                             f" to an image.")
+            raise ValueError(
+                f"The given visualization_bg_img {visualization_bg_img} should be of type str denoting a path"
+                f" to an image.")
 
         if not isinstance(run_matrx_visualizer, bool):
             raise ValueError(f"The given value {run_matrx_visualizer} for run_matrx_visualizer is invalid, should be "
@@ -140,8 +140,8 @@ class WorldBuilder:
 
         # initialize an api variables
         self.run_matrx_api = run_matrx_api
-        self.api_info = {   "run_matrx_api": run_matrx_api,
-                            "api_thread": False }
+        self.api_info = {"run_matrx_api": run_matrx_api,
+                         "api_thread": False}
 
         # initialize the visualization variables
         self.run_matrx_visualizer = run_matrx_visualizer
@@ -170,7 +170,6 @@ class WorldBuilder:
             warnings.simplefilter("always")
         else:  # use the default (print all warnings once per location [module and line number])
             warnings.simplefilter("default")
-
 
     def worlds(self, nr_of_worlds: int = 100):
         """
@@ -214,13 +213,13 @@ class WorldBuilder:
         --------
 
         """
-        #TODO Refer to GridWorld.run()
+        # TODO Refer to GridWorld.run()
         self.worlds_created += 1
         world = self.__create_world()
         self.__reset_random()
         return world
 
-    def __set_world_settings(self, shape, tick_duration, simulation_goal,  rnd_seed,
+    def __set_world_settings(self, shape, tick_duration, simulation_goal, rnd_seed,
                              visualization_bg_clr, visualization_bg_img, verbose):
 
         if rnd_seed is None:
@@ -549,8 +548,6 @@ class WorldBuilder:
                            visualize_opacity=visualize_opacities[idx],
                            **custom_properties[idx])
 
-
-
     def add_agent_prospect(self, location, agent, probability, name="Agent", customizable_properties=None,
                            sense_capability=None,
                            is_traversable=None, team=None, possible_actions=None,
@@ -791,7 +788,7 @@ class WorldBuilder:
         min_y = top_left_location[1]
         max_y = top_left_location[1] + height
 
-        noise_grid = utils._white_noise(min_x, max_x, min_y, max_y, rng=self.rng)
+        noise_grid = _white_noise(min_x, max_x, min_y, max_y, rng=self.rng)
 
         for x in range(noise_grid.shape[0]):
             for y in range(noise_grid.shape[1]):
@@ -922,7 +919,6 @@ class WorldBuilder:
                           visualize_colour=area_visualize_colour, visualize_opacity=area_visualize_opacity,
                           customizable_properties=area_customizable_properties, **area_custom_properties)
 
-
     def __create_world(self):
 
         # Create the world
@@ -959,15 +955,13 @@ class WorldBuilder:
             logger._set_world_nr(self.worlds_created)
             world._register_logger(logger)
 
-
-
         # Return the (successful/stable) world
         return world
 
     def __create_grid_world(self):
         args = self.world_settings
         # create a world ID in the shape of "world_" + world number + seeded random int
-        args['world_ID'] = f"world_{self.worlds_created}"
+        args['world_id'] = f"world_{self.worlds_created}"
         world = GridWorld(**args)
         return world
 
@@ -1004,15 +998,13 @@ class WorldBuilder:
             # Get all variables required by constructor
             argspecs = inspect.getfullargspec(callable_class)
             args = argspecs.args  # does not give *args or **kwargs names
-            defaults = argspecs.defaults  # defaults (if any) of the last n elements in args
-            varkw = argspecs.varkw # **kwargs names
-
-            argspecsv2 = inspect.getfullargspec(callable_class)
+            def_args = argspecs.defaults  # defaults (if any) of the last n elements in args
+            varkw = argspecs.varkw  # **kwargs names
 
             # Now assign the default values to kwargs dictionary
             args = OrderedDict({arg: "not_set" for arg in reversed(args[1:])})
-            if defaults is not None:
-                for idx, default in enumerate(reversed(defaults)):
+            if def_args is not None:
+                for idx, default in enumerate(reversed(def_args)):
                     k = list(args.keys())[idx]
                     args[k] = default
 
@@ -1040,7 +1032,6 @@ class WorldBuilder:
             elif varkw is not None and len(kwargs) > 0:
                 for arg in kwargs:
                     args[arg] = custom_props[arg]
-
 
         args = self.__instantiate_random_properties(args)
 
@@ -1100,7 +1091,6 @@ class WorldBuilder:
         # TODO selected again.
         pass
 
-
     def startup(self, media_folder=None):
         """ Start any world-overarching MATRX scripts, such as, if requested, the api or MATRX visualization.
         Returns
@@ -1121,7 +1111,8 @@ class WorldBuilder:
 
         # warn the user if they forgot to turn on the MATRX visualizer
         elif media_folder is not None:
-            warnings.warn("Set media folder path for MATRX visualizer, but run_matrx_visualizer is set to False")
+            warnings.warn("A media folder path for the MATRX visualizer was given, but run_matrx_visualizer is set to "
+                          "False denoting that the default visualizer should not be run.")
 
     def stop(self):
         """ Stop any world-overarching MATRX scripts, such as, if started, the api or MATRX visualization.
@@ -1137,8 +1128,6 @@ class WorldBuilder:
             print("Shutting down Matrx visualizer")
             r = requests.get("http://localhost:" + str(visualization_server.port) + "/shutdown_visualizer")
             self.matrx_visualizer_thread.join()
-
-
 
 
 class RandomProperty:
@@ -1173,9 +1162,6 @@ class RandomProperty:
 
     def reset(self):
         self.selected_values = set()
-
-
-
 
 
 def _get_line_coords(p1, p2):
@@ -1238,19 +1224,19 @@ def _perlin_noise(min_x, max_x, min_y, max_y, rng):
 
     """
 
-    def lerp(a, b, x):
+    def lerp(a, b, x_):
         """linear interpolation"""
-        return a + x * (b - a)
+        return a + x_ * (b - a)
 
     def fade(t):
         """6t^5 - 15t^4 + 10t^3"""
         return 6 * t ** 5 - 15 * t ** 4 + 10 * t ** 3
 
-    def gradient(h, x, y):
+    def gradient(h, x_, y):
         """grad converts h to the right gradient vector and return the dot product with (x,y)"""
         vectors = np.array([[0, 1], [0, -1], [1, 0], [-1, 0]])
         g = vectors[h % 4]
-        return g[:, :, 0] * x + g[:, :, 1] * y
+        return g[:, :, 0] * x_ + g[:, :, 1] * y
 
     # Create coordinate grid
     x_steps = int(max_x - min_x)

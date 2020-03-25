@@ -4,7 +4,7 @@ from matrx.agents.agent_types.human_agent import HumanAgentBrain
 from matrx.actions.move_actions import *
 
 
-def create_factory():
+def create_builder():
     factory = WorldBuilder(random_seed=1, shape=[14, 20], tick_duration=0.1, verbose=False, run_matrx_api=True,
                            run_matrx_visualizer=True, visualization_bg_clr="#f0f0f0",
                            visualization_bg_img='/static/images/restaurant_bg.png')
@@ -45,10 +45,10 @@ def create_factory():
         's': MoveSouth.__name__,
         'a': MoveWest.__name__
     }
-    factory.add_human_agent([5,5], HumanAgentBrain(), name="human",
+    factory.add_human_agent([5, 5], HumanAgentBrain(), name="human",
                             key_action_map=key_action_map, img_name="/static/images/transparent.png")
 
-    factory.add_human_agent([6,6], HumanAgentBrain(), name="human2",
+    factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
                             key_action_map=key_action_map, img_name="/img/agent_external.gif")
 
     return factory

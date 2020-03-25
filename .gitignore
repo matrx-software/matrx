@@ -1,28 +1,19 @@
-.pypirc
+# Ignore pycharm project folder
+.idea/
+
+# Ignore build related folders and files
 build/
 dist/
 matrx.egg-info/
-
-.idea/
-old/
-agents/__pycache__/
-agents/capabilities/__pycache__/
-environment/__pycache__/
-environment/actions/__pycache__/
-environment/objects/__pycache__/
-environment/sim_goals/__pycache__/
+.pypirc
 *.pyc
 *.stackdump
-__pycache__/
+pypi_tokens.txt
 
-generalStructure.log
-
-logData.log
-
+# Ignore logging data
+log_data/
 *.log
 
-log_data/
-
-# ignore generated documentation files
+# Ignore generated documentation files
 docs/build
 docs/source/sections/_generated_autodoc

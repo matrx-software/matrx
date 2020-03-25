@@ -2,41 +2,55 @@ import numpy as np
 
 
 class Capability:
+    """ Private MATRX class.
+
+    Base class for agent capabilities.
+
+    Notes
+    -----
+    Currently only used for the
+    :class:`matrxs.agents.capabilities.capability.SenseCapability`. Might be
+    extended in the future to include other type of capabilities.
+
+    """
 
     def __init__(self):
-        """ Base class for agent capabilities.
-
-        Currently only used for the SenseCapability.
-
-        """
         pass
 
 
 class SenseCapability(Capability):
+    """ Denotes what an agent can see within a certain range.
+
+    An instance of this class describes to an agent what it can perceive within
+    what ranges. It is used by a :class:`matrxs.grid_world.GridWorld` instance
+    to construct the agent's state.
+
+    Parameters
+    ----------
+    detectable_objects : dict
+        A dictionary with as keys the class names of EnvObject or inherited
+        classes thereof, and as values the distance this object type can be
+        perceived.
+
+        If one wants the agent to perceive all object type within some range,
+        None can be given as key with the desired range (and other keys are
+        ignored).
+
+    Examples
+    --------
+    An example of a SenseCapability that defines the perception of all agents
+    separate from SquareBlock objects. No other objects are perceived.
+
+    >>> SenseCapability({"AgentBody": 10, "SquareBlock": 25})
+
+    An example of a SenseCapability that sets the perception range of all
+    objects.
+
+    >>> SenseCapability({None: 25})
+
+    """
 
     def __init__(self, detectable_objects):
-        """This class stores what object types can be perceived in what distance for an agent.
-
-        Parameters
-        ----------
-        detectable_objects : dict
-            A dictionary with as keys the class names of EnvObject and potential inherited classes, and as values the
-            distance this object type can be perceived. One can denote the distance for all object types by providing
-            a dictionary with None as key, and the desired distance as value.
-
-        Examples
-        --------
-        An example of a SenseCapability that defines the perception of all AgentBody objects separate from SquareBlock
-        objects.
-
-        >>> SenseCapability({"AgentBody": 10, "SquareBlock": 25})
-
-        An example of a SenseCapability that sets the perception range of all objects.
-
-        >>> SenseCapability({None: 25})
-
-
-        """
         super().__init__()
         self.__detectable_objects = {}
         for obj_type, sense_range in detectable_objects.items():
@@ -48,12 +62,15 @@ class SenseCapability(Capability):
                 self.__detectable_objects[obj_type] = sense_range
 
     def get_capabilities(self):
-        """ Returns the dictionary defining what types can be perceived within which distance.
+        """ Returns the sense capabilities.
 
         Returns
         -------
         sense_capabilities: dict
-            A dictionary with as keys the object types and values the distances.
+            A dictionary with as keys the object types and values the
+            distances.
+
+            The key None denotes all object types.
         """
         return self.__detectable_objects.copy()
 
