@@ -10,7 +10,9 @@ requires = ['Flask>=1.0.2',
             'requests>=2.21.0',
             'colour>=0.1.5',
             'gevent>=1.4.0',
-            'flask-cors>=3.0.0'
+            'flask-cors>=3.0.0',
+            'docutils>=0.13.1',
+            'Pygments>=2.5.1'
             ],
 
 package_data = {
@@ -80,7 +82,7 @@ def build_and_upload(mode):
                + ' dist/* '
     else:
         print("Uploading to PyPi servers...")
-        cmd_ = 'python -m twine upload -u ' + token + ' dist/*'
+        cmd_ = 'python -m twine upload -u __token__ -p' + token + ' dist/*'
     os.system(cmd_)
 
 
