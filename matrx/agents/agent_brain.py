@@ -512,7 +512,7 @@ class AgentBrain:
         ----------
         all_agent_ids
             IDs of all agents
-            
+
         Returns
         -------
             A list of message objects with a generic content, the sender (this agent's id) and optionally a
