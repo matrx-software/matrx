@@ -1111,7 +1111,7 @@ class WorldBuilder:
 
         # warn the user if they forgot to turn on the MATRX visualizer
         elif media_folder is not None:
-            warnings.warn("A media folder path for the MATRX visualizer was given, but run_matrx_visualizer is set to "
+            warnings.warn("A media folder path for the MATRX visualizer was given, but run_matrx_visualizer is set to " \
                           "False denoting that the default visualizer should not be run.")
 
     def stop(self):
