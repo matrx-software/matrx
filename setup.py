@@ -16,8 +16,7 @@ requires = ['Flask>=1.0.2',
             ],
 
 package_data = {
-        "matrx_visualizer": ["mockup/**/*", "templates/**/*", "static/**/*"],
-        "": ["LICENSE", "HISTORY"]
+        "matrx_visualizer": ["mockup/**/*", "templates/**/*", "static/**/*"]
     }
 
 # Load readme file
@@ -29,7 +28,8 @@ with open("HISTORY.md", "r") as fh:
     history = fh.read()
 
 # Load about file
-about_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'matrx', '__version__.py')
+about_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'matrx',
+                          '__version__.py')
 about = {}
 with open(about_file, 'r') as f:
     exec(f.read(), about)
@@ -47,15 +47,18 @@ def load_tokens():
 
 def clean_dist():
     folder = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'dist')
-    for filename in os.listdir(folder):
-        file_path = os.path.join(folder, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
+    try:
+        for filename in os.listdir(folder):
+            file_path = os.path.join(folder, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
+    except FileNotFoundError:
+        pass
 
 
 def build_and_upload(mode):
@@ -78,11 +81,12 @@ def build_and_upload(mode):
 
     if mode == 'test':
         print("Uploading to test PyPi servers...")
-        cmd_ = 'python -m twine upload --repository-url https://test.pypi.org/legacy/ -u __token__ -p ' + token \
+        cmd_ = 'python -m twine upload --repository-url ' \
+               'https://test.pypi.org/legacy/ -u __token__ -p ' + token \
                + ' dist/* '
     else:
         print("Uploading to PyPi servers...")
-        cmd_ = 'python -m twine upload -u __token__ -p' + token + ' dist/*'
+        cmd_ = 'python -m twine upload -u __token__ -p ' + token + ' dist/*'
     os.system(cmd_)
 
 
@@ -110,8 +114,8 @@ setuptools.setup(
     install_requires=requires,
     package_data=package_data,
     include_package_data=True,
-    classifiers=[
-        "Development Status :: 4 - Beta",  # https://pypi.org/pypi?%3Aaction=list_classifiers
+    classifiers=[   # https://pypi.org/pypi?%3Aaction=list_classifiers
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
