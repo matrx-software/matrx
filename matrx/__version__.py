@@ -7,11 +7,12 @@
 #
 
 __title__ = 'matrx'
-__description__ = "A Python package for the rapid development and evaluation of human-agent teaming concepts."
+__description__ = "A Python package for the rapid development and " \
+                  "evaluation of human-agent teaming concepts."
 __url__ = 'https://matrx-software.com'
 __doc_url__ = 'http://docs.matrx-software.com/en/latest/'
 __source_url__ = 'https://github.com/matrx-software/matrx'
-__version__ = '1.0.0'
+__version__ = '1.0.1a0'
 __author__ = 'MATRX Team at TNO.nl'
 __author_email__ = 'info@matrx.com'
 __license__ = 'MIT License'
