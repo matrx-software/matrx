@@ -941,28 +941,42 @@ class WorldBuilder:
 
         # Create the world
         world = self.__create_grid_world()
-
         # Create all objects first
         objs = []
-        for obj_settings in self.object_settings:
+        for idx, obj_settings in enumerate(self.object_settings):
+            # Print progress (so user knows what is going on)
+            if idx % max(10, int(len(self.object_settings) * 0.1)) == 0:
+                print(f"Creating objects... @{np.round(idx / len(self.object_settings) * 100, 0)}%")
+
             env_object = self.__create_env_object(obj_settings)
             if env_object is not None:
                 objs.append(env_object)
 
         # Then create all agents
         avatars = []
-        for agent_settings in self.agent_settings:
+        for idx, agent_settings in enumerate(self.agent_settings):
+            # Print progress (so user knows what is going on)
+            if idx % max(10, int(len(self.agent_settings) * 0.1)) == 0:
+                print(f"Creating agents... @{np.round(idx / len(self.agent_settings) * 100, 0)}%")
+
             agent, agent_avatar = self.__create_agent_avatar(agent_settings)
             if agent_avatar is not None:
                 avatars.append((agent, agent_avatar))
 
         # Register all objects (including checks)
-        for env_object in objs:
+        for idx, env_object in enumerate(objs):
+            # Print progress (so user knows what is going on)
+            if idx % max(10, int(len(objs) * 0.1)) == 0:
+                print(f"Adding objects... @{np.round(idx / len(objs) * 100, 0)}%")
+
             world._register_env_object(env_object)
 
         # Register all agents (including checks)
-        for agent, agent_avatar in avatars:
-            world._register_agent(agent, agent_avatar)
+        for idx, agent in enumerate(avatars):
+            # Print progress (so user knows what is going on)
+            if idx % max(10, int(len(objs) * 0.1)) == 0:
+                print(f"Adding agents... @{np.round(idx / len(avatars) * 100, 0)}%")
+            world._register_agent(agent[0], agent[1])
 
         # Register all teams and who is in them
         world._register_teams()
