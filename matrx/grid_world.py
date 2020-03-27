@@ -252,11 +252,8 @@ class GridWorld:
             else:
                 self.__grid[loc[1], loc[0]] = [grid_obj.obj_id]
         else:
-            loc = grid_obj.location
-            if self.__grid[loc[1], loc[0]] is not None:
-                self.__grid[loc[1], loc[0]].append(grid_obj.obj_id)
-            else:
-                self.__grid[loc[1], loc[0]] = [grid_obj.obj_id]
+            raise BaseException(f"Object is not of type {str(type(EnvObject))} but of {str(type(grid_obj))} when adding"
+                                f" to grid in GridWorld.")
 
     def _register_agent(self, agent, agent_avatar: AgentBody):
         """ Register human agents and agents to the gridworld environment """
