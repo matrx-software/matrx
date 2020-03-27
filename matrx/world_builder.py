@@ -620,12 +620,12 @@ class WorldBuilder:
         self.object_settings.append(object_setting)
 
     def add_object_prospect(self, location, name, probability, callable_class=None, customizable_properties=None,
-                            is_traversable=None,
+                            is_traversable=None, is_movable=None,
                             visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
                             visualize_opacity=None, **custom_properties):
         # Add object as normal
         self.add_object(location, name, callable_class, customizable_properties,
-                        is_traversable,
+                        is_traversable, is_movable,
                         visualize_size, visualize_shape, visualize_colour, visualize_depth,
                         visualize_opacity, **custom_properties)
 
@@ -686,7 +686,7 @@ class WorldBuilder:
 
         if visualize_opacities is None:
             visualize_opacities = [None for _ in range(len(locations))]
-        elif isinstance(visualize_opacities, int):
+        elif isinstance(visualize_opacities, float):
             visualize_opacities = [visualize_opacities for _ in range(len(locations))]
 
         if visualize_depths is None:
@@ -859,7 +859,7 @@ class WorldBuilder:
                                   is_movable=is_movable)
 
     def add_room(self, top_left_location, width, height, name, door_locations=None, with_area_tiles=False,
-                 doors_open=False,
+                 doors_open=False, wall_visualize_colour=None, wall_visualize_opacity=None,
                  wall_custom_properties=None, wall_customizable_properties=None,
                  area_custom_properties=None, area_customizable_properties=None,
                  area_visualize_colour=None, area_visualize_opacity=None):
@@ -913,6 +913,8 @@ class WorldBuilder:
         # Add all walls
         names = [f"{name} - wall@{loc}" for loc in all_]
         self.add_multiple_objects(locations=all_, names=names, callable_classes=Wall,
+                                  visualize_colours=wall_visualize_colour,
+                                  visualize_opacities=wall_visualize_opacity,
                                   custom_properties=wall_custom_properties,
                                   customizable_properties=wall_customizable_properties)
 
@@ -1152,7 +1154,7 @@ class RandomProperty:
 
         # If distribution is None, its uniform (equal probability to all values)
         if distribution is None:
-            distribution = [1 / len(values) for _ in range(values)]
+            distribution = [1 / len(values) for _ in values]
 
         # Normalize distribution if not already
         if sum(distribution) != 1.0:
@@ -1173,6 +1175,14 @@ class RandomProperty:
             for it in self.selected_values:
                 vals.remove(it)
         choice = rng.choice(vals, p=self.distribution, size=size, replace=self.allow_duplicates)
+
+        # Since the value choice is selected using Numpy, the choice may have changed to a unserializable numpy object
+        # which would prevent it the be 'jsonified' for the API. So we check for this and cast it to its Python version.
+        if all(isinstance(n, int) for n in self.values):
+            choice = int(choice)
+        elif all(isinstance(n, float) for n in self.values):
+            choice = float(choice)
+
         self.selected_values.add(choice)
         return choice
 
