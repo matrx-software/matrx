@@ -108,7 +108,7 @@ class WorldBuilder:
 
         # Check the background color
         if not isinstance(visualization_bg_clr, str) and len(visualization_bg_clr) != 7 and \
-                visualization_bg_clr[0] is not "#":
+                visualization_bg_clr[0] != "#":
             raise ValueError(f"The given visualization_bg_clr {visualization_bg_clr} should be a Str of length 7 with"
                              f"an initial '#'' (a hexidecimal color string).")
 
@@ -224,6 +224,14 @@ class WorldBuilder:
 
         if rnd_seed is None:
             rnd_seed = self.rng.randint(0, 1000000)
+
+        # Check if the given shape contains integers, otherwise warn user and cast to int
+        if not (isinstance(shape[0], int) and isinstance(shape[1], int)):
+            warnings.warn(f"The world's provided shape {shape} should contain integers, "
+                          f"encountered {str(type(shape[0]))} and {str(type(shape[1]))} . "
+                          f"Casting these to integers resulting in "
+                          f"{(int(shape[0]), int(shape[1]))}")
+            shape = (int(shape[0]), int(shape[1]))
 
         world_settings = {"shape": shape,
                           "tick_duration": tick_duration,
@@ -575,6 +583,14 @@ class WorldBuilder:
         assert isinstance(location, list) or isinstance(location, tuple)
         assert isinstance(callable_class, Callable)
 
+        # Check if location only contains integers, otherwise warn use and cast to int
+        if not (isinstance(location[0], int) and isinstance(location[1], int)):
+            warnings.warn(f"The location {location} of {name} should contain only integers, "
+                          f"encountered {str(type(location[0]))} and {str(type(location[1]))} . "
+                          f"Casting these to integers resulting in "
+                          f"{(int(location[0]), int(location[1]))}")
+            location = (int(location[0]), int(location[1]))
+
         # Load default parameters if not passed
         if is_movable is None:
             is_movable = defaults.ENVOBJECT_IS_MOVABLE
@@ -864,14 +880,14 @@ class WorldBuilder:
             with_area_tiles = True
 
         # Subtract 1 from both width and height, since the top left already counts as a size of 1,1
-        width -= 1
-        height -= 1
+        width = int(width) - 1
+        height = int(height) - 1
 
         # Set corner coordinates
-        top_left = top_left_location
-        top_right = (top_left_location[0] + width, top_left_location[1])
-        bottom_left = (top_left_location[0], top_left_location[1] + height)
-        bottom_right = (top_left_location[0] + width, top_left_location[1] + height)
+        top_left = (int(top_left_location[0]), int(top_left_location[1]))
+        top_right = (int(top_left_location[0]) + int(width), int(top_left_location[1]))
+        bottom_left = (int(top_left_location[0]), int(top_left_location[1]) + int(height))
+        bottom_right = (int(top_left_location[0]) + int(width), int(top_left_location[1]) + int(height))
 
         # Get all edge coordinates
         top = _get_line_coords(top_left, top_right)
