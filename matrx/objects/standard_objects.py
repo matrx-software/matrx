@@ -95,7 +95,7 @@ class Wall(EnvObject):
 class AreaTile(EnvObject):
 
     def __init__(self, location, name="AreaTile", visualize_colour="#8ca58c", visualize_depth=None,
-                 visualize_opacity=1.0):
+                 visualize_opacity=1.0, **kwargs):
         """
         A simple AreaTile object. Is always traversable, not movable, the colour can be set but has otherwise the
         default EnvObject property values. Can be used to define different areas in the GridWorld.
@@ -105,7 +105,8 @@ class AreaTile(EnvObject):
         """
         super().__init__(name=name, location=location, visualize_colour=visualize_colour,
                          is_traversable=True, is_movable=False, class_callable=AreaTile,
-                         visualize_depth=visualize_depth, visualize_opacity=visualize_opacity)
+                         visualize_depth=visualize_depth, visualize_opacity=visualize_opacity,
+                         **kwargs)
 
 
 class SmokeTile(AreaTile):
