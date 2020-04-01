@@ -881,7 +881,7 @@ def _possible_drop(grid_world, agent_id, obj_id, drop_range):
 
     # TODO: incorporate is_possible check from DropAction.mutate is_possible here
 
-    return True, DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
+    return DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
 
 
 def _find_drop_loc(grid_world, agent, env_obj, drop_range, start_loc):
