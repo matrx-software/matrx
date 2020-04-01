@@ -89,7 +89,7 @@ class Wall(EnvObject):
         """
         is_traversable = False  # All walls are always not traversable
         super().__init__(name=name, location=location, visualize_colour=visualize_colour,
-                         is_traversable=is_traversable, class_callable=Wall)
+                         is_traversable=is_traversable, class_callable=Wall, is_movable=False)
 
 
 class AreaTile(EnvObject):
