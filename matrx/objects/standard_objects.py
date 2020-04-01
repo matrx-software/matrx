@@ -47,7 +47,7 @@ class Door(EnvObject):
         is_traversable = self.is_open
 
         super().__init__(location=location, name=name, is_traversable=is_traversable, visualize_colour=current_color,
-                         is_open=self.is_open, class_callable=Door)
+                         is_open=self.is_open, class_callable=Door, is_movable=False)
 
     def open_door(self):
         """
