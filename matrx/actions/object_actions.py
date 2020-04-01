@@ -884,7 +884,7 @@ def _possible_drop(grid_world, agent_id, obj_id, drop_range):
     return True, DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
 
 
-def _find_drop_loc(self, grid_world, agent, env_obj, drop_range, start_loc):
+def _find_drop_loc(grid_world, agent, env_obj, drop_range, start_loc):
     """ Private MATRX method.
     A breadth first search starting from the agent's location to find the closest valid drop location.
     Parameters
