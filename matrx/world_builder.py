@@ -787,7 +787,7 @@ class WorldBuilder:
         locs = self.__list_area_locs(top_left_location, width, height)
 
         # Add all area objects
-        self.add_multiple_objects(locations=locs, callable_classes=AreaTile,
+        self.add_multiple_objects(locations=locs, callable_classes=AreaTile, names=name,
                                   customizable_properties=customizable_properties, visualize_colours=visualize_colour,
                                   visualize_opacities=visualize_opacity, custom_properties=custom_properties)
 
@@ -1058,7 +1058,7 @@ class WorldBuilder:
             if varkw is None and len(kwargs) > 0:
                 warnings.warn(f"The following properties are not used in the creation of environment object of type "
                               f"{callable_class.__name__} with name {mandatory_props['name']}; {kwargs}, because "
-                              f"the class does nto have a **kwargs argument in the constructor.")
+                              f"the class does not have a **kwargs argument in the constructor.")
 
             # if a **kwargs argument was defined in the object constructor, pass all custom properties to the object
             elif varkw is not None and len(kwargs) > 0:
