@@ -17,7 +17,7 @@ from matrx.objects.env_object import EnvObject, _get_inheritence_path
 from matrx import utils
 from matrx.agents.capabilities.capability import create_sense_capability
 from matrx.objects.standard_objects import Wall, Door, AreaTile, SmokeTile
-from matrx.goals.goals import LimitedTimeGoal, UseCaseGoal
+from matrx.goals.goals import LimitedTimeGoal, WorldGoal
 
 import matrx.defaults as defaults
 
@@ -100,10 +100,10 @@ class WorldBuilder:
             raise ValueError(f"The given random_seed {random_seed} should be an Int and bigger or equal to 1.")
 
         # Check if the simulation_goal is a SimulationGoal, an int or a list or tuple of SimulationGoal
-        if not isinstance(simulation_goal, UseCaseGoal) and not isinstance(simulation_goal, int) \
+        if not isinstance(simulation_goal, WorldGoal) and not isinstance(simulation_goal, int) \
                 and not (isinstance(simulation_goal, Iterable) and (sum(1 for _ in simulation_goal)) > 0):
-            raise ValueError(f"The given simulation_goal {simulation_goal} should be of type {UseCaseGoal.__name__} "
-                             f"or a list/tuple of {UseCaseGoal.__name__}, or it should be an int denoting the max"
+            raise ValueError(f"The given simulation_goal {simulation_goal} should be of type {WorldGoal.__name__} "
+                             f"or a list/tuple of {WorldGoal.__name__}, or it should be an int denoting the max"
                              f"number of ticks the world should run (negative for infinite).")
 
         # Check the background color

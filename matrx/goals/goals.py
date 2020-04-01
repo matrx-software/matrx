@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class UseCaseGoal:
+class WorldGoal:
     """
     A class that tracks whether the simulation has reached its global goal.
     """
@@ -33,7 +33,7 @@ class UseCaseGoal:
         pass
 
 
-class LimitedTimeGoal(UseCaseGoal):
+class LimitedTimeGoal(WorldGoal):
     """
     A simulation goal that simply tracks whether a maximum number of ticks has been reached.
     """
