@@ -199,7 +199,6 @@ class HumanAgentBrain(AgentBrain):
         elif action == DropObject.__name__:
             # Assign it to the arguments list
             action_kwargs['drop_range'] = self.__drop_range  # Set drop range
-            action_kwargs['object_id'] = None  # None will cause it to drop the last grabbed object
 
         # if the user chose to do an open or close door action, find a door to open/close within range
         elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:
