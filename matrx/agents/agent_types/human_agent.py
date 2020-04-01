@@ -1,4 +1,4 @@
-from matrx.actions.object_actions import GrabObject
+from matrx.actions.object_actions import GrabObject, DropObject
 from matrx.actions.door_actions import OpenDoorAction, CloseDoorAction
 from matrx.agents.agent_brain import AgentBrain
 import numpy as np
@@ -6,12 +6,15 @@ import numpy as np
 
 class HumanAgentBrain(AgentBrain):
 
-    def __init__(self, max_carry_objects=3):
+    def __init__(self, max_carry_objects=3, grab_range=1, drop_range=1, door_range=1):
         """
         Creates an Human Agent which is an agent that can be controlled by a human.
         """
         super().__init__()
         self.__max_carry_objects = max_carry_objects
+        self.__grab_range = grab_range
+        self.__drop_range = drop_range
+        self.__door_range = door_range
 
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
                             customizable_properties, rnd_seed, callback_is_action_possible, key_action_map=None):
@@ -158,7 +161,7 @@ class HumanAgentBrain(AgentBrain):
         # if the user chose a grab action, choose an object within a grab_range of 1
         if action == GrabObject.__name__:
             # Assign it to the arguments list
-            action_kwargs['grab_range'] = 1  # Set grab range
+            action_kwargs['grab_range'] = self.__grab_range  # Set grab range
             action_kwargs['max_objects'] = self.__max_carry_objects  # Set max amount of objects
             action_kwargs['object_id'] = None
 
@@ -192,9 +195,15 @@ class HumanAgentBrain(AgentBrain):
                 object_id = self.rnd_gen.choice(object_in_range)
                 action_kwargs['object_id'] = object_id
 
-        # if the user chose to do an open or close door action, find a door to open/close within 1 block
+        # If the user chose to drop an object in its inventory
+        elif action == DropObject.__name__:
+            # Assign it to the arguments list
+            action_kwargs['drop_range'] = self.__drop_range  # Set drop range
+            action_kwargs['object_id'] = None  # None will cause it to drop the last grabbed object
+
+        # if the user chose to do an open or close door action, find a door to open/close within range
         elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:
-            action_kwargs['door_range'] = 1
+            action_kwargs['door_range'] = self.__door_range
             action_kwargs['object_id'] = None
 
             # Get all doors from the perceived objects
