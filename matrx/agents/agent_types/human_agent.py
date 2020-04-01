@@ -200,7 +200,7 @@ class HumanAgentBrain(AgentBrain):
                 # Select range as just enough to grab that object
                 dist = int(np.ceil(np.linalg.norm(
                     np.array(state[object_id]['location']) - np.array(
-                        state[self.agent_properties["name"]]['location']))))
+                        state[self.agent_id]['location']))))
                 if dist <= action_kwargs['door_range']:
                     doors_in_range.append(object_id)
 
