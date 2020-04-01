@@ -6,12 +6,12 @@ import numpy as np
 
 class HumanAgentBrain(AgentBrain):
 
-    def __init__(self):
+    def __init__(self, max_carry_objects=3):
         """
         Creates an Human Agent which is an agent that can be controlled by a human.
         """
-
         super().__init__()
+        self.__max_carry_objects = max_carry_objects
 
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
                             customizable_properties, rnd_seed, callback_is_action_possible, key_action_map=None):
@@ -159,7 +159,7 @@ class HumanAgentBrain(AgentBrain):
         if action == GrabObject.__name__:
             # Assign it to the arguments list
             action_kwargs['grab_range'] = 1  # Set grab range
-            action_kwargs['max_objects'] = 3  # Set max amount of objects
+            action_kwargs['max_objects'] = self.__max_carry_objects  # Set max amount of objects
             action_kwargs['object_id'] = None
 
             # Get all perceived objects
