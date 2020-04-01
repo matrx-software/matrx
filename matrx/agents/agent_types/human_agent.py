@@ -192,7 +192,7 @@ class HumanAgentBrain(AgentBrain):
 
             # Get all doors from the perceived objects
             objects = list(state.keys())
-            doors = [obj for obj in objects if 'door_open' in state[obj]]
+            doors = [obj for obj in objects if 'is_open' in state[obj]]
 
             # get all doors within range
             doors_in_range = []
