@@ -557,7 +557,7 @@ class DropObject(Action):
                 f"atleast 1")
 
         # check if we can drop it at our current location
-        curr_loc_drop_poss = _is_drop_poss(grid_world, env_obj, reg_ag.location)
+        curr_loc_drop_poss = _is_drop_poss(grid_world, env_obj, reg_ag.location, agent_id)
 
         # drop it on the agent location if possible
         if curr_loc_drop_poss:
@@ -780,7 +780,7 @@ def _act_drop(grid_world, agent, env_obj, drop_loc):
     return DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
 
 
-def _is_drop_poss(grid_world, env_obj, drop_location):
+def _is_drop_poss(grid_world, env_obj, drop_location, agent_id):
     """ Private MATRX method.
 
     A breadth first search starting from the agent's location to find the
@@ -791,15 +791,14 @@ def _is_drop_poss(grid_world, env_obj, drop_location):
     grid_world : GridWorld
         The :class:`matrxs.grid_world.GridWorld` instance in which the
         object is dropped.
-    agent : AgentBody
-        The :class:`matrxs.objects.agent_body.AgentBody` of the agent who
-        drops the object.
     env_obj : EnvObject
         The :class:`matrxs.objects.env_object.EnvObject` to be dropped.
     drop_range : int
         The range in which the object can be dropped.
     start_loc : [x, y]
         The location of the agent from which to start the search.
+    agent_id : str
+        The agent id of the agent who drops the object.
 
     Returns
     -------
@@ -816,6 +815,11 @@ def _is_drop_poss(grid_world, env_obj, drop_location):
     for key in list(objs_at_loc.keys()):
         if AreaTile.__name__ in objs_at_loc[key].class_inheritance:
             objs_at_loc.pop(key)
+
+    # Remove the agent who drops the object from the list (an agent can always drop the
+    # traversable object its carrying at its feet, even if the agent is intraversable)
+    if agent_id in objs_at_loc.keys():
+        objs_at_loc.pop(agent_id)
 
     in_trav_objs_count = 1 if not env_obj.is_traversable else 0
     in_trav_objs_count += len([obj for obj in objs_at_loc if not objs_at_loc[obj].is_traversable])
@@ -919,7 +923,7 @@ def _find_drop_loc(grid_world, agent, env_obj, drop_range, start_loc):
             return False
 
         # check if we can drop at this location
-        if _is_drop_poss(grid_world, env_obj, [x, y]):
+        if _is_drop_poss(grid_world, env_obj, [x, y], agent.obj_id):
             return [x, y]
 
         # queue unseen neighbouring tiles
