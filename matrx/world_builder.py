@@ -1019,6 +1019,7 @@ class WorldBuilder:
                     'class_callable': callable_class,
                     'customizable_properties': customizable_props,
                     'is_traversable': mandatory_props['is_traversable'],
+                    'is_movable': mandatory_props['is_movable'],
                     'visualize_size': mandatory_props['visualize_size'],
                     'visualize_shape': mandatory_props['visualize_shape'],
                     'visualize_colour': mandatory_props['visualize_colour'],
