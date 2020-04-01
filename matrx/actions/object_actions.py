@@ -776,7 +776,7 @@ def _is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
             return GrabObjectResult(GrabObjectResult.RESULT_OBJECT_UNMOVABLE, False)
         else:
             # Success
-            return GrabObjectResult(GrabObjectResult.RESULT_SUCCESS, False)
+            return GrabObjectResult(GrabObjectResult.RESULT_SUCCESS, True)
     else:
         return GrabObjectResult(GrabObjectResult.RESULT_UNKNOWN_OBJECT_TYPE, False)
 
