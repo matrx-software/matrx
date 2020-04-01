@@ -163,14 +163,21 @@ class HumanAgentBrain(AgentBrain):
             action_kwargs['object_id'] = None
 
             # Get all perceived objects
-            objects = list(state.keys())
+            object_ids = list(state.keys())
+
+            # Remove world from state
+            object_ids.remove("World")
+
+            # Remove self
+            object_ids.remove(self.agent_id)
 
             # Remove all (human)agents
-            objects = [obj for obj in objects if 'agent' not in obj.lower()]
+            object_ids = [obj_id for obj_id in object_ids if "AgentBrain" not in state[obj_id]['class_inheritance'] and
+                          "AgentBody" not in state[obj_id]['class_inheritance']]
 
             # find objects in range
             object_in_range = []
-            for object_id in objects:
+            for object_id in object_ids:
                 if "is_movable" not in state[object_id]:
                     continue
                 # Select range as just enough to grab that object
