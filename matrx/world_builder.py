@@ -789,7 +789,7 @@ class WorldBuilder:
         # Add all area objects
         self.add_multiple_objects(locations=locs, callable_classes=AreaTile,
                                   customizable_properties=customizable_properties, visualize_colours=visualize_colour,
-                                  visualize_opacities=visualize_opacity, **custom_properties)
+                                  visualize_opacities=visualize_opacity, custom_properties=custom_properties)
 
     def add_smoke_area(self, top_left_location, width, height, name, visualize_colour=None,
                        smoke_thickness_multiplier=1.0, visualize_depth=None, **custom_properties):
