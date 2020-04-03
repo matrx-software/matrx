@@ -627,13 +627,8 @@ class WorldBuilder:
 
         if names is None:
             names = [callable_class.__name__ for callable_class in callable_classes]
-        elif isinstance(names, str):
+        elif isinstance(names, str) or isinstance(names, RandomProperty):
             names = [names for _ in range(len(locations))]
-
-        if custom_properties is None:
-            custom_properties = [{} for _ in range(len(locations))]
-        elif isinstance(custom_properties, dict):
-            custom_properties = [custom_properties for _ in range(len(locations))]
 
         if customizable_properties is None:
             customizable_properties = [None for _ in range(len(locations))]
@@ -642,33 +637,38 @@ class WorldBuilder:
 
         if is_traversable is None:
             is_traversable = [None for _ in range(len(locations))]
-        elif isinstance(is_traversable, bool):
+        elif isinstance(is_traversable, bool) or isinstance(is_traversable, RandomProperty):
             is_traversable = [is_traversable for _ in range(len(locations))]
 
         if visualize_sizes is None:
             visualize_sizes = [None for _ in range(len(locations))]
-        elif isinstance(visualize_sizes, int):
+        elif isinstance(visualize_sizes, int) or isinstance(visualize_sizes, RandomProperty):
             visualize_sizes = [visualize_sizes for _ in range(len(locations))]
 
         if visualize_shapes is None:
             visualize_shapes = [None for _ in range(len(locations))]
-        elif isinstance(visualize_shapes, int):
+        elif isinstance(visualize_shapes, int) or isinstance(visualize_shapes, RandomProperty):
             visualize_shapes = [visualize_shapes for _ in range(len(locations))]
 
         if visualize_colours is None:
             visualize_colours = [None for _ in range(len(locations))]
-        elif isinstance(visualize_colours, str):
+        elif isinstance(visualize_colours, str) or isinstance(visualize_colours, RandomProperty):
             visualize_colours = [visualize_colours for _ in range(len(locations))]
 
         if visualize_opacities is None:
             visualize_opacities = [None for _ in range(len(locations))]
-        elif isinstance(visualize_opacities, float):
+        elif isinstance(visualize_opacities, float) or isinstance(visualize_opacities, RandomProperty):
             visualize_opacities = [visualize_opacities for _ in range(len(locations))]
 
         if visualize_depths is None:
             visualize_depths = [None for _ in range(len(locations))]
-        elif isinstance(visualize_depths, str):
+        elif isinstance(visualize_depths, str) or isinstance(visualize_depths, RandomProperty):
             visualize_depths = [visualize_depths for _ in range(len(locations))]
+
+        if custom_properties is None:
+            custom_properties = [{} for _ in range(len(locations))]
+        elif isinstance(custom_properties, dict):
+            custom_properties = [custom_properties for _ in range(len(locations))]
 
         # Loop through all agents and add them
         for idx in range(len(locations)):
