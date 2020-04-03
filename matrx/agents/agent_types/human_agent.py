@@ -1,6 +1,6 @@
 from matrx.actions.object_actions import GrabObject, DropObject, RemoveObject
 from matrx.actions.door_actions import OpenDoorAction, CloseDoorAction
-from matrx.agents import StateTracker
+from matrx.agents.agent_utils.state_tracker import StateTracker
 from matrx.agents.agent_brain import AgentBrain
 import numpy as np
 
