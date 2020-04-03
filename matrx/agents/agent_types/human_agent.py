@@ -1,21 +1,26 @@
 from matrx.actions.object_actions import GrabObject, DropObject, RemoveObject
 from matrx.actions.door_actions import OpenDoorAction, CloseDoorAction
+from matrx.agents import StateTracker
 from matrx.agents.agent_brain import AgentBrain
 import numpy as np
 
 
 class HumanAgentBrain(AgentBrain):
 
-    def __init__(self, max_carry_objects=3, grab_range=1, drop_range=1, door_range=1, remove_range=1):
+    def __init__(self, state_memory_decay=1, fov_occlusion=False, max_carry_objects=3,
+                 grab_range=1, drop_range=1, door_range=1, remove_range=1):
         """
         Creates an Human Agent which is an agent that can be controlled by a human.
         """
         super().__init__()
+        self.__state_memory_decay = state_memory_decay
+        self.__fov_occlusion = fov_occlusion
         self.__max_carry_objects = max_carry_objects
         self.__remove_range = remove_range
         self.__grab_range = grab_range
         self.__drop_range = drop_range
         self.__door_range = door_range
+        self.__remove_range = remove_range
 
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
                             customizable_properties, rnd_seed, callback_is_action_possible, key_action_map=None):
@@ -70,6 +75,10 @@ class HumanAgentBrain(AgentBrain):
             self.key_action_map = {}
         else:
             self.key_action_map = key_action_map
+
+        # Create the agent's state tracker
+        self.__state_tracker = StateTracker(agent_id, sense_capability, knowledge_decay=self.__state_memory_decay,
+                                            fov_occlusion=self.__fov_occlusion)
 
     def _get_action(self, state, agent_properties, agent_id, user_input):
         """
@@ -225,6 +234,7 @@ class HumanAgentBrain(AgentBrain):
         defined by self.sense_capability. It is a list of properties in a dictionary
         :return: A filtered state.
         """
+        state = self.__state_tracker.update(state)
         return state
 
     def filter_user_input(self, user_input):
