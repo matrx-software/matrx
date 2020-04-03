@@ -1,4 +1,5 @@
 import inspect
+import itertools
 import warnings
 from collections import OrderedDict
 from typing import Callable, Union, Iterable
@@ -893,6 +894,37 @@ class WorldBuilder:
             self.add_area(top_left_location=area_top_left, width=area_width, height=area_height, name=f"{name}_area",
                           visualize_colour=area_visualize_colour, visualize_opacity=area_visualize_opacity,
                           customizable_properties=area_customizable_properties, **area_custom_properties)
+
+    @staticmethod
+    def get_room_locations(room_top_left, room_width, room_height):
+        """ Returns the location coordinates within a room.
+
+        This is a helper function for adding objects to a room. It simply returns a list of all (x,y)
+        coordinates that fall within the room excluding the walls.
+
+        Parameters
+        ----------
+        room_top_left: tuple, (x, y)
+            The top left coordinates of a room, as used to add that room with methods such as `add_room`.
+        room_width: int
+            The width of the room.
+        room_height: int
+            The height of the room.
+
+        Returns
+        -------
+        list, [(x,y), ...]
+            A list of (x, y) coordinates that are encapsulated in the room, excluding walls.
+
+        See Also
+        --------
+        WorldBuilder.add_room
+
+        """
+        xs = list(range(room_top_left[0] + 1, room_top_left[0] + room_width))
+        ys = list(range(room_top_left[1] + 1, room_top_left[1] + room_height))
+        locs = list(itertools.product(xs, ys))
+        return locs
 
     def __set_world_settings(self, shape, tick_duration, simulation_goal, rnd_seed,
                              visualization_bg_clr, visualization_bg_img, verbose):
