@@ -41,8 +41,8 @@ var lv_base_url = window.location.hostname,
     lv_update_url = 'http://' + lv_base_url + ':3001/get_latest_state_and_messages/',
     lv_send_userinput_url = 'http://' + lv_base_url + ':3001/send_userinput/',
     lv_sync_messages_url = 'http://' + lv_base_url + ':3001/get_messages/',
-    lv_agent_id = null, // can be overwritten by user scripts (instead of fetching from the url)
-    lv_agent_type = null; // can be overwritten by user scripts (instead of fetching from the url)
+    lv_agent_id = "",
+    lv_agent_type = null;
 
 
 console.log("lv_send_userinput_url:", lv_send_userinput_url);
@@ -119,18 +119,15 @@ function initial_connect() {
 
     var lv_path = window.location.pathname;
     // get the view type ("" for god, "agent" or "human-agent") from the URL
-    if (lv_agent_type == null) {
-        var lv_tmp_agent_type = lv_path.substring(0, lv_path.lastIndexOf('/'));
-        if (lv_tmp_agent_type != "") {
-            lv_agent_type = lv_tmp_agent_type.substring(1);
-        };
-    }
+    lv_agent_type = lv_path.substring(0, lv_path.lastIndexOf('/'));
+    if (lv_agent_type != "") {
+        lv_agent_type = lv_agent_type.substring(1)
+    };
     // Get the agent ID from the url (e.g. "god", "agent_0123", etc.)
     var lv_ID = lv_path.substring(lv_path.lastIndexOf('/') + 1).toLowerCase();
     // decode the URL (e.g. spaces are encoding in urls as %20), and set the agent ID
-    if (lv_agent_id == null) {
-        lv_agent_id = decodeURI(lv_ID);
-    }
+    lv_agent_id = decodeURI(lv_ID);
+
 
     // check if this view is for the god view, agent, or human-agent, and get the correct urls
     if (lv_agent_type == "" && lv_ID == "god") {
