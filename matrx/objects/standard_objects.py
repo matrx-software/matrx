@@ -3,7 +3,7 @@ from matrx.objects.env_object import EnvObject
 
 class SquareBlock(EnvObject):
 
-    def __init__(self, location, name="Block"):
+    def __init__(self, location, name="Block", **custom_properties):
         """
         An example of a simple object with a set of attributes that are always the same. In this case that it is not
         traversable, and is visualized as a square. Otherwise it takes all default properties from an EnvObject and has
@@ -12,8 +12,8 @@ class SquareBlock(EnvObject):
         :param name: The name of the block, if not given it is simply "Block".
         """
 
-        super().__init__(name=name, location=location, is_traversable=False, visualize_shape=0,
-                         class_callable=SquareBlock, visualize_opacity=1.0)
+        super().__init__(name=name, location=location, visualize_shape=0, is_traversable=False,
+                         class_callable=SquareBlock, **custom_properties)
 
 
 class Door(EnvObject):
@@ -47,7 +47,8 @@ class Door(EnvObject):
         is_traversable = self.is_open
 
         super().__init__(location=location, name=name, is_traversable=is_traversable, visualize_colour=current_color,
-                         is_open=self.is_open, class_callable=Door)
+                         is_open=self.is_open, class_callable=Door, is_movable=False,
+                         customizable_properties=['is_open'])
 
     def open_door(self):
         """
@@ -89,13 +90,13 @@ class Wall(EnvObject):
         """
         is_traversable = False  # All walls are always not traversable
         super().__init__(name=name, location=location, visualize_colour=visualize_colour,
-                         is_traversable=is_traversable, class_callable=Wall)
+                         is_traversable=is_traversable, class_callable=Wall, is_movable=False)
 
 
 class AreaTile(EnvObject):
 
     def __init__(self, location, name="AreaTile", visualize_colour="#8ca58c", visualize_depth=None,
-                 visualize_opacity=1.0):
+                 visualize_opacity=1.0, **kwargs):
         """
         A simple AreaTile object. Is always traversable, not movable, the colour can be set but has otherwise the
         default EnvObject property values. Can be used to define different areas in the GridWorld.
@@ -105,7 +106,8 @@ class AreaTile(EnvObject):
         """
         super().__init__(name=name, location=location, visualize_colour=visualize_colour,
                          is_traversable=True, is_movable=False, class_callable=AreaTile,
-                         visualize_depth=visualize_depth, visualize_opacity=visualize_opacity)
+                         visualize_depth=visualize_depth, visualize_opacity=visualize_opacity,
+                         **kwargs)
 
 
 class SmokeTile(AreaTile):

@@ -1,4 +1,5 @@
 import inspect
+import itertools
 import warnings
 from collections import OrderedDict
 from typing import Callable, Union, Iterable
@@ -17,7 +18,7 @@ from matrx.objects.env_object import EnvObject, _get_inheritence_path
 from matrx import utils
 from matrx.agents.capabilities.capability import create_sense_capability
 from matrx.objects.standard_objects import Wall, Door, AreaTile, SmokeTile
-from matrx.goals.goals import LimitedTimeGoal, UseCaseGoal
+from matrx.goals.goals import LimitedTimeGoal, WorldGoal
 
 import matrx.defaults as defaults
 
@@ -100,15 +101,15 @@ class WorldBuilder:
             raise ValueError(f"The given random_seed {random_seed} should be an Int and bigger or equal to 1.")
 
         # Check if the simulation_goal is a SimulationGoal, an int or a list or tuple of SimulationGoal
-        if not isinstance(simulation_goal, UseCaseGoal) and not isinstance(simulation_goal, int) \
+        if not isinstance(simulation_goal, WorldGoal) and not isinstance(simulation_goal, int) \
                 and not (isinstance(simulation_goal, Iterable) and (sum(1 for _ in simulation_goal)) > 0):
-            raise ValueError(f"The given simulation_goal {simulation_goal} should be of type {UseCaseGoal.__name__} "
-                             f"or a list/tuple of {UseCaseGoal.__name__}, or it should be an int denoting the max"
+            raise ValueError(f"The given simulation_goal {simulation_goal} should be of type {WorldGoal.__name__} "
+                             f"or a list/tuple of {WorldGoal.__name__}, or it should be an int denoting the max"
                              f"number of ticks the world should run (negative for infinite).")
 
         # Check the background color
         if not isinstance(visualization_bg_clr, str) and len(visualization_bg_clr) != 7 and \
-                visualization_bg_clr[0] is not "#":
+                visualization_bg_clr[0] != "#":
             raise ValueError(f"The given visualization_bg_clr {visualization_bg_clr} should be a Str of length 7 with"
                              f"an initial '#'' (a hexidecimal color string).")
 
@@ -218,22 +219,6 @@ class WorldBuilder:
         world = self.__create_world()
         self.__reset_random()
         return world
-
-    def __set_world_settings(self, shape, tick_duration, simulation_goal, rnd_seed,
-                             visualization_bg_clr, visualization_bg_img, verbose):
-
-        if rnd_seed is None:
-            rnd_seed = self.rng.randint(0, 1000000)
-
-        world_settings = {"shape": shape,
-                          "tick_duration": tick_duration,
-                          "simulation_goal": simulation_goal,
-                          "rnd_seed": rnd_seed,
-                          "visualization_bg_clr": visualization_bg_clr,
-                          "visualization_bg_img": visualization_bg_img,
-                          "verbose": verbose}
-
-        return world_settings
 
     def add_logger(self, logger_class, log_strategy=None, save_path=None, file_name=None,
                    file_extension=None, delimiter=None, **kwargs):
@@ -575,6 +560,14 @@ class WorldBuilder:
         assert isinstance(location, list) or isinstance(location, tuple)
         assert isinstance(callable_class, Callable)
 
+        # Check if location only contains integers, otherwise warn use and cast to int
+        if not (isinstance(location[0], int) and isinstance(location[1], int)):
+            warnings.warn(f"The location {location} of {name} should contain only integers, "
+                          f"encountered {str(type(location[0]))} and {str(type(location[1]))} . "
+                          f"Casting these to integers resulting in "
+                          f"{(int(location[0]), int(location[1]))}")
+            location = (int(location[0]), int(location[1]))
+
         # Load default parameters if not passed
         if is_movable is None:
             is_movable = defaults.ENVOBJECT_IS_MOVABLE
@@ -604,12 +597,12 @@ class WorldBuilder:
         self.object_settings.append(object_setting)
 
     def add_object_prospect(self, location, name, probability, callable_class=None, customizable_properties=None,
-                            is_traversable=None,
+                            is_traversable=None, is_movable=None,
                             visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
                             visualize_opacity=None, **custom_properties):
         # Add object as normal
         self.add_object(location, name, callable_class, customizable_properties,
-                        is_traversable,
+                        is_traversable, is_movable,
                         visualize_size, visualize_shape, visualize_colour, visualize_depth,
                         visualize_opacity, **custom_properties)
 
@@ -635,13 +628,8 @@ class WorldBuilder:
 
         if names is None:
             names = [callable_class.__name__ for callable_class in callable_classes]
-        elif isinstance(names, str):
+        elif isinstance(names, str) or isinstance(names, RandomProperty):
             names = [names for _ in range(len(locations))]
-
-        if custom_properties is None:
-            custom_properties = [{} for _ in range(len(locations))]
-        elif isinstance(custom_properties, dict):
-            custom_properties = [custom_properties for _ in range(len(locations))]
 
         if customizable_properties is None:
             customizable_properties = [None for _ in range(len(locations))]
@@ -650,33 +638,38 @@ class WorldBuilder:
 
         if is_traversable is None:
             is_traversable = [None for _ in range(len(locations))]
-        elif isinstance(is_traversable, bool):
+        elif isinstance(is_traversable, bool) or isinstance(is_traversable, RandomProperty):
             is_traversable = [is_traversable for _ in range(len(locations))]
 
         if visualize_sizes is None:
             visualize_sizes = [None for _ in range(len(locations))]
-        elif isinstance(visualize_sizes, int):
+        elif isinstance(visualize_sizes, int) or isinstance(visualize_sizes, RandomProperty):
             visualize_sizes = [visualize_sizes for _ in range(len(locations))]
 
         if visualize_shapes is None:
             visualize_shapes = [None for _ in range(len(locations))]
-        elif isinstance(visualize_shapes, int):
+        elif isinstance(visualize_shapes, int) or isinstance(visualize_shapes, RandomProperty):
             visualize_shapes = [visualize_shapes for _ in range(len(locations))]
 
         if visualize_colours is None:
             visualize_colours = [None for _ in range(len(locations))]
-        elif isinstance(visualize_colours, str):
+        elif isinstance(visualize_colours, str) or isinstance(visualize_colours, RandomProperty):
             visualize_colours = [visualize_colours for _ in range(len(locations))]
 
         if visualize_opacities is None:
             visualize_opacities = [None for _ in range(len(locations))]
-        elif isinstance(visualize_opacities, int):
+        elif isinstance(visualize_opacities, float) or isinstance(visualize_opacities, RandomProperty):
             visualize_opacities = [visualize_opacities for _ in range(len(locations))]
 
         if visualize_depths is None:
             visualize_depths = [None for _ in range(len(locations))]
-        elif isinstance(visualize_depths, str):
+        elif isinstance(visualize_depths, str) or isinstance(visualize_depths, RandomProperty):
             visualize_depths = [visualize_depths for _ in range(len(locations))]
+
+        if custom_properties is None:
+            custom_properties = [{} for _ in range(len(locations))]
+        elif isinstance(custom_properties, dict):
+            custom_properties = [custom_properties for _ in range(len(locations))]
 
         # Loop through all agents and add them
         for idx in range(len(locations)):
@@ -771,9 +764,9 @@ class WorldBuilder:
         locs = self.__list_area_locs(top_left_location, width, height)
 
         # Add all area objects
-        self.add_multiple_objects(locations=locs, callable_classes=AreaTile,
+        self.add_multiple_objects(locations=locs, callable_classes=AreaTile, names=name,
                                   customizable_properties=customizable_properties, visualize_colours=visualize_colour,
-                                  visualize_opacities=visualize_opacity, **custom_properties)
+                                  visualize_opacities=visualize_opacity, custom_properties=custom_properties)
 
     def add_smoke_area(self, top_left_location, width, height, name, visualize_colour=None,
                        smoke_thickness_multiplier=1.0, visualize_depth=None, **custom_properties):
@@ -804,25 +797,6 @@ class WorldBuilder:
                                 visualize_colour=visualize_colour, visualize_opacity=opacity,
                                 visualize_depth=visualize_depth, **custom_properties)
 
-    def __list_area_locs(self, top_left_location, width, height):
-        """
-        Provided an area with the top_left_location, width and height,
-        generate a list containing all coordinates in that area
-        """
-
-        # Get all locations in the rectangle
-        locs = []
-        min_x = top_left_location[0]
-        max_x = top_left_location[0] + width
-        min_y = top_left_location[1]
-        max_y = top_left_location[1] + height
-
-        for x in range(min_x, max_x):
-            for y in range(min_y, max_y):
-                locs.append((x, y))
-
-        return locs
-
     def add_line(self, start, end, name, callable_class=None, customizable_properties=None,
                  is_traversable=None, is_movable=None,
                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
@@ -843,7 +817,7 @@ class WorldBuilder:
                                   is_movable=is_movable)
 
     def add_room(self, top_left_location, width, height, name, door_locations=None, with_area_tiles=False,
-                 doors_open=False,
+                 doors_open=False, wall_visualize_colour=None, wall_visualize_opacity=None,
                  wall_custom_properties=None, wall_customizable_properties=None,
                  area_custom_properties=None, area_customizable_properties=None,
                  area_visualize_colour=None, area_visualize_opacity=None):
@@ -864,14 +838,14 @@ class WorldBuilder:
             with_area_tiles = True
 
         # Subtract 1 from both width and height, since the top left already counts as a size of 1,1
-        width -= 1
-        height -= 1
+        width = int(width) - 1
+        height = int(height) - 1
 
         # Set corner coordinates
-        top_left = top_left_location
-        top_right = (top_left_location[0] + width, top_left_location[1])
-        bottom_left = (top_left_location[0], top_left_location[1] + height)
-        bottom_right = (top_left_location[0] + width, top_left_location[1] + height)
+        top_left = (int(top_left_location[0]), int(top_left_location[1]))
+        top_right = (int(top_left_location[0]) + int(width), int(top_left_location[1]))
+        bottom_left = (int(top_left_location[0]), int(top_left_location[1]) + int(height))
+        bottom_right = (int(top_left_location[0]) + int(width), int(top_left_location[1]) + int(height))
 
         # Get all edge coordinates
         top = _get_line_coords(top_left, top_right)
@@ -897,6 +871,8 @@ class WorldBuilder:
         # Add all walls
         names = [f"{name} - wall@{loc}" for loc in all_]
         self.add_multiple_objects(locations=all_, names=names, callable_classes=Wall,
+                                  visualize_colours=wall_visualize_colour,
+                                  visualize_opacities=wall_visualize_opacity,
                                   custom_properties=wall_custom_properties,
                                   customizable_properties=wall_customizable_properties)
 
@@ -919,32 +895,113 @@ class WorldBuilder:
                           visualize_colour=area_visualize_colour, visualize_opacity=area_visualize_opacity,
                           customizable_properties=area_customizable_properties, **area_custom_properties)
 
+    @staticmethod
+    def get_room_locations(room_top_left, room_width, room_height):
+        """ Returns the location coordinates within a room.
+
+        This is a helper function for adding objects to a room. It simply returns a list of all (x,y)
+        coordinates that fall within the room excluding the walls.
+
+        Parameters
+        ----------
+        room_top_left: tuple, (x, y)
+            The top left coordinates of a room, as used to add that room with methods such as `add_room`.
+        room_width: int
+            The width of the room.
+        room_height: int
+            The height of the room.
+
+        Returns
+        -------
+        list, [(x,y), ...]
+            A list of (x, y) coordinates that are encapsulated in the room, excluding walls.
+
+        See Also
+        --------
+        WorldBuilder.add_room
+
+        """
+        xs = list(range(room_top_left[0] + 1, room_top_left[0] + room_width - 1))
+        ys = list(range(room_top_left[1] + 1, room_top_left[1] + room_height -1))
+        locs = list(itertools.product(xs, ys))
+        return locs
+
+    def __set_world_settings(self, shape, tick_duration, simulation_goal, rnd_seed,
+                             visualization_bg_clr, visualization_bg_img, verbose):
+
+        if rnd_seed is None:
+            rnd_seed = self.rng.randint(0, 1000000)
+
+        # Check if the given shape contains integers, otherwise warn user and cast to int
+        if not (isinstance(shape[0], int) and isinstance(shape[1], int)):
+            warnings.warn(f"The world's provided shape {shape} should contain integers, "
+                          f"encountered {str(type(shape[0]))} and {str(type(shape[1]))} . "
+                          f"Casting these to integers resulting in "
+                          f"{(int(shape[0]), int(shape[1]))}")
+            shape = (int(shape[0]), int(shape[1]))
+
+        world_settings = {"shape": shape,
+                          "tick_duration": tick_duration,
+                          "simulation_goal": simulation_goal,
+                          "rnd_seed": rnd_seed,
+                          "visualization_bg_clr": visualization_bg_clr,
+                          "visualization_bg_img": visualization_bg_img,
+                          "verbose": verbose}
+
+        return world_settings
+
+    def __list_area_locs(self, top_left_location, width, height):
+        """
+        Provided an area with the top_left_location, width and height,
+        generate a list containing all coordinates in that area
+        """
+
+        # Get all locations in the rectangle
+        xs = list(range(top_left_location[0], top_left_location[0] + width))
+        ys = list(range(top_left_location[1], top_left_location[1] + height))
+        locs = list(itertools.product(xs, ys))
+        return locs
+
     def __create_world(self):
 
         # Create the world
         world = self.__create_grid_world()
-
         # Create all objects first
         objs = []
-        for obj_settings in self.object_settings:
+        for idx, obj_settings in enumerate(self.object_settings):
+            # Print progress (so user knows what is going on)
+            if idx % max(10, int(len(self.object_settings) * 0.1)) == 0:
+                print(f"Creating objects... @{np.round(idx / len(self.object_settings) * 100, 0)}%")
+
             env_object = self.__create_env_object(obj_settings)
             if env_object is not None:
                 objs.append(env_object)
 
         # Then create all agents
         avatars = []
-        for agent_settings in self.agent_settings:
+        for idx, agent_settings in enumerate(self.agent_settings):
+            # Print progress (so user knows what is going on)
+            if idx % max(10, int(len(self.agent_settings) * 0.1)) == 0:
+                print(f"Creating agents... @{np.round(idx / len(self.agent_settings) * 100, 0)}%")
+
             agent, agent_avatar = self.__create_agent_avatar(agent_settings)
             if agent_avatar is not None:
                 avatars.append((agent, agent_avatar))
 
         # Register all objects (including checks)
-        for env_object in objs:
+        for idx, env_object in enumerate(objs):
+            # Print progress (so user knows what is going on)
+            if idx % max(10, int(len(objs) * 0.1)) == 0:
+                print(f"Adding objects... @{np.round(idx / len(objs) * 100, 0)}%")
+
             world._register_env_object(env_object)
 
         # Register all agents (including checks)
-        for agent, agent_avatar in avatars:
-            world._register_agent(agent, agent_avatar)
+        for idx, agent in enumerate(avatars):
+            # Print progress (so user knows what is going on)
+            if idx % max(10, int(len(objs) * 0.1)) == 0:
+                print(f"Adding agents... @{np.round(idx / len(avatars) * 100, 0)}%")
+            world._register_agent(agent[0], agent[1])
 
         # Register all teams and who is in them
         world._register_teams()
@@ -987,6 +1044,7 @@ class WorldBuilder:
                     'class_callable': callable_class,
                     'customizable_properties': customizable_props,
                     'is_traversable': mandatory_props['is_traversable'],
+                    'is_movable': mandatory_props['is_movable'],
                     'visualize_size': mandatory_props['visualize_size'],
                     'visualize_shape': mandatory_props['visualize_shape'],
                     'visualize_colour': mandatory_props['visualize_colour'],
@@ -1026,7 +1084,7 @@ class WorldBuilder:
             if varkw is None and len(kwargs) > 0:
                 warnings.warn(f"The following properties are not used in the creation of environment object of type "
                               f"{callable_class.__name__} with name {mandatory_props['name']}; {kwargs}, because "
-                              f"the class does nto have a **kwargs argument in the constructor.")
+                              f"the class does not have a **kwargs argument in the constructor.")
 
             # if a **kwargs argument was defined in the object constructor, pass all custom properties to the object
             elif varkw is not None and len(kwargs) > 0:
@@ -1136,7 +1194,7 @@ class RandomProperty:
 
         # If distribution is None, its uniform (equal probability to all values)
         if distribution is None:
-            distribution = [1 / len(values) for _ in range(values)]
+            distribution = [1 / len(values) for _ in values]
 
         # Normalize distribution if not already
         if sum(distribution) != 1.0:
@@ -1157,6 +1215,14 @@ class RandomProperty:
             for it in self.selected_values:
                 vals.remove(it)
         choice = rng.choice(vals, p=self.distribution, size=size, replace=self.allow_duplicates)
+
+        # Since the value choice is selected using Numpy, the choice may have changed to a unserializable numpy object
+        # which would prevent it the be 'jsonified' for the API. So we check for this and cast it to its Python version.
+        if all(isinstance(n, int) for n in self.values):
+            choice = int(choice)
+        elif all(isinstance(n, float) for n in self.values):
+            choice = float(choice)
+
         self.selected_values.add(choice)
         return choice
 
