@@ -3,7 +3,7 @@ from matrx.objects.env_object import EnvObject
 
 class SquareBlock(EnvObject):
 
-    def __init__(self, location, name="Block"):
+    def __init__(self, location, name="Block", **custom_properties):
         """
         An example of a simple object with a set of attributes that are always the same. In this case that it is not
         traversable, and is visualized as a square. Otherwise it takes all default properties from an EnvObject and has
@@ -12,8 +12,8 @@ class SquareBlock(EnvObject):
         :param name: The name of the block, if not given it is simply "Block".
         """
 
-        super().__init__(name=name, location=location, is_traversable=False, visualize_shape=0,
-                         class_callable=SquareBlock, visualize_opacity=1.0)
+        super().__init__(name=name, location=location, visualize_shape=0, is_traversable=False,
+                         class_callable=SquareBlock, **custom_properties)
 
 
 class Door(EnvObject):
