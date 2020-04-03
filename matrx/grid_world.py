@@ -252,11 +252,8 @@ class GridWorld:
             else:
                 self.__grid[loc[1], loc[0]] = [grid_obj.obj_id]
         else:
-            loc = grid_obj.location
-            if self.__grid[loc[1], loc[0]] is not None:
-                self.__grid[loc[1], loc[0]].append(grid_obj.obj_id)
-            else:
-                self.__grid[loc[1], loc[0]] = [grid_obj.obj_id]
+            raise BaseException(f"Object is not of type {str(type(EnvObject))} but of {str(type(grid_obj))} when adding"
+                                f" to grid in GridWorld.")
 
     def _register_agent(self, agent, agent_avatar: AgentBody):
         """ Register human agents and agents to the gridworld environment """
@@ -611,13 +608,32 @@ class GridWorld:
     def __get_agent_state(self, agent_obj: AgentBody):
         agent_loc = agent_obj.location
         sense_capabilities = agent_obj.sense_capability.get_capabilities()
+
+        # Check if sense capabilities contains the "*" wildcard. If so we store
+        # those objects separately, in case there are also other types specified
+        # whose range precedes that of the "*" wildcard. For example, when an
+        # agent can perceive other agents within a certain range and also has
+        # the "*" wildcard to denote all OTHER objects. In that case we should
+        # ignore all the AgentBody objects in the "*"-range. and then add all
+        # the AgentBody objects we can see with the "AgentBody"-range.
+        wildcard_objs = {}
         objs_in_range = OrderedDict()
+        if "*" in sense_capabilities.keys():
+            wildcard_objs = self.get_objects_in_range(agent_loc, "*", sense_capabilities["*"])
+            sense_capabilities.pop("*")  # we did the wildcard already
 
         # Check which objects can be sensed with the agents' capabilities, from
         # its current position.
         for obj_type, sense_range in sense_capabilities.items():
             env_objs = self.get_objects_in_range(agent_loc, obj_type, sense_range)
             objs_in_range.update(env_objs)
+
+        # Merge the wildcard objects with those of the (potential) other objects,
+        # where we ignore all wildcard objects that are of a specific given type
+        # with its own range.
+        for wildcard_obj_id, wildcard_obj in wildcard_objs.items():
+            if type(wildcard_obj) not in sense_capabilities.keys():
+                objs_in_range[wildcard_obj_id] = wildcard_obj
 
         state = {}
         # Save all properties of the sensed objects in a state dictionary
