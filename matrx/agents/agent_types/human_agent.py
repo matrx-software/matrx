@@ -1,4 +1,4 @@
-from matrx.actions.object_actions import GrabObject, DropObject
+from matrx.actions.object_actions import GrabObject, DropObject, RemoveObject
 from matrx.actions.door_actions import OpenDoorAction, CloseDoorAction
 from matrx.agents.agent_brain import AgentBrain
 import numpy as np
@@ -6,12 +6,13 @@ import numpy as np
 
 class HumanAgentBrain(AgentBrain):
 
-    def __init__(self, max_carry_objects=3, grab_range=1, drop_range=1, door_range=1):
+    def __init__(self, max_carry_objects=3, grab_range=1, drop_range=1, door_range=1, remove_range=1):
         """
         Creates an Human Agent which is an agent that can be controlled by a human.
         """
         super().__init__()
         self.__max_carry_objects = max_carry_objects
+        self.__remove_range = remove_range
         self.__grab_range = grab_range
         self.__drop_range = drop_range
         self.__door_range = door_range
@@ -165,40 +166,21 @@ class HumanAgentBrain(AgentBrain):
             action_kwargs['max_objects'] = self.__max_carry_objects  # Set max amount of objects
             action_kwargs['object_id'] = None
 
-            # Get all perceived objects
-            object_ids = list(state.keys())
-
-            # Remove world from state
-            object_ids.remove("World")
-
-            # Remove self
-            object_ids.remove(self.agent_id)
-
-            # Remove all (human)agents
-            object_ids = [obj_id for obj_id in object_ids if "AgentBrain" not in state[obj_id]['class_inheritance'] and
-                          "AgentBody" not in state[obj_id]['class_inheritance']]
-
-            # find objects in range
-            object_in_range = []
-            for object_id in object_ids:
-                if "is_movable" not in state[object_id]:
-                    continue
-                # Select range as just enough to grab that object
-                dist = int(np.ceil(np.linalg.norm(
-                    np.array(state[object_id]['location']) - np.array(
-                        state[self.agent_id]['location']))))
-                if dist <= action_kwargs['grab_range'] and state[object_id]["is_movable"]:
-                    object_in_range.append(object_id)
-
-            # Select an object if there are any in range
-            if object_in_range:
-                object_id = self.rnd_gen.choice(object_in_range)
-                action_kwargs['object_id'] = object_id
+            obj_id = self.__select_random_obj_in_range(state, range_=self.__grab_range, property_to_check="is_movable")
+            action_kwargs['object_id'] = obj_id
 
         # If the user chose to drop an object in its inventory
         elif action == DropObject.__name__:
             # Assign it to the arguments list
             action_kwargs['drop_range'] = self.__drop_range  # Set drop range
+
+        # If the user chose to remove an object
+        elif action == RemoveObject.__name__:
+            # Assign it to the arguments list
+            action_kwargs['remove_range'] = self.__remove_range  # Set drop range
+
+            obj_id = self.__select_random_obj_in_range(state, range_=self.__remove_range)
+            action_kwargs['object_id'] = obj_id
 
         # if the user chose to do an open or close door action, find a door to open/close within range
         elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:
@@ -254,3 +236,39 @@ class HumanAgentBrain(AgentBrain):
             return []
         possible_key_presses = list(self.key_action_map.keys())
         return list(set(possible_key_presses) & set(user_input))
+
+    def __select_random_obj_in_range(self, state, range_, property_to_check=None):
+
+        # Get all perceived objects
+        object_ids = list(state.keys())
+
+        # Remove world from state
+        object_ids.remove("World")
+
+        # Remove self
+        object_ids.remove(self.agent_id)
+
+        # Remove all (human)agents
+        object_ids = [obj_id for obj_id in object_ids if "AgentBrain" not in state[obj_id]['class_inheritance'] and
+                      "AgentBody" not in state[obj_id]['class_inheritance']]
+
+        # find objects in range
+        object_in_range = []
+        for object_id in object_ids:
+            if "is_movable" not in state[object_id]:
+                continue
+            # Select range as just enough to grab that object
+            dist = int(np.ceil(np.linalg.norm(np.array(state[object_id]['location'])
+                                              - np.array(state[self.agent_id]['location']))))
+            if dist <= range_:
+                if property_to_check is not None:
+                    if state[object_id][property_to_check]:
+                        object_in_range.append(object_id)
+
+        # Select an object if there are any in range
+        if object_in_range:
+            object_id = self.rnd_gen.choice(object_in_range)
+        else:
+            object_id = None
+
+        return object_id
