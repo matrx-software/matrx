@@ -921,8 +921,8 @@ class WorldBuilder:
         WorldBuilder.add_room
 
         """
-        xs = list(range(room_top_left[0] + 1, room_top_left[0] + room_width))
-        ys = list(range(room_top_left[1] + 1, room_top_left[1] + room_height))
+        xs = list(range(room_top_left[0] + 1, room_top_left[0] + room_width - 1))
+        ys = list(range(room_top_left[1] + 1, room_top_left[1] + room_height -1))
         locs = list(itertools.product(xs, ys))
         return locs
 
@@ -957,16 +957,9 @@ class WorldBuilder:
         """
 
         # Get all locations in the rectangle
-        locs = []
-        min_x = top_left_location[0]
-        max_x = top_left_location[0] + width
-        min_y = top_left_location[1]
-        max_y = top_left_location[1] + height
-
-        for x in range(min_x, max_x):
-            for y in range(min_y, max_y):
-                locs.append((x, y))
-
+        xs = list(range(top_left_location[0], top_left_location[0] + width))
+        ys = list(range(top_left_location[1], top_left_location[1] + height))
+        locs = list(itertools.product(xs, ys))
         return locs
 
     def __create_world(self):
