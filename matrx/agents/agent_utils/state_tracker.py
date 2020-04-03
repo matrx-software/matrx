@@ -2,7 +2,7 @@ import numpy as np
 
 from matrx.utils import get_distance
 import itertools
-from fov import _field_of_view
+from matrx.agents.agent_utils.fov import _field_of_view
 
 
 class StateTracker:
