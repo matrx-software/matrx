@@ -25,28 +25,37 @@ class SenseCapability(Capability):
     what ranges. It is used by a :class:`matrxs.grid_world.GridWorld` instance
     to construct the agent's state.
 
+    To limit agents to sense objects more granulary then the given object types
+    allow for, you can extend classes with your own classes. For example, one
+    can extend the `SquareBlock` class into a custom class called
+    `MySquareBlock`. This allows you to specify these two types separately to
+    an agent for perception.
+
     Parameters
     ----------
     detectable_objects : dict
-        A dictionary with as keys the class names of EnvObject or inherited
-        classes thereof, and as values the distance this object type can be
-        perceived.
-
-        If one wants the agent to perceive all object type within some range,
-        None can be given as key with the desired range (and other keys are
-        ignored).
+        A dictionary with as keys the class you wish to perceive, and as
+        values the distance this object type can be perceived. The None
+        key stands for all otherwise not specified object types.
 
     Examples
     --------
     An example of a SenseCapability that defines the perception of all agents
     separate from SquareBlock objects. No other objects are perceived.
 
-    >>> SenseCapability({"AgentBody": 10, "SquareBlock": 25})
+    >>> from matrx.objects import AgentBody, SquareBlock
+    >>> SenseCapability({AgentBody: 10, SquareBlock: 25})
 
     An example of a SenseCapability that sets the perception range of all
     objects.
 
     >>> SenseCapability({None: 25})
+
+    An example of a SenseCapability that sets the range of perceiving all
+    other agents to 25 but the perception of all other objects to 10.
+
+    >>> from matrx.objects import AgentBody
+    >>> SenseCapability({AgentBody: 25, None: 10})
 
     """
 
@@ -55,9 +64,9 @@ class SenseCapability(Capability):
         self.__detectable_objects = {}
         for obj_type, sense_range in detectable_objects.items():
             if obj_type is None:
-                # If the obj_type is none, we can detect all object types
-                self.__detectable_objects = {"*": sense_range}  # hence all other object types in there have no effect
-                break  # as such we break this loop
+                # If the obj_type is none, we can detect all object types in that associated range who have not a
+                # specific range set.
+                self.__detectable_objects["*"] = sense_range
             else:
                 self.__detectable_objects[obj_type] = sense_range
 

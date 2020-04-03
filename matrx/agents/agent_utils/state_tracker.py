@@ -1,11 +1,13 @@
 import numpy as np
 
 from matrx.utils import get_distance
+import itertools
+from fov import _field_of_view
 
 
 class StateTracker:
 
-    def __init__(self, agent_id, knowledge_decay=10):
+    def __init__(self, agent_id, sense_capability, knowledge_decay=10, fov_occlusion=True):
 
         # The amount with which we forget known knowledge (we do so linearly)
         if knowledge_decay > 1.0:
@@ -14,6 +16,12 @@ class StateTracker:
             self.__decay = 0.0
         else:
             self.__decay = knowledge_decay
+
+        # Set the agent's sense capability, needed for FOV occlusion to find the max view radius
+        self.sense_capability = sense_capability
+
+        # Whether we occlude objects from view if they are blocked by an intraversable object
+        self.fov_occlusion = fov_occlusion
 
         # We store the agent id of which we track the state so we know what object in the state belongs to the agent
         self.agent_id = agent_id
@@ -30,8 +38,7 @@ class StateTracker:
         return self.__memorized_state.copy()
 
     def update(self, state):
-
-        # Update all of the objects decays
+        # Decay all objects in our memory
         for obj_id in self.__decay_values.keys():
             self.__decay_values[obj_id] -= self.__decay
 
@@ -78,23 +85,57 @@ class StateTracker:
 
         return self.get_memorized_state()
 
-    def get_traversability_map(self, inverted=False):
-        map_size = self.__memorized_state['World']['grid_shape']
-        traverse_map = np.array([[int(not inverted) for _ in range(map_size[1])] for _ in range(map_size[0])])
+    def __get_traversability_map(self, inverted=False, state=None):
 
-        for obj_id, properties in self.__memorized_state.items():
+        if state is None:
+            state = self.__memorized_state
+
+        map_size = state['World']['grid_shape']  # (width, height)
+        traverse_map = np.array([[int(not inverted) for _ in range(map_size[1])] for _ in range(map_size[0])])
+        obj_grid = [[[] for _ in range(map_size[1])] for _ in range(map_size[0])]
+
+        for obj_id, properties in state.items():
 
             if obj_id == "World":
                 continue
 
             loc = properties['location']
 
+            # we store that there is an object there
+            obj_grid[loc[0]][loc[1]].append(obj_id)
+
             # if another object on that location is intraversable, don't overwrite it
             if (traverse_map[loc[0], loc[1]] == 0 and not inverted) or (traverse_map[loc[0], loc[1]] == 1 and inverted):
                 continue
 
-            # add the traversability to the map
             traverse_map[loc[0], loc[1]] = int(properties['is_traversable']) \
-                if not inverted else int(not(properties['is_traversable']))
+                if not inverted else int(not (properties['is_traversable']))
 
-        return traverse_map
+        return traverse_map, obj_grid
+
+    def __get_occluded_objects(self, state):
+        loc = state[self.agent_id]["location"]
+        map_size = state['World']['grid_shape']
+
+        radius = max(self.sense_capability.get_capabilities().values())
+        if radius >= np.inf:
+            radius = max(map_size)
+
+        traverse_grid, obj_grid = self.__get_traversability_map(inverted=True, state=state)
+        objects_seen = []
+
+        sees = np.zeros(map_size)
+
+        def func_visit_tile(x, y):
+            sees[x, y] = 1
+            objects_seen.extend(obj_grid[x][y])
+
+        def func_tile_blocked(x, y):
+            return bool(traverse_grid[x, y])
+
+        _field_of_view(loc[0], loc[1], map_size[0], map_size[1], radius, func_visit_tile, func_tile_blocked)
+
+        all_objects = list(itertools.chain(*itertools.chain(*obj_grid)))
+        occluded_objects = [obj_id for obj_id in all_objects if obj_id not in objects_seen]
+
+        return occluded_objects
