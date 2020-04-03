@@ -219,30 +219,6 @@ class WorldBuilder:
         self.__reset_random()
         return world
 
-    def __set_world_settings(self, shape, tick_duration, simulation_goal, rnd_seed,
-                             visualization_bg_clr, visualization_bg_img, verbose):
-
-        if rnd_seed is None:
-            rnd_seed = self.rng.randint(0, 1000000)
-
-        # Check if the given shape contains integers, otherwise warn user and cast to int
-        if not (isinstance(shape[0], int) and isinstance(shape[1], int)):
-            warnings.warn(f"The world's provided shape {shape} should contain integers, "
-                          f"encountered {str(type(shape[0]))} and {str(type(shape[1]))} . "
-                          f"Casting these to integers resulting in "
-                          f"{(int(shape[0]), int(shape[1]))}")
-            shape = (int(shape[0]), int(shape[1]))
-
-        world_settings = {"shape": shape,
-                          "tick_duration": tick_duration,
-                          "simulation_goal": simulation_goal,
-                          "rnd_seed": rnd_seed,
-                          "visualization_bg_clr": visualization_bg_clr,
-                          "visualization_bg_img": visualization_bg_img,
-                          "verbose": verbose}
-
-        return world_settings
-
     def add_logger(self, logger_class, log_strategy=None, save_path=None, file_name=None,
                    file_extension=None, delimiter=None, **kwargs):
 
@@ -820,25 +796,6 @@ class WorldBuilder:
                                 visualize_colour=visualize_colour, visualize_opacity=opacity,
                                 visualize_depth=visualize_depth, **custom_properties)
 
-    def __list_area_locs(self, top_left_location, width, height):
-        """
-        Provided an area with the top_left_location, width and height,
-        generate a list containing all coordinates in that area
-        """
-
-        # Get all locations in the rectangle
-        locs = []
-        min_x = top_left_location[0]
-        max_x = top_left_location[0] + width
-        min_y = top_left_location[1]
-        max_y = top_left_location[1] + height
-
-        for x in range(min_x, max_x):
-            for y in range(min_y, max_y):
-                locs.append((x, y))
-
-        return locs
-
     def add_line(self, start, end, name, callable_class=None, customizable_properties=None,
                  is_traversable=None, is_movable=None,
                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
@@ -936,6 +893,49 @@ class WorldBuilder:
             self.add_area(top_left_location=area_top_left, width=area_width, height=area_height, name=f"{name}_area",
                           visualize_colour=area_visualize_colour, visualize_opacity=area_visualize_opacity,
                           customizable_properties=area_customizable_properties, **area_custom_properties)
+
+    def __set_world_settings(self, shape, tick_duration, simulation_goal, rnd_seed,
+                             visualization_bg_clr, visualization_bg_img, verbose):
+
+        if rnd_seed is None:
+            rnd_seed = self.rng.randint(0, 1000000)
+
+        # Check if the given shape contains integers, otherwise warn user and cast to int
+        if not (isinstance(shape[0], int) and isinstance(shape[1], int)):
+            warnings.warn(f"The world's provided shape {shape} should contain integers, "
+                          f"encountered {str(type(shape[0]))} and {str(type(shape[1]))} . "
+                          f"Casting these to integers resulting in "
+                          f"{(int(shape[0]), int(shape[1]))}")
+            shape = (int(shape[0]), int(shape[1]))
+
+        world_settings = {"shape": shape,
+                          "tick_duration": tick_duration,
+                          "simulation_goal": simulation_goal,
+                          "rnd_seed": rnd_seed,
+                          "visualization_bg_clr": visualization_bg_clr,
+                          "visualization_bg_img": visualization_bg_img,
+                          "verbose": verbose}
+
+        return world_settings
+
+    def __list_area_locs(self, top_left_location, width, height):
+        """
+        Provided an area with the top_left_location, width and height,
+        generate a list containing all coordinates in that area
+        """
+
+        # Get all locations in the rectangle
+        locs = []
+        min_x = top_left_location[0]
+        max_x = top_left_location[0] + width
+        min_y = top_left_location[1]
+        max_y = top_left_location[1] + height
+
+        for x in range(min_x, max_x):
+            for y in range(min_y, max_y):
+                locs.append((x, y))
+
+        return locs
 
     def __create_world(self):
 
