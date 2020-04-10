@@ -81,7 +81,8 @@ def get_latest_state_and_messages(agent_id):
     # check for validity and return an error if not valid
     api_call_valid, error = check_states_API_request(ids=[agent_id])
     if not api_call_valid:
-        print("api request not valid:", error)
+        if debug:
+            print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
     # fetch states and messages
@@ -120,7 +121,8 @@ def get_states(tick):
     # check for validity and return an error if not valid
     api_call_valid, error = check_states_API_request(tick=tick)
     if not api_call_valid:
-        print("api request not valid:", error)
+        if debug:
+            print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
     return jsonify(__fetch_states(tick))
@@ -146,7 +148,8 @@ def get_states_specific_agents(tick, agent_ids):
     # check for validity and return an error if not valid
     api_call_valid, error = check_states_API_request(tick=tick)
     if not api_call_valid:
-        print("api request not valid:", error)
+        if debug:
+            print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
     # fetch states and messages
@@ -205,7 +208,8 @@ def get_messages(tick):
     # check for validity and return an error if not valid
     api_call_valid, error = check_messages_API_request(tick=tick)
     if not api_call_valid:
-        print("api request not valid:", error)
+        if debug:
+            print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
     messages = gw_message_manager.fetch_messages(int(tick), current_tick)
@@ -241,7 +245,8 @@ def get_messages_specific_agent(tick, agent_id):
     # check for validity and return an error if not valid
     api_call_valid, error = check_messages_API_request(tick=tick, agent_id=agent_id)
     if not api_call_valid:
-        print("api request not valid:", error)
+        if debug:
+            print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
     messages = gw_message_manager.fetch_messages(int(tick), current_tick, clean_input_ids(agent_id)[0])
@@ -267,7 +272,8 @@ def get_latest_messages():
     # check for validity and return an error if not valid
     api_call_valid, error = check_messages_API_request(tick=current_tick)
     if not api_call_valid:
-        print("api request not valid:", error)
+        if debug:
+            print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
     messages = gw_message_manager.fetch_messages(current_tick, current_tick)
@@ -300,7 +306,8 @@ def get_latest_messages_specific_agent(agent_id):
     # check for validity and return an error if not valid
     api_call_valid, error = check_messages_API_request(tick=current_tick, agent_id=agent_id)
     if not api_call_valid:
-        print("api request not valid:", error)
+        if debug:
+            print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
     messages = gw_message_manager.fetch_messages(current_tick, current_tick, clean_input_ids(agent_id)[0])
@@ -332,7 +339,8 @@ def send_userinput(agent_ids):
 
     api_call_valid, error = check_states_API_request(current_tick, agent_ids, ids_required=True)
     if not api_call_valid:
-        print("api request not valid:", error)
+        if debug:
+            print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
     # make sure the ids are a list
@@ -481,7 +489,8 @@ def shutdown():
 
 @app.errorhandler(400)
 def bad_request(e):
-    print("Throwing error", e)
+    if debug:
+        print("Throwing error", e)
     return jsonify(error=str(e)), 400
 
 
@@ -574,10 +583,6 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
     if not check_passed:
         return False, error_message
 
-    # Don't throw an error if MATRX is paused the first tick, and thus still has no states
-    # if current_tick is 0 and matrx_paused:
-    #     return True, None
-
     # if this api call requires ids, check this variable on validity as well
     if ids_required:
 
@@ -586,9 +591,6 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
             ids = eval(ids)
         except:
             pass
-            # return False, {'error_code': 400, 'error_message': f'Provided IDs are not of valid format. Provides IDs
-            # is of ' f'type {type(ids)} but should be either of type string for ' f'requesting states of 1 agent (
-            # e.g. "god"), or a list of ' f'IDs(string) for requesting states of multiple agents'}
 
         # check if the api was reset during this time
         if len(states) is 0:
