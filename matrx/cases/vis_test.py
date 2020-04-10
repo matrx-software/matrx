@@ -1,7 +1,6 @@
-from matrx.agents.agent_types.patrolling_agent import PatrollingAgentBrain
+from matrx.agents import PatrollingAgentBrain, HumanAgentBrain
 from matrx.world_builder import WorldBuilder
-from matrx.agents.agent_types.human_agent import HumanAgentBrain
-from matrx.actions.move_actions import *
+from matrx.actions import *
 
 def create_builder():
     factory = WorldBuilder(random_seed=1, shape=[14, 20], tick_duration=0.1, verbose=False, run_matrx_api=True,
@@ -42,12 +41,15 @@ def create_builder():
         'w': MoveNorth.__name__,
         'd': MoveEast.__name__,
         's': MoveSouth.__name__,
-        'a': MoveWest.__name__
+        'a': MoveWest.__name__,
+        'r': RemoveObject.__name__
     }
     factory.add_human_agent([5, 5], HumanAgentBrain(), name="human",
                             key_action_map=key_action_map, img_name="/static/images/transparent.png")
 
     factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
                             key_action_map=key_action_map, img_name="/static/images/agent.gif")
+
+    factory.add_object([6,7], "block")
 
     return factory

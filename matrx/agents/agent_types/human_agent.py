@@ -265,15 +265,17 @@ class HumanAgentBrain(AgentBrain):
         # find objects in range
         object_in_range = []
         for object_id in object_ids:
-            if "is_movable" not in state[object_id]:
-                continue
+
             # Select range as just enough to grab that object
             dist = int(np.ceil(np.linalg.norm(np.array(state[object_id]['location'])
                                               - np.array(state[self.agent_id]['location']))))
             if dist <= range_:
+                # check for any properties specifically specified by the user
                 if property_to_check is not None:
-                    if state[object_id][property_to_check]:
+                    if property_to_check in state[object_id] and state[object_id][property_to_check]:
                         object_in_range.append(object_id)
+                else:
+                    object_in_range.append(object_id)
 
         # Select an object if there are any in range
         if object_in_range:

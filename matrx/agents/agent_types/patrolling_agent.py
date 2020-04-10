@@ -1,4 +1,4 @@
-from matrx.agents.agent_brain import AgentBrain
+from matrx.agents import AgentBrain
 from matrx.agents.agent_utils.navigator import Navigator
 from matrx.agents.agent_utils.state_tracker import StateTracker
 
