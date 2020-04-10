@@ -85,11 +85,16 @@ def get_latest_state_and_messages(agent_id):
         return abort(error['error_code'], description=error['error_message'])
 
     # fetch states and messages
-    states_ = __fetch_states(current_tick, agent_id)
+    states = __fetch_states(current_tick, agent_id)
+
+    # check if the agent ID is known
+    if not states:
+        return abort(400, description=f'{agent_id} was not found for one or multiple of the specified ticks.')
+
     messages = gw_message_manager.fetch_messages(current_tick, current_tick, clean_input_ids(agent_id)[0])
     chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
 
-    return jsonify({"matrx_paused": matrx_paused, "states": states_, "messages": messages, "chatrooms": chatrooms})
+    return jsonify({"matrx_paused": matrx_paused, "states": states, "messages": messages, "chatrooms": chatrooms})
 
 
 #########################################################################
@@ -144,7 +149,14 @@ def get_states_specific_agents(tick, agent_ids):
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    return jsonify(__fetch_states(tick, agent_ids))
+    # fetch states and messages
+    states = __fetch_states(tick, agent_ids)
+
+    # check if the agent ID is known
+    if not states:
+        return abort(400, description=f'One or multiple of the agent IDs: {agent_ids} were not found for one or multiple of the specified ticks.')
+
+    return jsonify(states)
 
 
 @app.route('/get_latest_state/<agent_ids>', methods=['GET', 'POST'])
@@ -651,6 +663,8 @@ def __fetch_states(tick, ids=None):
 
         # add each agent's state for this tick
         for agent_id in ids:
+            if agent_id not in states[t]:
+                return False
             states_this_tick[agent_id] = states[t][agent_id]
 
         # save the states of all filtered agents for this tick
