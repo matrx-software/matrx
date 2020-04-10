@@ -138,9 +138,7 @@ class Navigator:
                 return []
 
         # Get our occupation map
-        self.__occupation_map = state_tracker.get_traversability_map(inverted=True)
-
-        # print("occupation map:", self.__occupation_map)
+        self.__occupation_map, obj_grid = state_tracker.get_traversability_map(inverted=True)
 
         # Get our current waypoint
         current_wp = self.__get_current_waypoint()
