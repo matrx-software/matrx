@@ -188,7 +188,7 @@ class HumanAgentBrain(AgentBrain):
             # Assign it to the arguments list
             action_kwargs['remove_range'] = self.__remove_range  # Set drop range
 
-            obj_id = self.__select_random_obj_in_range(state, range_=self.__remove_range)
+            obj_id = self.__select_random_obj_in_range(state, range_=self.__remove_range, property_to_check="is_movable")
             action_kwargs['object_id'] = obj_id
 
         # if the user chose to do an open or close door action, find a door to open/close within range
