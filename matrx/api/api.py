@@ -1,3 +1,4 @@
+import sys
 import threading
 import copy
 import logging
@@ -348,7 +349,7 @@ def send_userinput(agent_ids):
     # make sure the ids are a list
     try:
         agent_ids = eval(agent_ids)
-    except:
+    except TypeError or NameError:
         agent_ids = [agent_ids]
 
     # fetch the data from the request object
@@ -458,10 +459,11 @@ def change_MATRX_speed(tick_dur):
 
     """
     # check if the passed value is a float / int, and return an error if not
-    try:
-        float(tick_dur)
-    except:
-        return abort(400, description=f'Tick duration has to be an float, but is of type {type(tick_dur)}')
+    if not isinstance(float, tick_dur):
+        if not isinstance(int,tick_dur):
+            return abort(400, description=f'Tick duration has to be an float, but is of type {type(tick_dur)}')
+        else:
+            tick_dur = float(tick_dur)
 
     # save the new tick duration
     global tick_duration
@@ -517,16 +519,22 @@ def clean_input_ids(ids):
     if ids is None:
         return None
 
-    try:
-        ids = eval(ids)
-    except:
-        pass
-
     # if it is a list
     if isinstance(ids, list):
         return ids
 
+    # check if it is a string encoded list
+    try:
+        ids = eval(ids)
+    except TypeError or NameError:
+        pass
+
     if isinstance(ids, str):
+        if "[" in ids:
+            try:
+                ids = eval(ids)
+            except TypeError or NameError:
+                print(f"Passed {ids} is of unknown type")
         return [ids]
 
 
@@ -588,12 +596,13 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
     # if this api call requires ids, check this variable on validity as well
     if ids_required:
 
-        # check if ids variable is of a valid type
+        # check if it is a string encoded list
         try:
             ids = eval(ids)
-        except:
+        except TypeError or NameError:
             pass
 
+        print("Oops!", sys.exc_info()[0], "occured.")
         # check if the api was reset during this time
         if len(states) is 0:
             return False, {'error_code': 400,
@@ -616,11 +625,11 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
 def check_input(tick=None, ids=None):
     # check if tick is a valid format
     if tick is not None:
-        try:
-            tick = int(tick)
-        except:
+        if not isinstance(int, tick) or isinstance(float, tick):
             return False, {'error_code': 400,
                            'error_message': f'Tick has to be an integer, but is of type {type(tick)}'}
+
+        tick = int(tick)
 
         # check if the tick has actually occurred
         if not tick in range(0, current_tick + 1):
@@ -657,7 +666,7 @@ def __fetch_states(tick, ids=None):
     # convert ints to lists so we can use 1 uniform approach
     try:
         ids = eval(ids)
-    except:
+    except TypeError or NameError:
         ids = [ids]
 
     # create a list containing the states from tick to current_tick containing the states of all desired agents/god
