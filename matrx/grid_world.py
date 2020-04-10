@@ -40,6 +40,7 @@ class GridWorld:
 
         self.__api_info = None  # Dict containing info about the API instance
         self.__run_matrx_api = False  # Bool if API is running
+        self.__matrx_previously_paused = False # var used to display the pause and unpausing messages only once
         self.__loggers = []  # a list of GridWorldLogger use to log the data
         self.__is_done = False  # Whether the simulation is done (goal(s) reached)
         self.__rnd_seed = rnd_seed  # The random seed of this GridWorld
@@ -135,13 +136,19 @@ class GridWorld:
         while not is_done:
 
             if self.__run_matrx_api and api.matrx_paused:
-                print("MATRX paused through api")
+                if not self.__matrx_previously_paused:
+                    self.__matrx_previously_paused = True
+                    print("MATRX scenario paused through api")
                 gevent.sleep(1)
             else:
+                if self.__matrx_previously_paused:
+                    self.__matrx_previously_paused = False
+                    print("MATRX scenario started through api")
+
                 is_done, tick_duration = self.__step()
 
             if self.__run_matrx_api and api.matrx_done:
-                print("Scenario stopped through api")
+                print("MATRX scenario stopped through api")
                 break
 
     def get_env_object(self, requested_id, obj_type=None):

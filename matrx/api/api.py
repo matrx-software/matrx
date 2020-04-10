@@ -1,6 +1,7 @@
 import threading
 import copy
 import logging
+import os
 
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
@@ -15,8 +16,9 @@ userinput or other information to MATRX. The api is a Flask (Python) webserver.
 For visualization, see the seperate MATRX visualization folder / package.
 '''
 
-debug = True
+debug = False
 
+os.environ["FLASK_ENV"] = "development"
 app = Flask(__name__)
 CORS(app)
 port = 3001

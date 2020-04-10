@@ -4,8 +4,8 @@ from matrx.world_builder import WorldBuilder
 
 
 def create_builder():
-    size_x = 10
-    size_y = 10
+    size_x = 50
+    size_y = 50
 
     factory = WorldBuilder(random_seed=1, shape=[size_x, size_y], tick_duration=0.2, run_matrx_api=True,
                            run_matrx_visualizer=True, verbose=False)

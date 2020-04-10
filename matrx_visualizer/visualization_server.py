@@ -1,7 +1,7 @@
 import threading
 import logging
 from flask import Flask, render_template, request, jsonify, send_from_directory
-
+import os
 '''
 This file holds the code for the MATRX RESTful api. 
 External scripts can send POST and/or GET requests to retrieve state, tick and other information, and send 
@@ -10,7 +10,8 @@ userinput or other information to MATRX. The api is a Flask (Python) webserver.
 For visualization, see the seperate MATRX visualization folder / package.
 '''
 
-debug = True
+os.environ["FLASK_ENV"] = "development"
+debug = False
 port = 3000
 app = Flask(__name__, template_folder='templates')
 
@@ -133,8 +134,13 @@ def flask_thread():
     """
 
     if not debug:
+        # log = logging.getLogger('werkzeug')
+        # log.setLevel(logging.ERROR)
+        app.logger.disabled = True
         log = logging.getLogger('werkzeug')
-        log.setLevel(logging.ERROR)
+        log.disabled = True
+
+    app.config['FLASK_ENV'] = 'development'
 
     app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
 
