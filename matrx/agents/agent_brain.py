@@ -1,8 +1,7 @@
 import copy
 import numpy as np
-from matrx.actions.object_actions import GrabObject, RemoveObject
-from matrx.actions.door_actions import OpenDoorAction, CloseDoorAction
-from matrx.messages.message import Message
+from matrx.actions import GrabObject, RemoveObject, OpenDoorAction, CloseDoorAction
+from matrx.messages import Message
 
 
 class AgentBrain:
