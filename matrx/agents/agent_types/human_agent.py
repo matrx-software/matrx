@@ -77,7 +77,7 @@ class HumanAgentBrain(AgentBrain):
             self.key_action_map = key_action_map
 
         # Create the agent's state tracker
-        self.__state_tracker = StateTracker(agent_id, sense_capability, knowledge_decay=self.__state_memory_decay,
+        self.__state_tracker = StateTracker(agent_id, knowledge_decay=self.__state_memory_decay,
                                             fov_occlusion=self.__fov_occlusion)
 
     def _get_action(self, state, agent_properties, agent_id, user_input):
