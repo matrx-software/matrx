@@ -127,6 +127,7 @@ def get_states(tick):
         if debug:
             print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
+    tick = int(tick)
 
     return jsonify(__fetch_states(tick))
 
@@ -154,6 +155,8 @@ def get_states_specific_agents(tick, agent_ids):
         if debug:
             print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
+
+    tick = int(tick)
 
     # fetch states and messages
     states = __fetch_states(tick, agent_ids)
@@ -215,7 +218,9 @@ def get_messages(tick):
             print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    messages = gw_message_manager.fetch_messages(int(tick), current_tick)
+    tick = int(tick)
+
+    messages = gw_message_manager.fetch_messages(tick, current_tick)
     chatrooms = gw_message_manager.fetch_chatrooms()
 
     return jsonify({"messages": messages, "chatrooms": chatrooms})
@@ -252,7 +257,9 @@ def get_messages_specific_agent(tick, agent_id):
             print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    messages = gw_message_manager.fetch_messages(int(tick), current_tick, clean_input_ids(agent_id)[0])
+    tick = int(tick)
+
+    messages = gw_message_manager.fetch_messages(tick, current_tick, clean_input_ids(agent_id)[0])
     chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
 
     return jsonify({"messages": messages, "chatrooms": chatrooms})
@@ -458,12 +465,11 @@ def change_MATRX_speed(tick_dur):
         True if successfully changed tick speed (400 error if tick_duration not valid)
 
     """
-    # check if the passed value is a float / int, and return an error if not
-    if not isinstance(float, tick_dur):
-        if not isinstance(int,tick_dur):
-            return abort(400, description=f'Tick duration has to be an float, but is of type {type(tick_dur)}')
-        else:
-            tick_dur = float(tick_dur)
+    # check if the passed value is a float and return an error if not
+    try:
+        tick_dur = float(tick_dur)
+    except ValueError:
+        return abort(400, description=f'Tick duration has to be an float, but is of type {type(tick_dur)}')
 
     # save the new tick duration
     global tick_duration
@@ -502,7 +508,6 @@ def bad_request(e):
 # api helper methods
 #########################################################################
 
-
 def clean_input_ids(ids):
     """ Clean a received api variable ids to valid Python code
 
@@ -523,22 +528,24 @@ def clean_input_ids(ids):
     if isinstance(ids, list):
         return ids
 
-    # check if it is a string encoded list
-    try:
-        ids = eval(ids)
-    except TypeError or NameError:
-        pass
+    # if it is a string
+    elif isinstance(ids, str):
+        # check if it is a string encoded list
+        try:
+            ids = eval(ids)
+            return ids
+        except TypeError or NameError:
+            pass
 
-    if isinstance(ids, str):
-        if "[" in ids:
-            try:
-                ids = eval(ids)
-            except TypeError or NameError:
-                print(f"Passed {ids} is of unknown type")
+        # it is a single agent ID, so put it in a list
         return [ids]
 
+    # unknown
+    else:
+        raise ValueError(f"Passed {ids} is of unknown type")
 
-def check_messages_API_request(tick=None, agent_id=None):
+
+def check_messages_API_request(tick=None, agent_id=None, agent_ids=None):
     """ Checks if the variables of the api request are valid, and if the requested information exists
 
     Parameters
@@ -596,13 +603,8 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
     # if this api call requires ids, check this variable on validity as well
     if ids_required:
 
-        # check if it is a string encoded list
-        try:
-            ids = eval(ids)
-        except TypeError or NameError:
-            pass
+        ids = clean_input_ids(ids)
 
-        print("Oops!", sys.exc_info()[0], "occured.")
         # check if the api was reset during this time
         if len(states) is 0:
             return False, {'error_code': 400,
@@ -623,13 +625,14 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
 
 
 def check_input(tick=None, ids=None):
+
     # check if tick is a valid format
     if tick is not None:
-        if not isinstance(int, tick) or isinstance(float, tick):
+        try:
+            tick = int(tick)
+        except ValueError:
             return False, {'error_code': 400,
-                           'error_message': f'Tick has to be an integer, but is of type {type(tick)}'}
-
-        tick = int(tick)
+                           'error_message': f'Tick has to be an integer, but {tick} is something else.'}
 
         # check if the tick has actually occurred
         if not tick in range(0, current_tick + 1):
@@ -657,7 +660,6 @@ def __fetch_states(tick, ids=None):
         specified in `agent_ids`, indexed by their agent ID.
 
     """
-    tick = int(tick)
 
     # return all states
     if ids is None:
