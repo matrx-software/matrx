@@ -1,3 +1,5 @@
+import copy
+
 from matrx.messages.message import Message
 
 
@@ -91,6 +93,10 @@ class MessageManager:
         """
         all_ids_except_me = [agent_id for agent_id in all_agent_ids if agent_id != mssg.from_id]
 
+        # make sure when we copy this mssg to the global, private or team message groups, that we keep the potentially
+        # custom message class and its custom properties. Also make sure that the message has a unique ID
+        new_mssg = copy.copy(mssg).regen_id()
+
         # if the receiver is None, it is a global message which has to be sent to everyone
         if mssg.to_id is None:  # global message
             # create a list in memory for global messages for this tick
@@ -98,13 +104,13 @@ class MessageManager:
                 self.global_messages[tick] = []
 
             # save in global
-            global_message = Message(content=mssg.content, from_id=mssg.from_id, to_id="global")
+            global_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id="global")
             self.global_messages[tick].append(global_message)
 
             # split in sub mssgs
             for to_id in all_ids_except_me.copy():
                 # create message
-                new_message = Message(content=mssg.content, from_id=mssg.from_id, to_id=to_id)
+                new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=to_id)
 
                 # save in prepr
                 self.preprocessed_messages[tick].append(new_message)  # all messages above combined
@@ -113,7 +119,7 @@ class MessageManager:
         elif isinstance(mssg.to_id, list):
             for receiver_id in mssg.to_id:
                 # create message
-                new_message = Message(content=mssg.content, from_id=mssg.from_id, to_id=receiver_id)
+                new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=receiver_id)
 
                 self._decode_message_receiver(new_message, all_agent_ids, teams, tick)
 
@@ -126,7 +132,7 @@ class MessageManager:
                 to_ids = eval(mssg.to_id)
 
                 # create a new message addressed to this list of IDs, and reprocess
-                new_message = Message(content=mssg.content, from_id=mssg.from_id, to_id=to_ids)
+                new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=to_ids)
                 self._decode_message_receiver(new_message, all_agent_ids, teams, tick)
             except:
                 pass
@@ -147,7 +153,7 @@ class MessageManager:
                 # split in sub mssgs for every agent in the team
                 for to_id in teams[mssg.to_id]:
                     # create a message
-                    new_message = Message(content=mssg.content, from_id=mssg.from_id, to_id=to_id)
+                    new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=to_id)
 
                     # save in prepr
                     self.preprocessed_messages[tick].append(new_message)
@@ -274,3 +280,35 @@ class MessageManager:
                             messages['private'][t].append(message.to_json())
 
         return messages
+
+    def copy_message(self, mssg, from_id, to_id):
+        """ Copy a message while keeping the potentially custom message type and custom message properties.
+        Global and team messages have to be subdivided into individual messages for each receiving agent.
+        This function copies a message while paying attention to any custom message classes used and their custom
+        properties, in addition to making sure the message has a unique message ID.
+
+        Parameters
+        ----------
+        mssg
+            original message instance. Can be the default Message() class, or a class that inherits from it.
+        from_id
+            the new sender ID.
+        to_id
+             the new receiver ID.
+
+        Returns
+            the new message instance with the same class and custom properties as mssg, with the provided from_id
+            and to_id.
+        -------
+        """
+        # copy the original message so we are sure we have the correct message class
+        new_mssg = copy.copy(mssg)#
+
+        # make sure the new message has a unique ID
+        new_mssg.regen_id()
+
+        # set the new from and to ID
+        new_mssg.from_id = from_id
+        new_mssg.to_id = to_id
+
+        return new_mssg

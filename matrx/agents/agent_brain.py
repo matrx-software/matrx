@@ -335,8 +335,6 @@ class AgentBrain:
             recipient, a list of recipients or None. If None, it is send to all other agents.
 
         """
-        # Check if the message is a true message
-        self.__check_message(message, self.agent_id)
         # Add the message to our list
         self.messages_to_send.append(message)
 
@@ -539,14 +537,8 @@ class AgentBrain:
         If messages is set to None (or no messages are used as input), only the previous messages are removed
         """
 
-        # We empty all received messages as this is from the previous tick
-        # self.received_messages = []
-
         # Loop through all messages and create a Message object out of the dictionaries.
         for mssg in messages:
-
-            # Check if the message is of type Message (its content contains the actual message)
-            AgentBrain.__check_message(mssg, self.agent_id)
 
             # Since each message is secretly wrapped inside a Message (as its content), we unpack its content and
             # set that as the actual received message.
@@ -554,9 +546,3 @@ class AgentBrain:
 
             # Add the message object to the received messages
             self.received_messages.append(received_message)
-
-    @staticmethod
-    def __check_message(mssg, this_agent_id):
-        if not isinstance(mssg, Message):
-            raise Exception(f"A message to {this_agent_id} is not, nor inherits from, the class {Message.__name__}."
-                            f" This is required for agents to be able to send and receive them.")
