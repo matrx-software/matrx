@@ -507,9 +507,9 @@ function gen_rectangle(obj_vis_settings, obj_element, element_type = "div") {
     var shape = document.createElement(element_type);
     shape.className = "shape";
 
-    // coords of top left corner, such that it is centerd in our tile
-    shape.style.left = ((1 - size) * 0.5 * tile_size);
-    shape.style.top = ((1 - size) * 0.5 * tile_size);
+    // coords of top left corner, such that it is centered in our tile
+    shape.style.left = ((1 - size) * 0.5 * tile_size) + "px";
+    shape.style.top = ((1 - size) * 0.5 * tile_size) + "px";
 
     // width and height of rectangle
     shape.style.width = size * tile_size + "px";
@@ -548,8 +548,8 @@ function gen_triangle(obj_vis_settings, obj_element) {
     shape.className = "shape";
 
     // coords of top left corner, such that it is centerd in our tile
-    shape.style.left = ((1 - size) * 0.5 * tile_size);
-    shape.style.top = ((1 - size) * 0.5 * tile_size);
+    shape.style.left = ((1 - size) * 0.5 * tile_size) + "px";
+    shape.style.top = ((1 - size) * 0.5 * tile_size) + "px";
 
     // for a triangle, we set the content width/height to 0
     shape.style.width = 0;
