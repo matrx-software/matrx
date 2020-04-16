@@ -335,7 +335,11 @@ function parse_world_settings(world_settings) {
  */
 function parse_vis_settings(vis_settings) {
     bg_colour = vis_settings['vis_bg_clr'];
-    bg_image = fix_img_url(vis_settings['vis_bg_img']);
+
+    bg_image = null;
+    if (Object.keys(vis_settings).includes('vis_bg_img') && vis_settings['vis_bg_img'] != null) {
+        bg_image = fix_img_url(vis_settings['vis_bg_img']);
+    }
 
     // update background colour / image if needed
     draw_bg();
