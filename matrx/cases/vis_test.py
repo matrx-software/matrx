@@ -1,4 +1,5 @@
 from matrx.agents import PatrollingAgentBrain, HumanAgentBrain
+from matrx.agents.agent_types.human_agent_context import HumanAgentBrainContextTest
 from matrx.world_builder import WorldBuilder
 from matrx.actions import *
 
@@ -47,9 +48,11 @@ def create_builder():
     factory.add_human_agent([5, 5], HumanAgentBrain(), name="human",
                             key_action_map=key_action_map, img_name="/static/images/transparent.png")
 
-    factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
-                            key_action_map=key_action_map, img_name="/static/images/agent.gif")
+    # factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
+    #                         key_action_map=key_action_map, img_name="/static/images/agent.gif")
 
     factory.add_object([6,7], "block")
+
+    factory.add_human_agent([7,7], HumanAgentBrainContextTest(), name="human2_context", key_action_map={}, img_name="/static/images/agent.gif")
 
     return factory
