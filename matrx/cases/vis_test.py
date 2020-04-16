@@ -45,8 +45,8 @@ def create_builder():
         'a': MoveWest.__name__,
         'r': RemoveObject.__name__
     }
-    factory.add_human_agent([5, 5], HumanAgentBrain(), name="human",
-                            key_action_map=key_action_map, img_name="/static/images/transparent.png")
+    # factory.add_human_agent([5, 5], HumanAgentBrain(), name="human",
+    #                         key_action_map=key_action_map, img_name="/static/images/transparent.png")
 
     # factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
     #                         key_action_map=key_action_map, img_name="/static/images/agent.gif")

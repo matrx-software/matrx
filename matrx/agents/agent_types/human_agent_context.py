@@ -130,7 +130,7 @@ class HumanAgentBrainContextTest(HumanAgentBrain):
 
         return object_id
 
-    def fill_tasking_menu(self, selected_obj_id, target_obj_id):
+    def fill_context_menu(self, selected_obj_id, target_obj_id):
         requester_agent_ID = self.agent_id
         context_menu = {
             "Move to...": self.context_move_to,
