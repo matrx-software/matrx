@@ -12,3 +12,4 @@ Also, MATRX supports HAT solutions to be implemented in the form of [Team Design
 This all is made possible by MATRX. 
 
 Feel free to try some tasks or to browse our official [webpage](https://matrx-software.com/). This also includes a set of elaborate [tutorials](https://matrx-software.com/tutorials/), [documentation](http://docs.matrx-software.com/en/latest/) and [contribution guide](https://matrx-software.com/contribution_guide/).
+.
