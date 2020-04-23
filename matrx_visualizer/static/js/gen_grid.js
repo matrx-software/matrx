@@ -528,9 +528,7 @@ function gen_rectangle(obj_vis_settings, obj_element, element_type = "div") {
     }
 
     // add a click listener for the context menu
-    if (lv_agent_type != "agent") {
-        add_context_menu(shape);
-    }
+    add_context_menu(shape);
 
     // add the new shape
     obj_element.append(shape);
@@ -571,9 +569,7 @@ function gen_triangle(obj_vis_settings, obj_element) {
     }
 
     // add a click listener for the context menu
-    if (lv_agent_type != "agent") {
-        add_context_menu(shape);
-    }
+    add_context_menu(shape);
 
     // add the new shape
     obj_element.append(shape);
@@ -660,6 +656,9 @@ function draw_bg_tiles() {
             var pos_x = x * tile_size;
             var pos_y = y * tile_size;
             tile.style = "left:" + pos_x + "px; top:" + pos_y + "px; width: " + tile_size + "px; height: " + tile_size + "px; z-index: 0;";
+
+            // add context menu
+            add_context_menu(tile);
 
             // add to grid
             grid.append(tile);
