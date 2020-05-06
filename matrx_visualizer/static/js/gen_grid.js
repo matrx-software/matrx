@@ -105,8 +105,8 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
         }
 
         var show_busy_condition =  (obj.hasOwnProperty("is_blocked_by_action") &&
-                                    obj.hasOwnProperty('show_when_busy') &&
-                                    obj['show_when_busy'] == true);
+                                    obj['visualization'].hasOwnProperty('show_busy') &&
+                                    obj['visualization']['show_busy']);
 
         // save visualization settings for this object
         var obj_vis_settings = {
