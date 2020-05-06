@@ -111,7 +111,8 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             "size": obj['visualization']['size'], // percentage how much of tile is filled
             "colour": hexToRgba(obj['visualization']['colour'], obj['visualization']['opacity']),
             "opacity": obj['visualization']['opacity'],
-            "dimension": tile_size // width / height of the tile
+            "dimension": tile_size, // width / height of the tile
+            "busy": (obj.hasOwnProperty("is_blocked_by_action") ? obj['is_blocked_by_action'] : false)
         };
 
         var obj_element = null; // the html element of this object
@@ -532,6 +533,23 @@ function gen_rectangle(obj_vis_settings, obj_element, element_type = "div") {
 
     // add the new shape
     obj_element.append(shape);
+
+    // check if we need to show a loading icon
+    if (obj_vis_settings['busy']) {
+        var busy_icon = document.createElement('img');
+        busy_icon.className = "matrx_object_busy";
+        // set the image source
+        busy_icon.setAttribute("src", '/static/images/busy_black_small.gif');
+        // small loading icon
+        busy_icon.style.width = 0.35 * tile_size + "px";
+        busy_icon.style.height = 0.35 * tile_size + "px";
+        // position in the top left corner
+        busy_icon.style.right = "0px";
+        busy_icon.style.top = "0px";
+        obj_element.append(busy_icon);
+    }
+
+
     return shape;
 }
 
