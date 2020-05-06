@@ -1,5 +1,4 @@
 from matrx.agents import PatrollingAgentBrain, HumanAgentBrain
-from matrx.agents.agent_types.human_agent_context import HumanAgentBrainContextTest
 from matrx.world_builder import WorldBuilder
 from matrx.actions import *
 
@@ -35,7 +34,7 @@ def create_builder():
 
         navigating_agent = PatrollingAgentBrain(waypoints, move_speed=10)
         factory.add_agent(start, navigating_agent, name="navigate " + str(x), visualization_shape=2, has_menu=True,
-                          is_traversable=False)
+                          is_traversable=False, show_when_busy=True)
 
     # add human agent
     key_action_map = {
@@ -45,14 +44,12 @@ def create_builder():
         'a': MoveWest.__name__,
         'r': RemoveObject.__name__
     }
-    # factory.add_human_agent([5, 5], HumanAgentBrain(), name="human",
-    #                         key_action_map=key_action_map, img_name="/static/images/transparent.png")
+    factory.add_human_agent([5, 5], HumanAgentBrain(), name="human",
+                            key_action_map=key_action_map, img_name="/static/images/transparent.png")
 
-    # factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
-    #                         key_action_map=key_action_map, img_name="/static/images/agent.gif")
+    factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
+                            key_action_map=key_action_map, img_name="/static/images/agent.gif", show_when_busy=True)
 
     factory.add_object([6,7], "block")
-
-    factory.add_human_agent([7,7], HumanAgentBrainContextTest(), name="human2_context", key_action_map={}, img_name="/static/images/agent.gif")
 
     return factory

@@ -104,6 +104,10 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             obj_img = fix_img_url(obj['img_name']);
         }
 
+        var show_busy_condition =  (obj.hasOwnProperty("is_blocked_by_action") &&
+                                    obj.hasOwnProperty('show_when_busy') &&
+                                    obj['show_when_busy'] == true);
+
         // save visualization settings for this object
         var obj_vis_settings = {
             "img": obj_img,
@@ -112,7 +116,7 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             "colour": hexToRgba(obj['visualization']['colour'], obj['visualization']['opacity']),
             "opacity": obj['visualization']['opacity'],
             "dimension": tile_size, // width / height of the tile
-            "busy": (obj.hasOwnProperty("is_blocked_by_action") ? obj['is_blocked_by_action'] : false)
+            "busy": (show_busy_condition ? obj['is_blocked_by_action'] : false) // show busy if available and requested
         };
 
         var obj_element = null; // the html element of this object
@@ -591,6 +595,22 @@ function gen_triangle(obj_vis_settings, obj_element) {
 
     // add the new shape
     obj_element.append(shape);
+
+       // check if we need to show a loading icon
+    if (obj_vis_settings['busy']) {
+        var busy_icon = document.createElement('img');
+        busy_icon.className = "matrx_object_busy";
+        // set the image source
+        busy_icon.setAttribute("src", '/static/images/busy_black_small.gif');
+        // small loading icon
+        busy_icon.style.width = 0.35 * tile_size + "px";
+        busy_icon.style.height = 0.35 * tile_size + "px";
+        // position in the top left corner
+        busy_icon.style.right = "0px";
+        busy_icon.style.top = "0px";
+        obj_element.append(busy_icon);
+    }
+
     return shape;
 }
 
