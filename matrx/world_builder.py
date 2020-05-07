@@ -251,7 +251,7 @@ class WorldBuilder:
                   customizable_properties: Union[tuple, list] = None, sense_capability: SenseCapability = None,
                   is_traversable: bool = True, team: str = None, possible_actions: list = None, is_movable: bool = None,
                   visualize_size: float = None, visualize_shape: Union[float, str] = None, visualize_colour: str = None,
-                  visualize_depth: int = None, visualize_opacity: float = None,
+                  visualize_depth: int = None, visualize_opacity: float = None, visualize_when_busy: bool = None,
                   **custom_properties):
         """The helper method within a WorldFactory instance to add a single agent.
 
@@ -303,6 +303,9 @@ class WorldBuilder:
             visualized. A larger value is more on 'top'.
         visualize_opacity: optional
             The opacity of this agent in its visualization. A value of 1.0 means full opacity and 0.0 no opacity.
+        visualize_when_busy: optional
+            Whether to visualize when an agent is busy with a action. True means show this using a loading icon, false
+            means do not show this in the visualizer.
         custom_properties: optional
             Any additional given keyword arguments will be encapsulated in this dictionary. These will be added to the
             AgentBody as custom_properties which can be perceived by other agents and objects or which can be used or
@@ -347,6 +350,8 @@ class WorldBuilder:
             visualize_colour = defaults.AGENTBODY_VIS_COLOUR
         if visualize_opacity is None:
             visualize_opacity = defaults.AGENTBODY_VIS_OPACITY
+        if visualize_when_busy is None:
+            visualize_when_busy = defaults.AGENTBODY_VIS_BUSY
         if visualize_depth is None:
             visualize_depth = defaults.AGENTBODY_VIS_DEPTH
         if possible_actions is None:
@@ -385,6 +390,7 @@ class WorldBuilder:
                              "visualize_colour": visualize_colour,
                              "visualize_opacity": visualize_opacity,
                              "visualize_depth": visualize_depth,
+                             "visualize_when_busy": visualize_when_busy,
                              "location": location,
                              "team": team}
                          }
@@ -394,7 +400,8 @@ class WorldBuilder:
     def add_team(self, agent_brains: Union[list, tuple], locations: Union[list, tuple], team_name,
                  custom_properties=None, sense_capability=None,
                  customizable_properties=None, is_traversable=None,
-                 visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_opacity=None):
+                 visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_opacity=None,
+                 visualize_when_busy=None):
         """Adds a group of agents as a single team (meaning that their 'team' property all have the given team name).
 
         All parameters except for the `locations` and `agent_brain` defaults to `None`. Which means that their values
@@ -426,6 +433,8 @@ class WorldBuilder:
             ..
         visualize_opacity
             ..
+        visualize_when_busy
+            Whether to visualize a loading icon when the agent is busy with an action.
 
         Returns
         -------
@@ -438,13 +447,15 @@ class WorldBuilder:
                                  sense_capabilities=sense_capability, customizable_properties=customizable_properties,
                                  is_traversable=is_traversable,
                                  teams=team_name, visualize_sizes=visualize_size, visualize_shapes=visualize_shape,
-                                 visualize_colours=visualize_colour, visualize_opacities=visualize_opacity)
+                                 visualize_colours=visualize_colour, visualize_opacities=visualize_opacity,
+                                 visualize_when_busy=visualize_when_busy)
 
     def add_multiple_agents(self, agents, locations, custom_properties=None,
                             sense_capabilities=None, customizable_properties=None,
                             is_traversable=None,
                             teams=None, visualize_sizes=None, visualize_shapes=None,
-                            visualize_colours=None, visualize_opacities=None, visualize_depths=None):
+                            visualize_colours=None, visualize_opacities=None, visualize_depths=None,
+                            visualize_when_busy=None):
         """
 
         Parameters
@@ -461,6 +472,7 @@ class WorldBuilder:
         visualize_colours
         visualize_opacities
         visualize_depths
+        visualize_when_busy
 
         Returns
         -------
@@ -519,6 +531,11 @@ class WorldBuilder:
         elif isinstance(visualize_depths, int):
             visualize_depths = [visualize_depths for _ in range(len(agents))]
 
+        if visualize_when_busy is None:
+            visualize_when_busy = [None for _ in range(len(agents))]
+        elif isinstance(visualize_when_busy, bool):
+            visualize_when_busy = [visualize_when_busy for _ in range(len(agents))]
+
         # Loop through all agents and add them
         for idx, agent in enumerate(agents):
             self.add_agent(locations[idx], agent,
@@ -531,6 +548,7 @@ class WorldBuilder:
                            visualize_colour=visualize_colours[idx],
                            visualize_depth=visualize_depths[idx],
                            visualize_opacity=visualize_opacities[idx],
+                           visualize_when_busy=visualize_when_busy[idx],
                            **custom_properties[idx])
 
     def add_agent_prospect(self, location, agent, probability, name="Agent", customizable_properties=None,
@@ -538,13 +556,13 @@ class WorldBuilder:
                            is_traversable=None, team=None, possible_actions=None,
                            is_movable=None,
                            visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_opacity=None,
-                           visualize_depth=None, **custom_properties):
+                           visualize_depth=None, visualize_when_busy=None, **custom_properties):
 
         # Add agent as normal
         self.add_agent(location, agent, name, customizable_properties, sense_capability,
                        is_traversable, team, possible_actions, is_movable,
                        visualize_size, visualize_shape, visualize_colour, visualize_depth,
-                       visualize_opacity, **custom_properties)
+                       visualize_opacity, visualize_when_busy, **custom_properties)
 
         # Get the last settings (which we just added) and add the probability
         self.agent_settings[-1]['probability'] = probability
@@ -684,7 +702,7 @@ class WorldBuilder:
                         is_traversable=None, team=None, possible_actions=None,
                         is_movable=None,
                         visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                        visualize_opacity=None, key_action_map=None, **custom_properties):
+                        visualize_opacity=None, visualize_when_busy=None, key_action_map=None, **custom_properties):
 
         # Check if location and agent are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
@@ -708,6 +726,8 @@ class WorldBuilder:
             visualize_opacity = defaults.AGENTBODY_VIS_OPACITY
         if visualize_depth is None:
             visualize_depth = defaults.AGENTBODY_VIS_DEPTH
+        if visualize_when_busy is None:
+            visualize_when_busy = defaults.AGENTBODY_VIS_BUSY
         if possible_actions is None:
             possible_actions = defaults.AGENTBODY_POSSIBLE_ACTIONS
         if is_movable is None:
@@ -747,6 +767,7 @@ class WorldBuilder:
                              "visualize_colour": visualize_colour,
                              "visualize_opacity": visualize_opacity,
                              "visualize_depth": visualize_depth,
+                             "visualize_when_busy": visualize_when_busy,
                              "location": location,
                              "team": team}
                          }

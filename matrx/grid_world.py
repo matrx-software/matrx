@@ -728,7 +728,7 @@ class GridWorld:
 
         # Check if the action_name is None, in which case we simply idle for one tick
         if action_name is None:
-            duration_in_ticks = 1
+            duration_in_ticks = 0
 
         else:  # action is not None
 

@@ -284,3 +284,5 @@ class HumanAgentBrain(AgentBrain):
             object_id = None
 
         return object_id
+
+
