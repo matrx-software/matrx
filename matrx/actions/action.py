@@ -27,10 +27,10 @@ class Action:
     def mutate(self, grid_world, agent_id, **kwargs):
         """ Method that mutates the world.
 
-        This method is allowed to mutate a :class:`matrxs.grid_world.GridWorld`
+        This method is allowed to mutate a :class:`matrx.grid_world.GridWorld`
         instance according to the purposes of the
-        :class:`matrxs.actions.Action`. Override this method when implementing
-        a new :class:`matrxs.actions.action.Action`.
+        :class:`matrx.actions.Action`. Override this method when implementing
+        a new :class:`matrx.actions.action.Action`.
 
         Parameters
         ----------
@@ -42,48 +42,48 @@ class Action:
         **kwargs
             The set of keyword arguments provided by the agent that decided
             upon this action. When overriding this method and setting required
-            arguments, the :class:`matrxs.grid_world.GridWorld` will take
+            arguments, the :class:`matrx.grid_world.GridWorld` will take
             responsibility in checking whether the agent provided these. Hence,
             it is not required to do so here.
 
         Returns
         -------
         ActionResult
-            An instance of the :class:`matrxs.actions.Action.ActionResult`
+            An instance of the :class:`matrx.actions.Action.ActionResult`
             class, or an inherited class thereof, which denotes whether the
             mutation actually succeeded or not, together with the reason why.
             This result is passed to the
-            :class:`matrxs.agents.agent_brain.AgentBrain` by the
-            :class:`matrxs.grid_world.GridWorld` instance so that an agent is
+            :class:`matrx.agents.agent_brain.AgentBrain` by the
+            :class:`matrx.grid_world.GridWorld` instance so that an agent is
             capable of checking when and why an
-            :class:`matrxs.actions.action.Action` succeeded or failed.
+            :class:`matrx.actions.action.Action` succeeded or failed.
 
         Notes
         -----
-        This method is called by the :class:`matrxs.grid_world.GridWorld` iff:
+        This method is called by the :class:`matrx.grid_world.GridWorld` iff:
 
-        * An :class:`matrxs.agents.agent_brain.AgentBrain` of an agent decided
+        * An :class:`matrx.agents.agent_brain.AgentBrain` of an agent decided
           upon this action.
         * It is the turn of the agent to take an action.
-        * The implemented :meth:`matrxs.actions.Action.is_possible` method
-          returned an :class:`matrxs.actions.Action.ActionResult.succeeded`
+        * The implemented :meth:`matrx.actions.Action.is_possible` method
+          returned an :class:`matrx.actions.Action.ActionResult.succeeded`
           denoting success.
         * The `action_duration` has passed.
 
         Furthermore, it is important to remember that the given
-        :class:matrxs.grid_world.GridWorld` instance, represents the actual
+        :class:matrx.grid_world.GridWorld` instance, represents the actual
         world. Any change to this instance are immediately reflected in the
         world.
 
         See Also
         --------
-        matrxs.grid_world.GridWorld :
+        matrx.grid_world.GridWorld :
             Contains additional functions to make the implementation of
-            :class:`matrxs.actions.action.Action` simpler.
+            :class:`matrx.actions.action.Action` simpler.
         ActionResult :
             Contains a description on how to create an instance of
-            :class:`matrxs.actions.action.ActionResult`, or how to override it
-            for your own custom :class:`matrxs.actions.action.Action`.
+            :class:`matrx.actions.action.ActionResult`, or how to override it
+            for your own custom :class:`matrx.actions.action.Action`.
 
         """
         return None
@@ -91,9 +91,9 @@ class Action:
     def is_possible(self, grid_world, agent_id, **kwargs):
         """ Checks if the Action is possible.
 
-        This method analyses a :class:`matrxs.grid_world.GridWorld` instance
+        This method analyses a :class:`matrx.grid_world.GridWorld` instance
         to check if the Action is possible to perform. Override this method
-        when implementing a new :class:`matrxs.actions.action.Action`.
+        when implementing a new :class:`matrx.actions.action.Action`.
 
         Parameters
         ----------
@@ -112,41 +112,41 @@ class Action:
         Returns
         -------
         ActionResult
-            The expected :class:`matrxs.actions.action.ActionResult` when
-            performing this :class:`matrxs.actions.action.Action`. The
-            :attr:`matrxs.actions.action.ActionResult.succeeded` attribute is
-            used to check if the :class:`matrxs.actions.action.Action` is
-            indeed possible by the :class:`matrxs.grid_world.GridWorld`.
+            The expected :class:`matrx.actions.action.ActionResult` when
+            performing this :class:`matrx.actions.action.Action`. The
+            :attr:`matrx.actions.action.ActionResult.succeeded` attribute is
+            used to check if the :class:`matrx.actions.action.Action` is
+            indeed possible by the :class:`matrx.grid_world.GridWorld`.
 
         Notes
         -----
         It is important to understand that this function does not have to
-        guarantee the success of an :class:`matrxs.actions.action.Action`. It
+        guarantee the success of an :class:`matrx.actions.action.Action`. It
         might be impossible to check if an
-        :class:`matrxs.actions.action.Action` would always succeed without
+        :class:`matrx.actions.action.Action` would always succeed without
         actually performing the mutation. Hence, this method only needs to
         check for general cases. The
-        :meth:`matrxs.actions.action.Action.mutate` itself also returns an
-        :class:`matrxs.actions.action.ActionResult` which denotes the actual
+        :meth:`matrx.actions.action.Action.mutate` itself also returns an
+        :class:`matrx.actions.action.ActionResult` which denotes the actual
         success or failure of the Action.
 
-        This method is called by the :class:`matrxs.grid_world.GridWorld` iff:
+        This method is called by the :class:`matrx.grid_world.GridWorld` iff:
 
-        * An :class:`matrxs.agents.agent_brain.AgentBrain` of an agent decided
+        * An :class:`matrx.agents.agent_brain.AgentBrain` of an agent decided
           upon this action.
         * It is the turn of the agent to take an action.
         * The `action_duration` has passed.
 
         OR
 
-        * An :class:`matrxs.agents.agent_brain.AgentBrain` requested if a
-          certain :class:`matrxs.actions.action.Action` is possible. (Requested
+        * An :class:`matrx.agents.agent_brain.AgentBrain` requested if a
+          certain :class:`matrx.actions.action.Action` is possible. (Requested
           functionality: See Issue #46)
 
         Warnings
         --------
         This method should not change anything in this instance. This is
-        reserved for the :meth:`matrxs.actions.action.Action.mutate` method as
+        reserved for the :meth:`matrx.actions.action.Action.mutate` method as
         any change here will be reflected in the world.
 
         See Also
@@ -166,32 +166,32 @@ class ActionResult:
 
     This class functions as a simple wrapper around a boolean representing the
     success (`True`) or failure (`False`) of the (expected) mutation of an
-    :class:`matrxs.actions.action.Action`, as well as the reason for it.
+    :class:`matrx.actions.action.Action`, as well as the reason for it.
 
-    The :class:`matrxs.actions.action.ActionResult` class contains several
+    The :class:`matrx.actions.action.ActionResult` class contains several
     generic reasons for a succeed or fail as constant class attributes.
 
     Parameters
     ----------
     result : str
         A string representing the reason for the (expected) success or fail of
-        an :class:`matrxs.actions.action.Action`.
+        an :class:`matrx.actions.action.Action`.
     succeeded : bool
         A boolean representing the (expected) success or fail of an
-        :class:`matrxs.actions.action.Action`.
+        :class:`matrx.actions.action.Action`.
 
     Notes
     -----
-    Both the methods :meth:`matrxs.actions.Action.is_possible` and
-    :meth:`matrxs.actions.Action.mutate` should return an
-    :class:`matrxs.actions.action.ActionResult`. With the former it represents
+    Both the methods :meth:`matrx.actions.Action.is_possible` and
+    :meth:`matrx.actions.Action.mutate` should return an
+    :class:`matrx.actions.action.ActionResult`. With the former it represents
     the expected success or failure of the
-    :class:`matrxs.actions.action.Action`, with the latter the actual success
+    :class:`matrx.actions.action.Action`, with the latter the actual success
     or failure.
 
-    The :class:`matrxs.actions.action.ActionResult` class contain several
-    reasons why an :class:`matrxs.actions.action.Action` may succeed or fail
-    that are being checked by a :class:`matrxs.grid_world.GridWorld` instance.
+    The :class:`matrx.actions.action.ActionResult` class contain several
+    reasons why an :class:`matrx.actions.action.Action` may succeed or fail
+    that are being checked by a :class:`matrx.grid_world.GridWorld` instance.
     These are:
 
         * IDLE_ACTION: Always given when an AgentBrain decided upon returning
@@ -207,12 +207,12 @@ class ActionResult:
           not existing or because it is never imported anywhere (and hence is
           not on the path the GridWorld searches in).
 
-    When creating a new :class:`matrxs.actions.action.Action` class, you can
+    When creating a new :class:`matrx.actions.action.Action` class, you can
     also extend this class with your own. This allows you to set your own
     constants representing reasons for that
-    :class:`matrxs.actions.action.Action` specific results. This allows an
-    :class:`matrxs.agents.agent_brain.AgentBrain` to directly match the
-    :attr:`matrxs.actions.ActionResult.result` with a constant and potentially
+    :class:`matrx.actions.action.Action` specific results. This allows an
+    :class:`matrx.agents.agent_brain.AgentBrain` to directly match the
+    :attr:`matrx.actions.ActionResult.result` with a constant and potentially
     adjust its behavior.
 
     See Also

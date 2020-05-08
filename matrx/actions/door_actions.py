@@ -17,8 +17,8 @@ class OpenDoorAction(Action):
             Optional, default: ``1``. Should be zero or larger.
 
             The default duration of this action in ticks during which the
-            :class:`matrxs.grid_world.GridWorld` blocks the
-            :class:`matrxs.agents.agent.Agent` performing other actions. By default
+            :class:`matrx.grid_world.GridWorld` blocks the
+            :class:`matrx.agents.agent.Agent` performing other actions. By default
             this is 1, meaning that this action  will take both the tick in which
             it was decided upon and the subsequent tick.
 
@@ -30,16 +30,16 @@ class OpenDoorAction(Action):
         """ Opens a door in the world.
 
         Mutates the `door_status` of an
-        :class:`matrxs.objects.simple_objects.Door` in the
-        :class:`matrxs.grid_world.GridWorld` to be open (and as such passable).
+        :class:`matrx.objects.simple_objects.Door` in the
+        :class:`matrx.grid_world.GridWorld` to be open (and as such passable).
         It does so only if the `object_id` exists, is a
-        :class:`matrxs.objects.simple_objects.Door`, and is within
+        :class:`matrx.objects.simple_objects.Door`, and is within
         `door_range`.
 
         Parameters
         ----------
         grid_world : GridWorld
-            The :class:`matrxs.grid_world.GridWorld` instance in which the
+            The :class:`matrx.grid_world.GridWorld` instance in which the
             door is sought according to the `object_id` parameter.
         agent_id : str
             The string representing the unique identifier that represents the
@@ -61,7 +61,7 @@ class OpenDoorAction(Action):
             The ActionResult depicting the action's success or failure and
             reason for that result.
 
-            See :class:`matrxs.actions.simple_objects.OpenDoorActionResult` for
+            See :class:`matrx.actions.simple_objects.OpenDoorActionResult` for
             the results it can return.
 
         """
@@ -89,7 +89,7 @@ class OpenDoorAction(Action):
         Parameters
         ----------
         grid_world : GridWorld
-            The :class:`matrxs.grid_world.GridWorld` instance in which the door
+            The :class:`matrx.grid_world.GridWorld` instance in which the door
              is sought according to the `object_id` parameter.
         agent_id : str
             The string representing the unique identifier that represents the
@@ -111,7 +111,7 @@ class OpenDoorAction(Action):
             Depicts the action's expected success or failure and reason for
             that result.
 
-            See :class:`matrxs.actions.simple_objects.OpenDoorActionResult` for
+            See :class:`matrx.actions.simple_objects.OpenDoorActionResult` for
             the results it can return.
 
         """
@@ -136,7 +136,7 @@ class CloseDoorAction(Action):
             Optional. Default: ``1``. Should be zero or larger.
 
             The default duration of this action in ticks during which the
-            :class:`matrxs.grid_world.GridWorld` blocks the agent performing
+            :class:`matrx.grid_world.GridWorld` blocks the agent performing
             other actions. By default this is 1, meaning that this action will take
             both the tick in which it was decided upon and the subsequent tick.
 
@@ -147,16 +147,16 @@ class CloseDoorAction(Action):
         """ Closes a door in the world.
 
         Mutates the `door_status` of an
-        :class:`matrxs.objects.simple_objects.Door` in the
-        :class:`matrxs.grid_world.GridWorld` to be closed (and as such not
+        :class:`matrx.objects.simple_objects.Door` in the
+        :class:`matrx.grid_world.GridWorld` to be closed (and as such not
         passable). It does so only if the `object_id` exists, is a
-        :class:`matrxs.objects.simple_objects.Door`, and is within
+        :class:`matrx.objects.simple_objects.Door`, and is within
         `door_range`.
 
         Parameters
         ----------
         grid_world : GridWorld
-            The :class:`matrxs.grid_world.GridWorld` instance in which the
+            The :class:`matrx.grid_world.GridWorld` instance in which the
             door is sought according to the `object_id` parameter.
         agent_id : str
             The string representing the unique identifier that represents the
@@ -177,7 +177,7 @@ class CloseDoorAction(Action):
         OpenDoorActionResult
             Depicts the action's success or failure and reason for that result.
 
-            See :class:`matrxs.actions.simple_objects.CloseDoorActionResult`
+            See :class:`matrx.actions.simple_objects.CloseDoorActionResult`
             for the results it can return.
 
         """
@@ -203,7 +203,7 @@ class CloseDoorAction(Action):
         Parameters
         ----------
         grid_world : GridWorld
-            The :class:`matrxs.grid_world.GridWorld` instance in which the door
+            The :class:`matrx.grid_world.GridWorld` instance in which the door
              is sought according to the `object_id` parameter.
         agent_id : str
             The string representing the unique identifier that represents the
@@ -225,7 +225,7 @@ class CloseDoorAction(Action):
             Depicts the action's expected success or failure and reason for
             that result.
 
-            See :class:`matrxs.actions.door_actions.CloseDoorActionResult`
+            See :class:`matrx.actions.door_actions.CloseDoorActionResult`
             for the results it can return.
 
         """
@@ -251,7 +251,7 @@ class CloseDoorActionResult(ActionResult):
         """ ActionResult for the CloseDoorAction.
 
         The results uniquely for
-        :class:`matrxs.actions.action.door_actions.CloseDoorAction` are (as class
+        :class:`matrx.actions.action.door_actions.CloseDoorAction` are (as class
         constants):
 
         * RESULT_SUCCESS: When the action is a success.
@@ -267,10 +267,10 @@ class CloseDoorActionResult(ActionResult):
         ----------
         result : str
             A string representing the reason for the (expected) success or fail of
-            a :class:`matrxs.actions.door_actions.CloseDoorAction`.
+            a :class:`matrx.actions.door_actions.CloseDoorAction`.
         succeeded : bool
             A boolean representing the (expected) success or fail of a
-            :class:`matrxs.actions.door_actions.CloseDoorAction`.
+            :class:`matrx.actions.door_actions.CloseDoorAction`.
 
         See Also
         --------
@@ -294,7 +294,7 @@ class OpenDoorActionResult(ActionResult):
         """ ActionResult for the OpenDoorAction.
 
         The results uniquely for
-        :class:`matrxs.actions.door_actions.OpenDoorAction` are (as class
+        :class:`matrx.actions.door_actions.OpenDoorAction` are (as class
         constants):
 
         * RESULT_SUCCESS: When the action is a success.
@@ -309,10 +309,10 @@ class OpenDoorActionResult(ActionResult):
         ----------
         result : str
             A string representing the reason for the (expected) success or fail of
-            an :class:`matrxs.actions.door_actions.OpenDoorAction`.
+            an :class:`matrx.actions.door_actions.OpenDoorAction`.
         succeeded : bool
             A boolean representing the (expected) success or fail of an
-            :class:`matrxs.actions.door_actions.OpenDoorAction`.
+            :class:`matrx.actions.door_actions.OpenDoorAction`.
 
         See Also
         --------
@@ -331,17 +331,17 @@ def _is_possible_door_open_close(grid_world, agent_id, action_result, object_id=
     Parameters
     ----------
     grid_world : GridWorld
-        The :class:`matrxs.grid_world.GridWorld` instance in which the door is
+        The :class:`matrx.grid_world.GridWorld` instance in which the door is
          sought according to the `object_id` parameter.
     agent_id : str
         The string representing the unique identified that represents the agent
         performing this action.
     action_result : {Type[OpenDoorActionResult], Type[CloseDoorActionResult]}
-        The type of the :class:`matrxs.actions.action.ActionResult` that should
+        The type of the :class:`matrx.actions.action.ActionResult` that should
         be returned. Also used to determine for which kind of
-        :class:`matrxs.actions.action.Action` this check is made (
-        :class:`matrxs.actions.door_actions.OpenDoorAction` or
-        :class:`matrxs.actions.door_actions.CloseDoorAction`).
+        :class:`matrx.actions.action.Action` this check is made (
+        :class:`matrx.actions.door_actions.OpenDoorAction` or
+        :class:`matrx.actions.door_actions.CloseDoorAction`).
     object_id : str,
         Optional. Default: `None`
 

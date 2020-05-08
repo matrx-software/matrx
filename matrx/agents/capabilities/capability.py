@@ -9,7 +9,7 @@ class Capability:
     Notes
     -----
     Currently only used for the
-    :class:`matrxs.agents.capabilities.capability.SenseCapability`. Might be
+    :class:`matrx.agents.capabilities.capability.SenseCapability`. Might be
     extended in the future to include other type of capabilities.
 
     """
@@ -22,7 +22,7 @@ class SenseCapability(Capability):
     """ Denotes what an agent can see within a certain range.
 
     An instance of this class describes to an agent what it can perceive within
-    what ranges. It is used by a :class:`matrxs.grid_world.GridWorld` instance
+    what ranges. It is used by a :class:`matrx.grid_world.GridWorld` instance
     to construct the agent's state.
 
     To limit agents to sense objects more granulary then the given object types
