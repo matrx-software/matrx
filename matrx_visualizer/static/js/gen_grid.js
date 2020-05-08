@@ -32,7 +32,8 @@ var firstDraw = true,
     animation_duration_s = null, // is calculated based on animation_duration_perc and tps.
     populate_god_agent_menu = null, // keep track of any new agents
     pop_new_chat_dropdown = null,
-    latest_tick_processed = null;
+    latest_tick_processed = null,
+    redraw_required = false; // for instance when the window has been resized
 
 // tracked HTML objects
 var saved_prev_objs = {}, // obj containing the IDs of objects and their visualization settings of the previous tick
@@ -70,7 +71,7 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
     parse_world_settings(world_settings);
 
     // if we already processed this tick (MATRX is paused), stop and return
-    if (latest_tick_processed == current_tick) {
+    if (latest_tick_processed == current_tick && !redraw_required) {
         return;
     }
 
@@ -176,11 +177,10 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
 
         // set the visualization depth of this object
         obj_element.style.zIndex = obj['visualization']['depth'];
-//        obj_element.style.zIndex = 0;
 
         // if we need to style this object, e.g. because it's new or visualiation settings changed,
         // regenerate the specfic object shape with its settings
-        if (style_object) {
+        if (style_object || redraw_required) {
             set_tile_dimensions(obj_element);
 
             // draw the object with the correct shape, size and colour
@@ -203,6 +203,9 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             return e !== objID
         })
     });
+
+    // all objects have been redrawn, so this can be set to false again
+    redraw_required = false;
 
     // any objects present in the previous tick but not present in the current
     // tick should be removed
@@ -247,6 +250,9 @@ function fix_grid_size() {
         // resize the grid to exactly encompass all tiles
         grid.style.width = tile_size * grid_size[0] + "px";
         grid.style.height = tile_size * grid_size[1] + "px";
+
+        // next time redraw all objects
+        redraw_required = true;
     }
 
     console.log("Fixed tile and grid size");
