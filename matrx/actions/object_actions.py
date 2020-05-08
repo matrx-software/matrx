@@ -27,7 +27,7 @@ class RemoveObject(Action):
 
     """
 
-    def __init__(self, duration_in_ticks=1):
+    def __init__(self, duration_in_ticks=0):
         super().__init__(duration_in_ticks)
 
     def mutate(self, grid_world, agent_id, **kwargs):
@@ -221,7 +221,7 @@ class GrabObject(Action):
 
     """
 
-    def __init__(self, duration_in_ticks=1):
+    def __init__(self, duration_in_ticks=0):
         super().__init__(duration_in_ticks)
 
     def is_possible(self, grid_world, agent_id, **kwargs):
@@ -443,7 +443,7 @@ class DropObject(Action):
 
         """
     
-    def __init__(self, duration_in_ticks=1):
+    def __init__(self, duration_in_ticks=0):
         super().__init__(duration_in_ticks)
 
     def is_possible(self, grid_world, agent_id, **kwargs):

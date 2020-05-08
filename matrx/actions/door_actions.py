@@ -6,7 +6,7 @@ from matrx.objects.standard_objects import Door
 
 class OpenDoorAction(Action):
 
-    def __init__(self, duration_in_ticks=1):
+    def __init__(self, duration_in_ticks=0):
         """ Action that opens doors.
 
         The action that opens a specific door within a given range from the agent.
@@ -125,7 +125,7 @@ class OpenDoorAction(Action):
 
 class CloseDoorAction(Action):
 
-    def __init__(self, duration_in_ticks=1):
+    def __init__(self, duration_in_ticks=0):
         """ Action that opens doors.
 
         The action that closes a specific door within a given range from the agent.

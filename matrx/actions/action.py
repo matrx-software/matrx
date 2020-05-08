@@ -20,7 +20,7 @@ class Action:
 
     """
 
-    def __init__(self, duration_in_ticks=1):
+    def __init__(self, duration_in_ticks=0):
         # number of ticks the action takes to complete
         self.duration_in_ticks = duration_in_ticks
 
