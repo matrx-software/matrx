@@ -28,14 +28,12 @@ from matrx_visualizer import visualization_server
 
 
 class WorldBuilder:
+    """ A builder to create one or more worlds. """
 
     def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=1000, run_matrx_api=True,
                  run_matrx_visualizer=False, visualization_bg_clr="#C2C2C2", visualization_bg_img=None,
                  verbose=False):
-        """
-        A builder to create one or more worlds.
-
-        With the constructor you can set a number of general properties and from the resulting instance you can call
+        """ With the constructor you can set a number of general properties and from the resulting instance you can call
         numerous methods to add new objects and/or agents.
 
         Parameters
@@ -456,7 +454,7 @@ class WorldBuilder:
                             teams=None, visualize_sizes=None, visualize_shapes=None,
                             visualize_colours=None, visualize_opacities=None, visualize_depths=None,
                             visualize_when_busy=None):
-        """
+        """ Add agents in bulk
 
         Parameters
         ----------
