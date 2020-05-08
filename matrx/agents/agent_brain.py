@@ -9,7 +9,7 @@ class AgentBrain:
 
     This class is the place where all the decision logic of an agent is
     contained. This class together with the
-    :class:`matrxs.objects.agent_body.AgentBody` class represent a full agent.
+    :class:`matrx.objects.agent_body.AgentBody` class represent a full agent.
 
     This agent brain simply selects a random action from the possible actions
     it can do.
@@ -17,16 +17,16 @@ class AgentBrain:
     When you wish to create a new agent, this is the class you need
     to extend. In specific these are the functions you should override:
 
-    * :meth:`matrxs.agents.agent_brain.initialize`
+    * :meth:`matrx.agents.agent_brain.initialize`
         Called before a world starts running. Can be used to initialize
         variables that can only be initialized after the brain is connected to
         its body (which is done by the world).
-    * :meth:`matrxs.agents.agent_brain.filter_observations`
+    * :meth:`matrx.agents.agent_brain.filter_observations`
         Called before deciding on an action to allow detailed and agent
         specific filtering of the received world state.
-    * :meth:`matrxs.agents.agent_brain.decide_on_action`
+    * :meth:`matrx.agents.agent_brain.decide_on_action`
         Called to decide on an action.
-    * :meth:`matrxs.agents.agent_brain.get_log_data`
+    * :meth:`matrx.agents.agent_brain.get_log_data`
         Called by data loggers to obtain data that should be logged from this
         agent internal reasoning.
 
@@ -40,7 +40,7 @@ class AgentBrain:
         The name of this agent.
     agent_properties: dict
         A dictionary of this agent's
-        :class:`matrxs.objects.agent_body.AgentBody` properties. With as keys
+        :class:`matrx.objects.agent_body.AgentBody` properties. With as keys
         the property name, and as value the property's value.
 
         These can be adjusted iff they are said to be adjustable (e.g. inside
@@ -49,12 +49,12 @@ class AgentBrain:
         List of property names that this agent can adjust.
     messages_to_send: [Message, ...]
         List of messages this agent will send. Use the method
-        :meth:`matrxs.agents.agent_brain.AgentBrain.send_message` to append to
+        :meth:`matrx.agents.agent_brain.AgentBrain.send_message` to append to
         this list.
     previous_action: str
         The name of the previous performed or attempted action.
     previous_action_result: ActionResult
-        The :class:`matrxs.actions.action.ActionResult` of the previously
+        The :class:`matrx.actions.action.ActionResult` of the previously
         performed or attempted action.
     received_messages: [Message, ...]
         The list of received messages.
@@ -63,7 +63,7 @@ class AgentBrain:
     rnd_seed: int
         The random seed with which this agent's `rnd_gen` was initialized. This
         seed is based on the master random seed given of the
-        :class:`matrxs.grid_world.GridWorld`.
+        :class:`matrx.grid_world.GridWorld`.
     """
 
     def __init__(self):
@@ -89,7 +89,7 @@ class AgentBrain:
     def initialize(self):
         """ To initialize an agent's brain.
 
-        Method called at the start of a :class:`matrxs.grid_world.GridWorld`.
+        Method called at the start of a :class:`matrx.grid_world.GridWorld`.
 
         Here you can initialize everything you need for your agent to work
         since you can't do much in the constructor as the brain needs to be
@@ -105,7 +105,7 @@ class AgentBrain:
 
         Currently the world returns ALL properties of ALL objects within a
         certain range(s), as specified by :
-        class:`matrxs.agents.capabilities.capability.SenseCapability`. But
+        class:`matrx.agents.capabilities.capability.SenseCapability`. But
         perhaps some objects are obscured because they are behind walls and
         this agent is not supposed to look through walls, or an agent is not
         able to see some properties of certain objects (e.g. colour).
@@ -121,12 +121,12 @@ class AgentBrain:
         ----------
         state: dict
             A state description containing all perceived
-            :class:`matrxs.objects.env_object.EnvObject` and objects inheriting
+            :class:`matrx.objects.env_object.EnvObject` and objects inheriting
             from this class within a certain range as defined by the
-            :class:`matrxs.agents.capabilities.capability.SenseCapability`.
+            :class:`matrx.agents.capabilities.capability.SenseCapability`.
 
             The keys are the unique identifiers, as values the properties of
-            an object. See :class:`matrxs.objects.env_object.EnvObject` for the
+            an object. See :class:`matrx.objects.env_object.EnvObject` for the
             kind of properties that are always included. It will also contain
             all properties for more specific objects that inherit from that
             class.
@@ -155,7 +155,7 @@ class AgentBrain:
         """ Contains the decision logic of the agent.
 
         This method determines what action the agent should perform. The
-        :class:`matrxs.grid_world.GridWorld` is responsible for deciding when
+        :class:`matrx.grid_world.GridWorld` is responsible for deciding when
         an agent can perform an action, if so this method is called for each
         agent and fed with the world state from the `filter_observations`
         method.
@@ -175,7 +175,7 @@ class AgentBrain:
         ----------
         state : dict
         A state description as given by the agent's
-        :meth:`matrxs.agents.agent_brain.AgentBrain.filter_observation` method.
+        :meth:`matrx.agents.agent_brain.AgentBrain.filter_observation` method.
 
         Returns
         -------

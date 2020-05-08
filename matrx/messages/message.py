@@ -28,6 +28,13 @@ class Message:
         return json.dumps(self, default=lambda o: o.__dict__,
                           sort_keys=True, indent=4)
 
+    def regen_id(self):
+        """
+        When someone copies this message, by default the message_id is not changed. To avoid duplicate mssg IDs, this
+        message can be called to change the regen the ID of a message.
+        """
+        self.message_id = self.__gen_random_string()
+
     @staticmethod
     def __gen_random_string(length=32):
         """ Generates a random hexidecimal string of length 'length'.
