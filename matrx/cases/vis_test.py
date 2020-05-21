@@ -1,8 +1,6 @@
-from matrx.agents.agent_types.patrolling_agent import PatrollingAgentBrain
+from matrx.agents import PatrollingAgentBrain, HumanAgentBrain
 from matrx.world_builder import WorldBuilder
-from matrx.agents.agent_types.human_agent import HumanAgentBrain
-from matrx.actions.move_actions import *
-
+from matrx.actions import *
 
 def create_builder():
     factory = WorldBuilder(random_seed=1, shape=[14, 20], tick_duration=0.1, verbose=False, run_matrx_api=True,
@@ -36,19 +34,22 @@ def create_builder():
 
         navigating_agent = PatrollingAgentBrain(waypoints, move_speed=10)
         factory.add_agent(start, navigating_agent, name="navigate " + str(x), visualization_shape=2, has_menu=True,
-                          is_traversable=False)
+                          is_traversable=False, visualize_when_busy=True)
 
     # add human agent
     key_action_map = {
         'w': MoveNorth.__name__,
         'd': MoveEast.__name__,
         's': MoveSouth.__name__,
-        'a': MoveWest.__name__
+        'a': MoveWest.__name__,
+        'r': RemoveObject.__name__
     }
     factory.add_human_agent([5, 5], HumanAgentBrain(), name="human",
                             key_action_map=key_action_map, img_name="/static/images/transparent.png")
 
     factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
-                            key_action_map=key_action_map, img_name="/static/images/agent.gif")
+                            key_action_map=key_action_map, img_name="/static/images/agent.gif", visualize_when_busy=True)
+
+    factory.add_object([6,7], "block")
 
     return factory

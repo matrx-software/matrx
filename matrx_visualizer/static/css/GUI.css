@@ -126,8 +126,6 @@ html {
 #messages {
     overflow-y: auto;
     max-height: 50vh;
-    display: flex;
-    flex-direction: column-reverse;
 }
 
 .message_you {
@@ -205,4 +203,8 @@ h5 {
 
 .chat-mssg-sender {
     font-weight: bold;
+}
+
+.matrx_object_busy {
+    position: absolute;
 }

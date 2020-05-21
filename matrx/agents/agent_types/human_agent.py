@@ -77,7 +77,7 @@ class HumanAgentBrain(AgentBrain):
             self.key_action_map = key_action_map
 
         # Create the agent's state tracker
-        self.__state_tracker = StateTracker(agent_id, sense_capability, knowledge_decay=self.__state_memory_decay,
+        self.__state_tracker = StateTracker(agent_id, knowledge_decay=self.__state_memory_decay,
                                             fov_occlusion=self.__fov_occlusion)
 
     def _get_action(self, state, agent_properties, agent_id, user_input):
@@ -188,7 +188,7 @@ class HumanAgentBrain(AgentBrain):
             # Assign it to the arguments list
             action_kwargs['remove_range'] = self.__remove_range  # Set drop range
 
-            obj_id = self.__select_random_obj_in_range(state, range_=self.__remove_range)
+            obj_id = self.__select_random_obj_in_range(state, range_=self.__remove_range, property_to_check="is_movable")
             action_kwargs['object_id'] = obj_id
 
         # if the user chose to do an open or close door action, find a door to open/close within range
@@ -265,15 +265,17 @@ class HumanAgentBrain(AgentBrain):
         # find objects in range
         object_in_range = []
         for object_id in object_ids:
-            if "is_movable" not in state[object_id]:
-                continue
+
             # Select range as just enough to grab that object
             dist = int(np.ceil(np.linalg.norm(np.array(state[object_id]['location'])
                                               - np.array(state[self.agent_id]['location']))))
             if dist <= range_:
+                # check for any properties specifically specified by the user
                 if property_to_check is not None:
-                    if state[object_id][property_to_check]:
+                    if property_to_check in state[object_id] and state[object_id][property_to_check]:
                         object_in_range.append(object_id)
+                else:
+                    object_in_range.append(object_id)
 
         # Select an object if there are any in range
         if object_in_range:
@@ -282,3 +284,5 @@ class HumanAgentBrain(AgentBrain):
             object_id = None
 
         return object_id
+
+
