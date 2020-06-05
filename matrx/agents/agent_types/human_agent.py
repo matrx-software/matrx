@@ -9,7 +9,6 @@ class HumanAgentBrain(AgentBrain):
     """ Creates an Human Agent which is an agent that can be controlled by a human.
     """
 
-
     def __init__(self, state_memory_decay=1, fov_occlusion=False, max_carry_objects=3,
                  grab_range=1, drop_range=1, door_range=1, remove_range=1):
         """ Creates an Human Agent which is an agent that can be controlled by a human.
