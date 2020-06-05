@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Capability:
-    """ Private MATRX class.
+    """ Denotes an capability of an agent.
 
     Base class for agent capabilities.
 
@@ -31,13 +31,6 @@ class SenseCapability(Capability):
     `MySquareBlock`. This allows you to specify these two types separately to
     an agent for perception.
 
-    Parameters
-    ----------
-    detectable_objects : dict
-        A dictionary with as keys the class you wish to perceive, and as
-        values the distance this object type can be perceived. The None
-        key stands for all otherwise not specified object types.
-
     Examples
     --------
     An example of a SenseCapability that defines the perception of all agents
@@ -60,6 +53,16 @@ class SenseCapability(Capability):
     """
 
     def __init__(self, detectable_objects):
+        """ Denotes what an agent can see within a certain range.
+
+        Parameters
+        ----------
+        detectable_objects : dict
+            A dictionary with as keys the class you wish to perceive, and as
+            values the distance this object type can be perceived. The None
+            key stands for all otherwise not specified object types.
+        """
+
         super().__init__()
         self.__detectable_objects = {}
         for obj_type, sense_range in detectable_objects.items():
@@ -85,6 +88,21 @@ class SenseCapability(Capability):
 
 
 def create_sense_capability(objects_to_perceive, range_to_perceive_them_in):
+    """ Creates a sense capability based that denotes what object types can be perceived from what range.
+
+
+    Parameters
+    ----------
+    objects_to_perceive : list
+        Various types of objects that the agent can perceive. An empty list is interpreted as all objects being
+        detectable with infinite range by the agent.
+
+    range_to_perceive_them_in : list
+        The range for the object in `objects_to_perceive` from which the agent can perceive that object type.
+        So range_to_perceive_them_in[4] denotes the range from which the agent can detect the object
+        at objects_to_perceive[4].
+
+    """
     # Check if range and objects are the same length
     assert len(objects_to_perceive) == len(range_to_perceive_them_in)
 
