@@ -28,63 +28,86 @@ from matrx_visualizer import visualization_server
 
 
 class WorldBuilder:
-    """ A builder to create one or more worlds. """
 
-    def __init__(self, shape, tick_duration=0.5, random_seed=1, simulation_goal=1000, run_matrx_api=True,
-                 run_matrx_visualizer=False, visualization_bg_clr="#C2C2C2", visualization_bg_img=None,
-                 verbose=False):
-        """ With the constructor you can set a number of general properties and from the resulting instance you can call
-        numerous methods to add new objects and/or agents.
+    def __init__(self, shape, tick_duration=0.5, random_seed=1,
+                 simulation_goal=1000, run_matrx_api=True,
+                 run_matrx_visualizer=False, visualization_bg_clr="#C2C2C2",
+                 visualization_bg_img=None, verbose=False):
+
+        """ Used to create one or more worlds according to a singel blueprint.
+
+        With the constructor you can set a number of general properties and
+        from the resulting instance you can call numerous methods to add new
+        objects and/or agents.
 
         Parameters
         ----------
-        shape : tuple, list
+        shape : tuple or list
             Denotes the width and height of the world you create.
-        tick_duration : float, optional
-            The duration of a single 'tick' or loop in the game-loop of the world you create. Defaults to 0.5.
-        random_seed : int, optional
-            The master random seed on which all objects, agents and worlds are seeded. Should be a positive non-zero
-            integer. Defaults 1.0.
-        simulation_goal : int, SimulationGoal, list of SimulationGoal, optional
-            The goal or goals of the world, either a single SimulationGoal, a list of such or a positive non-zero
-            integer to denote the maximum number of 'ticks' the world(s) have to run. Defaults to 1000.
-        run_matrx_api : bool, optional
-            Whether to run the MATRX api
-        run_matrx_visualizer : bool, optional
-            Whether to run the default MATRX visualizer, this requires the api to be run
-        visualization_bg_clr : str, optional
-            The color of the world when visualized using MATRX' own visualisation server. A string representation of
-            hexadecimal color. Defaults to "#C2C2C2" (light grey).
-        visualization_bg_img : str, optional
-            An optional background image of the world when visualized using MATRX' own visualisation server. A string
-            of the path to the image file. Defaults to None (no image).
-        verbose : bool, optional
-            Whether the subsequent created world should be verbose or not. Defaults to False.
+
+        tick_duration : float (optional, default 0.5)
+            The duration of a single 'tick' or loop in the game-loop of the
+            world you create.
+
+        random_seed : int, (optional, default 1)
+            The master random seed on which all objects, agents and worlds are
+            seeded. Should be a positive non-zero integer.
+
+        simulation_goal : WorldGoal, int, list or list (optional, default 1000)
+            The goal or goals of the world, either a single `WorldGoal`, a
+            list of such or a positive non-zero integer to denote the maximum
+            number of 'ticks' the world(s) has to run.
+
+        run_matrx_api : bool (optional, default True)
+            Whether to run the API. This API is used to connect the default
+            MATRX visualizer or a custom one.
+
+        run_matrx_visualizer : bool (optional, default False)
+            Whether to run the default MATRX visualizer, this requires the API
+            to be run. When set to True, it starts the visualization that is
+            accessible through http://localhost:3000.
+
+        visualization_bg_clr : string (optional, "C2C2C2")
+            The color of the world when visualized using MATRX' own
+            visualisation server. A string representation of hexadecimal color.
+
+        visualization_bg_img : string (optional, None)
+            An optional background image of the world when visualized using
+            MATRX' own visualisation server. A string of the path to the image
+            file. When None, no background image is used.
+
+        verbose : bool (optional, False)
+            Whether the subsequent created world should be verbose or not.
 
         Raises
         ------
         ValueError
-            On an incorrect argument. The exception specifies further what argument and what is erroneous about it.
+            On an incorrect argument. The exception specifies further what
+            argument and what is erroneous about it.
 
         Examples
         --------
 
-        This creates a WorldBuilder that creates world of a certain size (here 10 by 10);
+        This creates a WorldBuilder that creates world of a certain size (here
+        10 by 10);
 
             >>> from matrx.world_builder import WorldBuilder
-            >>> WorldBuilder(shape=(10, 10))
+            >>> builder = WorldBuilder(shape=(10, 10))
 
-        To create a WorldBuilder with a black background, a tick duration as fast as possible and with a different
-        master random seed;
+        To create a WorldBuilder with a black background, a tick duration as
+        fast as possible and with a different master random seed;
 
             >>> from matrx.world_builder import WorldBuilder
-            >>> WorldBuilder(shape=(10, 10), random_seed=42, tick_duration=-1, visualization_bg_clr="#000000")
+            >>> builder = WorldBuilder(shape=(10, 10), random_seed=42, \
+            >>>    tick_duration=-1, visualization_bg_clr="#000000")
 
         """
 
         # Check if shape is of correct type and length
-        if not isinstance(shape, list) and not isinstance(shape, tuple) and len(shape) != 2:
-            raise ValueError(f"The given grid shape {shape} is not of type List, Tuple or of length two.")
+        if not isinstance(shape, list) and not isinstance(shape, tuple) \
+                and len(shape) != 2:
+            raise ValueError(f"The given grid shape {shape} is not of type "
+                             f"List, Tuple or of size two.")
 
         # convert int to float
         if isinstance(tick_duration, int):
@@ -92,42 +115,57 @@ class WorldBuilder:
 
         # Check that tick duration is of float and a positive number.
         if not isinstance(tick_duration, float) and tick_duration >= 0.0:
-            raise ValueError(f"The given tick_duration {tick_duration} should be a Float and larger or equal than 0.0.")
+            raise ValueError(f"The given tick_duration {tick_duration} should "
+                             f"be a Float and larger or equal than 0.0.")
 
         # Check that the random seed is a positive non-zero integer
         if not isinstance(random_seed, int) and random_seed > 0:
-            raise ValueError(f"The given random_seed {random_seed} should be an Int and bigger or equal to 1.")
+            raise ValueError(f"The given random_seed {random_seed} should be "
+                             f"an Int and bigger or equal to 1.")
 
-        # Check if the simulation_goal is a SimulationGoal, an int or a list or tuple of SimulationGoal
-        if not isinstance(simulation_goal, WorldGoal) and not isinstance(simulation_goal, int) \
-                and not (isinstance(simulation_goal, Iterable) and (sum(1 for _ in simulation_goal)) > 0):
-            raise ValueError(f"The given simulation_goal {simulation_goal} should be of type {WorldGoal.__name__} "
-                             f"or a list/tuple of {WorldGoal.__name__}, or it should be an int denoting the max"
-                             f"number of ticks the world should run (negative for infinite).")
+        # Check if the simulation_goal is a SimulationGoal, an int or a list
+        # or tuple of SimulationGoal
+        if not isinstance(simulation_goal, WorldGoal) and \
+                not isinstance(simulation_goal, int) \
+                and not (isinstance(simulation_goal, Iterable)
+                         and (sum(1 for _ in simulation_goal)) > 0):
+            raise ValueError(f"The given simulation_goal {simulation_goal} "
+                             f"should be of type {WorldGoal.__name__} or a "
+                             f"list/tuple of {WorldGoal.__name__}, or it "
+                             f"should be an int denoting the max" f"number of "
+                             f"ticks the world should run (negative for "
+                             f"infinite).")
 
         # Check the background color
-        if not isinstance(visualization_bg_clr, str) and len(visualization_bg_clr) != 7 and \
+        if not isinstance(visualization_bg_clr, str) and \
+                len(visualization_bg_clr) != 7 and \
                 visualization_bg_clr[0] != "#":
-            raise ValueError(f"The given visualization_bg_clr {visualization_bg_clr} should be a Str of length 7 with"
-                             f"an initial '#'' (a hexidecimal color string).")
+            raise ValueError(f"The given visualization_bg_clr "
+                             f"{visualization_bg_clr} should be a Str of "
+                             f"length 7 with an initial '#'' (a hexidecimal "
+                             f"color string).")
 
         # Check if the background image is a path
-        if visualization_bg_img is not None and not isinstance(visualization_bg_img, str):
+        if visualization_bg_img is not None \
+                and not isinstance(visualization_bg_img, str):
             raise ValueError(
-                f"The given visualization_bg_img {visualization_bg_img} should be of type str denoting a path"
-                f" to an image.")
+                f"The given visualization_bg_img {visualization_bg_img} "
+                f"should be of type str denoting a path to an image.")
 
         if not isinstance(run_matrx_visualizer, bool):
-            raise ValueError(f"The given value {run_matrx_visualizer} for run_matrx_visualizer is invalid, should be "
-                             f"of type bool ")
+            raise ValueError(f"The given value {run_matrx_visualizer} for run_"
+                             f"matrx_visualizer is invalid, should be of type "
+                             f"bool ")
 
         if not isinstance(run_matrx_api, bool):
-            raise ValueError(f"The given value {run_matrx_api} for run_matrx_api is invalid, should be "
-                             f"of type bool.")
+            raise ValueError(f"The given value {run_matrx_api} for run_matrx_"
+                             f"api is invalid, should be of type bool.")
 
         if not run_matrx_api and run_matrx_visualizer:
-            raise ValueError(f"Run_matrx_api is set to False while run_matrx_visualizer is set to True. The MATRX "
-                             f"visualizer requires the api to work, so this is not possible.")
+            raise ValueError(f"Run_matrx_api is set to False while "
+                             f"run_matrx_visualizer is set to True. The MATRX "
+                             f"visualizer requires the api to work, so this "
+                             f"is not possible.")
 
         # Set our random number generator
         self.rng = np.random.RandomState(random_seed)
@@ -149,68 +187,78 @@ class WorldBuilder:
         # Whether the world factory and evrything else should print stuff
         self.verbose = verbose
 
-        # If simulation goal is an integer, we create a LimitedTimeGoal with that number of ticks
+        # If simulation goal is an integer, we create a LimitedTimeGoal with
+        # that number of ticks
         if isinstance(simulation_goal, int):
             simulation_goal = LimitedTimeGoal(max_nr_ticks=simulation_goal)
 
         # Set our world settings
-        self.world_settings = self.__set_world_settings(shape=shape,
-                                                        tick_duration=tick_duration,
-                                                        simulation_goal=simulation_goal,
-                                                        visualization_bg_clr=visualization_bg_clr,
-                                                        visualization_bg_img=visualization_bg_img,
-                                                        verbose=self.verbose,
-                                                        rnd_seed=random_seed)
+        self.world_settings = \
+            self.__set_world_settings(shape=shape, tick_duration=tick_duration,
+                                      simulation_goal=simulation_goal,
+                                      visualization_bg_clr=visualization_bg_clr,
+                                      visualization_bg_img=visualization_bg_img,
+                                      verbose=self.verbose,
+                                      rnd_seed=random_seed)
         # Keep track of the number of worlds we created
         self.worlds_created = 0
 
         # Based on our verbosity and debug level, we set a warning scheme
         if verbose:
             warnings.simplefilter("always")
-        else:  # use the default (print all warnings once per location [module and line number])
+        # use the default (print all warnings once per location [module and
+        # line number])
+        else:
             warnings.simplefilter("default")
 
     def worlds(self, nr_of_worlds: int = 100):
-        """
-        Returns a Generator of GridWorld instance for the specified number of worlds.
+        """ A Generator of worlds.
 
         Parameters
         ----------
-        nr_of_worlds
-            The number of worlds the Generator contains. Defaults to 10.
+        nr_of_worlds: int (default, 100)
+            The number of worlds that should be generated.
 
         Yields
         ------
         GridWorld
-            A GridWorld, where all random properties and prospects are sampled using the given master seed.
+            A GridWorld, where all random properties and prospects are
+            sampled using the given master seed.
 
         Raises
         ------
         ValueError
-            The nr_of_worlds should be a postive non-zero integer.
+            When `nr_of_worlds` is not an integer. zero or negative.
+
+        See Also
+        --------
+        :any:`~matrx.GridWorld.run`:
+            Start a GridWorld instance.
 
         """
 
         if not isinstance(nr_of_worlds, int) and nr_of_worlds <= 0:
-            raise ValueError(f"The given nr_of_worlds {nr_of_worlds} should be of type Int and larger or equal to 1.")
+            raise ValueError(f"The given nr_of_worlds {nr_of_worlds} should "
+                             f"be of type Int and larger or equal to 1.")
 
         while self.worlds_created < nr_of_worlds:
             yield self.get_world()
 
     def get_world(self):
-        """
-        Creates a single GridWorld instance based on the current state of this WorldFactor instance.
+        """ Create a single world using the blueprint of this builder.
 
-        The returned GridWorld can be started with world.run().
+        The returned GridWorld can be started with `world.run()`.
 
         Returns
         -------
         world: GridWorld
-            A GridWorld instance.
+            A GridWorld instance representing the create world using this
+            builder.
 
         See Also
         --------
-
+        :any:`~matrx.GridWorld.run`:
+            Start a GridWorld instance.
         """
         # TODO Refer to GridWorld.run()
         self.worlds_created += 1
@@ -218,13 +266,86 @@ class WorldBuilder:
         self.__reset_random()
         return world
 
-    def add_logger(self, logger_class, log_strategy=None, save_path=None, file_name=None,
-                   file_extension=None, delimiter=None, **kwargs):
+    def add_logger(self, logger_class, log_strategy=None, save_path=None,
+                   file_name=None, file_extension=None, delimiter=None,
+                   **kwargs):
+        """ Adds a data logger to the world's blueprint.
+
+        Parameters
+        ----------
+        logger_class: Logger
+            The class of Logger you wish to add.
+
+        log_strategy: int, str (default, None)
+            The logging strategy used. Supports either an integer denoting the
+            number of ticks the logger should be called. Or either one of the
+            following:
+
+            * GridWorldLogger.LOG_ON_LAST_TICK: Log only on last tick.
+
+            * GridWorldLogger.LOG_ON_FIRST_TICK: Log only on first tick.
+
+            * GridWorldLogger.LOG_ON_GOAL_REACHED: Log whenever a goal is
+            reached.
+
+        save_path: string (default, None)
+            A path to a folder where to save the data. When set to None, a
+            folder "logs" is created and used.
+
+        file_name: string (default, None)
+            The file name of the stored data. When set to None, a name of
+            "_<time_stamp>" will be used. With <time_stamp> the time of world
+            creation.
+
+        file_extension: string (default, None)
+            The extension of the file. When set to None, ".csv" is used.
+
+        delimiter: string (default, None)
+            The delimiter of the columns in the data file. When set to None,
+            the ";" is used.
+
+        **kwargs
+            Any key word arguments the given `logger_class` requires.
+
+        Raises
+        ------
+        ValueError
+            When the given `logger_class` is not of (super) type
+            `GridWorldLogger`.
+
+        See Also
+        --------
+        :any:`~matrx.logger.GridWorldLogger`:
+            The interface class to which the passed `logger_class` should
+            from. inherit
+        :any:`~matrx.logger`:
+            The module with predefined loggers for you to use.
+
+        Examples
+        --------
+
+        Add a logger that logs all agent actions every tick:
+        >>> from matrx import WorldBuilder
+        >>> from matrx.logger import LogActions
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> builder.add_logger(LogActions)
+
+        Add a logger that logs when agents are idle or not every time a goal
+        will be achieved:
+        >>> from matrx import WorldBuilder
+        >>> from matrx.logger import LogIdleAgents, GridWorldLogger
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> builder.add_logger(LogIdleAgents, \
+        >>>     log_strategy=GridWorldLogger.LOG_ON_GOAL_REACHED)
+
+        """
 
         if issubclass(logger_class, GridWorldLogger):
 
-            set_params = {'log_strategy': log_strategy, 'save_path': save_path, 'file_name': file_name,
-                          'file_extension': file_extension, 'delimiter': delimiter}
+            set_params = {'log_strategy': log_strategy, 'save_path': save_path,
+                          'file_name': file_name,
+                          'file_extension': file_extension,
+                          'delimiter': delimiter}
 
             # Add all kwarg
             set_params = {**set_params, **kwargs}
@@ -243,81 +364,137 @@ class WorldBuilder:
             # Append the class and its parameters to the list of loggers
             self.loggers.append((logger_class, accepted_parameters))
         else:
-            raise Exception(f"The logger is not of type, nor inherits from, {GridWorldLogger.__name__}.")
+            raise ValueError(f"The logger is not of type, nor inherits from, "
+                             f"{GridWorldLogger.__name__}.")
 
-    def add_agent(self, location: Union[tuple, list], agent_brain: AgentBrain, name,
-                  customizable_properties: Union[tuple, list] = None, sense_capability: SenseCapability = None,
-                  is_traversable: bool = True, team: str = None, possible_actions: list = None, is_movable: bool = None,
-                  visualize_size: float = None, visualize_shape: Union[float, str] = None, visualize_colour: str = None,
-                  visualize_depth: int = None, visualize_opacity: float = None, visualize_when_busy: bool = None,
-                  **custom_properties):
-        """The helper method within a WorldFactory instance to add a single agent.
+    def add_agent(self, location: Union[tuple, list], agent_brain: AgentBrain,
+                  name, customizable_properties: Union[tuple, list] = None,
+                  sense_capability: SenseCapability = None,
+                  is_traversable: bool = True, team: str = None,
+                  possible_actions: list = None, is_movable: bool = None,
+                  visualize_size: float = None,
+                  visualize_shape: Union[float, str] = None,
+                  visualize_colour: str = None, visualize_depth: int = None,
+                  visualize_opacity: float = None,
+                  visualize_when_busy: bool = None, **custom_properties):
+        """ Adds a single agent to the world's blueprint.
 
-        This method makes sure that when this
-        factory generates a GridWorld instance, it contains an AgentBody connected to the given AgentBrain.
+        This methods adds an agent body to every created world at the specified
+        location and linked to an instance of the provided agent brain.
 
-        All keyword parameters default to None. Which means that their values are obtained from the
-        "defaults.py" file under the segment AgentBody.
+        All keyword parameters default to None. Which means that their values
+        are obtained from their similar named constants in `matrx.defaults`.
 
         Parameters
         ----------
-        location
+        location: tuple or list
             The location (x,y) of the to be added agent.
-        agent_brain
-            The AgentBrain instance that will control the agent.
-        name
-            The name of the agent, should be unique to allow the visualisation to have a single web page per agent. If
-            the name is already used, an exception is thrown.
-        customizable_properties: optional
-            A list or tuple of names of properties for this agent that can be altered or customized. Either by the agent
-            itself or by other agents or objects. If a property value gets changed that is not in this list than an
-            exception is thrown.
-        sense_capability: optional
-            The SenseCapability object belonging this this agent's AgentBody. Used by the GridWorld to pre-filter
-            objects and agents from this agent's states when querying for actions. Defaults to a SenseCapability that
-            sees all object types within the entire world.
-        is_traversable: optional
-            Denotes whether other agents and object can move over this agent. It also throws an exception when this is
-            set to False and another object/agent with this set to False is added to the same location.
-        team: optional
-            The team name. Used to group agents together. Defaults to this agent's name + "_team" to signify it
-            forms its own team.
-        possible_actions: optional
-            A list or tuple of the names of the Action classes this agent can perform. With this you can limit the
-            actions this agent can perform.
-        is_movable: optional
-            Whether this agent can be moved by other agents (currently this only happens with the DropObjectAction and
-            PickUpAction).
-        visualize_size: optional
-            The size of this agent in its visualisation. A value of 1.0 denotes the full grid location square, whereas
-            a value of 0.5 denotes half, and 0.0 an infinitesimal small size.
-        visualize_shape: optional
-            The shape of this agent in its visualisation. Depending on the value it obtains this shape: 0 = a square,
-            1 = a triangle, 2 = a circle or when "img" the image from `image_filename` is used.
-        visualize_colour: optional
-            The colour of this agent in its visualisation. Should be a string hexadecimal colour value.
-        visualize_depth: optional
-            The visualisation depth of this agent in its visualisation. It denotes the 'layer' on which it is
-            visualized. A larger value is more on 'top'.
-        visualize_opacity: optional
-            The opacity of this agent in its visualization. A value of 1.0 means full opacity and 0.0 no opacity.
-        visualize_when_busy: optional
-            Whether to visualize when an agent is busy with a action. True means show this using a loading icon, false
-            means do not show this in the visualizer.
-        custom_properties: optional
-            Any additional given keyword arguments will be encapsulated in this dictionary. These will be added to the
-            AgentBody as custom_properties which can be perceived by other agents and objects or which can be used or
-            altered (if allowed to by the customizable_properties list) by the AgentBrain or others.
 
-        Returns
-        -------
-        None
-            ...
+        agent_brain: AgentBrain
+            The AgentBrain instance that will control the agent.
+
+        name: string
+            The name of the agent, should be unique to allow the visualisation
+            to have a single web page per agent. If the name is already used,
+            an exception is thrown.
+
+        customizable_properties: list (optional, None)
+            A list or tuple of names of properties for this agent that can be
+            altered or customized. Either by the agent itself or by other
+            agents or objects. If a property value gets changed that is not
+            in this list than an exception is thrown.
+
+        sense_capability: SenseCapability (optional, None)
+            The SenseCapability object belonging this this agent's AgentBody.
+            Used by the GridWorld to pre-filter objects and agents from this
+            agent's states when querying for actions. Defaults to a
+            SenseCapability that sees all object types within the entire world.
+
+        is_traversable: bool (optional, None)
+            Denotes whether other agents and object can move over this agent.
+            It also throws an exception when this is set to False and another
+            object/agent with this set to False is added to the same location.
+
+        team: string (optional, None)
+            The team name. Used to group agents together. Defaults to this
+            agent's name + "_team" to signify it forms its own team.
+
+        possible_actions: list (optional, None)
+            A list or tuple of the names of the Action classes this agent can
+            perform. With this you can limit the actions this agent can
+            perform.
+
+        is_movable: bool (optional, None)
+            Whether this agent can be moved by other agents (currently this
+            only happens with the DropObjectAction and PickUpAction).
+
+        visualize_size: float (optional, None)
+            The size of this agent in its visualisation. A value of 1.0
+            denotes the full grid location square, whereas a value of 0.5
+            denotes half, and 0.0 an infinitesimal small size.
+
+        visualize_shape: int or string (optional, None)
+            The shape of this agent in its visualisation. Depending on the
+            value it obtains this shape:
+
+            * 0 = a square
+
+            * 1 = a triangle
+
+            * 2 = a circle
+
+            * Path to image or GIF = that image scaled to match the size.
+
+        visualize_colour: string (optional, None)
+            The colour of this agent in its visualisation. Should be a string
+            hexadecimal colour value.
+
+        visualize_depth: int (optional, None)
+            The visualisation depth of this agent in its visualisation. It
+            denotes the 'layer' on which it is visualized. A larger value is
+            more on 'top'.
+
+        visualize_opacity: float (optional, None)
+            The opacity of this agent in its visualization. A value of 1.0
+            means full opacity and 0.0 no opacity.
+
+        visualize_when_busy: bool (optional, None)
+            Whether to visualize when an agent is busy with a action. True
+            means show this using a loading icon, false means do not show
+            this in the visualizer.
+
+        custom_properties: list (optional, None)
+            Any additional given keyword arguments will be encapsulated in
+            this dictionary. These will be added to the AgentBody as
+            custom_properties which can be perceived by other agents and
+            objects or which can be used or altered (if allowed to by the
+            customizable_properties list) by the AgentBrain or others.
 
         Raises
         ------
-        AttributeError
-            When the given agent name is already added to this WorldFactory instance.
+        ValueError
+            When the given agent name is already added to this WorldFactory
+            instance.
+
+        Examples
+        --------
+
+        Add a simple patrolling agent that patrols the world.
+        >>> from matrx import WorldBuilder
+        >>> from matrx.logger import LogActions
+        >>> from matrx.agents import PatrollingAgentBrain
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> waypoints = [(0, 0), (10, 0), (10, 10), (0, 10)]
+        >>> brain = PatrollingAgentBrain(waypoints)
+        >>> builder.add_agent((5, 5), brain, name="Patroller")
+
+        Add an agent with some custom property `foo="bar"` and w.
+        >>> from matrx import WorldBuilder
+        >>> from matrx.logger import LogActions
+        >>> from matrx.agents import AgentBrain
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> brain = AgentBrain()
+        >>> builder.add_agent((5, 5), brain, name="Agent", foo="bar")
 
         """
 
@@ -369,7 +546,7 @@ class WorldBuilder:
         # Check if the agent is not of HumanAgent, if so; use the add_human_agent method
         inh_path = _get_inheritence_path(agent_brain.__class__)
         if 'HumanAgent' in inh_path:
-            Exception(f"You are adding an agent that is or inherits from HumanAgent with the name {name}. Use "
+            ValueError(f"You are adding an agent that is or inherits from HumanAgent with the name {name}. Use "
                       f"factory.add_human_agent to add such agents.")
 
         # Define a settings dictionary with all we need to register and add an agent to the GridWorld
@@ -400,25 +577,33 @@ class WorldBuilder:
                  customizable_properties=None, is_traversable=None,
                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_opacity=None,
                  visualize_when_busy=None):
-        """Adds a group of agents as a single team (meaning that their 'team' property all have the given team name).
+        """ Adds multiple agents as a single team.
 
-        All parameters except for the `locations` and `agent_brain` defaults to `None`. Which means that their values
-        are obtained from the "defaults.py" file under the segment AgentBody.
+        All parameters except for the `locations` and `agent_brain` default to
+        `None`. Which means that their values are obtained from the
+        `matrx.defaults`.
 
         Parameters
         ----------
-        agent_brains
-            The list or tuple of AgentBrain that will control each agent in the team. Should be of the same size as
-            `locations`.
-        locations
-            The list or tuple of locations in the form of [x, y] at which coordinates each agent starts in the team.
-            Should be of the same size as `locations`.
-        team_name
-            The
-        custom_properties
-            ..
+        agent_brains: list or tuple
+            The list or tuple of AgentBrain that will control each agent in
+            the team. Should be of the same size as `locations`.
+
+        locations: list or tuple
+            The list or tuple of locations in the form of (x, y) at which
+            coordinates each agent starts in the team. Should be of the same
+            size as `locations`.
+
+        team_name: string
+            The name of the team these agents are part of.
+
+        custom_properties: list (optional, None)
+            A list of property names that each agent can edit. When it is a
+            list of listed properties, it denotes a unique set of customizable
+            properties for every agent.
         sense_capability
-            ..
+            A single `SenseCapability` used for every agent, or a list
+            
         customizable_properties
             ..
         is_traversable
