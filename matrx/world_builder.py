@@ -43,41 +43,41 @@ class WorldBuilder:
 
         Parameters
         ----------
-        shape : tuple or list
+        shape: tuple or list
             Denotes the width and height of the world you create.
 
-        tick_duration : float (optional, default 0.5)
+        tick_duration: float (optional, default 0.5)
             The duration of a single 'tick' or loop in the game-loop of the
             world you create.
 
-        random_seed : int, (optional, default 1)
+        random_seed: int, (optional, default 1)
             The master random seed on which all objects, agents and worlds are
             seeded. Should be a positive non-zero integer.
 
-        simulation_goal : WorldGoal, int, list or tuple (optional, default 1000)
+        simulation_goal: WorldGoal, int, list or tuple (optional, default 1000)
             The goal or goals of the world, either a single `WorldGoal`, a
             list of such or a positive non-zero integer to denote the maximum
             number of 'ticks' the world(s) has to run.
 
-        run_matrx_api : bool (optional, default True)
+        run_matrx_api: bool (optional, default True)
             Whether to run the API. This API is used to connect the default
             MATRX visualizer or a custom one.
 
-        run_matrx_visualizer : bool (optional, default False)
+        run_matrx_visualizer: bool (optional, default False)
             Whether to run the default MATRX visualizer, this requires the API
             to be run. When set to True, it starts the visualization that is
             accessible through http://localhost:3000.
 
-        visualization_bg_clr : string (optional, "C2C2C2")
+        visualization_bg_clr: string (optional, default "C2C2C2")
             The color of the world when visualized using MATRX' own
             visualisation server. A string representation of hexadecimal color.
 
-        visualization_bg_img : string (optional, None)
+        visualization_bg_img: string (optional, None)
             An optional background image of the world when visualized using
             MATRX' own visualisation server. A string of the path to the image
             file. When None, no background image is used.
 
-        verbose : bool (optional, False)
+        verbose: bool (optional, False)
             Whether the subsequent created world should be verbose or not.
 
         Raises
@@ -99,8 +99,7 @@ class WorldBuilder:
         fast as possible and with a different master random seed;
 
             >>> from matrx.world_builder import WorldBuilder
-            >>> builder = WorldBuilder(shape=(10, 10), random_seed=42, \
-            >>>    tick_duration=-1, visualization_bg_clr="#000000")
+            >>> builder = WorldBuilder(shape=(10, 10), random_seed=42, tick_duration=-1, visualization_bg_clr="#000000")
 
         """
 
@@ -267,7 +266,7 @@ class WorldBuilder:
 
         See Also
         --------
-        :any:`~matrx.GridWorld.run`:
+        :meth:`matrx.grid_world.GridWorld.run`:
             Start a GridWorld instance.
         """
 
@@ -296,7 +295,7 @@ class WorldBuilder:
             * GridWorldLogger.LOG_ON_FIRST_TICK: Log only on first tick.
 
             * GridWorldLogger.LOG_ON_GOAL_REACHED: Log whenever a goal is
-            reached.
+              reached.
 
         save_path: string (default, None)
             A path to a folder where to save the data. When set to None, a
@@ -325,16 +324,17 @@ class WorldBuilder:
 
         See Also
         --------
-        :any:`~matrx.logger.GridWorldLogger`:
+        :any:`matrx.logger.GridWorldLogger`:
             The interface class to which the passed `logger_class` should
             from. inherit
-        :any:`~matrx.logger`:
+        :any:`matrx.logger`:
             The module with predefined loggers for you to use.
 
         Examples
         --------
 
         Add a logger that logs all agent actions every tick:
+
         >>> from matrx import WorldBuilder
         >>> from matrx.logger import LogActions
         >>> builder = WorldBuilder(shape=(10, 10))
@@ -342,11 +342,11 @@ class WorldBuilder:
 
         Add a logger that logs when agents are idle or not every time a goal
         will be achieved:
+
         >>> from matrx import WorldBuilder
         >>> from matrx.logger import LogIdleAgents, GridWorldLogger
         >>> builder = WorldBuilder(shape=(10, 10))
-        >>> builder.add_logger(LogIdleAgents, \
-        >>>     log_strategy=GridWorldLogger.LOG_ON_GOAL_REACHED)
+        >>> builder.add_logger(LogIdleAgents, log_strategy=GridWorldLogger.LOG_ON_GOAL_REACHED)
 
         """
 
@@ -491,6 +491,7 @@ class WorldBuilder:
         --------
 
         Add a simple patrolling agent that patrols the world.
+
         >>> from matrx import WorldBuilder
         >>> from matrx.agents import PatrollingAgentBrain
         >>> builder = WorldBuilder(shape=(10, 10))
@@ -499,6 +500,7 @@ class WorldBuilder:
         >>> builder.add_agent((5, 5), brain, name="Patroller")
 
         Add an agent with some custom property `foo="bar"` and w.
+
         >>> from matrx import WorldBuilder
         >>> from matrx.agents import AgentBrain
         >>> builder = WorldBuilder(shape=(10, 10))
