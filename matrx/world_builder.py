@@ -28,80 +28,79 @@ from matrx_visualizer import visualization_server
 
 
 class WorldBuilder:
+    """ Used to create one or more worlds according to a singel blueprint.
+
+    With the constructor you can set a number of general properties and
+    from the resulting instance you can call numerous methods to add new
+    objects and/or agents.
+
+    Parameters
+    ----------
+    shape : tuple or list
+        Denotes the width and height of the world you create.
+
+    tick_duration : float (optional, default 0.5)
+        The duration of a single 'tick' or loop in the game-loop of the
+        world you create.
+
+    random_seed : int, (optional, default 1)
+        The master random seed on which all objects, agents and worlds are
+        seeded. Should be a positive non-zero integer.
+
+    simulation_goal : WorldGoal, int, list or list (optional, default 1000)
+        The goal or goals of the world, either a single `WorldGoal`, a
+        list of such or a positive non-zero integer to denote the maximum
+        number of 'ticks' the world(s) has to run.
+
+    run_matrx_api : bool (optional, default True)
+        Whether to run the API. This API is used to connect the default
+        MATRX visualizer or a custom one.
+
+    run_matrx_visualizer : bool (optional, default False)
+        Whether to run the default MATRX visualizer, this requires the API
+        to be run. When set to True, it starts the visualization that is
+        accessible through http://localhost:3000.
+
+    visualization_bg_clr : string (optional, "C2C2C2")
+        The color of the world when visualized using MATRX' own
+        visualisation server. A string representation of hexadecimal color.
+
+    visualization_bg_img : string (optional, None)
+        An optional background image of the world when visualized using
+        MATRX' own visualisation server. A string of the path to the image
+        file. When None, no background image is used.
+
+    verbose : bool (optional, False)
+        Whether the subsequent created world should be verbose or not.
+
+    Raises
+    ------
+    ValueError
+        On an incorrect argument. The exception specifies further what
+        argument and what is erroneous about it.
+
+    Examples
+    --------
+
+    This creates a WorldBuilder that creates world of a certain size (here
+    10 by 10);
+
+        >>> from matrx.world_builder import WorldBuilder
+        >>> builder = WorldBuilder(shape=(10, 10))
+
+    To create a WorldBuilder with a black background, a tick duration as
+    fast as possible and with a different master random seed;
+
+        >>> from matrx.world_builder import WorldBuilder
+        >>> builder = WorldBuilder(shape=(10, 10), random_seed=42, \
+        >>>    tick_duration=-1, visualization_bg_clr="#000000")
+
+    """
 
     def __init__(self, shape, tick_duration=0.5, random_seed=1,
                  simulation_goal=1000, run_matrx_api=True,
                  run_matrx_visualizer=False, visualization_bg_clr="#C2C2C2",
                  visualization_bg_img=None, verbose=False):
-
-        """ Used to create one or more worlds according to a singel blueprint.
-
-        With the constructor you can set a number of general properties and
-        from the resulting instance you can call numerous methods to add new
-        objects and/or agents.
-
-        Parameters
-        ----------
-        shape : tuple or list
-            Denotes the width and height of the world you create.
-
-        tick_duration : float (optional, default 0.5)
-            The duration of a single 'tick' or loop in the game-loop of the
-            world you create.
-
-        random_seed : int, (optional, default 1)
-            The master random seed on which all objects, agents and worlds are
-            seeded. Should be a positive non-zero integer.
-
-        simulation_goal : WorldGoal, int, list or list (optional, default 1000)
-            The goal or goals of the world, either a single `WorldGoal`, a
-            list of such or a positive non-zero integer to denote the maximum
-            number of 'ticks' the world(s) has to run.
-
-        run_matrx_api : bool (optional, default True)
-            Whether to run the API. This API is used to connect the default
-            MATRX visualizer or a custom one.
-
-        run_matrx_visualizer : bool (optional, default False)
-            Whether to run the default MATRX visualizer, this requires the API
-            to be run. When set to True, it starts the visualization that is
-            accessible through http://localhost:3000.
-
-        visualization_bg_clr : string (optional, "C2C2C2")
-            The color of the world when visualized using MATRX' own
-            visualisation server. A string representation of hexadecimal color.
-
-        visualization_bg_img : string (optional, None)
-            An optional background image of the world when visualized using
-            MATRX' own visualisation server. A string of the path to the image
-            file. When None, no background image is used.
-
-        verbose : bool (optional, False)
-            Whether the subsequent created world should be verbose or not.
-
-        Raises
-        ------
-        ValueError
-            On an incorrect argument. The exception specifies further what
-            argument and what is erroneous about it.
-
-        Examples
-        --------
-
-        This creates a WorldBuilder that creates world of a certain size (here
-        10 by 10);
-
-            >>> from matrx.world_builder import WorldBuilder
-            >>> builder = WorldBuilder(shape=(10, 10))
-
-        To create a WorldBuilder with a black background, a tick duration as
-        fast as possible and with a different master random seed;
-
-            >>> from matrx.world_builder import WorldBuilder
-            >>> builder = WorldBuilder(shape=(10, 10), random_seed=42, \
-            >>>    tick_duration=-1, visualization_bg_clr="#000000")
-
-        """
 
         # Check if shape is of correct type and length
         if not isinstance(shape, list) and not isinstance(shape, tuple) \
@@ -598,14 +597,16 @@ class WorldBuilder:
             The name of the team these agents are part of.
 
         custom_properties: list (optional, None)
+
+        sense_capability
+            A single `SenseCapability` used for every agent, or a list of those
+            for every given agent.
+
+        customizable_properties
             A list of property names that each agent can edit. When it is a
             list of listed properties, it denotes a unique set of customizable
             properties for every agent.
-        sense_capability
-            A single `SenseCapability` used for every agent, or a list
-            
-        customizable_properties
-            ..
+
         is_traversable
             ..
         visualize_size
@@ -619,10 +620,9 @@ class WorldBuilder:
         visualize_when_busy
             Whether to visualize a loading icon when the agent is busy with an action.
 
-        Returns
-        -------
-        None
-            ..
+        Raises
+        ------
+
 
         """
 
