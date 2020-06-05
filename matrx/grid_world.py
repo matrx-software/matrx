@@ -78,7 +78,7 @@ class GridWorld:
         """
 
         self.__tick_duration = tick_duration  # How long each tick should take (process sleeps until this time passed)
-        self.__simulation_goal = simulation_goal  # The simulation goal, the simulation end when this/these are reached
+        self.__simulation_goal = simulation_goal  # The world goal, the simulation end when this/these are reached
         self.__shape = shape  # The width and height of the GridWorld
         self.__visualization_bg_clr = visualization_bg_clr  # The background color of the visualisation
         self.__visualization_bg_img = visualization_bg_img  # The background image of the visualisation
@@ -240,7 +240,7 @@ class GridWorld:
         Examples
         --------
 
-        In an action, simulation goal, or somewhere else with access to the Gridworld, the function can be used as below.
+        In an action, world goal, or somewhere else with access to the Gridworld, the function can be used as below.
         In this example the custom action removes a specific agent from the world when executed.
 
         >>> from matrx.agents import HumanAgent
@@ -305,7 +305,7 @@ class GridWorld:
         Examples
         --------
 
-        In an action, simulation goal, or somewhere else with access to the Gridworld, the function can be used as
+        In an action, world goal, or somewhere else with access to the Gridworld, the function can be used as
         below.
         In this example all objects of all types (denoted with the "*") within 5 tiles of the coordinate [3,3] are
         returned.
@@ -356,7 +356,7 @@ class GridWorld:
         Examples
         --------
 
-        In an action, simulation goal, or somewhere else with access to the Gridworld, the function can be used as
+        In an action, world goal, or somewhere else with access to the Gridworld, the function can be used as
         below.
         In this example the Agent3 is removed from the Grid.
         >>> succeeded = grid_world.remove_from_grid(object_id="Agent3", remove_from_carrier=False)
@@ -1013,7 +1013,7 @@ class GridWorld:
 
     @property
     def simulation_goal(self):
-        """WorldGoal: The simulation goal of type WorldGoal, or a class that extends WorldGoal """
+        """WorldGoal: The world goal of type WorldGoal, or a class that extends WorldGoal """
         return self.__simulation_goal
 
     @property

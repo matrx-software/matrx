@@ -188,7 +188,7 @@ class WorldBuilder:
         # Whether the world factory and evrything else should print stuff
         self.verbose = verbose
 
-        # If simulation goal is an integer, we create a LimitedTimeGoal with
+        # If world goal is an integer, we create a LimitedTimeGoal with
         # that number of ticks
         if isinstance(simulation_goal, int):
             simulation_goal = LimitedTimeGoal(max_nr_ticks=simulation_goal)
