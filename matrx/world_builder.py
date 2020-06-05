@@ -29,78 +29,80 @@ from matrx_visualizer import visualization_server
 
 class WorldBuilder:
     """ Used to create one or more worlds according to a singel blueprint.
-
-    With the constructor you can set a number of general properties and
-    from the resulting instance you can call numerous methods to add new
-    objects and/or agents.
-
-    Parameters
-    ----------
-    shape : tuple or list
-        Denotes the width and height of the world you create.
-
-    tick_duration : float (optional, default 0.5)
-        The duration of a single 'tick' or loop in the game-loop of the
-        world you create.
-
-    random_seed : int, (optional, default 1)
-        The master random seed on which all objects, agents and worlds are
-        seeded. Should be a positive non-zero integer.
-
-    simulation_goal : WorldGoal, int, list or list (optional, default 1000)
-        The goal or goals of the world, either a single `WorldGoal`, a
-        list of such or a positive non-zero integer to denote the maximum
-        number of 'ticks' the world(s) has to run.
-
-    run_matrx_api : bool (optional, default True)
-        Whether to run the API. This API is used to connect the default
-        MATRX visualizer or a custom one.
-
-    run_matrx_visualizer : bool (optional, default False)
-        Whether to run the default MATRX visualizer, this requires the API
-        to be run. When set to True, it starts the visualization that is
-        accessible through http://localhost:3000.
-
-    visualization_bg_clr : string (optional, "C2C2C2")
-        The color of the world when visualized using MATRX' own
-        visualisation server. A string representation of hexadecimal color.
-
-    visualization_bg_img : string (optional, None)
-        An optional background image of the world when visualized using
-        MATRX' own visualisation server. A string of the path to the image
-        file. When None, no background image is used.
-
-    verbose : bool (optional, False)
-        Whether the subsequent created world should be verbose or not.
-
-    Raises
-    ------
-    ValueError
-        On an incorrect argument. The exception specifies further what
-        argument and what is erroneous about it.
-
-    Examples
-    --------
-
-    This creates a WorldBuilder that creates world of a certain size (here
-    10 by 10);
-
-        >>> from matrx.world_builder import WorldBuilder
-        >>> builder = WorldBuilder(shape=(10, 10))
-
-    To create a WorldBuilder with a black background, a tick duration as
-    fast as possible and with a different master random seed;
-
-        >>> from matrx.world_builder import WorldBuilder
-        >>> builder = WorldBuilder(shape=(10, 10), random_seed=42, \
-        >>>    tick_duration=-1, visualization_bg_clr="#000000")
-
     """
 
     def __init__(self, shape, tick_duration=0.5, random_seed=1,
                  simulation_goal=1000, run_matrx_api=True,
                  run_matrx_visualizer=False, visualization_bg_clr="#C2C2C2",
                  visualization_bg_img=None, verbose=False):
+
+        """
+        With the constructor you can set a number of general properties and
+        from the resulting instance you can call numerous methods to add new
+        objects and/or agents.
+
+        Parameters
+        ----------
+        shape : tuple or list
+            Denotes the width and height of the world you create.
+
+        tick_duration : float (optional, default 0.5)
+            The duration of a single 'tick' or loop in the game-loop of the
+            world you create.
+
+        random_seed : int, (optional, default 1)
+            The master random seed on which all objects, agents and worlds are
+            seeded. Should be a positive non-zero integer.
+
+        simulation_goal : WorldGoal, int, list or list (optional, default 1000)
+            The goal or goals of the world, either a single `WorldGoal`, a
+            list of such or a positive non-zero integer to denote the maximum
+            number of 'ticks' the world(s) has to run.
+
+        run_matrx_api : bool (optional, default True)
+            Whether to run the API. This API is used to connect the default
+            MATRX visualizer or a custom one.
+
+        run_matrx_visualizer : bool (optional, default False)
+            Whether to run the default MATRX visualizer, this requires the API
+            to be run. When set to True, it starts the visualization that is
+            accessible through http://localhost:3000.
+
+        visualization_bg_clr : string (optional, "C2C2C2")
+            The color of the world when visualized using MATRX' own
+            visualisation server. A string representation of hexadecimal color.
+
+        visualization_bg_img : string (optional, None)
+            An optional background image of the world when visualized using
+            MATRX' own visualisation server. A string of the path to the image
+            file. When None, no background image is used.
+
+        verbose : bool (optional, False)
+            Whether the subsequent created world should be verbose or not.
+
+        Raises
+        ------
+        ValueError
+            On an incorrect argument. The exception specifies further what
+            argument and what is erroneous about it.
+
+        Examples
+        --------
+
+        This creates a WorldBuilder that creates world of a certain size (here
+        10 by 10);
+
+            >>> from matrx.world_builder import WorldBuilder
+            >>> builder = WorldBuilder(shape=(10, 10))
+
+        To create a WorldBuilder with a black background, a tick duration as
+        fast as possible and with a different master random seed;
+
+            >>> from matrx.world_builder import WorldBuilder
+            >>> builder = WorldBuilder(shape=(10, 10), random_seed=42, \
+            >>>    tick_duration=-1, visualization_bg_clr="#000000")
+
+        """
 
         # Check if shape is of correct type and length
         if not isinstance(shape, list) and not isinstance(shape, tuple) \
@@ -233,6 +235,15 @@ class WorldBuilder:
         --------
         :any:`~matrx.GridWorld.run`:
             Start a GridWorld instance.
+
+        Examples
+        --------
+
+        Create a world builder and generate 10 worlds and run them:
+        >>> from matrx.world_builder import WorldBuilder
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> for w in builder.worlds(): w.run()
+
 
         """
 
@@ -498,18 +509,24 @@ class WorldBuilder:
         """
 
         # Check if location and agent are of correct type
-        if not isinstance(location, list) and not isinstance(location, tuple) and len(location) != 2:
-            raise ValueError(f"The given location {location} while adding the agent with name {name} is not a list, "
-                             f"tuple or  of length two.")
+        if not isinstance(location, list) \
+                and not isinstance(location, tuple) \
+                and len(location) != 2:
+            raise ValueError(f"The given location {location} while adding the "
+                             f"agent with name {name} is not a list, tuple or "
+                             f"of length two.")
 
         if not isinstance(agent_brain, AgentBrain):
-            raise ValueError(f"The given agent_brain while adding agent with name {name} is not of type "
-                             f"{AgentBrain.__name__} but of type {agent_brain.__class__.__name__}.")
+            raise ValueError(f"The given agent_brain while adding agent with "
+                             f"name {name} is not of type "
+                             f"{AgentBrain.__name__} but of type"
+                             f" {agent_brain.__class__.__name__}.")
 
         # Check if the agent name is unique
         for existingAgent in self.agent_settings:
             if existingAgent["mandatory_properties"]["name"] == name:
-                raise ValueError(f"An agent with the name {name} was already added. Agent names should be unique.",
+                raise ValueError(f"An agent with the name {name} was already "
+                                 f"added. Agent names should be unique.",
                                  name)
 
         # Load the defaults for any variable that is not defined
@@ -533,22 +550,27 @@ class WorldBuilder:
         if is_movable is None:
             is_movable = defaults.AGENTBODY_IS_MOVABLE
 
-        # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
-        # objects with infinite range).
+        # If default variables are not given, assign them (most empty, except
+        # of sense_capability that defaults to all objects with infinite
+        # range).
         if custom_properties is None:
             custom_properties = {}
         if sense_capability is None:
-            sense_capability = create_sense_capability([], [])  # Create sense capability that perceives all
+            # Create sense capability that perceives all
+            sense_capability = create_sense_capability([], [])
         if customizable_properties is None:
             customizable_properties = []
 
-        # Check if the agent is not of HumanAgent, if so; use the add_human_agent method
+        # Check if the agent is not of HumanAgent, if so; use the add_human_
+        # agent method
         inh_path = _get_inheritence_path(agent_brain.__class__)
         if 'HumanAgent' in inh_path:
-            ValueError(f"You are adding an agent that is or inherits from HumanAgent with the name {name}. Use "
-                      f"factory.add_human_agent to add such agents.")
+            ValueError(f"You are adding an agent that is or inherits from "
+                       f"HumanAgent with the name {name}. Use "
+                       f"factory.add_human_agent to add such agents.")
 
-        # Define a settings dictionary with all we need to register and add an agent to the GridWorld
+        # Define a settings dictionary with all we need to register and add
+        # an agent to the GridWorld
         agent_setting = {"agent": agent_brain,
                          "custom_properties": custom_properties,
                          "customizable_properties": customizable_properties,
@@ -558,7 +580,9 @@ class WorldBuilder:
                              "is_movable": is_movable,
                              "is_traversable": is_traversable,
                              "possible_actions": possible_actions,
-                             "is_human_agent": False,  # is you want a human agent, use factory.add_human_agent()
+                             # is you want a human agent, use
+                             # factory.add_human_agent()
+                             "is_human_agent": False,
                              "visualize_size": visualize_size,
                              "visualize_shape": visualize_shape,
                              "visualize_colour": visualize_colour,
@@ -571,10 +595,12 @@ class WorldBuilder:
 
         self.agent_settings.append(agent_setting)
 
-    def add_team(self, agent_brains: Union[list, tuple], locations: Union[list, tuple], team_name,
+    def add_team(self, agent_brains: Union[list, tuple],
+                 locations: Union[list, tuple], team_name,
                  custom_properties=None, sense_capability=None,
                  customizable_properties=None, is_traversable=None,
-                 visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_opacity=None,
+                 visualize_size=None, visualize_shape=None,
+                 visualize_colour=None, visualize_opacity=None,
                  visualize_when_busy=None):
         """ Adds multiple agents as a single team.
 
@@ -598,27 +624,53 @@ class WorldBuilder:
 
         custom_properties: list (optional, None)
 
-        sense_capability
+        sense_capability: SenseCapability or list (optional, None)
             A single `SenseCapability` used for every agent, or a list of those
             for every given agent.
 
-        customizable_properties
+        customizable_properties: list (optional, None)
             A list of property names that each agent can edit. When it is a
             list of listed properties, it denotes a unique set of customizable
             properties for every agent.
 
-        is_traversable
-            ..
-        visualize_size
-            ..
-        visualize_shape
-            ..
-        visualize_colour
-            ..
-        visualize_opacity
-            ..
+        is_traversable: bool or list (optional, None)
+            A list of booleans or a single boolean denoting either for each
+            agent or all agents their traversability.
+
+        visualize_size: float or list (optional, None)
+            A list of floats or a single float denoting either for each
+            agent or all agents their traversability. A value of 0.0 means no
+            size, and a value of 1.0 fills the entire tile.
+
+        visualize_shape: int, string or list (optional, None)
+            The shape of the agents in the visualisation. When a list, denotes
+            the shape of every agent. Depending on the value it obtains this
+            shape:
+
+            * 0 = a square
+
+            * 1 = a triangle
+
+            * 2 = a circle
+
+            * Path to image or GIF = that image scaled to match the size.
+
+        visualize_colour: string or list (optional, None)
+            The colour of this agent in its visualisation. Should be a string
+            hexadecimal colour value.
+
+        visualize_opacity: float or list (optional, None)
+            The opacities of the agents in the visualization. A value of 1.0
+            means full opacity and 0.0 no opacity.
+
+        visualize_when_busy: bool or list (optional, None)
+            Whether to visualize when an agent is busy with a action. True
+            means show this using a loading icon, false means do not show
+            this in the visualizer.
+
         visualize_when_busy
-            Whether to visualize a loading icon when the agent is busy with an action.
+            Whether to visualize a loading icon when the agent is busy with an
+            action.
 
         Raises
         ------
