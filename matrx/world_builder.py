@@ -28,7 +28,7 @@ from matrx_visualizer import visualization_server
 
 
 class WorldBuilder:
-    """ Used to create one or more worlds according to a singel blueprint.
+    """ Used to create one or more worlds according to a single blueprint.
     """
 
     def __init__(self, shape, tick_duration=0.5, random_seed=1,
@@ -54,7 +54,7 @@ class WorldBuilder:
             The master random seed on which all objects, agents and worlds are
             seeded. Should be a positive non-zero integer.
 
-        simulation_goal : WorldGoal, int, list or list (optional, default 1000)
+        simulation_goal : WorldGoal, int, list or tuple (optional, default 1000)
             The goal or goals of the world, either a single `WorldGoal`, a
             list of such or a positive non-zero integer to denote the maximum
             number of 'ticks' the world(s) has to run.
@@ -270,7 +270,7 @@ class WorldBuilder:
         :any:`~matrx.GridWorld.run`:
             Start a GridWorld instance.
         """
-        # TODO Refer to GridWorld.run()
+
         self.worlds_created += 1
         world = self.__create_world()
         self.__reset_random()
@@ -473,7 +473,7 @@ class WorldBuilder:
             means show this using a loading icon, false means do not show
             this in the visualizer.
 
-        custom_properties: list (optional, None)
+        **custom_properties: dict (optional, None)
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
@@ -483,15 +483,15 @@ class WorldBuilder:
         Raises
         ------
         ValueError
-            When the given agent name is already added to this WorldFactory
-            instance.
+            When the given location is not of form (x, y).
+            When the given agent brain does not inheret from `AgentBrain`
+            When the given name was already assigned to a previous added agent.
 
         Examples
         --------
 
         Add a simple patrolling agent that patrols the world.
         >>> from matrx import WorldBuilder
-        >>> from matrx.logger import LogActions
         >>> from matrx.agents import PatrollingAgentBrain
         >>> builder = WorldBuilder(shape=(10, 10))
         >>> waypoints = [(0, 0), (10, 0), (10, 10), (0, 10)]
@@ -500,7 +500,6 @@ class WorldBuilder:
 
         Add an agent with some custom property `foo="bar"` and w.
         >>> from matrx import WorldBuilder
-        >>> from matrx.logger import LogActions
         >>> from matrx.agents import AgentBrain
         >>> builder = WorldBuilder(shape=(10, 10))
         >>> brain = AgentBrain()
@@ -622,27 +621,29 @@ class WorldBuilder:
         team_name: string
             The name of the team these agents are part of.
 
-        custom_properties: list (optional, None)
+        custom_properties: dict or list (optional, default None)
+            A dictionary of custom properties and their values for all agents
+            or a list of such dictionaries for every agent.
 
-        sense_capability: SenseCapability or list (optional, None)
+        sense_capability: SenseCapability or list (optional, default None)
             A single `SenseCapability` used for every agent, or a list of those
             for every given agent.
 
-        customizable_properties: list (optional, None)
+        customizable_properties: list (optional, default None)
             A list of property names that each agent can edit. When it is a
             list of listed properties, it denotes a unique set of customizable
             properties for every agent.
 
-        is_traversable: bool or list (optional, None)
+        is_traversable: bool or list (optional, default None)
             A list of booleans or a single boolean denoting either for each
             agent or all agents their traversability.
 
-        visualize_size: float or list (optional, None)
+        visualize_size: float or list (optional, default None)
             A list of floats or a single float denoting either for each
             agent or all agents their traversability. A value of 0.0 means no
             size, and a value of 1.0 fills the entire tile.
 
-        visualize_shape: int, string or list (optional, None)
+        visualize_shape: int, string or list (optional, default None)
             The shape of the agents in the visualisation. When a list, denotes
             the shape of every agent. Depending on the value it obtains this
             shape:
@@ -655,67 +656,157 @@ class WorldBuilder:
 
             * Path to image or GIF = that image scaled to match the size.
 
-        visualize_colour: string or list (optional, None)
-            The colour of this agent in its visualisation. Should be a string
+        visualize_colour: string or list (optional, default None)
+            The colours the agents in the visualisation. When a list, denotes
+            the colour separately of every agent. Should be a string
             hexadecimal colour value.
 
-        visualize_opacity: float or list (optional, None)
-            The opacities of the agents in the visualization. A value of 1.0
+        visualize_opacity: float or list (optional, default None)
+            The opacities of the agents in the visualization. When a list,
+            denotes the opacity separately of every agent A value of 1.0
             means full opacity and 0.0 no opacity.
 
-        visualize_when_busy: bool or list (optional, None)
+        visualize_when_busy: bool or list (optional, default None)
             Whether to visualize when an agent is busy with a action. True
             means show this using a loading icon, false means do not show
-            this in the visualizer.
-
-        visualize_when_busy
-            Whether to visualize a loading icon when the agent is busy with an
-            action.
+            this in the visualizer. When a list, specifies this for every
+            agent separately.
 
         Raises
         ------
+        ValueError
+            When a given location is not of form (x, y).
+            When a given agent brain does not inheret from `AgentBrain`
+            When a given name was already assigned to a previous added agent.
 
+        Examples
+        --------
+
+        Add a team of three agents:
+        >>> from matrx import WorldBuilder
+        >>> from matrx.agents import AgentBrain
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> brains = [AgentBrain() for _ in range(3)]
+        >>> locs = [(0, 0), (1, 1), (2, 2)]
+        >>> builder.add_team(brains, locs, "The A Team")
 
         """
 
-        self.add_multiple_agents(agent_brains, locations, custom_properties=custom_properties,
-                                 sense_capabilities=sense_capability, customizable_properties=customizable_properties,
+        self.add_multiple_agents(agent_brains, locations,
+                                 custom_properties=custom_properties,
+                                 sense_capabilities=sense_capability,
+                                 customizable_properties=customizable_properties,
                                  is_traversable=is_traversable,
-                                 teams=team_name, visualize_sizes=visualize_size, visualize_shapes=visualize_shape,
-                                 visualize_colours=visualize_colour, visualize_opacities=visualize_opacity,
+                                 teams=team_name,
+                                 visualize_sizes=visualize_size,
+                                 visualize_shapes=visualize_shape,
+                                 visualize_colours=visualize_colour,
+                                 visualize_opacities=visualize_opacity,
                                  visualize_when_busy=visualize_when_busy)
 
     def add_multiple_agents(self, agents, locations, custom_properties=None,
-                            sense_capabilities=None, customizable_properties=None,
+                            sense_capabilities=None,
+                            customizable_properties=None,
                             is_traversable=None,
-                            teams=None, visualize_sizes=None, visualize_shapes=None,
-                            visualize_colours=None, visualize_opacities=None, visualize_depths=None,
+                            teams=None, visualize_sizes=None,
+                            visualize_shapes=None,
+                            visualize_colours=None, visualize_opacities=None,
+                            visualize_depths=None,
                             visualize_when_busy=None):
-        """ Add agents in bulk
+        """ Add multiple agents to the world.
 
         Parameters
         ----------
-        agents
-        locations
-        custom_properties
-        sense_capabilities
-        customizable_properties
-        is_traversable
-        teams
-        visualize_sizes
-        visualize_shapes
-        visualize_colours
-        visualize_opacities
-        visualize_depths
-        visualize_when_busy
+        agents: list or tuple
+            The list or tuple of agent brains that will control each agent.
+            Should be of the same size as `locations`.
 
-        Returns
-        -------
+        locations: list or tuple
+            The list or tuple of all agent locations.
+
+        custom_properties: dict or list (optional, default None)
+            A dictionary of custom properties and their values for all agents
+            or a list of such dictionaries for every agent.
+
+        sense_capability: SenseCapability or list (optional, default None)
+            A single `SenseCapability` used for every agent, or a list of those
+            for every given agent.
+
+        customizable_properties: list (optional, default None)
+            A list of property names that each agent can edit. When it is a
+            list of listed properties, it denotes a unique set of customizable
+            properties for every agent.
+
+        is_traversable: bool or list (optional, default None)
+            A list of booleans or a single boolean denoting either for each
+            agent or all agents their traversability.
+
+        teams: string or list (optional, default None)
+            The team name of all agents or a list of the team for every
+            separate agent.
+
+        visualize_sizes: float or list (optional, default None)
+            A list of floats or a single float denoting either for each
+            agent or all agents their traversability. A value of 0.0 means no
+            size, and a value of 1.0 fills the entire tile.
+
+        visualize_shapes: int, string or list (optional, default None)
+            The shape of the agents in the visualisation. When a list, denotes
+            the shape of every agent. Depending on the value it obtains this
+            shape:
+
+            * 0 = a square
+
+            * 1 = a triangle
+
+            * 2 = a circle
+
+            * Path to image or GIF = that image scaled to match the size.
+
+        visualize_colours: string or list (optional, default None)
+            The colours the agents in the visualisation. When a list, denotes
+            the colour separately of every agent. Should be a string
+            hexadecimal colour value.
+
+        visualize_opacities: float or list (optional, default None)
+            The opacities of the agents in the visualization. When a list,
+            denotes the opacity separately of every agent A value of 1.0
+            means full opacity and 0.0 no opacity.
+
+        visualize_depths: int or list (optional, default None)
+            The visualization depths of the agents. When a list, denotes the
+            depths separately of every agent. Larger values, means that they
+            will be visiualized on top.
+
+        visualize_when_busy: bool or list (optional, default None)
+            Whether to visualize when an agent is busy with a action. True
+            means show this using a loading icon, false means do not show
+            this in the visualizer. When a list, specifies this for every
+            agent separately.
+
+        Raises
+        ------
+        ValueError
+            When a given location is not of form (x, y).
+            When a given agent brain does not inheret from `AgentBrain`
+            When a given name was already assigned to a previous added agent.
+
+        Examples
+        --------
+
+        Add a team of three agents:
+        >>> from matrx import WorldBuilder
+        >>> from matrx.agents import AgentBrain
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> brains = [AgentBrain() for _ in range(3)]
+        >>> locs = [(0, 0), (1, 1), (2, 2)]
+        >>> builder.add_team(brains, locs, "The A Team")
 
         """
 
-        # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
-        # copy it in a list. A none value causes the default value to be loaded.
+        # If any of the lists are not given, fill them with None and if they
+        # are a single value of its expected type we copy it in a list. A none
+        # value causes the default value to be loaded.
         if custom_properties is None:
             custom_properties = [{} for _ in range(len(agents))]
         elif isinstance(custom_properties, dict):
@@ -786,26 +877,232 @@ class WorldBuilder:
                            visualize_when_busy=visualize_when_busy[idx],
                            **custom_properties[idx])
 
-    def add_agent_prospect(self, location, agent, probability, name="Agent", customizable_properties=None,
-                           sense_capability=None,
-                           is_traversable=None, team=None, possible_actions=None,
-                           is_movable=None,
-                           visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_opacity=None,
-                           visualize_depth=None, visualize_when_busy=None, **custom_properties):
+    def add_agent_prospect(self, location, agent, probability, name="Agent",
+                           customizable_properties=None, sense_capability=None,
+                           is_traversable=None, team=None,
+                           possible_actions=None, is_movable=None,
+                           visualize_size=None, visualize_shape=None,
+                           visualize_colour=None, visualize_opacity=None,
+                           visualize_depth=None, visualize_when_busy=None,
+                           **custom_properties):
+        """ Adds an agent to the world's blueprint given a probability.
+
+        This methods adds an agent body to every created world at the specified
+        location and linked to an instance of the provided agent brain. It does
+        so based on the provided probability. Meaning that there is
+        `probability` chance that the agent will be added on the specified
+        location.
+
+        All keyword parameters default to None. Which means that their values
+        are obtained from their similar named constants in `matrx.defaults`.
+
+        Parameters
+        ----------
+        location: tuple or list
+            The location (x,y) of the to be added agent.
+
+        agent_brain: AgentBrain
+            The AgentBrain instance that will control the agent.
+
+        probability: float
+            A float between 0.0 and 1.0. Denotes the probability with which
+            to add this agent when a world is created.
+
+        name: string
+            The name of the agent, should be unique to allow the visualisation
+            to have a single web page per agent. If the name is already used,
+            an exception is thrown.
+
+        customizable_properties: list (optional, None)
+            A list or tuple of names of properties for this agent that can be
+            altered or customized. Either by the agent itself or by other
+            agents or objects. If a property value gets changed that is not
+            in this list than an exception is thrown.
+
+        sense_capability: SenseCapability (optional, None)
+            The SenseCapability object belonging this this agent's AgentBody.
+            Used by the GridWorld to pre-filter objects and agents from this
+            agent's states when querying for actions. Defaults to a
+            SenseCapability that sees all object types within the entire world.
+
+        is_traversable: bool (optional, None)
+            Denotes whether other agents and object can move over this agent.
+            It also throws an exception when this is set to False and another
+            object/agent with this set to False is added to the same location.
+
+        team: string (optional, None)
+            The team name. Used to group agents together. Defaults to this
+            agent's name + "_team" to signify it forms its own team.
+
+        possible_actions: list (optional, None)
+            A list or tuple of the names of the Action classes this agent can
+            perform. With this you can limit the actions this agent can
+            perform.
+
+        is_movable: bool (optional, None)
+             Whether this agent can be moved by other agents, for example by
+             picking it up and dropping it.
+
+        visualize_size: float (optional, None)
+            The size of this agent in its visualisation. A value of 1.0
+            denotes the full grid location square, whereas a value of 0.5
+            denotes half, and 0.0 an infinitesimal small size.
+
+        visualize_shape: int or string (optional, None)
+            The shape of this agent in its visualisation. Depending on the
+            value it obtains this shape:
+
+            * 0 = a square
+
+            * 1 = a triangle
+
+            * 2 = a circle
+
+            * Path to image or GIF = that image scaled to match the size.
+
+        visualize_colour: string (optional, None)
+            The colour of this agent in its visualisation. Should be a string
+            hexadecimal colour value.
+
+        visualize_depth: int (optional, None)
+            The visualisation depth of this agent in its visualisation. It
+            denotes the 'layer' on which it is visualized. A larger value is
+            more on 'top'.
+
+        visualize_opacity: float (optional, None)
+            The opacity of this agent in its visualization. A value of 1.0
+            means full opacity and 0.0 no opacity.
+
+        visualize_when_busy: bool (optional, None)
+            Whether to visualize when an agent is busy with a action. True
+            means show this using a loading icon, false means do not show
+            this in the visualizer.
+
+        **custom_properties: dict (optional, None)
+            Any additional given keyword arguments will be encapsulated in
+            this dictionary. These will be added to the AgentBody as
+            custom_properties which can be perceived by other agents and
+            objects or which can be used or altered (if allowed to by the
+            customizable_properties list) by the AgentBrain or others.
+
+        Raises
+        ------
+        ValueError
+            When the given location is not of form (x, y).
+            When the given agent brain does not inheret from `AgentBrain`
+            When the given name was already assigned to a previous added agent.
+
+        Examples
+        --------
+
+        Add an agent with 50% chance of being added to the world.
+        >>> from matrx import WorldBuilder
+        >>> from matrx.agents import AgentBrain
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> brain = AgentBrain()
+        >>> builder.add_agent_prospect((5, 5), brain, 0.5, name="Agent", \
+        >>>     foo="bar")
+
+        """
 
         # Add agent as normal
-        self.add_agent(location, agent, name, customizable_properties, sense_capability,
-                       is_traversable, team, possible_actions, is_movable,
-                       visualize_size, visualize_shape, visualize_colour, visualize_depth,
-                       visualize_opacity, visualize_when_busy, **custom_properties)
+        self.add_agent(location, agent, name, customizable_properties,
+                       sense_capability, is_traversable, team,
+                       possible_actions, is_movable, visualize_size,
+                       visualize_shape, visualize_colour, visualize_depth,
+                       visualize_opacity, visualize_when_busy,
+                       **custom_properties)
 
         # Get the last settings (which we just added) and add the probability
         self.agent_settings[-1]['probability'] = probability
 
-    def add_object(self, location, name, callable_class=None, customizable_properties=None,
-                   is_traversable=None, is_movable=None,
-                   visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
+    def add_object(self, location, name, callable_class=None,
+                   customizable_properties=None, is_traversable=None,
+                   is_movable=None, visualize_size=None, visualize_shape=None,
+                   visualize_colour=None, visualize_depth=None,
                    visualize_opacity=None, **custom_properties):
+        """ Adds an environment object to the blueprint.
+
+        This environment object can be any object that is a `EnvObject` or
+        inherits from it.
+
+        All optional parameters default to None, meaning that their values are
+        taken from `matrx.defaults`.
+
+        Parameters
+        ----------
+        location: list or tuple
+            The location of the object of the form (x,y).
+
+        name: string
+            The name of the object.
+
+        callable_class: class
+            A class object of the to be added object. Should be `EnvObject` or
+            any class that inherits from this.
+
+        customizable_properties: list (optional, None)
+            A list or tuple of names of properties for this object that can be
+            altered or customized. Either by an agent, itself or other objects.
+            If a property value gets changed that is not in this list than an
+            exception is thrown.
+
+        is_traversable: bool (optional, default None)
+            Whether this object allows other (traversable) agents and objects
+            to be at the same location.
+
+        is_movable: bool (optional, default None)
+            Whether this object can be moved by an agent. For example, by
+            picking it up and dropping it.
+
+        visualize_shape: int or string (optional, None)
+            The shape of this object in its visualisation. Depending on the
+            value it obtains this shape:
+
+            * 0 = a square
+
+            * 1 = a triangle
+
+            * 2 = a circle
+
+            * Path to image or GIF = that image scaled to match the size.
+
+        visualize_colour: string (optional, None)
+            The colour of this object in its visualisation. Should be a string
+            hexadecimal colour value.
+
+        visualize_depth: int (optional, None)
+            The visualisation depth of this object in its visualisation. It
+            denotes the 'layer' on which it is visualized. A larger value is
+            more on 'top'.
+
+        visualize_opacity: float (optional, None)
+            The opacity of this object in its visualization. A value of 1.0
+            means full opacity and 0.0 no opacity.
+
+        **custom_properties: dict (optional, None)
+            Any additional given keyword arguments will be encapsulated in
+            this dictionary. These will be added to the AgentBody as
+            custom_properties which can be perceived by other agents and
+            objects or which can be used or altered (if allowed to by the
+            customizable_properties list) by the AgentBrain or others.
+
+        Raises
+        ------
+            AssertionError
+                When the location is not a list or tuple.
+                When the callable_class is not callable.
+
+        Examples
+        --------
+        Add a standard EnvObject:
+        >>> from matrx import WorldBuilder
+        >>> from matrx.objects import EnvObject
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> builder.add_object((4, 4), "Object", EnvObject)
+
+        """
+
         if callable_class is None:
             callable_class = EnvObject
 
@@ -813,11 +1110,13 @@ class WorldBuilder:
         assert isinstance(location, list) or isinstance(location, tuple)
         assert isinstance(callable_class, Callable)
 
-        # Check if location only contains integers, otherwise warn use and cast to int
+        # Check if location only contains integers, otherwise warn use and
+        # cast to int
         if not (isinstance(location[0], int) and isinstance(location[1], int)):
-            warnings.warn(f"The location {location} of {name} should contain only integers, "
-                          f"encountered {str(type(location[0]))} and {str(type(location[1]))} . "
-                          f"Casting these to integers resulting in "
+            warnings.warn(f"The location {location} of {name} should contain "
+                          f"only integers, encountered {str(type(location[0]))}"
+                          f" and {str(type(location[1]))} . Casting these to "
+                          f"integers resulting in "
                           f"{(int(location[0]), int(location[1]))}")
             location = (int(location[0]), int(location[1]))
 
@@ -825,14 +1124,16 @@ class WorldBuilder:
         if is_movable is None:
             is_movable = defaults.ENVOBJECT_IS_MOVABLE
 
-        # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
-        # objects with infinite range).
+        # If default variables are not given, assign them (most empty, except
+        # of sense_capability that defaults to all objects with infinite
+        # range).
         if custom_properties is None:
             custom_properties = {}
         if customizable_properties is None:
             customizable_properties = []
 
-        # Define a settings dictionary with all we need to register and add an agent to the GridWorld
+        # Define a settings dictionary with all we need to register and add
+        # an agent to the GridWorld
         object_setting = {"callable_class": callable_class,
                           "custom_properties": custom_properties,
                           "customizable_properties": customizable_properties,
@@ -849,26 +1150,203 @@ class WorldBuilder:
                           }
         self.object_settings.append(object_setting)
 
-    def add_object_prospect(self, location, name, probability, callable_class=None, customizable_properties=None,
+    def add_object_prospect(self, location, name, probability,
+                            callable_class=None, customizable_properties=None,
                             is_traversable=None, is_movable=None,
-                            visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
+                            visualize_size=None, visualize_shape=None,
+                            visualize_colour=None, visualize_depth=None,
                             visualize_opacity=None, **custom_properties):
+        """ Adds an object to the blueprint with a certain probability.
+
+        This methods adds an object to every created world at the specified
+        location. It does so based on the provided probability. Meaning that
+        there is `probability` chance that the agent will be added on the
+        specified location.
+
+        All keyword parameters default to None. Which means that their values
+        are obtained from their similar named constants in `matrx.defaults`.
+
+        Parameters
+        ----------
+        location: list or tuple
+            The location of the object of the form (x,y).
+
+        name: string
+            The name of the object.
+
+        probability: float
+            A float between 0.0 and 1.0 that denotes the probability of adding
+            this object to the world when it is created.
+
+        callable_class: class
+            A class object of the to be added object. Should be `EnvObject` or
+            any class that inherits from this.
+
+        customizable_properties: list (optional, None)
+            A list or tuple of names of properties for this object that can be
+            altered or customized. Either by an agent, itself or other objects.
+            If a property value gets changed that is not in this list than an
+            exception is thrown.
+
+        is_traversable: bool (optional, default None)
+            Whether this obejct allows other (traversable) agents and objects
+            to be at the same location.
+
+        is_movable: bool (optional, None)
+             Whether this agent can be moved by other agents, for example by
+             picking it up and dropping it.
+
+        visualize_shape: int or string (optional, None)
+            The shape of this object in its visualisation. Depending on the
+            value it obtains this shape:
+
+            * 0 = a square
+
+            * 1 = a triangle
+
+            * 2 = a circle
+
+            * Path to image or GIF = that image scaled to match the size.
+
+        visualize_colour: string (optional, None)
+            The colour of this object in its visualisation. Should be a string
+            hexadecimal colour value.
+
+        visualize_depth: int (optional, None)
+            The visualisation depth of this object in its visualisation. It
+            denotes the 'layer' on which it is visualized. A larger value is
+            more on 'top'.
+
+        visualize_opacity: float (optional, None)
+            The opacity of this object in its visualization. A value of 1.0
+            means full opacity and 0.0 no opacity.
+
+        **custom_properties: dict (optional, None)
+            Any additional given keyword arguments will be encapsulated in
+            this dictionary. These will be added to the AgentBody as
+            custom_properties which can be perceived by other agents and
+            objects or which can be used or altered (if allowed to by the
+            customizable_properties list) by the AgentBrain or others.
+
+        Raises
+        ------
+            AssertionError
+                When the location is not a list or tuple.
+                When the callable_class is not callable.
+
+        Examples
+        --------
+        Add a standard EnvObject with a 50% probability:
+        >>> from matrx import WorldBuilder
+        >>> from matrx.objects import EnvObject
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> builder.add_object_prospect((4, 4), "Object", 0.5, EnvObject)
+
+        """
+
         # Add object as normal
-        self.add_object(location, name, callable_class, customizable_properties,
-                        is_traversable, is_movable,
-                        visualize_size, visualize_shape, visualize_colour, visualize_depth,
-                        visualize_opacity, **custom_properties)
+        self.add_object(location, name, callable_class,
+                        customizable_properties, is_traversable, is_movable,
+                        visualize_size, visualize_shape, visualize_colour,
+                        visualize_depth, visualize_opacity,
+                        **custom_properties)
 
         # Get the last settings (which we just added) and add the probability
         self.object_settings[-1]['probability'] = probability
 
-    def add_multiple_objects(self, locations, names=None, callable_classes=None, custom_properties=None,
-                             customizable_properties=None, is_traversable=None, visualize_sizes=None,
-                             visualize_shapes=None, visualize_colours=None, visualize_depths=None,
+    def add_multiple_objects(self, locations, names=None,
+                             callable_classes=None, custom_properties=None,
+                             customizable_properties=None, is_traversable=None,
+                             visualize_sizes=None, visualize_shapes=None,
+                             visualize_colours=None, visualize_depths=None,
                              visualize_opacities=None, is_movable=None):
+        """ Add several objects to the blueprint.
 
-        # If any of the lists are not given, fill them with None and if they are a single value of its expected type we
-        # copy it in a list. A none value causes the default value to be loaded.
+        These environment objects can be any object that is an `EnvObject` or
+        inherits from it.
+
+        All optional parameters default to None, meaning that their values are
+        taken from `matrx.defaults`.
+
+        Parameters
+        ----------
+        locations: tuple or list
+            A tuple or list of the form [(x, y), ...] specifying each object's
+            location.
+
+        names: string or list (optional, default None)
+            A single name for all objects or a list of names for every object.
+            When None, defaults to the name of the provided `callable_classes`.
+
+        callable_classes: EnvObject or list (optional, default None)
+            A single class specifying a environment object or a list of classes
+            for every object. When None, defaults to EnvObject
+
+        custom_properties: dict or list (optional, None)
+            A dictionary containing all custom property names and their values
+            of a list of such dictionaries for every object.
+
+        customizable_properties: list (optional, None)
+            A list of properties that agents and objects are allowed to change
+            or a list of such lists for every object.
+
+        is_traversable: bool or list (optional, None)
+            Whether all objects are traversable or a list of such booleans to
+            specify this for every object.
+
+        visualize_sizes: float or list (optional, None)
+            The size of all objects or a list of such sizes for every object.
+
+        visualize_shapes: int, string or list (optional, None)
+            The shape of the objects in the visualisation or list of shapes for
+            every object. Depending on the value it obtains this shape:
+
+            * 0 = a square
+
+            * 1 = a triangle
+
+            * 2 = a circle
+
+            * Path to image or GIF = that image scaled to match the size.
+
+        visualize_colours: string or list (optional, None)
+            The colour of the objects or a list of such colours. As a
+            hexidecimal string.
+
+        visualize_depths: int or list (optional, None)
+            The visualisation depth of the objects in the visualisation or a
+            list of such depths for every object. It denotes the 'layer' on
+            which it is visualized. A larger value is more on 'top'.
+
+        visualize_opacities: float (optional, None)
+            The opacity of the objects in the visualisation or a list of
+            opacities for every object. A value of 1.0 means full opacity and
+            0.0 no opacity.
+
+        is_movable: bool or list (optional, None)
+            Whether the objects can be moved by an agent or list denoting this
+            for every object. For example, by picking it up and dropping it.
+
+        Raises
+        ------
+            AssertionError
+                When the location is not a list or tuple.
+                When the callable_class is not callable.
+
+        Examples
+        --------
+        Add three standard environment objects with the same name:
+        >>> from matrx import WorldBuilder
+        >>> from matrx.objects import EnvObject
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> locs = [(1, 1), (2, 2), (3, 3)]
+        >>> builder.add_multiple_objects(locs, "Object", EnvObject)
+
+        """
+
+        # If any of the lists are not given, fill them with None and if they
+        # are a single value of its expected type we copy it in a list. A none
+        # value causes the default value to be loaded.
         if is_movable is None:
             is_movable = [None for _ in range(len(locations))]
         elif isinstance(is_movable, bool):
@@ -933,11 +1411,142 @@ class WorldBuilder:
                             visualize_colour=visualize_colours[idx], visualize_depth=visualize_depths[idx],
                             visualize_opacity=visualize_opacities[idx], **custom_properties[idx])
 
-    def add_human_agent(self, location, agent, name="HumanAgent", customizable_properties=None, sense_capability=None,
+    def add_human_agent(self, location, agent, name="HumanAgent",
+                        customizable_properties=None, sense_capability=None,
                         is_traversable=None, team=None, possible_actions=None,
-                        is_movable=None,
-                        visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                        visualize_opacity=None, visualize_when_busy=None, key_action_map=None, **custom_properties):
+                        is_movable=None, visualize_size=None,
+                        visualize_shape=None, visualize_colour=None,
+                        visualize_depth=None, visualize_opacity=None,
+                        visualize_when_busy=None, key_action_map=None,
+                        **custom_properties):
+        """ Adds an agent that can be controlled by a human user.
+
+        This methods adds an agent body to every created world at the specified
+        location and linked to an instance of a `HumanAgentBrain` which handles
+        user input as received from a visualisation.
+
+        All keyword parameters default to None. Which means that their values
+        are obtained from their similar named constants in `matrx.defaults`.
+
+        Parameters
+        ----------
+        location: tuple or list
+            The location (x,y) of the to be added agent.
+
+        agent: HumanAgentBrain
+            The human agent brain that is linked to this agent. Should be of
+            type `HumanAgentBrain` or inherit from it.
+
+        name: string (optional, default "HumanAgent")
+            The name of the agent, should be unique to allow the visualisation
+            to have a single web page per agent. If the name is already used,
+            an exception is raised.
+
+        customizable_properties: list (optional, None)
+            A list or tuple of names of properties for this agent that can be
+            altered or customized. Either by the agent itself or by other
+            agents or objects. If a property value gets changed that is not
+            in this list than an exception is thrown.
+
+        sense_capability: SenseCapability (optional, None)
+            The SenseCapability object belonging this this agent's AgentBody.
+            Used by the GridWorld to pre-filter objects and agents from this
+            agent's states when querying for actions. Defaults to a
+            SenseCapability that sees all object types within the entire world.
+
+        is_traversable: bool (optional, None)
+            Denotes whether other agents and object can move over this agent.
+            It also throws an exception when this is set to False and another
+            object/agent with this set to False is added to the same location.
+
+        team: string (optional, None)
+            The team name. Used to group agents together. Defaults to this
+            agent's name + "_team" to signify it forms its own team.
+
+        possible_actions: list (optional, None)
+            A list or tuple of the names of the Action classes this agent can
+            perform. With this you can limit the actions this agent can
+            perform.
+
+        is_movable: bool (optional, None)
+            Whether this agent can be moved by other agents (currently this
+            only happens with the DropObjectAction and PickUpAction).
+
+        visualize_size: float (optional, None)
+            The size of this agent in its visualisation. A value of 1.0
+            denotes the full grid location square, whereas a value of 0.5
+            denotes half, and 0.0 an infinitesimal small size.
+
+        visualize_shape: int or string (optional, None)
+            The shape of this agent in its visualisation. Depending on the
+            value it obtains this shape:
+
+            * 0 = a square
+
+            * 1 = a triangle
+
+            * 2 = a circle
+
+            * Path to image or GIF = that image scaled to match the size.
+
+        visualize_colour: string (optional, None)
+            The colour of this agent in its visualisation. Should be a string
+            hexadecimal colour value.
+
+        visualize_depth: int (optional, None)
+            The visualisation depth of this agent in its visualisation. It
+            denotes the 'layer' on which it is visualized. A larger value is
+            more on 'top'.
+
+        visualize_opacity: float (optional, None)
+            The opacity of this agent in its visualization. A value of 1.0
+            means full opacity and 0.0 no opacity.
+
+        visualize_when_busy: bool (optional, None)
+            Whether to visualize when an agent is busy with a action. True
+            means show this using a loading icon, false means do not show
+            this in the visualizer.
+
+        key_action_map: dict (optional, None)
+            A dictionary that maps keyboard keys in ASCII to action classes. It
+            can be used to translate keystrokes to the agent performing a
+            certain action.
+
+        **custom_properties: dict (optional, None)
+            Any additional given keyword arguments will be encapsulated in
+            this dictionary. These will be added to the AgentBody as
+            custom_properties which can be perceived by other agents and
+            objects or which can be used or altered (if allowed to by the
+            customizable_properties list) by the AgentBrain or others.
+
+        Raises
+        ------
+            ValueError
+                When an agent with the given name was already added previously.
+                When the `agent` parameter does not inherits from
+                `HumanAgentBrain`
+
+        Examples
+        --------
+
+        Add a standard human controlled agent:
+        >>> from matrx import WorldBuilder
+        >>> from matrx.agents import HumanAgentBrain
+        >>> builder = WorldBuilder(shape=(10, 10)))
+        >>> brain = HumanAgentBrain()
+        >>> builder.add_human_agent((5, 5), brain, name="Neo")
+
+        Add a human controlled agent with a custom key map:
+        >>> from matrx import WorldBuilder
+        >>> from matrx.agents import HumanAgentBrain
+        >>> from matrx.actions import *
+        >>> builder = WorldBuilder(shape=(10, 10)))
+        >>> brain = HumanAgentBrain()
+        >>> keymap = {8: MoveNorth, 6: MoveEast, 2: MoveSouth, 4: MoveWest}
+        >>> builder.add_human_agent((5, 5), brain, name="Morpheus", \
+        >>>     key_action_map=keymap)
+
+        """
 
         # Check if location and agent are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
@@ -945,8 +1554,9 @@ class WorldBuilder:
 
         for existingAgent in self.agent_settings:
             if existingAgent["mandatory_properties"]["name"] == name:
-                raise Exception(f"A human agent with the name {name} was already added. Agent names should be unique.",
-                                name)
+                raise Exception(f"A human agent with the name {name} was "
+                                f"already added. Agent names should be "
+                                f"unique.", name)
         # Load the defaults for any variable that is not defined
         # Obtain any defaults from the defaults.py file if not set already.
         if is_traversable is None:
@@ -968,8 +1578,8 @@ class WorldBuilder:
         if is_movable is None:
             is_movable = defaults.AGENTBODY_IS_MOVABLE
 
-        # If default variables are not given, assign them (most empty, except of sense_capability that defaults to all
-        # objects with infinite range).
+        # If default variables are not given, assign them (most empty, except
+        # of sense_capability that defaults to all objects with infinite range).
         if custom_properties is None:
             custom_properties = {}
         if sense_capability is None:
@@ -980,7 +1590,7 @@ class WorldBuilder:
         # Check if the agent is of HumanAgent, if not; use the add_agent method
         inh_path = _get_inheritence_path(agent.__class__)
         if 'HumanAgent' not in inh_path:
-            Exception(f"You are adding an agent that does not inherit from HumanAgent with the name {name}. Use "
+            ValueError(f"You are adding an agent that does not inherit from HumanAgent with the name {name}. Use "
                       f"factory.add_agent to add autonomous agents.")
 
         # Append the user input map to the custom properties
@@ -1009,26 +1619,147 @@ class WorldBuilder:
 
         self.agent_settings.append(hu_ag_setting)
 
-    def add_area(self, top_left_location, width, height, name, customizable_properties=None, visualize_colour=None,
+    def add_area(self, top_left_location, width, height, name,
+                 customizable_properties=None, visualize_colour=None,
                  visualize_opacity=None, **custom_properties):
-        # Check if width and height are large enough to make an actual room (with content)
+        """ Adds an area of tiles/surface.
+
+        Adds multiple `AreaTile` objects inside the specified square, including
+        the edges under a single common name.
+
+        All keyword parameters default to None. Which means that their values
+        are obtained from their similar named constants in `matrx.defaults`.
+
+        Parameters
+        ----------
+        top_left_location: list or tuple
+            A location of the form (x, y) that specifies the top-left location
+            of the rectangle.
+
+        width: int
+            The width in number of grid squares.
+
+        height: int
+            The height in number of grid squares.
+
+        name: string
+            The name of the area.
+
+        customizable_properties: list (optional, default None)
+            The properties that agents and objects can modify in all the
+            created tiles.
+
+        visualize_colour: string (optional, default None)
+            The colour of the tiles as a hexidecimal string.
+
+        visualize_opacity: float (optional, default None)
+            The opacity of the tiles. A value of 1.0 means full opacity and
+            0.0 no opacity.
+
+        **custom_properties: list (optional, None)
+        Any additional given keyword arguments will be encapsulated in
+        this dictionary. These will be added to all the tiles as
+        custom_properties which can be perceived by other agents and
+        objects or which can be used or altered (if allowed to by the
+        customizable_properties list) by agents or objects.
+
+        Raises
+        ------
+            AssertionError
+                When the location is not a list or tuple.
+                When the callable_class is not callable.
+
+            ValueError
+                When the width or height is less then 1.
+
+        Examples
+        --------
+
+        Add a green area to the world:
+        >>> from matrx import WorldBuilder
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> builder.add_area((3,3), 3, 3, "Grass", visualize_colour="#00a000")
+
+        """
+
+        # Check if width and height are large enough to make an actual room
+        # (with content)
         if width < 1 or height < 1:
-            raise Exception(f"While adding area {name}; The width {width} and/or height {height} should both be larger"
-                            f" than 0.")
+            raise Exception(f"While adding area {name}; The width {width} "
+                            f"and/or height {height} should both be larger "
+                            f"than 0.")
 
         # Get all locations in the rectangle
         locs = self.__list_area_locs(top_left_location, width, height)
 
         # Add all area objects
-        self.add_multiple_objects(locations=locs, callable_classes=AreaTile, names=name,
-                                  customizable_properties=customizable_properties, visualize_colours=visualize_colour,
-                                  visualize_opacities=visualize_opacity, custom_properties=custom_properties)
+        self.add_multiple_objects(locations=locs, callable_classes=AreaTile,
+                                  names=name,
+                                  customizable_properties=customizable_properties,
+                                  visualize_colours=visualize_colour,
+                                  visualize_opacities=visualize_opacity,
+                                  custom_properties=custom_properties)
 
-    def add_smoke_area(self, top_left_location, width, height, name, visualize_colour=None,
-                       smoke_thickness_multiplier=1.0, visualize_depth=None, **custom_properties):
-        # Check if width and height are large enough to make an actual room (with content)
+    def add_smoke_area(self, top_left_location, width, height, name,
+                       visualize_colour=None, smoke_thickness_multiplier=1.0,
+                       visualize_depth=None, **custom_properties):
+        """ Adds a smoke-like area.
+
+        This method adds an area where the opacity of the added `SmokeTile`
+        follow a white noise pattern, mimicking the idea of a fog or body of
+        water.
+
+        Parameters
+        ----------
+        top_left_location: list or tuple
+            A location of the form (x, y) that specifies the top-left location
+            of the rectangle.
+
+        width: int
+            The width in number of grid squares.
+
+        height: int
+            The height in number of grid squares.
+
+        name: string
+            The name of the area.
+
+        visualize_colour: string (optional, default None)
+            The colour of the tiles as a hexadecimal string.
+
+        visualize_depth: int (optional, default None)
+            The visualisation depth of the area in the visualisation. It
+            denotes the 'layer' on which it is visualized. A larger value is
+            more on 'top'.
+
+        **custom_properties: list (optional, None)
+        Any additional given keyword arguments will be encapsulated in
+        this dictionary. These will be added to all the tiles as
+        custom_properties which can be perceived by other agents and
+        objects or which can be used or altered (if allowed to by the
+        customizable_properties list) by agents or objects.
+
+        Raises
+        ------
+            AssertionError
+                When the location is not a list or tuple.
+                When the callable_class is not callable.
+
+        Examples
+        --------
+
+        Add an area resembling a body of water:
+        >>> from matrx import WorldBuilder
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> builder.add_smoke_area((3,3), 3, 3, "Lake", \
+        >>>     visualize_colour="#0050a0")
+
+        """
+        # Check if width and height are large enough to make an actual room
+        # (with content)
         if width < 1 or height < 1:
-            raise Exception(f"While adding area {name}; The width {width} and/or height {height} should both be larger"
+            raise Exception(f"While adding area {name}; The width {width} "
+                            f"and/or height {height} should both be larger"
                             f" than 0.")
 
         # Get all locations in the rectangle
@@ -1049,14 +1780,105 @@ class WorldBuilder:
                 opacity = np.clip(opacity * smoke_thickness_multiplier, 0, 1)
 
                 # add the smokeTile
-                self.add_object(location=[x, y], name=name, callable_class=SmokeTile,
-                                visualize_colour=visualize_colour, visualize_opacity=opacity,
-                                visualize_depth=visualize_depth, **custom_properties)
+                self.add_object(location=[x, y], name=name,
+                                callable_class=SmokeTile,
+                                visualize_colour=visualize_colour,
+                                visualize_opacity=opacity,
+                                visualize_depth=visualize_depth,
+                                **custom_properties)
 
-    def add_line(self, start, end, name, callable_class=None, customizable_properties=None,
-                 is_traversable=None, is_movable=None,
-                 visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
+    def add_line(self, start, end, name, callable_class=None,
+                 customizable_properties=None, is_traversable=None,
+                 is_movable=None, visualize_size=None, visualize_shape=None,
+                 visualize_colour=None, visualize_depth=None,
                  visualize_opacity=None, **custom_properties):
+        """ Adds a line of objects to the blueprint.
+
+        This line can be under any angle, and all locations crossed by that
+        line will have an object.
+
+        All keyword parameters default to None. Which means that their values
+        are obtained from their similar named constants in `matrx.defaults`.
+
+        Parameters
+        ----------
+        start: list or tuple
+            A location of form (x, y) denoting the start of the line.
+        end
+            A location of form (x, y) denoting the end of the line.
+
+        name: string
+            The name of the line of objects.
+
+        callable_class: EnvObject (optional, None)
+            The object class denoting the objects that should be added. This
+            is `EnvObject` by default or must be any other class or inherit
+            from this class.
+
+        customizable_properties: list (optional, None)
+            A list or tuple of names of properties for these objects that can
+            be altered or customized. Either by an agent, itself or other
+            objects. If a property value gets changed that is not in this list,
+            an exception is thrown.
+
+        is_traversable: bool (optional, default None)
+            Whether this object allows other (traversable) agents and objects
+            to be at the same location.
+
+        is_movable: bool (optional, None)
+             Whether these objects can be moved by  agents, for example by
+             picking it up and dropping it.
+
+        visualize_size: float or list (optional, None)
+            The size of all objects or a list of such sizes for every object.
+
+        visualize_shape: int or string (optional, None)
+            The shape of this object in its visualisation. Depending on the
+            value it obtains this shape:
+
+            * 0 = a square
+
+            * 1 = a triangle
+
+            * 2 = a circle
+
+            * Path to image or GIF = that image scaled to match the size.
+
+        visualize_colour: string (optional, None)
+            The colour of this object in its visualisation. Should be a string
+            hexadecimal colour value.
+
+        visualize_depth: int (optional, None)
+            The visualisation depth of this object in its visualisation. It
+            denotes the 'layer' on which it is visualized. A larger value is
+            more on 'top'.
+
+        visualize_opacity: float (optional, None)
+            The opacity of this object in its visualization. A value of 1.0
+            means full opacity and 0.0 no opacity.
+
+        **custom_properties: dict (optional, None)
+            Any additional given keyword arguments will be encapsulated in
+            this dictionary. These will be added to the AgentBody as
+            custom_properties which can be perceived by other agents and
+            objects or which can be used or altered (if allowed to by the
+            customizable_properties list) by the AgentBrain or others.
+
+        Raises
+        ------
+            AssertionError
+                When the location is not a list or tuple.
+                When the callable_class is not callable.
+
+        Examples
+        --------
+        Add two colored lines in a cross:
+        >>> from matrx import WorldBuilder
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> builder.add_line((0, 0), (10, 10), "Line 1")
+        >>> builder.add_line((10, 0), (0, 10), "Line 2")
+
+        """
 
         # Get the coordinates on the given line
         line_coords = _get_line_coords(start, end)
@@ -1065,43 +1887,147 @@ class WorldBuilder:
         names = [name for _ in line_coords]
 
         # Add the actual properties
-        self.add_multiple_objects(locations=line_coords, names=names, callable_classes=callable_class,
-                                  custom_properties=custom_properties, customizable_properties=customizable_properties,
-                                  is_traversable=is_traversable, visualize_sizes=visualize_size,
-                                  visualize_shapes=visualize_shape, visualize_colours=visualize_colour,
-                                  visualize_opacities=visualize_opacity, visualize_depths=visualize_depth,
+        self.add_multiple_objects(locations=line_coords, names=names,
+                                  callable_classes=callable_class,
+                                  custom_properties=custom_properties,
+                                  customizable_properties=customizable_properties,
+                                  is_traversable=is_traversable,
+                                  visualize_sizes=visualize_size,
+                                  visualize_shapes=visualize_shape,
+                                  visualize_colours=visualize_colour,
+                                  visualize_opacities=visualize_opacity,
+                                  visualize_depths=visualize_depth,
                                   is_movable=is_movable)
 
-    def add_room(self, top_left_location, width, height, name, door_locations=None, with_area_tiles=False,
-                 doors_open=False, wall_visualize_colour=None, wall_visualize_opacity=None,
-                 wall_custom_properties=None, wall_customizable_properties=None,
-                 area_custom_properties=None, area_customizable_properties=None,
+    def add_room(self, top_left_location, width, height, name,
+                 door_locations=None, with_area_tiles=False, doors_open=False,
+                 wall_visualize_colour=None, wall_visualize_opacity=None,
+                 wall_custom_properties=None,
+                 wall_customizable_properties=None,
+                 area_custom_properties=None,
+                 area_customizable_properties=None,
                  area_visualize_colour=None, area_visualize_opacity=None):
+        """ Adds a rectangular room withs walls and doors.
 
-        # Check if width and height are large enough to make an actual room (with content)
+        This method allows you to create an area surrounded with walls and
+        optional doors.
+
+        All keyword parameters default to None. Which means that their values
+        are obtained from their similar named constants in `matrx.defaults`.
+
+        Parameters
+        ----------
+        top_left_location: list or tuple
+            A location of the form (x, y) that specifies the top-left location
+            of the rectangle.
+
+        width: int
+            The width in number of grid squares.
+
+        height: int
+            The height in number of grid squares.
+
+        name: string
+            The name of the room. Shared with all objects.
+
+        door_locations: list, (optional, None)
+            A list of locations on the wall locations that should be replaced
+            by doors. When set to None, no doors will be added.
+
+        with_area_tiles: bool (optional, False)
+            Whether the area within the walls should be filled with `AreaTile`
+            objects. If set to True, the area parameters are used and passed.
+
+        doors_open: bool (optional, False)
+            Whether the doors are initially open or closed.
+
+        wall_visualize_colour: string (optional, default None)
+            The colour of the walls.
+
+        wall_visualize_opacity: string (optional, default None)
+            The opacity of the walls.
+
+        wall_custom_properties: dict (optional, default None)
+            A dictionary of custom properties and their values passed to every
+            wall object.
+
+        wall_customizable_properties: list (optional, default None)
+            A list of property names that other objects and agents are allowed
+            to adjust.
+
+        area_custom_properties:  (optional, default None)
+            A dictionary of custom properties and their values passed to every
+            area object. Only used when area tiles are added.
+
+        area_customizable_properties:  (optional, default None)
+            A list of property names that other objects and agents are allowed
+            to adjust. Only used when area tiles are added.
+
+        area_visualize_colour:  (optional, default None)
+            The colour of the areas as a hexadeciamal string. Only used when
+            area tiles are added.
+
+        area_visualize_opacity:  (optional, default None)
+            The opacity of the added area tiles. Only used when area tiles are
+            added.
+
+        Raises
+        ------
+            AssertionError
+                When the location is not a list or tuple.
+                When the callable_class is not callable.
+
+            ValueError
+                When the width or height is less then 2.
+                When a door location is not inside a wall.
+
+        Examples
+        --------
+
+        Add world boundaries around the grid and a single room with a door and
+        a green area:
+        >>> from matrx import WorldBuilder
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> builder.add_room((0,0), 10, 10, "World bounds")
+        >>> builder.add_room((3,3), 3, 3, "Room", door_locations=(4,3), \
+        >>>     with_area_tiles=True, area_visualize_colour="#00a000")
+
+        """
+
+        # Check if width and height are large enough to make an actual room
+        # (with content)
         if width <= 2 or height <= 2:
-            raise Exception(f"While adding room {name}; The width {width} and/or height {height} should both be larger"
-                            f" than 2.")
+            raise ValueError(f"While adding room {name}; The width {width} "
+                            f"and/or height {height} should both be larger "
+                            f"than 2.")
 
-        # Check if the with_area boolean is True when any area properties are given
+        # Check if the with_area boolean is True when any area properties are
+        # given
         if with_area_tiles is False and (
                 area_custom_properties is not None or
                 area_customizable_properties is not None or
                 area_visualize_colour is not None or
                 area_visualize_opacity is not None):
-            warnings.warn(f"While adding room {name}: The boolean with_area_tiles is set to {with_area_tiles} while "
-                          f"also providing specific area statements. Treating with_area_tiles as True.")
+            warnings.warn(f"While adding room {name}: The boolean with_area_"
+                          f"tiles is set to {with_area_tiles} while also "
+                          f"providing specific area statements. Treating with_"
+                          f"area_tiles as True.")
             with_area_tiles = True
 
-        # Subtract 1 from both width and height, since the top left already counts as a size of 1,1
+        # Subtract 1 from both width and height, since the top left already
+        # counts as a size of 1,1
         width = int(width) - 1
         height = int(height) - 1
 
         # Set corner coordinates
-        top_left = (int(top_left_location[0]), int(top_left_location[1]))
-        top_right = (int(top_left_location[0]) + int(width), int(top_left_location[1]))
-        bottom_left = (int(top_left_location[0]), int(top_left_location[1]) + int(height))
-        bottom_right = (int(top_left_location[0]) + int(width), int(top_left_location[1]) + int(height))
+        top_left = (int(top_left_location[0]),
+                    int(top_left_location[1]))
+        top_right = (int(top_left_location[0]) + int(width),
+                     int(top_left_location[1]))
+        bottom_left = (int(top_left_location[0]),
+                       int(top_left_location[1]) + int(height))
+        bottom_right = (int(top_left_location[0]) + int(width),
+                        int(top_left_location[1]) + int(height))
 
         # Get all edge coordinates
         top = _get_line_coords(top_left, top_right)
@@ -1116,13 +2042,16 @@ class WorldBuilder:
         all_.extend(left)
         all_ = list(set(all_))
 
-        # Check if all door locations are at wall locations, if so remove those wall locations
+        # Check if all door locations are at wall locations, if so remove
+        # those wall locations
         door_locations = [] if door_locations is None else door_locations
         for door_loc in door_locations:
             if door_loc in all_:
                 all_.remove(door_loc)
             else:
-                raise Exception(f"While adding room {name}, the requested door location {door_loc} is not in a wall.")
+                raise ValueError(f"While adding room {name}, the requested "
+                                 f"door location {door_loc} is not in a "
+                                 f"wall.")
 
         # Add all walls
         names = [f"{name} - wall@{loc}" for loc in all_]
@@ -1153,15 +2082,17 @@ class WorldBuilder:
 
     @staticmethod
     def get_room_locations(room_top_left, room_width, room_height):
-        """ Returns the location coordinates within a room.
+        """ Returns the locations within a room, excluding walls.
 
-        This is a helper function for adding objects to a room. It simply returns a list of all (x,y)
-        coordinates that fall within the room excluding the walls.
+        This is a helper function for adding objects to a room. It returns a
+        list of all (x,y) coordinates that fall within the room excluding the
+        walls.
 
         Parameters
         ----------
         room_top_left: tuple, (x, y)
-            The top left coordinates of a room, as used to add that room with methods such as `add_room`.
+            The top left coordinates of a room, as used to add that room with
+            methods such as `add_room`.
         room_width: int
             The width of the room.
         room_height: int
@@ -1170,15 +2101,18 @@ class WorldBuilder:
         Returns
         -------
         list, [(x,y), ...]
-            A list of (x, y) coordinates that are encapsulated in the room, excluding walls.
+            A list of (x, y) coordinates that are encapsulated in the
+            rectangle, excluding walls.
 
         See Also
         --------
         WorldBuilder.add_room
 
         """
-        xs = list(range(room_top_left[0] + 1, room_top_left[0] + room_width - 1))
-        ys = list(range(room_top_left[1] + 1, room_top_left[1] + room_height -1))
+        xs = list(range(room_top_left[0] + 1,
+                        room_top_left[0] + room_width - 1))
+        ys = list(range(room_top_left[1] + 1,
+                        room_top_left[1] + room_height -1))
         locs = list(itertools.product(xs, ys))
         return locs
 
@@ -1406,49 +2340,109 @@ class WorldBuilder:
         pass
 
     def startup(self, media_folder=None):
-        """ Start any world-overarching MATRX scripts, such as, if requested, the api or MATRX visualization.
-        Returns
-        -------
+        """ Start the API and default visualization.
+
+        This method allows you to start the API and the default visualization
+        if set in the builder's constructor.
+
+        Parameters
+        ----------
+        media_folder: string
+            The path to a folder where additional figures are stored. Providing
+            this path makes those media files accessible to MATRX. It is
+            required if you pass your figures to object shapes.
+
+        Raises
+        ------
+            ValueError
+                When the visualizer is set to run but without the API running.
+
+        Examples
+        --------
+        Create a builder with a running API and visualizer and start these,
+        referring to a custom media folder.
+        >>> from matrx import WorldBuilder
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> media_folder = "media"
+        >>> builder.startup(media_folder)
+
         """
         # startup the MATRX API if requested
         if self.run_matrx_api:
             self.api_info["api_thread"] = api.run_api(self.verbose)
 
-        # check that the MATRX API is set to True if the MATRX visualizer is requested
+        # check that the MATRX API is set to True if the MATRX visualizer is
+        # requested
         elif self.run_matrx_visualizer:
-            raise Exception("The MATRX visualizer requires the MATRX API to work. Currently, run_matrx_visualizer=True"
-                            " while run_matrx_api=False")
+            raise ValueError("The MATRX visualizer requires the MATRX API to "
+                             "work. Currently, run_matrx_visualizer=True while"
+                             " run_matrx_api=False")
 
         # startup the MATRX visualizer if requested
         if self.run_matrx_visualizer:
-            self.matrx_visualizer_thread = visualization_server.run_matrx_visualizer(self.verbose, media_folder)
+            self.matrx_visualizer_thread = \
+                visualization_server.run_matrx_visualizer(self.verbose,
+                                                          media_folder)
 
         # warn the user if they forgot to turn on the MATRX visualizer
         elif media_folder is not None:
-            warnings.warn("A media folder path for the MATRX visualizer was given, but run_matrx_visualizer is set to " \
-                          "False denoting that the default visualizer should not be run.")
+            warnings.warn("A media folder path for the MATRX visualizer was "
+                          "given, but run_matrx_visualizer is set to False "
+                          "denoting that the default visualizer should not be "
+                          "run.")
 
     def stop(self):
-        """ Stop any world-overarching MATRX scripts, such as, if started, the api or MATRX visualization.
-        Returns
-        -------
+        """ Stops the running API and default visualisation gracefully.
         """
         if self.run_matrx_api:
-            print("Shutting down Matrx api")
-            r = requests.get("http://localhost:" + str(api.port) + "/shutdown_API")
+            if self.verbose:
+                print("Shutting down Matrx api")
+            _ = requests.get("http://localhost:" + str(api.port)
+                             + "/shutdown_API")
             self.api_info["api_thread"].join()
 
         if self.run_matrx_visualizer:
-            print("Shutting down Matrx visualizer")
-            r = requests.get("http://localhost:" + str(visualization_server.port) + "/shutdown_visualizer")
+            if self.verbose:
+                print("Shutting down Matrx visualizer")
+            _ = requests.get("http://localhost:"
+                             + str(visualization_server.port)
+                             + "/shutdown_visualizer")
             self.matrx_visualizer_thread.join()
 
 
 class RandomProperty:
+    """ Represents a object property with random values.
+
+    This property is similar to a regular property of any object or agent.
+    The difference is that this represents a set of possible values from which
+    the builder samples using a uniform or provided distribution when creating
+    a new world.
+
+    It allows you to assign a value to a property (custom or not) that is
+    different every time a new world is create (e.g. a block that has a
+    different colour each time).
+
+    """
 
     def __init__(self, values, distribution=None, allow_duplicates=True):
+        """ Create a random property value instance.
 
-        # If distribution is None, its uniform (equal probability to all values)
+        Parameters
+        ----------
+        values: list
+            A list of possible values.
+
+        distribution: list (optional, default None)
+            A list of probabilities for each respective value to be sampled. If
+            set to None, a uniform distribution will be used.
+
+        allow_duplicates: bool (optional, default True)
+            Whether the values should be sampled a fresh each time a new world
+            is created or values that were already sampled should be ignored.
+        """
+
+        # If distribution is None, its uniform (equal probability to all
+        # values)
         if distribution is None:
             distribution = [1 / len(values) for _ in values]
 
