@@ -90,8 +90,8 @@ class AgentBrain:
         self.keys_of_agent_writable_props = []
         self.__memorize_for_ticks = memorize_for_ticks
 
-        # The central state property (a extended dict with unique searching capabilities)
-        self.__state = State(memorize_for_ticks=self.__memorize_for_ticks)
+        # The central state property (an extended dict with unique searching capabilities)
+        self.__state = None
 
     def initialize(self):
         """ To initialize an agent's brain.
@@ -419,6 +419,9 @@ class AgentBrain:
         # Setting the random seed and rng
         self.rnd_seed = rnd_seed
         self._set_rnd_seed(seed=rnd_seed)
+
+        # Initializing the State object
+        self.__state = State(memorize_for_ticks=self.__memorize_for_ticks, own_id=self.agent_id)
 
         # The SenseCapability of the agent; what it can see and within what range
         self.sense_capability = sense_capability

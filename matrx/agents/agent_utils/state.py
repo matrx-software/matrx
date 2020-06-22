@@ -3,16 +3,18 @@ from collections import Iterable, MutableMapping
 
 from matrx import utils
 from matrx.objects import Door, AreaTile, Wall
+import numpy as np
 
 
 class State(MutableMapping):
 
-    def __init__(self, memorize_for_ticks=None):
+    def __init__(self, own_id, memorize_for_ticks=None):
         if memorize_for_ticks is None:
             self.__decay_val = 0
         else:
             self.__decay_val = 1.0 / memorize_for_ticks
 
+        self.__own_id = own_id
         self.__state_dict = {}
         self.__prev_state_dict = {}
         self.__decays = {}
@@ -246,7 +248,7 @@ class State(MutableMapping):
                 return None
 
         # Get all walls of the room
-        walls = self.get_with_property(["room_name", "class_inheritance"], [room_name, "Wall"], combined=True)
+        walls = self.get_with_property(props={"room_name": room_name, "class_inheritance": "Wall"}, combined=True)
 
         # Get the top left corner and width and height of the room based on the found walls (and assuming the room is
         # rectangle).
@@ -257,8 +259,8 @@ class State(MutableMapping):
         height = max(ys) - top_left[1] + 1
         content_locs = utils.get_room_locations(top_left, width, height)
 
-        # Get all objects with those content locations
-        content = self.get_with_property('location', content_locs)
+        # # Get all objects with those content locations
+        content = self.get_with_property(props={'location': content_locs}, combined=True)
 
         # Get all room objects
         room_objs = self.get_room_objects(room_name)
@@ -287,40 +289,64 @@ class State(MutableMapping):
         return doors
 
     def get_agents(self):
-        pass
+        agents = self.__find_object(props={'class_inheritance': 'AgentBrain'}, combined=True)
+        return agents
 
-    def get_agent_with_property(self, prop_name, prop_value):
-        pass
+    def get_agents_with_property(self, prop_name, prop_value):
+        props = {'class_inheritance': 'AgentBrain', prop_name: prop_value}
+        agents = self.__find_object(props=props, combined=True)
+        return agents
 
-    def get_team_members(self):
-        pass
+    def get_team_members(self, team_name):
+        team_members = self.get_agents_with_property('team', team_name)
+        return team_members
 
-    def get_closest_object(self):
-        pass
+    def get_closest_objects(self):
+        objs = np.array(self.__find_object(props='location', combined=True)[0])
+        closest_objects = self.__get_closest(objs)
+        return closest_objects
 
     def get_closest_with_property(self, prop_name, prop_value):
-        pass
+        objs = np.array(self.__find_object(props={prop_name: prop_value}, combined=True)[0])
+        closest_objects = self.__get_closest(objs)
+        return closest_objects
 
-    def get_closest_room(self):
-        pass
+    def get_closest_room_door(self, room_name=None):
+        objs = []
+        if room_name is None:
+            room_names = self.get_all_room_names()
+            for name in room_names:
+                room_doors = self.get_room_doors(name)
+                objs.extend(room_doors)
+        else:
+            objs = self.get_room_doors(room_name)
+        closest_objects = self.__get_closest(objs)
+        return closest_objects
 
-    def get_closest_agent(self):
-        pass
+    def get_closest_agents(self):
+        agents = np.array(self.get_agents())
+        closest_agents = self.__get_closest(agents)
+        return closest_agents
 
     def get_with_colour(self, colour):
-        pass
+        colored_objects = self.__find_object(props={'visualize_colour': colour}, combined=True)
+        return colored_objects
 
     def get_with_size(self, size):
-        pass
+        sized_objects = self.__find_object(props={'visualize_size': size}, combined=True)
+        return sized_objects
 
     def get_with_shape(self, shape):
-        pass
+        shaped_objects = self.__find_object(props={'visualize_shape': shape}, combined=True)
+        return shaped_objects
 
     def get_with_depth(self, depth):
-        pass
+        depth_objects = self.__find_object(props={'visualize_depth': depth}, combined=True)
+        return depth_objects
 
     def get_with_opacity(self, opacity):
-        pass
+        opacity_objects = self.__find_object(props={'visualize_opacity': opacity}, combined=True)
+        return opacity_objects
 
     ###############################################
     # Some higher level abstractions of the state #
@@ -337,6 +363,20 @@ class State(MutableMapping):
     ##################################################
     # The basic functions that make up most of state #
     ##################################################
+    def __get_closest(self, objs):
+        my_loc = self.__find_object(props={'obj_id': self.__own_id}, combined=True)[0]['location']
+
+        def distance(x):
+            loc = x['location']
+            return utils.get_distance(my_loc, loc)
+
+        dists = np.array(list(map(distance, objs)))
+        closest_idx = np.where(dists == dists.min())[0]
+        closest_objects = objs[closest_idx]
+        closest_objects = list(closest_objects)
+
+        return closest_objects
+
     def __find_object(self, props, combined):
         # Make sure that props is a dict, with as keys the property names and as values a tuple of allowable property
         # values (which can be (None,) if no value is specified).
