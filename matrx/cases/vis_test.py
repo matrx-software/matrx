@@ -1,10 +1,14 @@
+import os
+
 from matrx.agents import PatrollingAgentBrain, HumanAgentBrain
 from matrx.world_builder import WorldBuilder
 from matrx.actions import *
 
+
 def create_builder():
-    factory = WorldBuilder(random_seed=1, shape=[14, 20], tick_duration=0.1, verbose=False, run_matrx_api=True,
-                           run_matrx_visualizer=True, visualization_bg_clr="#f0f0f0",
+    tick_dur = 0.1
+    factory = WorldBuilder(random_seed=1, shape=[14, 20], tick_duration=tick_dur, verbose=False, run_matrx_api=True,
+                           run_matrx_visualizer=True, visualization_bg_clr="#f0f0f0", simulation_goal=int(10/tick_dur),
                            visualization_bg_img='/static/images/restaurant_bg.png')
 
     factory.add_room(top_left_location=[0, 0], width=14, height=20, name="world_bounds")
@@ -53,3 +57,18 @@ def create_builder():
     factory.add_object([6,7], "block")
 
     return factory
+
+
+def run_vis_test(nr_of_worlds=1):
+    builder = create_builder()
+
+    # startup world-overarching MATRX scripts, such as the api and/or visualizer if requested
+    media_folder = os.path.dirname(os.path.realpath(__file__)) # set our path for media files to our current folder
+    builder.startup(media_folder=media_folder)
+
+    # run each world
+    for world in builder.worlds(nr_of_worlds=nr_of_worlds):
+        world.run(builder.api_info)
+
+    # stop MATRX scripts such as the api and visualizer (if used)
+    builder.stop()

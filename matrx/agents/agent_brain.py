@@ -1,6 +1,7 @@
 import copy
 import numpy as np
 from matrx.actions import GrabObject, RemoveObject, OpenDoorAction, CloseDoorAction
+from matrx.agents.agent_utils.state import State
 from matrx.messages import Message
 
 
@@ -8,7 +9,7 @@ class AgentBrain:
     """ An artificial agent whose behaviour can be programmed to be, for example, (semi-)autonomous.
     """
 
-    def __init__(self):
+    def __init__(self, memorize_for_ticks=None):
         """ Defines the behavior of an agent.
 
         This class is the place where all the decision logic of an agent is
@@ -87,6 +88,10 @@ class AgentBrain:
         self.rnd_seed = None
         self.agent_properties = {}
         self.keys_of_agent_writable_props = []
+        self.__memorize_for_ticks = memorize_for_ticks
+
+        # The central state property (a extended dict with unique searching capabilities)
+        self.__state = State(memorize_for_ticks=self.__memorize_for_ticks)
 
     def initialize(self):
         """ To initialize an agent's brain.
@@ -465,6 +470,9 @@ class AgentBrain:
         # Process any properties of this agent which were updated in the environment as a result of actions
         self.agent_properties = agent_properties
 
+        # Update the state property of an agent with the GridWorld's state dictionary
+        state = self.state.state_update(state)
+
         # Call the filter method to filter the observation
         filtered_state = self.filter_observations(state)
 
@@ -477,6 +485,10 @@ class AgentBrain:
         # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
         # action if needed.
         return filtered_state, self.agent_properties, action, action_kwargs
+
+    @property
+    def state(self):
+        return self.__state
 
     def _get_log_data(self):
         return self.get_log_data()

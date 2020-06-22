@@ -78,7 +78,6 @@ class GridWorld:
         """
 
         self.__tick_duration = tick_duration  # How long each tick should take (process sleeps until this time passed)
-        self.__simulation_goal = simulation_goal  # The world goal, the simulation end when this/these are reached
         self.__shape = shape  # The width and height of the GridWorld
         self.__visualization_bg_clr = visualization_bg_clr  # The background color of the visualisation
         self.__visualization_bg_img = visualization_bg_img  # The background image of the visualisation
@@ -88,6 +87,14 @@ class GridWorld:
         self.__teams = {}  # dictionary with team names (keys), and agents in those teams (values)
         self.__registered_agents = OrderedDict()  # The dictionary of all existing agents in the GridWorld
         self.__environment_objects = OrderedDict()  # The dictionary of all existing objects in the GridWorld
+
+        # The simulation goal, the simulation ends when this/these are reached.
+        # Copy and reset all simulation goals, this to make sure that this world has its own goals independent of any
+        # other world that potentially received the same simulation goal instance (or list of them)
+        if isinstance(simulation_goal, (tuple, list)):
+            self.__simulation_goal = [sg.reset() for sg in simulation_goal]
+        else:
+            self.__simulation_goal = simulation_goal.reset()
 
         # Get all actions within all currently imported files
         self.__all_actions = _get_all_classes(Action, omit_super_class=True)
@@ -743,7 +750,7 @@ class GridWorld:
 
         goal_status = {}
         if self.__simulation_goal is not None:
-            if isinstance(self.__simulation_goal, list):
+            if isinstance(self.__simulation_goal, (list, tuple)):  # edited this check to include tuples
                 for sim_goal in self.__simulation_goal:
                     is_done = sim_goal.goal_reached(self)
                     goal_status[sim_goal] = is_done
