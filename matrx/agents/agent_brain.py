@@ -126,7 +126,7 @@ class AgentBrain:
 
         Parameters
         ----------
-        state: dict
+        state: State
             A state description containing all perceived
             :class:`matrx.objects.env_object.EnvObject` and objects inheriting
             from this class within a certain range as defined by the
@@ -143,7 +143,7 @@ class AgentBrain:
 
         Returns
         -------
-        filtered_state : dict
+        filtered_state : State
             A dictionary similar to `state` but describing the filtered state
             this agent perceives of the world.
 
@@ -180,7 +180,7 @@ class AgentBrain:
 
         Parameters
         ----------
-        state : dict
+        state : State
         A state description as given by the agent's
         :meth:`matrx.agents.agent_brain.AgentBrain.filter_observation` method.
 
@@ -376,6 +376,14 @@ class AgentBrain:
 
         return action_result.succeeded, action_result
 
+    @property
+    def state(self):
+        return self.__state
+
+    @property
+    def memorize_for_ticks(self):
+        return self.__memorize_for_ticks
+
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
                             customizable_properties, rnd_seed, callback_is_action_possible):
         """ Private MATRX function.
@@ -421,7 +429,7 @@ class AgentBrain:
         self._set_rnd_seed(seed=rnd_seed)
 
         # Initializing the State object
-        self.__state = State(memorize_for_ticks=self.__memorize_for_ticks, own_id=self.agent_id)
+        self._init_state()
 
         # The SenseCapability of the agent; what it can see and within what range
         self.sense_capability = sense_capability
@@ -474,24 +482,29 @@ class AgentBrain:
         self.agent_properties = agent_properties
 
         # Update the state property of an agent with the GridWorld's state dictionary
-        state = self.state.state_update(state)
+        self.__state.state_update(state)
 
         # Call the filter method to filter the observation
-        filtered_state = self.filter_observations(state)
+        self.__state = self.filter_observations(self.__state)
 
         # Call the method that decides on an action
-        action, action_kwargs = self.decide_on_action(filtered_state)
+        action, action_kwargs = self.decide_on_action(self.__state)
 
         # Store the action so in the next call the agent still knows what it did
         self.previous_action = action
+
+        # Get the dictionary from the State object
+        filtered_state = self.__state.as_dict()
 
         # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
         # action if needed.
         return filtered_state, self.agent_properties, action, action_kwargs
 
-    @property
-    def state(self):
-        return self.__state
+    def _fetch_state(self, state_dict):
+        self.__state.state_update(state_dict)
+        state = self.filter_observations(self.__state)
+        filtered_state_dict = state.as_dict()
+        return filtered_state_dict
 
     def _get_log_data(self):
         return self.get_log_data()
@@ -584,6 +597,9 @@ class AgentBrain:
 
             # Add the message object to the received messages
             self.received_messages.append(received_message)
+
+    def _init_state(self):
+        self.__state = State(memorize_for_ticks=self.memorize_for_ticks, own_id=self.agent_id)
 
     @staticmethod
     def __check_message(mssg, this_agent_id):

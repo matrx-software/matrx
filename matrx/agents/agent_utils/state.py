@@ -14,6 +14,7 @@ class State(MutableMapping):
         else:
             self.__decay_val = 1.0 / memorize_for_ticks
 
+        self.__me = None
         self.__own_id = own_id
         self.__state_dict = {}
         self.__prev_state_dict = {}
@@ -75,7 +76,9 @@ class State(MutableMapping):
         # Set the new state
         self.__prev_state_dict = self.__state_dict
         self.__state_dict = new_state
-        # self.update(dict(*args, **kwargs))  # use the free update to set keys
+
+        # Set the "me"
+        self.__me = self.get_self()
 
         # Return self
         return self
@@ -226,44 +229,36 @@ class State(MutableMapping):
 
     def remove_with_property(self, props, combined=True):
         found = self.__find_object(props, combined)
-        _ = (self.remove(obj['obj_id']) for f in found for obj in f)
+        if found is None:
+            return
+        for obj in found:
+            self.remove(obj['obj_id'])
 
     def get_of_type(self, obj_type):
-        return self.get_with_property("class_inheritance", obj_type)
+        return self.get_with_property({"class_inheritance": obj_type}, combined=False)
 
-    def get_room_objects(self, room_name):
-        return self.get_with_property("room_name", room_name)
+    def get_room(self, room_name):
+        return self.get_with_property({"room_name": room_name}, combined=False)
 
     def get_all_room_names(self):
-        return list({obj['room_name'] for obj in self.get_with_property("room_name")})
+        return list({obj['room_name'] for obj in self.get_with_property("room_name", combined=False)})
 
-    def get_room_content(self, room_name):
+    def get_room_objects(self, room_name):
         # Locate method to identify room content
         def is_content(obj):
             if 'class_inheritance' in obj.keys():
                 chain = obj['class_inheritance']
-                if not (Wall.__name__ in chain or Door.__name__ in chain or AreaTile in chain):
+                if not (Wall.__name__ in chain or Door.__name__ in chain or AreaTile in chain) \
+                        and obj['room_name'] == room_name:
                     return obj
             else:  # the object is a Wall, Door or AreaTile
                 return None
 
-        # Get all walls of the room
-        walls = self.get_with_property(props={"room_name": room_name, "class_inheritance": "Wall"}, combined=True)
-
-        # Get the top left corner and width and height of the room based on the found walls (and assuming the room is
-        # rectangle).
-        xs = [wall['location'][0] for wall in walls]
-        ys = [wall['location'][1] for wall in walls]
-        top_left = (min(xs), min(ys))
-        width = max(xs) - top_left[0] + 1
-        height = max(ys) - top_left[1] + 1
-        content_locs = utils.get_room_locations(top_left, width, height)
-
-        # # Get all objects with those content locations
-        content = self.get_with_property(props={'location': content_locs}, combined=True)
-
         # Get all room objects
-        room_objs = self.get_room_objects(room_name)
+        room_objs = self.get_room(room_name)
+
+        if room_objs is None:  # No room with room_name was found
+            return None
 
         # Filter out all area's, walls and doors
         content = map(is_content, room_objs)
@@ -272,16 +267,19 @@ class State(MutableMapping):
         return content
 
     def get_room_doors(self, room_name):
-        # Locate method to identify doors
+        # Locate method to identify doors of the right room
         def is_content(obj):
             if 'class_inheritance' in obj.keys():
                 chain = obj['class_inheritance']
-                if Door.__name__ in chain:
+                if Door.__name__ in chain and obj['room_name'] == room_name:
                     return obj
             else:  # the object is not a Door
                 return None
 
-        room_objs = self.get_room_objects(room_name)
+        room_objs = self.get_room(room_name)
+        if room_objs is None:  # No room was found with the given room name
+            return None
+
         # Filter out all doors
         doors = map(is_content, room_objs)
         doors = [c for c in doors if c is not None]
@@ -289,82 +287,117 @@ class State(MutableMapping):
         return doors
 
     def get_agents(self):
-        agents = self.__find_object(props={'class_inheritance': 'AgentBrain'}, combined=True)
+        agents = self.__find_object(props={'class_inheritance': 'AgentBrain'}, combined=False)
         return agents
 
-    def get_agents_with_property(self, prop_name, prop_value):
-        props = {'class_inheritance': 'AgentBrain', prop_name: prop_value}
+    def get_agents_with_property(self, props):
+        if isinstance(props, str):
+            props = {'class_inheritance': 'AgentBrain', props: (None, )}
+        else:
+            props = {'class_inheritance': 'AgentBrain', **props}
         agents = self.__find_object(props=props, combined=True)
         return agents
 
-    def get_team_members(self, team_name):
-        team_members = self.get_agents_with_property('team', team_name)
+    def get_team_members(self, team_name=None):
+        if team_name is None:
+            if self.__me is not None:
+                team_name = self.__me['team']
+            else:
+                team_name = self.get_self()['team']
+        team_members = self.get_agents_with_property({'team': team_name})
         return team_members
 
     def get_closest_objects(self):
-        objs = np.array(self.__find_object(props='location', combined=True)[0])
-        closest_objects = self.__get_closest(objs)
+        objs = self.__find_object(props='location', combined=True)
+        if objs is None:
+            return None
+
+        objs = np.array(objs)
+        # Remove itself, since the agent self is always closest...
+        other_objects = np.array([o for o in objs if o['obj_id'] != self.__own_id])
+        closest_objects = self.__get_closest(other_objects)
         return closest_objects
 
-    def get_closest_with_property(self, prop_name, prop_value):
-        objs = np.array(self.__find_object(props={prop_name: prop_value}, combined=True)[0])
-        closest_objects = self.__get_closest(objs)
+    def get_closest_with_property(self, props):
+        objs = self.__find_object(props=props, combined=True)
+        if objs is None:
+            return None
+
+        objs = np.array(objs)
+        # Remove itself, since the agent self is always closest...
+        other_objects = np.array([o for o in objs if o['obj_id'] != self.__own_id])
+        closest_objects = self.__get_closest(other_objects)
         return closest_objects
 
     def get_closest_room_door(self, room_name=None):
-        objs = []
         if room_name is None:
-            room_names = self.get_all_room_names()
-            for name in room_names:
-                room_doors = self.get_room_doors(name)
-                objs.extend(room_doors)
+            objs = self.get_with_property({"class_inheritance": "Door", "room_name": room_name}, combined=True)
         else:
             objs = self.get_room_doors(room_name)
+
+        if objs is None:
+            return None
+
+        objs = np.array(objs)
         closest_objects = self.__get_closest(objs)
         return closest_objects
 
     def get_closest_agents(self):
-        agents = np.array(self.get_agents())
-        closest_agents = self.__get_closest(agents)
+        agents = self.get_agents()
+        if agents is None:
+            return None
+
+        # Remove itself, since the agent self is always closest...
+        other_agents = np.array([a for a in agents if a['obj_id'] != self.__own_id])
+        closest_agents = self.__get_closest(other_agents)
         return closest_agents
 
-    def get_with_colour(self, colour):
-        colored_objects = self.__find_object(props={'visualize_colour': colour}, combined=True)
-        return colored_objects
-
-    def get_with_size(self, size):
-        sized_objects = self.__find_object(props={'visualize_size': size}, combined=True)
-        return sized_objects
-
-    def get_with_shape(self, shape):
-        shaped_objects = self.__find_object(props={'visualize_shape': shape}, combined=True)
-        return shaped_objects
-
-    def get_with_depth(self, depth):
-        depth_objects = self.__find_object(props={'visualize_depth': depth}, combined=True)
-        return depth_objects
-
-    def get_with_opacity(self, opacity):
-        opacity_objects = self.__find_object(props={'visualize_opacity': opacity}, combined=True)
-        return opacity_objects
+    def get_self(self):
+        me = self.__find_object(props={'obj_id': self.__own_id}, combined=True)
+        return me
 
     ###############################################
     # Some higher level abstractions of the state #
     ###############################################
     def get_traverse_map(self):
-        pass
+        width, length = self.get_world_info()['grid_shape']
+        coords = [(x, y) for x in range(width) for y in range(length)]
+        traverse_map = {c: True for c in coords}
+        intrav_objs = self.get_with_property(props={'is_traversable': False, 'location': (None, )}, combined=False)
+        for o in intrav_objs:
+            traverse_map[(o['location'][0], o['location'][1])] = False
+
+        return traverse_map
 
     def get_distance_map(self):
-        pass
+        width, length = self.get_world_info()['grid_shape']
+        coords = [(x, y) for x in range(width) for y in range(length)]
+        if self.__me is not None:
+            loc = self.__me['location']
+        else:
+            loc = self.get_self()['location']
+
+        def distance(coord):
+            return utils.get_distance(loc, coord)
+
+        dist_map = {c: distance(c) for c in coords}
+
+        return dist_map
 
     def apply_occlusion(self):
-        pass
+        raise NotImplemented("Field of view occlusion is not yet implemented.")
 
     ##################################################
     # The basic functions that make up most of state #
     ##################################################
     def __get_closest(self, objs):
-        my_loc = self.__find_object(props={'obj_id': self.__own_id}, combined=True)[0]['location']
+        if len(objs) == 0:
+            return None
+
+        if self.__me is not None:
+            my_loc = self.__me['location']
+        else:
+            my_loc = self.get_self()['location']
 
         def distance(x):
             loc = x['location']
@@ -446,6 +479,8 @@ class State(MutableMapping):
                 found = [obj for f in found for obj in f]
             elif len(found[0]) == 0:  # if just one property value was given (or omitted) but nothing was found
                 found = None
+            elif len(found) > 0 and len(found[0]) > 0:
+                found = found[0]
 
         # If nothing was found, we set it to None for easy identification and break any iterable over it.
         if not found:

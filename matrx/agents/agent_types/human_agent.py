@@ -1,5 +1,8 @@
+import warnings
+
 from matrx.actions.object_actions import GrabObject, DropObject, RemoveObject
 from matrx.actions.door_actions import OpenDoorAction, CloseDoorAction
+from matrx.agents.agent_utils.state import State
 from matrx.agents.agent_utils.state_tracker import StateTracker
 from matrx.agents.agent_brain import AgentBrain
 import numpy as np
@@ -9,13 +12,14 @@ class HumanAgentBrain(AgentBrain):
     """ Creates an Human Agent which is an agent that can be controlled by a human.
     """
 
-    def __init__(self, state_memory_decay=1, fov_occlusion=False, max_carry_objects=3,
+    def __init__(self, memorize_for_ticks=None, fov_occlusion=False, max_carry_objects=3,
                  grab_range=1, drop_range=1, door_range=1, remove_range=1):
         """ Creates an Human Agent which is an agent that can be controlled by a human.
         """
-        super().__init__()
-        self.__state_memory_decay = state_memory_decay
+        super().__init__(memorize_for_ticks=memorize_for_ticks)
         self.__fov_occlusion = fov_occlusion
+        if fov_occlusion:
+            warnings.warn("FOV Occlusion is not yet fully implemented. Setting fov_occlusion to True has not effect.")
         self.__max_carry_objects = max_carry_objects
         self.__remove_range = remove_range
         self.__grab_range = grab_range
@@ -88,9 +92,8 @@ class HumanAgentBrain(AgentBrain):
         else:
             self.key_action_map = key_action_map
 
-        # Create the agent's state tracker
-        self.__state_tracker = StateTracker(agent_id, knowledge_decay=self.__state_memory_decay,
-                                            fov_occlusion=self.__fov_occlusion)
+        # Initializing the State object
+        self._init_state()
 
     def _get_action(self, state, agent_properties, agent_id, user_input):
         """
@@ -270,7 +273,6 @@ class HumanAgentBrain(AgentBrain):
             The filtered state of this agent
 
         """
-        state = self.__state_tracker.update(state)
         return state
 
     def filter_user_input(self, user_input):

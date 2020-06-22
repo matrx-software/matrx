@@ -110,7 +110,7 @@ def add_drop_off_zone(builder, world_size, block_colours, nr_blocks_to_collect):
         loc = (loc[0], loc[1] + 1)
 
 
-def add_agents(builder, block_sense_range, other_sense_range, agent_memory_decay):
+def add_agents(builder, block_sense_range, other_sense_range, memorize_for_ticks):
     # Create the agents sense capability. This is a circular range around the agent that denotes what it can perceive.
     # Here, we define that the agent cannot see other agent's their bodies, they can see square blocks with their own
     # range and see all other objects (doors, walls, etc.) with another range.
@@ -124,7 +124,7 @@ def add_agents(builder, block_sense_range, other_sense_range, agent_memory_decay
     # We add 1 Human Agent; which is an agent you can control yourself. We first create the brain of the agent, and then
     # add it to our builder.
     brain = HumanAgentBrain(max_carry_objects=1, grab_range=0, drop_range=0, fov_occlusion=True,
-                            state_memory_decay=agent_memory_decay)
+                            memorize_for_ticks=memorize_for_ticks)
     loc = (1, 1)
     builder.add_human_agent(loc, brain, team=team_name, name="Human", key_action_map=key_action_map,
                             sense_capability=sense_capability)
@@ -162,7 +162,7 @@ def create_builder():
     block_colours = ['#ff0000', '#ffffff', '#ffff00', '#0000ff', '#00ff00', '#ff00ff']
     block_sense_range = 10  # the range with which agents detect blocks
     other_sense_range = np.inf  # the range with which agents detect other objects (walls, doors, etc.)
-    agent_memory_decay = (10 / tick_duration)  # we want to memorize states for (seconds / tick_duration ticks) ticks
+    memorize_for_ticks = (10 / tick_duration)  # we want to memorize states for (seconds / tick_duration ticks) ticks
 
     # Set numpy's random generator
     np.random.seed(random_seed)
@@ -188,7 +188,7 @@ def create_builder():
     add_drop_off_zone(builder, world_size, block_colours, nr_blocks_to_collect=2)
 
     # Add the agents and human agents to the top row of the world
-    add_agents(builder, block_sense_range, other_sense_range, agent_memory_decay)
+    add_agents(builder, block_sense_range, other_sense_range, memorize_for_ticks)
 
     # Return the builder
     return builder

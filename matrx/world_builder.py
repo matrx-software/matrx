@@ -2319,7 +2319,7 @@ class WorldBuilder:
                 'class_callable': agent.__class__,
                 'callback_agent_get_action': agent._get_action,
                 'callback_agent_set_action_result': agent._set_action_result,
-                'callback_agent_observe': agent.filter_observations,
+                'callback_agent_observe': agent._fetch_state,
                 'callback_agent_log': agent._get_log_data,
                 'callback_agent_get_messages': agent._get_messages,
                 'callback_agent_set_messages': agent._set_messages,
