@@ -12,4 +12,3 @@ recommonmark
 sphinx-autoapi
 setuptools
 wheel
-
