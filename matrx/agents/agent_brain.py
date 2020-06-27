@@ -1,4 +1,6 @@
 import copy
+import json
+
 import numpy as np
 from matrx.actions import GrabObject, RemoveObject, OpenDoorAction, CloseDoorAction
 from matrx.messages import Message
@@ -370,6 +372,28 @@ class AgentBrain:
         action_result = self.__callback_is_action_possible(self.agent_id, action, action_kwargs)
 
         return action_result.succeeded, action_result
+
+
+
+
+    def create_context_menu_for_other(self, agent_id_who_clicked, clicked_object_id, click_location):
+
+        context_menu = []
+
+        for action in self.action_set:
+
+            context_menu.append({
+                "OptionText": f"Do action: {action}",
+                "Message": Message(content=action, from_id=agent_id_who_clicked, to_id=clicked_object_id)
+            })
+
+        return context_menu
+
+
+    def create_context_menu_for_self(self, clicked_object_id, click_location):
+        return []
+
+
 
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
                             customizable_properties, rnd_seed, callback_is_action_possible):

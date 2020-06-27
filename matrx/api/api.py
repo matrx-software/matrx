@@ -2,6 +2,7 @@ import threading
 import copy
 import logging
 
+import jsonpickle
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
@@ -32,6 +33,7 @@ next_tick_info = {}
 add_message_to_agent = None
 received_messages = {}  # messages received via the api, intended for the Gridworld
 gw_message_manager = None  # the message manager of the gridworld, containing all messages of various types
+gw = None
 teams = None  # dict with team names (keys) and IDs of agents who are in that team (values)
 # currently only one world at a time is supported
 current_world_ID = False
@@ -369,6 +371,87 @@ def send_message():
 
     return jsonify(True)
 
+
+#########################################################################
+# MATRX context menu API calls
+#########################################################################
+@app.route('/fetch_context_menu_self', methods=['POST'])
+def fetch_context_menu_of_self():
+    """ Fetch the context menu of the user itself
+    """
+    # TODO: check if all data present
+
+    # fetch the data
+    data = request.json
+    agent_id_who_clicked = data.agent_id_who_clicked
+    clicked_object_id = data.clicked_object_id
+    click_location = data.click_location
+
+    # TODO: check if agent_id_who_clicked exists in the gw
+
+    # fetch context menu from agent
+    context_menu = gw.registered_agents[agent_id_who_clicked].get_context_menu_self_func(clicked_object_id, click_location)
+
+    # TODO: check if 'Message' in context_menu
+
+    # encode the object instance of the message
+    for item in context_menu:
+        # encode the object instance of the message
+        item['Message'] = jsonpickle.encode(item['Message'])
+
+    return jsonify(context_menu)
+
+
+@app.route('/fetch_context_menu_of_other', methods=['POST'])
+def fetch_context_menu_of_other():
+    """ Fetch the context menu of another agent
+    """
+    # TODO: check if all data present
+
+    # fetch the data
+    data = request.json
+    print(data)
+
+    agent_id_who_clicked = data['agent_id_who_clicked']
+    clicked_object_id = data['clicked_object_id']
+    click_location = data['click_location']
+
+    # TODO: check if agent_id_who_clicked exists in the gw
+    # TODO: ignore if god
+
+    # fetch context menu from agent
+    context_menu = gw.registered_agents[agent_id_who_clicked].create_context_menu_for_other_func(agent_id_who_clicked, clicked_object_id, click_location)
+
+    # TODO: check if 'Message' in context_menu
+
+    for item in context_menu:
+        # encode the object instance of the message
+        item['Message'] = jsonpickle.encode(item['Message'])
+
+    return jsonify(context_menu)
+
+
+
+@app.route('/send_message_pickled', methods=['POST'])
+def send_message_pickled():
+    """ To send a custom message, e.g. via the context menu. The pre-formatted CustomMessage instance an be jsonpickled
+    and sent via the API. This API call can handle that request and send the CustomMessage to the MATRX agent"""
+
+    # TODO: check if all data present
+
+    # fetch the data
+    data = request.json
+
+    print(data)
+    sender_id = data['sender']
+    mssg = jsonpickle.decode(data['message'])
+
+    # add the received_messages to the api global variable
+    if sender_id not in received_messages:
+        received_messages[sender_id] = []
+    received_messages[sender_id].append(mssg)
+
+    return jsonify(True)
 
 #########################################################################
 # MATRX control api calls

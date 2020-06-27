@@ -2317,6 +2317,8 @@ class WorldBuilder:
                 'callback_agent_get_messages': agent._get_messages,
                 'callback_agent_set_messages': agent._set_messages,
                 'callback_agent_initialize': agent.initialize,
+                'callback_create_context_menu_for_other': agent.create_context_menu_for_other,
+                'callback_create_context_menu_for_self': agent.create_context_menu_for_self,
                 'customizable_properties': customizable_props,
                 **custom_props}
 

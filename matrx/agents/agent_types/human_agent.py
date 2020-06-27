@@ -4,6 +4,8 @@ from matrx.agents.agent_utils.state_tracker import StateTracker
 from matrx.agents.agent_brain import AgentBrain
 import numpy as np
 
+from matrx.messages import Message
+
 
 class HumanAgentBrain(AgentBrain):
     """ Creates an Human Agent which is an agent that can be controlled by a human.
@@ -284,10 +286,31 @@ class HumanAgentBrain(AgentBrain):
             A dictionary containing the key presses of the user, intended for controlling thus human agent.
 
         """
+
+        for message in self.received_messages:
+            print(message)
+
+
         if user_input is None:
             return []
         possible_key_presses = list(self.key_action_map.keys())
         return list(set(possible_key_presses) & set(user_input))
+
+
+
+    def create_context_menu_for_self(self, clicked_object_id, click_location):
+
+        context_menu = []
+
+        for action in self.action_set:
+
+            context_menu.append({
+                "OptionText": f"Do action: {action}",
+                "Message": Message(content=action, from_id=self.agent_id, to_id=self.agent_id)
+            })
+
+        return context_menu
+
 
     def __select_random_obj_in_range(self, state, range_, property_to_check=None):
 
