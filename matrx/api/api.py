@@ -382,36 +382,46 @@ def send_message():
 #########################################################################
 # MATRX context menu API calls
 #########################################################################
-# @app.route('/fetch_context_menu_self', methods=['POST'])
-# def fetch_context_menu_of_self():
-#     """ Fetch the context menu of the user itself
-#     """
-#     # TODO: check if all data present
-#
-#     # fetch the data
-#     data = request.json
-#     agent_id_who_clicked = data.agent_id_who_clicked
-#     clicked_object_id = data.clicked_object_id
-#     click_location = data.click_location
-#
-#     # TODO: check if agent_id_who_clicked exists in the gw
-#
-#     # fetch context menu from agent
-#     context_menu = gw.registered_agents[agent_id_who_clicked].get_context_menu_self_func(clicked_object_id, click_location)
-#
-#     # TODO: check if 'Message' in context_menu
-#
-#     # encode the object instance of the message
-#     for item in context_menu:
-#         # encode the object instance of the message
-#         item['Message'] = jsonpickle.encode(item['Message'])
-#
-#     return jsonify(context_menu)
-
-
 @app.route('/fetch_context_menu_of_self', methods=['POST'])
+def fetch_context_menu_of_self():
+    """ Fetch the context menu opened for a specific object/location of the agent being controlled by the user.
+    """
+    # fetch the data
+    data = request.json
+
+    # check that all required parameters have been passed
+    required_params = ("agent_id_who_clicked", "clicked_object_id", "click_location")
+    if not all(k in data for k in required_params):
+        return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
+
+    agent_id_who_clicked = data['agent_id_who_clicked']
+    clicked_object_id = data['clicked_object_id']
+    click_location = data['click_location']
+
+    # check if agent_id_who_clicked exists in the gw
+    if agent_id_who_clicked not in gw.registered_agents.keys():
+        return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
+
+    # ignore if called from the god view
+    if agent_id_who_clicked.lower() == "god":
+        return return_error(code=400,
+                            message=f"The god view is not an agent and thus cannot show its own context menu.")
+
+    # fetch context menu from agent
+    context_menu = gw.registered_agents[agent_id_who_clicked].create_context_menu_for_self_func(clicked_object_id,
+                                                                                                 click_location)
+
+    # encode the object instance of the message
+    for item in context_menu:
+        item['Message'] = jsonpickle.encode(item['Message'])
+
+    return jsonify(context_menu)
+
+
+
+@app.route('/fetch_context_menu_of_other', methods=['POST'])
 def fetch_context_menu_of_other():
-    """ Fetch the context menu of the agent being controlled by the test subject
+    """ Fetch the context menu opened for a specific object/location of the agent being controlled by the user.
     """
     # fetch the data
     data = request.json
@@ -434,7 +444,9 @@ def fetch_context_menu_of_other():
         return return_error(code=400, message=f"The god view is not an agent and thus cannot show its own context menu.")
 
     # fetch context menu from agent
-    context_menu = gw.registered_agents[agent_id_who_clicked].create_context_menu_for_other_func(agent_id_who_clicked, clicked_object_id, click_location)
+    context_menu = gw.registered_agents[agent_id_who_clicked].create_context_menu_for_other_func(agent_id_who_clicked,
+                                                                                                 clicked_object_id,
+                                                                                                 click_location)
 
     # encode the object instance of the message
     for item in context_menu:

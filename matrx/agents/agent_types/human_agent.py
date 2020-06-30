@@ -313,7 +313,6 @@ class HumanAgentBrain(AgentBrain):
         ----------
         clicked_object_id : str
             A string indicating the ID of an object. Is None if the user clicked on a background tile (which has no ID).
-
         click_location : list
             A list containing the [x,y] coordinates of the object on which the user right clicked.
 
@@ -324,6 +323,7 @@ class HumanAgentBrain(AgentBrain):
             the text shown in the menu for the option, and a 'Message' key, which is the message instance that is sent
             to this agent when the user clicks on the context menu option.
         """
+        print("Context menu self")
 
         context_menu = []
 
@@ -335,6 +335,50 @@ class HumanAgentBrain(AgentBrain):
             })
 
         return context_menu
+
+
+    def create_context_menu_for_other(self, agent_id_who_clicked, clicked_object_id, click_location):
+        """ Generate options for a context menu for a specific object/location that a user NOT controlling this
+        human agent opened.
+
+        Thus: another human agent selected this agent, opened a context menu by right clicking on an object or location.
+        This function is called. It should return actions, messages, or other info for what this agent can do for that
+        object / location.
+
+        Example usecase: tasking another agent that is not yourself, e.g. to move an object.
+
+        For the default MATRX visualization, the context menu is opened by right clicking on an object. This function
+        should generate a list of options (actions, messages, or something else) which relate to that object or location.
+        Each option is in the shape of a text shown in the context menu, and a message which is send to this agent if
+        the user actually clicks that context menu option.
+
+        Parameters
+        ----------
+        agent_id_who_clicked : str
+            The ID of the (human) agent that selected this agent and requested for a context menu.
+        clicked_object_id : str
+            A string indicating the ID of an object. Is None if the user clicked on a background tile (which has no ID).
+        click_location : list
+            A list containing the [x,y] coordinates of the object on which the user right clicked.
+
+        Returns
+        -------
+         context_menu : list
+            A list containing context menu items. Each context menu item is a dict with a 'OptionText' key, which is
+            the text shown in the menu for the option, and a 'Message' key, which is the message instance that is sent
+            to this agent when the user clicks on the context menu option.
+        """
+        print("Context menu other")
+        context_menu = []
+
+        # Generate a context menu option for every action
+        for action in self.action_set:
+            context_menu.append({
+                "OptionText": f"Do action: {action}",
+                "Message": Message(content=action, from_id=clicked_object_id, to_id=self.agent_id)
+            })
+        return context_menu
+
 
 
     def __select_random_obj_in_range(self, state, range_, property_to_check=None):
