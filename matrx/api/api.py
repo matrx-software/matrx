@@ -361,6 +361,13 @@ def send_message():
     # fetch the data
     data = request.json
 
+    # check that all required parameters have been passed
+    required_params = ("content", "sender", "receiver")
+    if not all(k in data for k in required_params):
+        error = {"error_code": 400, "error_message": f"Missing one of the required parameters: {required_params}"}
+        print("api request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
     # create message
     msg = Message(content=data['content'], from_id=data['sender'], to_id=data['receiver'])
 
@@ -375,57 +382,62 @@ def send_message():
 #########################################################################
 # MATRX context menu API calls
 #########################################################################
-@app.route('/fetch_context_menu_self', methods=['POST'])
-def fetch_context_menu_of_self():
-    """ Fetch the context menu of the user itself
-    """
-    # TODO: check if all data present
+# @app.route('/fetch_context_menu_self', methods=['POST'])
+# def fetch_context_menu_of_self():
+#     """ Fetch the context menu of the user itself
+#     """
+#     # TODO: check if all data present
+#
+#     # fetch the data
+#     data = request.json
+#     agent_id_who_clicked = data.agent_id_who_clicked
+#     clicked_object_id = data.clicked_object_id
+#     click_location = data.click_location
+#
+#     # TODO: check if agent_id_who_clicked exists in the gw
+#
+#     # fetch context menu from agent
+#     context_menu = gw.registered_agents[agent_id_who_clicked].get_context_menu_self_func(clicked_object_id, click_location)
+#
+#     # TODO: check if 'Message' in context_menu
+#
+#     # encode the object instance of the message
+#     for item in context_menu:
+#         # encode the object instance of the message
+#         item['Message'] = jsonpickle.encode(item['Message'])
+#
+#     return jsonify(context_menu)
 
-    # fetch the data
-    data = request.json
-    agent_id_who_clicked = data.agent_id_who_clicked
-    clicked_object_id = data.clicked_object_id
-    click_location = data.click_location
 
-    # TODO: check if agent_id_who_clicked exists in the gw
-
-    # fetch context menu from agent
-    context_menu = gw.registered_agents[agent_id_who_clicked].get_context_menu_self_func(clicked_object_id, click_location)
-
-    # TODO: check if 'Message' in context_menu
-
-    # encode the object instance of the message
-    for item in context_menu:
-        # encode the object instance of the message
-        item['Message'] = jsonpickle.encode(item['Message'])
-
-    return jsonify(context_menu)
-
-
-@app.route('/fetch_context_menu_of_other', methods=['POST'])
+@app.route('/fetch_context_menu_of_self', methods=['POST'])
 def fetch_context_menu_of_other():
-    """ Fetch the context menu of another agent
+    """ Fetch the context menu of the agent being controlled by the test subject
     """
-    # TODO: check if all data present
-
     # fetch the data
     data = request.json
-    print(data)
+
+    # check that all required parameters have been passed
+    required_params = ("agent_id_who_clicked", "clicked_object_id", "click_location")
+    if not all(k in data for k in required_params):
+        return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
 
     agent_id_who_clicked = data['agent_id_who_clicked']
     clicked_object_id = data['clicked_object_id']
     click_location = data['click_location']
 
-    # TODO: check if agent_id_who_clicked exists in the gw
-    # TODO: ignore if god
+    # check if agent_id_who_clicked exists in the gw
+    if agent_id_who_clicked not in gw.registered_agents.keys():
+        return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
+
+    # ignore if called from the god view
+    if agent_id_who_clicked.lower() == "god":
+        return return_error(code=400, message=f"The god view is not an agent and thus cannot show its own context menu.")
 
     # fetch context menu from agent
     context_menu = gw.registered_agents[agent_id_who_clicked].create_context_menu_for_other_func(agent_id_who_clicked, clicked_object_id, click_location)
 
-    # TODO: check if 'Message' in context_menu
-
+    # encode the object instance of the message
     for item in context_menu:
-        # encode the object instance of the message
         item['Message'] = jsonpickle.encode(item['Message'])
 
     return jsonify(context_menu)
@@ -434,15 +446,25 @@ def fetch_context_menu_of_other():
 
 @app.route('/send_message_pickled', methods=['POST'])
 def send_message_pickled():
-    """ To send a custom message, e.g. via the context menu. The pre-formatted CustomMessage instance an be jsonpickled
-    and sent via the API. This API call can handle that request and send the CustomMessage to the MATRX agent"""
+    """ This function makes it possible to send a custom message to a MATRX agent via the API as a jsonpickle object.
+    For instance, sending a custom message when a context menu option is clicked.
+    The pre-formatted CustomMessage instance an be jsonpickled and sent via the API.
+    This API call can handle that request and send the CustomMessage to the MATRX agent
 
-    # TODO: check if all data present
+        Returns
+    -------
+        Error if api call invalid, or True if valid.
+    """
 
     # fetch the data
     data = request.json
-
     print(data)
+
+    # check that all required parameters have been passed
+    required_params = ("sender", "message")
+    if not all(k in data for k in required_params):
+        return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
+
     sender_id = data['sender']
     mssg = jsonpickle.decode(data['message'])
 
@@ -554,6 +576,13 @@ def shutdown():
 def bad_request(e):
     print("Throwing error", e)
     return jsonify(error=str(e)), 400
+
+
+def return_error(code, message):
+    """ A helper function that returns a specified error code and message """
+    if debug:
+        print(f"api request not valid: code {code}. Message: {message}.")
+    return abort(code, description=message)
 
 
 #########################################################################

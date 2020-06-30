@@ -1,3 +1,5 @@
+import copy
+
 from matrx.actions.object_actions import GrabObject, DropObject, RemoveObject
 from matrx.actions.door_actions import OpenDoorAction, CloseDoorAction
 from matrx.agents.agent_utils.state_tracker import StateTracker
@@ -276,9 +278,7 @@ class HumanAgentBrain(AgentBrain):
         return state
 
     def filter_user_input(self, user_input):
-        """
-        From the received userinput, only keep those which are actually Connected
-        to a specific agent action
+        """ From the received userinput, only keep those which are actually connected to a specific agent action.
 
         Parameters
         ----------
@@ -287,8 +287,10 @@ class HumanAgentBrain(AgentBrain):
 
         """
 
-        for message in self.received_messages:
-            print(message)
+        # read messages and remove them
+        for message in list(self.received_messages):
+            print("Received message:", message)
+            self.received_messages.remove(message)
 
 
         if user_input is None:
@@ -299,6 +301,29 @@ class HumanAgentBrain(AgentBrain):
 
 
     def create_context_menu_for_self(self, clicked_object_id, click_location):
+        """ Generate options for a context menu for a specific object/location which the user controlling this
+        human agent opened.
+
+        For the default MATRX visualization, the context menu is opened by right clicking on an object. This function
+        should generate a list of options (actions, messages, or something else) which relate to that object.
+        Each option is in the shape of a text shown in the context menu, and a message which is send to this agent if
+        the user actually clicks that context menu option.
+
+        Parameters
+        ----------
+        clicked_object_id : str
+            A string indicating the ID of an object. Is None if the user clicked on a background tile (which has no ID).
+
+        click_location : list
+            A list containing the [x,y] coordinates of the object on which the user right clicked.
+
+        Returns
+        -------
+         context_menu : list
+            A list containing context menu items. Each context menu item is a dict with a 'OptionText' key, which is
+            the text shown in the menu for the option, and a 'Message' key, which is the message instance that is sent
+            to this agent when the user clicks on the context menu option.
+        """
 
         context_menu = []
 

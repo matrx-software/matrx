@@ -390,10 +390,6 @@ class AgentBrain:
         return context_menu
 
 
-    def create_context_menu_for_self(self, clicked_object_id, click_location):
-        return []
-
-
 
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
                             customizable_properties, rnd_seed, callback_is_action_possible):

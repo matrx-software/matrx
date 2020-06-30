@@ -666,9 +666,6 @@ function add_context_menu(object) {
     $(object).contextMenu({
         menuSelector: "#contextMenu",
         menuSelected: function(invokedOn, selectedMenu) {
-//            var msg = "You selected the menu item '" + selectedMenu.text() +
-//                "' on the value '" + invokedOn.text() + "'";
-//            alert(msg);
 
             console.log("Execute API call with message:", selectedMenu[0].mssg)
 
@@ -678,7 +675,6 @@ function add_context_menu(object) {
 
             post_data = {'sender': lv_agent_id, 'message': selectedMenu[0].mssg}
             console.log("Sending post data:", post_data);
-
 
             var context_menu_request = $.ajax({
                 method: "POST",

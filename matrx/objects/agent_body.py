@@ -53,6 +53,14 @@ class AgentBody(EnvObject):
         :param callback_agent_set_messages: A callback function that allows the GridWorld to set any message send by
         some agent to a list of received messages in an agent.
 
+        :param callback_create_context_menu_for_other: A callback function that allows the gridworld or API to call the
+        subsequent agent function that generates the menu options of an agent for a context menu opened by a user not
+        controlling that specific agent.
+        :param callback_create_context_menu_for_self: A callback function that allows the gridworld or API to call the
+        subsequent agent function that generates the menu options for a context menu opened by the user controlling
+        the current human agent. If this is not a human agent, it is set to None.
+
+
         :param name: String Defaults to "Agent". The name of the agent, does not need to be unique.
         :param is_human_agent: Boolean. Defaults to False. Boolean to signal that the agent represented by this Agent's
         body is a human controlled agent.
