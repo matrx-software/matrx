@@ -1,6 +1,7 @@
 var matrx_url = 'http://' + window.location.hostname,
     port = "3001",
     matrx_context_menu_other = "fetch_context_menu_of_self";
+    matrx_context_menu_self = "fetch_context_menu_of_other";
 
 (function ($, window) {
 
@@ -25,10 +26,13 @@ var matrx_url = 'http://' + window.location.hostname,
                 post_data = {'agent_id_who_clicked': lv_agent_id, 'clicked_object_id': obj_id, 'click_location': [x,y]}
                 console.log("Sending post data:", post_data);
 
+                // if someone is
+                var url = (object_selected != false : matrx_context_menu_other ? matrx_context_menu_self)
+
                 var context_menu_request = $.ajax({
                     method: "POST",
                     data: JSON.stringify(post_data),
-                    url: matrx_url + ":" + port + "/" + matrx_context_menu_other,
+                    url: matrx_url + ":" + port + "/" + url,
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json'
                 });
