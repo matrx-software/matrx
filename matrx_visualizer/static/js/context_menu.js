@@ -14,20 +14,19 @@ var matrx_url = 'http://' + window.location.hostname,
                 // return native menu if pressing control
                 if (e.ctrlKey) return;
 
-                console.log("Context menu opened");
-
                 var obj = $(e.target).parent();
                 var obj_id = obj.attr('id');
                 var x = obj[0].cell_x;
                 var y = obj[0].cell_y;
 
-                console.log("Context menu opened by ", lv_agent_id, " on ", obj_id, " at ", x, y);
+                post_data = {'agent_id_who_clicked': lv_agent_id,
+                        'clicked_object_id': obj_id,
+                        'click_location': [x,y],
+                        'self_selected': object_selected == lv_agent_id}
 
-                post_data = {'agent_id_who_clicked': lv_agent_id, 'clicked_object_id': obj_id, 'click_location': [x,y]}
-                console.log("Sending post data:", post_data);
-
-                // if someone is
-                var url = (object_selected != false : matrx_context_menu_other ? matrx_context_menu_self)
+                // if no one or only ourselves are selected, send to matrx_context_menu_self,
+                // otherwise send to matrx_context_menu_other
+                var url = ( (!object_selected || post_data['self_selected']) ? matrx_context_menu_other : matrx_context_menu_self);
 
                 var context_menu_request = $.ajax({
                     method: "POST",
@@ -37,8 +36,6 @@ var matrx_url = 'http://' + window.location.hostname,
                     dataType: 'json'
                 });
 
-                console.log("Response:", context_menu_request);
-
                 // if the request gave an error, print to console and try to reinitialize
                 context_menu_request.fail(function(data) {
                     console.log("Context menu request via API failed, response:", data.responseJSON)
@@ -47,7 +44,7 @@ var matrx_url = 'http://' + window.location.hostname,
 
                 // if the request was succesfull, add the options to the menu and show the menu
                 context_menu_request.done(function(data) {
-                    console.log("Context menu request via API successfull, response:", data)
+                    // console.log("Context menu request via API successfull, response:", data)
 
                     var context_menu = $("#contextMenu");
 

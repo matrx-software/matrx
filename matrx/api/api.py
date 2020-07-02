@@ -390,16 +390,17 @@ def fetch_context_menu_of_self():
     data = request.json
 
     # check that all required parameters have been passed
-    required_params = ("agent_id_who_clicked", "clicked_object_id", "click_location")
+    required_params = ("agent_id_who_clicked", "clicked_object_id", "click_location", "self_selected")
     if not all(k in data for k in required_params):
         return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
 
     agent_id_who_clicked = data['agent_id_who_clicked']
     clicked_object_id = data['clicked_object_id']
     click_location = data['click_location']
+    self_selected = data['self_selected']
 
     # check if agent_id_who_clicked exists in the gw
-    if agent_id_who_clicked not in gw.registered_agents.keys():
+    if agent_id_who_clicked not in gw.registered_agents.keys() and agent_id_who_clicked != "god":
         return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
 
     # ignore if called from the god view
@@ -409,7 +410,8 @@ def fetch_context_menu_of_self():
 
     # fetch context menu from agent
     context_menu = gw.registered_agents[agent_id_who_clicked].create_context_menu_for_self_func(clicked_object_id,
-                                                                                                 click_location)
+                                                                                                 click_location,
+                                                                                                self_selected)
 
     # encode the object instance of the message
     for item in context_menu:
@@ -436,15 +438,15 @@ def fetch_context_menu_of_other():
     click_location = data['click_location']
 
     # check if agent_id_who_clicked exists in the gw
-    if agent_id_who_clicked not in gw.registered_agents.keys():
+    if agent_id_who_clicked not in gw.registered_agents.keys() and agent_id_who_clicked != "god":
         return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
 
     # ignore if called from the god view
-    if agent_id_who_clicked.lower() == "god":
-        return return_error(code=400, message=f"The god view is not an agent and thus cannot show its own context menu.")
+    # if agent_id_who_clicked.lower() == "god":
+    #     return return_error(code=400, message=f"The god view is not an agent and thus cannot show its own context menu.")
 
     # fetch context menu from agent
-    context_menu = gw.registered_agents[agent_id_who_clicked].create_context_menu_for_other_func(agent_id_who_clicked,
+    context_menu = gw.registered_agents[clicked_object_id].create_context_menu_for_other_func(agent_id_who_clicked,
                                                                                                  clicked_object_id,
                                                                                                  click_location)
 

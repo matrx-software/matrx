@@ -19,7 +19,7 @@ function check_arrow_key(e) {
         return
     }
 
-    console.log("Userinput:", e);
+//    console.log("Userinput:", e);
 
     data = [e.key];
 

@@ -59,6 +59,7 @@ html {
     height: 110%;
     left: -5%;
     top: -5%;
+    pointer-events: none;
 }
 
 

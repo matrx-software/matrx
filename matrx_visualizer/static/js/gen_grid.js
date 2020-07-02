@@ -145,14 +145,13 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             // add to grid
             grid.append(obj_element);
 
-            // add a click listener for the selection
-            add_selection_listener(obj_element);
-
-
             // add this agent to the dropdown list
-            if (obj_element.hasOwnProperty('isAgent')) {
+            if (obj.hasOwnProperty('isAgent')) {
                 populate_god_agent_menu = true;
                 pop_new_chat_dropdown = true;
+
+                // add a click listener for the selection
+                add_selection_listener(obj_element);
             }
 
             // we already generated this object in a previous tick
@@ -739,8 +738,6 @@ function add_selection_listener(object) {
         var obj = $(this);
         var obj_id = obj.attr('id');
 
-        console.log(obj_id);
-
         // clicking twice on the same object deselects it
         if (object_selected == obj_id) {
             deselect(obj_id)
@@ -761,8 +758,6 @@ function add_selection_listener(object) {
 function select(obj_id) {
     object_selected = obj_id;
 
-    console.log("Set background image of ", obj_id);
-
     // add selection image
     var selection_img = document.createElement('img');
     selection_img.className = "matrx_object_selected";
@@ -776,8 +771,6 @@ function deselect(obj_id) {
     object_selected = false;
     document.getElementById(obj_id).style.backgroundImage = "none";
 
-    console.log("Removed background image of ", obj_id);
-
     // remove selection image
     $('#' + obj_id).find('.matrx_object_selected').remove()
 }
@@ -788,14 +781,14 @@ function add_context_menu(object) {
         menuSelector: "#contextMenu",
         menuSelected: function(invokedOn, selectedMenu) {
 
-            console.log("Execute API call with message:", selectedMenu[0].mssg)
+            // console.log("Execute API call with message:", selectedMenu[0].mssg)
 
             var matrx_url = 'http://' + window.location.hostname,
                 port = "3001",
                 matrx_send_message_pickled = "send_message_pickled";
 
             post_data = {'sender': lv_agent_id, 'message': selectedMenu[0].mssg}
-            console.log("Sending post data:", post_data);
+            // console.log("Sending post data:", post_data);
 
             var context_menu_request = $.ajax({
                 method: "POST",
@@ -805,7 +798,7 @@ function add_context_menu(object) {
                 dataType: 'json'
             });
 
-            console.log("Response:", context_menu_request);
+            // console.log("Response:", context_menu_request);
 
             // if the request gave an error, print to console and try to reinitialize
             context_menu_request.fail(function(data) {
@@ -814,7 +807,7 @@ function add_context_menu(object) {
 
             // if the request was succesfull, add the options to the menu and show the menu
             context_menu_request.done(function(data) {
-                console.log("Sending context menu input succeeded:", data)
+                // console.log("Sending context menu input succeeded:", data)
             });
 
         }

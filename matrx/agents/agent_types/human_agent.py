@@ -300,7 +300,7 @@ class HumanAgentBrain(AgentBrain):
 
 
 
-    def create_context_menu_for_self(self, clicked_object_id, click_location):
+    def create_context_menu_for_self(self, clicked_object_id, click_location, self_selected):
         """ Generate options for a context menu for a specific object/location which the user controlling this
         human agent opened.
 
@@ -315,6 +315,13 @@ class HumanAgentBrain(AgentBrain):
             A string indicating the ID of an object. Is None if the user clicked on a background tile (which has no ID).
         click_location : list
             A list containing the [x,y] coordinates of the object on which the user right clicked.
+        self_selected : bool
+            Describes if the current human agent being controlled by the user was selected or not before opening the
+            context menu. Depending on this, you might pass back a different context menu in this function.
+            E.g. option 1: no-one selected + right click is the same as self selected + right click: both open the
+            current agent's context menu.
+            option 2: self selected + right click opens our own context menu, no one selected + right click gives a
+            context menu with commands for the entire TEAM.
 
         Returns
         -------
@@ -323,7 +330,7 @@ class HumanAgentBrain(AgentBrain):
             the text shown in the menu for the option, and a 'Message' key, which is the message instance that is sent
             to this agent when the user clicks on the context menu option.
         """
-        print("Context menu self")
+        print("Context menu self with self selected:", self_selected)
 
         context_menu = []
 

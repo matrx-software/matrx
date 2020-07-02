@@ -406,7 +406,7 @@ class AgentBrain:
             the text shown in the menu for the option, and a 'Message' key, which is the message instance that is sent
             to this agent when the user clicks on the context menu option.
         """
-
+        print("Context menu other")
         context_menu = []
 
         # Generate a context menu option for every action
