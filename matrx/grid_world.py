@@ -78,7 +78,6 @@ class GridWorld:
         """
 
         self.__tick_duration = tick_duration  # How long each tick should take (process sleeps until this time passed)
-        self.__simulation_goal = simulation_goal  # The world goal, the simulation end when this/these are reached
         self.__shape = shape  # The width and height of the GridWorld
         self.__visualization_bg_clr = visualization_bg_clr  # The background color of the visualisation
         self.__visualization_bg_img = visualization_bg_img  # The background image of the visualisation
@@ -88,6 +87,14 @@ class GridWorld:
         self.__teams = {}  # dictionary with team names (keys), and agents in those teams (values)
         self.__registered_agents = OrderedDict()  # The dictionary of all existing agents in the GridWorld
         self.__environment_objects = OrderedDict()  # The dictionary of all existing objects in the GridWorld
+
+        # The simulation goal, the simulation ends when this/these are reached.
+        # Copy and reset all simulation goals, this to make sure that this world has its own goals independent of any
+        # other world that potentially received the same simulation goal instance (or list of them)
+        if isinstance(simulation_goal, (tuple, list)):
+            self.__simulation_goal = [sg.reset() for sg in simulation_goal]
+        else:
+            self.__simulation_goal = simulation_goal.reset()
 
         # Get all actions within all currently imported files
         self.__all_actions = _get_all_classes(Action, omit_super_class=True)
@@ -442,45 +449,45 @@ class GridWorld:
         # agents have been updated
         api.next_tick()
 
-    def _register_agent(self, agent, agent_avatar: AgentBody):
+    def _register_agent(self, agent, agent_body: AgentBody):
         """ Register human agents and agents to the gridworld environment """
 
         # Random seed for agent between 1 and 10000000, might need to be adjusted still
         agent_seed = self.__rnd_gen.randint(1, 1000000)
 
         # check if the agent can be succesfully placed at that location
-        self.__validate_obj_placement(agent_avatar)
+        self.__validate_obj_placement(agent_body)
 
         # Add agent to registered agents
-        self.__registered_agents[agent_avatar.obj_id] = agent_avatar
+        self.__registered_agents[agent_body.obj_id] = agent_body
 
         if self.__verbose:
-            print(f"@{os.path.basename(__file__)}: Created agent with id {agent_avatar.obj_id}.")
+            print(f"@{os.path.basename(__file__)}: Created agent with id {agent_body.obj_id}.")
 
         # Get all properties from the agent avatar
-        avatar_props = agent_avatar.properties
+        avatar_props = agent_body.properties
 
-        if agent_avatar.is_human_agent is False:
-            agent._factory_initialise(agent_name=agent_avatar.obj_name,
-                                      agent_id=agent_avatar.obj_id,
-                                      action_set=agent_avatar.action_set,
-                                      sense_capability=agent_avatar.sense_capability,
+        if agent_body.is_human_agent is False:
+            agent._factory_initialise(agent_name=agent_body.obj_name,
+                                      agent_id=agent_body.obj_id,
+                                      action_set=agent_body.action_set,
+                                      sense_capability=agent_body.sense_capability,
                                       agent_properties=avatar_props,
-                                      customizable_properties=agent_avatar.customizable_properties,
+                                      customizable_properties=agent_body.customizable_properties,
                                       callback_is_action_possible=self.__check_action_is_possible,
                                       rnd_seed=agent_seed)
         else:  # if the agent is a human agent, we also assign its user input action map
-            agent._factory_initialise(agent_name=agent_avatar.obj_name,
-                                      agent_id=agent_avatar.obj_id,
-                                      action_set=agent_avatar.action_set,
-                                      sense_capability=agent_avatar.sense_capability,
+            agent._factory_initialise(agent_name=agent_body.obj_name,
+                                      agent_id=agent_body.obj_id,
+                                      action_set=agent_body.action_set,
+                                      sense_capability=agent_body.sense_capability,
                                       agent_properties=avatar_props,
-                                      customizable_properties=agent_avatar.customizable_properties,
+                                      customizable_properties=agent_body.customizable_properties,
                                       callback_is_action_possible=self.__check_action_is_possible,
                                       rnd_seed=agent_seed,
-                                      key_action_map=agent_avatar.properties["key_action_map"])
+                                      key_action_map=agent_body.properties["key_action_map"])
 
-        return agent_avatar.obj_id
+        return agent_body.obj_id
 
     def _register_env_object(self, env_object: EnvObject):
         """ this function adds the objects """
@@ -744,7 +751,7 @@ class GridWorld:
 
         goal_status = {}
         if self.__simulation_goal is not None:
-            if isinstance(self.__simulation_goal, list):
+            if isinstance(self.__simulation_goal, (list, tuple)):  # edited this check to include tuples
                 for sim_goal in self.__simulation_goal:
                     is_done = sim_goal.goal_reached(self)
                     goal_status[sim_goal] = is_done
