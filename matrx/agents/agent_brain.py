@@ -384,7 +384,7 @@ class AgentBrain:
 
     @property
     def memorize_for_ticks(self):
-        return self.__memorize_for_tick
+        return self.__memorize_for_ticks
 
 
     def create_context_menu_for_other(self, agent_id_who_clicked, clicked_object_id, click_location):
@@ -492,7 +492,7 @@ class AgentBrain:
         # if not why not (in the form of an ActionResult).
         self.__callback_is_action_possible = callback_is_action_possible
 
-    def _get_action(self, state, agent_properties, agent_id):
+    def _get_action(self, state_dict, agent_properties, agent_id):
         """ Private MATRX function
 
         The function the environment calls. The environment receives this function object and calls it when it is time
@@ -502,7 +502,7 @@ class AgentBrain:
 
         Parameters
         ----------
-        state: dict
+        state_dict: dict
             A state description containing all properties of EnvObject that are within a certain range as defined by
             self.sense_capability. It is a list of properties in a dictionary
         agent_properties: dict
@@ -527,10 +527,15 @@ class AgentBrain:
         self.agent_properties = agent_properties
 
         # Update the state property of an agent with the GridWorld's state dictionary
-        self.__state.state_update(state)
+        self.__state.state_update(state_dict)
 
         # Call the filter method to filter the observation
         self.__state = self.filter_observations(self.__state)
+        if isinstance(self.__state, dict):
+            raise ValueError(f"The filter_observation function of "
+                             f"{self.agent_id} does not return a State "
+                             f"object, but a dictionary. Please return "
+                             f"self.state.")
 
         # Call the method that decides on an action
         action, action_kwargs = self.decide_on_action(self.__state)
