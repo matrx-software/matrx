@@ -168,6 +168,32 @@ def get_latest_state(agent_ids):
     return get_states_specific_agents(current_tick, agent_ids)
 
 
+@app.route('/get_filtered_latest_state/<agent_ids>', methods=['POST'])
+def get_filtered_latest_state(agent_ids):
+    """
+
+    """
+
+    # check for validity and return an error if not valid
+    api_call_valid, error = check_states_API_request(tick=current_tick)
+    if not api_call_valid:
+        print("api request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
+    # Get the agent states
+    agent_states = __fetch_states(current_tick, agent_ids)[0]
+
+    # Filter the agent states based on the received properties list
+    props = request.json['properties']
+    filters = request.json['filters']
+    filtered_states = {}
+    for agent_id, agent_dict in agent_states.items():
+        state_dict = agent_dict['state']
+        filtered_state_dict = __filter_dict(state_dict, props, filters)
+
+    return jsonify(filtered_states)
+
+
 #########################################################################
 # MATRX fetch messages api calls
 #########################################################################
@@ -784,6 +810,14 @@ def __fetch_states(tick, ids=None):
 
     return filtered_states
 
+
+def __filter_dict(state_dict, props, filters):
+    """ Filters a state dictionary to only a dict that contains props for all
+    objects that adhere to the filters. A filter is a combination of a
+    property and value."""
+
+
+    pass
 
 def create_error_response(code, message):
     """ Creates an error code with a custom message """
