@@ -492,7 +492,7 @@ class AgentBrain:
         # if not why not (in the form of an ActionResult).
         self.__callback_is_action_possible = callback_is_action_possible
 
-    def _get_action(self, state_dict, agent_properties, agent_id):
+    def _get_action(self, state, agent_properties, agent_id):
         """ Private MATRX function
 
         The function the environment calls. The environment receives this function object and calls it when it is time
@@ -527,7 +527,7 @@ class AgentBrain:
         self.agent_properties = agent_properties
 
         # Update the state property of an agent with the GridWorld's state dictionary
-        self.__state.state_update(state_dict)
+        self.__state.state_update(state)
 
         # Call the filter method to filter the observation
         self.__state = self.filter_observations(self.__state)
