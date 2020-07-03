@@ -41,6 +41,9 @@ var saved_prev_objs = {}, // obj containing the IDs of objects and their visuali
     bg_tile_ids = [], // obj_IDS of background tiles
     matrx_tile_ids = []; // obj_IDS of MATRX objects
 
+// track
+var object_selected = false; //
+
 /**
  * Get the grid wrapper object
  */
@@ -96,8 +99,8 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
         obj = state[objID];
 
         // get the location of the object in pixel values
-        var x = obj['location'][0] * tile_size;
-        var y = obj['location'][1] * tile_size;
+        var x = obj['location'][0];
+        var y = obj['location'][1];
 
         // fetch bg img if defined
         var obj_img = null;
@@ -117,7 +120,8 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             "colour": hexToRgba(obj['visualization']['colour'], obj['visualization']['opacity']),
             "opacity": obj['visualization']['opacity'],
             "dimension": tile_size, // width / height of the tile
-            "busy": (show_busy_condition ? obj['is_blocked_by_action'] : false) // show busy if available and requested
+            "busy": (show_busy_condition ? obj['is_blocked_by_action'] : false), // show busy if available and requested
+            "selected": (object_selected == objID ? true : false)
         };
 
         // Check if any subtiles have been defined and include them in the ob_vis_settings if so
@@ -148,9 +152,12 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             grid.append(obj_element);
 
             // add this agent to the dropdown list
-            if (obj_element.hasOwnProperty('isAgent')) {
+            if (obj.hasOwnProperty('isAgent')) {
                 populate_god_agent_menu = true;
                 pop_new_chat_dropdown = true;
+
+                // add a click listener for the selection
+                add_selection_listener(obj_element);
             }
 
             // we already generated this object in a previous tick
@@ -160,7 +167,7 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
 
             // check if the coordinate changed compared to the previous tick, and if so, add css rules
             // for animating the x,y coordinates change
-            if (obj_element.style.left != (x * tile_size) || obj_element.style.top != (y * tile_size)) {
+            if (obj_element.style.left != (x * tile_size) + "px" || obj_element.style.top != (y * tile_size) + "px") {
                 obj_element.style.setProperty("-webkit-transition", "all " + animation_duration_s + "s");
                 obj_element.style.transition = "all " + animation_duration_s + "s";
 
@@ -172,13 +179,8 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             // to (re)style the object
             if (compare_objects(saved_prev_objs[objID], obj_vis_settings)) {
                 style_object = false;
-
-                // repopulate the agent list, when the visualization settings changed of an agent
-                if (obj_element.hasOwnProperty('isAgent')) {
-                    populate_god_agent_menu = true;
-                    pop_new_chat_dropdown = true;
-                }
             }
+
         }
 
         // set the visualization depth of this object
@@ -187,6 +189,13 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
         // if we need to style this object, e.g. because it's new or visualiation settings changed,
         // regenerate the specfic object shape with its settings
         if (style_object || redraw_required) {
+
+            // repopulate the agent list, when the visualization settings changed of an agent
+            if (obj.hasOwnProperty('isAgent')) {
+                populate_god_agent_menu = true;
+                pop_new_chat_dropdown = true;
+            }
+
             set_tile_dimensions(obj_element);
 
             // draw the object with the correct shape, size and colour
@@ -599,6 +608,14 @@ function gen_rectangle(obj_vis_settings, obj_element, element_type = "div") {
         obj_element.append(busy_icon);
     }
 
+    // add selection image if needed
+    if (obj_vis_settings['selected']) {
+        var selection_img = document.createElement('img');
+        selection_img.className = "matrx_object_selected";
+        // set the image source
+        selection_img.setAttribute("src", '/static/images/selected.png');
+        obj_element.append(selection_img);
+    }
 
     return shape;
 }
@@ -680,7 +697,7 @@ function gen_triangle(obj_vis_settings, obj_element) {
     // add the new shape
     obj_element.append(shape);
 
-       // check if we need to show a loading icon
+   // check if we need to show a loading icon
     if (obj_vis_settings['busy']) {
         var busy_icon = document.createElement('img');
         busy_icon.className = "matrx_object_busy";
@@ -693,6 +710,15 @@ function gen_triangle(obj_vis_settings, obj_element) {
         busy_icon.style.right = "0px";
         busy_icon.style.top = "0px";
         obj_element.append(busy_icon);
+    }
+
+    // add selected img if needed
+    if (obj_vis_settings['selected']) {
+        var selection_img = document.createElement('img');
+        selection_img.className = "matrx_object_selected";
+        // set the image source
+        selection_img.setAttribute("src", '/static/images/selected.png');
+        obj_element.append(selection_img);
     }
 
     return shape;
@@ -732,22 +758,9 @@ function gen_image(obj_vis_settings, obj_element) {
     shape.style.background = "transparent";
     shape.style.opacity = obj_vis_settings["opacity"];
 
-    shape.dataset.toggle = "dropdown";
-
     return shape;
 }
 
-// add an event listener for mouse clicks, opening the context menu
-function add_context_menu(object) {
-    $(object).contextMenu({
-        menuSelector: "#contextMenu",
-        menuSelected: function(invokedOn, selectedMenu) {
-            var msg = "You selected the menu item '" + selectedMenu.text() +
-                "' on the value '" + invokedOn.text() + "'";
-            alert(msg);
-        }
-    });
-}
 
 
 /**
@@ -791,6 +804,93 @@ function draw_bg_tiles() {
     }
 }
 
+
+/*********************************************************************
+ * Click listeners
+ ********************************************************************/
+
+// add an event listener for left mouse clicks, that selects an agent
+function add_selection_listener(object) {
+    $(object).click( function() {
+
+        var obj = $(this);
+        var obj_id = obj.attr('id');
+
+        // clicking twice on the same object deselects it
+        if (object_selected == obj_id) {
+            deselect(obj_id)
+
+        // deselect any other selected objects, and select the clicked object
+        } else {
+            if (object_selected != false) {
+                deselect(object_selected);
+            }
+
+            select(obj_id)
+        }
+    })
+
+}
+
+// select an object
+function select(obj_id) {
+    object_selected = obj_id;
+
+    // add selection image
+    var selection_img = document.createElement('img');
+    selection_img.className = "matrx_object_selected";
+    // set the image source
+    selection_img.setAttribute("src", '/static/images/selected.png');
+    $('#' + obj_id).append(selection_img);
+}
+
+// deselect an object
+function deselect(obj_id) {
+    object_selected = false;
+    document.getElementById(obj_id).style.backgroundImage = "none";
+
+    // remove selection image
+    $('#' + obj_id).find('.matrx_object_selected').remove()
+}
+
+// add an event listener for right mouse clicks, opening the context menu
+function add_context_menu(object) {
+    $(object).contextMenu({
+        menuSelector: "#contextMenu",
+        menuSelected: function(invokedOn, selectedMenu) {
+
+            // console.log("Execute API call with message:", selectedMenu[0].mssg)
+
+            var matrx_url = 'http://' + window.location.hostname,
+                port = "3001",
+                matrx_send_message_pickled = "send_message_pickled";
+
+            post_data = {'sender': lv_agent_id, 'message': selectedMenu[0].mssg}
+            // console.log("Sending post data:", post_data);
+
+            var context_menu_request = $.ajax({
+                method: "POST",
+                data: JSON.stringify(post_data),
+                url: matrx_url + ":" + port + "/" + matrx_send_message_pickled,
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json'
+            });
+
+            // console.log("Response:", context_menu_request);
+
+            // if the request gave an error, print to console and try to reinitialize
+            context_menu_request.fail(function(data) {
+                console.log("Sending context menu input failed:", data.responseJSON)
+            });
+
+            // if the request was succesfull, add the options to the menu and show the menu
+            context_menu_request.done(function(data) {
+                // console.log("Sending context menu input succeeded:", data)
+            });
+
+        }
+    });
+}
 
 /*********************************************************************
  * Helper methods
@@ -842,8 +942,10 @@ function compare_objects(o1, o2) {
  * Move an object to a new x, y coordinate using css
  */
 function move_object(obj_element, x, y) {
-    obj_element.style.left = x + "px";
-    obj_element.style.top = y + "px";
+    obj_element.style.left = (x * tile_size) + "px";
+    obj_element.style.top = (y * tile_size) + "px";
+    obj_element.cell_x = x;
+    obj_element.cell_y = y;
 }
 
 /*
