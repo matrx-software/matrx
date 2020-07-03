@@ -13,7 +13,7 @@ and performs that action if so.
     :nosignatures:
     :toctree: _generated_autodoc
 
-    matrxs.actions.action.Action
+    matrx.actions.action.Action
 
 --------------
 Object Actions
@@ -25,11 +25,11 @@ These are all the actions mutating objects in the world.
     :nosignatures:
     :toctree: _generated_autodoc
 
-    matrxs.actions.object_actions.RemoveObject
-    matrxs.actions.object_actions.GrabObject
-    matrxs.actions.object_actions.DropObject
-    matrxs.actions.door_actions.OpenDoorAction
-    matrxs.actions.door_actions.CloseDoorAction
+    matrx.actions.object_actions.RemoveObject
+    matrx.actions.object_actions.GrabObject
+    matrx.actions.object_actions.DropObject
+    matrx.actions.door_actions.OpenDoorAction
+    matrx.actions.door_actions.CloseDoorAction
 
 
 ------------
@@ -42,15 +42,15 @@ These are all the actions for moving the agent from one location to another.
     :nosignatures:
     :toctree: _generated_autodoc
 
-    matrxs.actions.move_actions.Move
-    matrxs.actions.move_actions.MoveNorth
-    matrxs.actions.move_actions.MoveNorthEast
-    matrxs.actions.move_actions.MoveEast
-    matrxs.actions.move_actions.MoveSouthEast
-    matrxs.actions.move_actions.MoveSouth
-    matrxs.actions.move_actions.MoveSouthWest
-    matrxs.actions.move_actions.MoveWest
-    matrxs.actions.move_actions.MoveNorthWest
+    matrx.actions.move_actions.Move
+    matrx.actions.move_actions.MoveNorth
+    matrx.actions.move_actions.MoveNorthEast
+    matrx.actions.move_actions.MoveEast
+    matrx.actions.move_actions.MoveSouthEast
+    matrx.actions.move_actions.MoveSouth
+    matrx.actions.move_actions.MoveSouthWest
+    matrx.actions.move_actions.MoveWest
+    matrx.actions.move_actions.MoveNorthWest
 
 ==============
 Action results
@@ -64,10 +64,10 @@ denoting if an action succeeded or not, and the potential reasons for it.
     :nosignatures:
     :toctree: _generated_autodoc
 
-    matrxs.actions.action.ActionResult
-    matrxs.actions.object_actions.RemoveObjectResult
-    matrxs.actions.object_actions.GrabObjectResult
-    matrxs.actions.object_actions.DropObjectResult
-    matrxs.actions.door_actions.OpenDoorActionResult
-    matrxs.actions.door_actions.CloseDoorActionResult
-    matrxs.actions.move_actions.MoveActionResult
+    matrx.actions.action.ActionResult
+    matrx.actions.object_actions.RemoveObjectResult
+    matrx.actions.object_actions.GrabObjectResult
+    matrx.actions.object_actions.DropObjectResult
+    matrx.actions.door_actions.OpenDoorActionResult
+    matrx.actions.door_actions.CloseDoorActionResult
+    matrx.actions.move_actions.MoveActionResult
