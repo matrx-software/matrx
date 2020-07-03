@@ -292,13 +292,10 @@ class HumanAgentBrain(AgentBrain):
             print("Received message:", message)
             self.received_messages.remove(message)
 
-
         if user_input is None:
             return []
         possible_key_presses = list(self.key_action_map.keys())
         return list(set(possible_key_presses) & set(user_input))
-
-
 
     def create_context_menu_for_self(self, clicked_object_id, click_location, self_selected):
         """ Generate options for a context menu for a specific object/location which the user controlling this
