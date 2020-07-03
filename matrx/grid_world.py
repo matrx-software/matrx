@@ -160,6 +160,7 @@ class GridWorld:
                 api.grid_size = self.shape
                 # point the api towards our message manager, for making messages available via the api
                 api.gw_message_manager = self.message_manager
+                api.gw = self
                 api.teams = self.__teams
 
                 # init api with world info

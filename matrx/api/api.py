@@ -2,6 +2,7 @@ import threading
 import copy
 import logging
 
+import jsonpickle
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
@@ -32,6 +33,7 @@ next_tick_info = {}
 add_message_to_agent = None
 received_messages = {}  # messages received via the api, intended for the Gridworld
 gw_message_manager = None  # the message manager of the gridworld, containing all messages of various types
+gw = None
 teams = None  # dict with team names (keys) and IDs of agents who are in that team (values)
 # currently only one world at a time is supported
 current_world_ID = False
@@ -359,6 +361,13 @@ def send_message():
     # fetch the data
     data = request.json
 
+    # check that all required parameters have been passed
+    required_params = ("content", "sender", "receiver")
+    if not all(k in data for k in required_params):
+        error = {"error_code": 400, "error_message": f"Missing one of the required parameters: {required_params}"}
+        print("api request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
     # create message
     msg = Message(content=data['content'], from_id=data['sender'], to_id=data['receiver'])
 
@@ -369,6 +378,116 @@ def send_message():
 
     return jsonify(True)
 
+
+#########################################################################
+# MATRX context menu API calls
+#########################################################################
+@app.route('/fetch_context_menu_of_self', methods=['POST'])
+def fetch_context_menu_of_self():
+    """ Fetch the context menu opened for a specific object/location of the agent being controlled by the user.
+    """
+    # fetch the data
+    data = request.json
+
+    # check that all required parameters have been passed
+    required_params = ("agent_id_who_clicked", "clicked_object_id", "click_location", "self_selected")
+    if not all(k in data for k in required_params):
+        return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
+
+    agent_id_who_clicked = data['agent_id_who_clicked']
+    clicked_object_id = data['clicked_object_id']
+    click_location = data['click_location']
+    self_selected = data['self_selected']
+
+    # check if agent_id_who_clicked exists in the gw
+    if agent_id_who_clicked not in gw.registered_agents.keys() and agent_id_who_clicked != "god":
+        return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
+
+    # ignore if called from the god view
+    if agent_id_who_clicked.lower() == "god":
+        return return_error(code=400,
+                            message=f"The god view is not an agent and thus cannot show its own context menu.")
+
+    # fetch context menu from agent
+    context_menu = gw.registered_agents[agent_id_who_clicked].create_context_menu_for_self_func(clicked_object_id,
+                                                                                                 click_location,
+                                                                                                self_selected)
+
+    # encode the object instance of the message
+    for item in context_menu:
+        item['Message'] = jsonpickle.encode(item['Message'])
+
+    return jsonify(context_menu)
+
+
+
+@app.route('/fetch_context_menu_of_other', methods=['POST'])
+def fetch_context_menu_of_other():
+    """ Fetch the context menu opened for a specific object/location of the agent being controlled by the user.
+    """
+    # fetch the data
+    data = request.json
+
+    # check that all required parameters have been passed
+    required_params = ("agent_id_who_clicked", "clicked_object_id", "click_location")
+    if not all(k in data for k in required_params):
+        return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
+
+    agent_id_who_clicked = data['agent_id_who_clicked']
+    clicked_object_id = data['clicked_object_id']
+    click_location = data['click_location']
+
+    # check if agent_id_who_clicked exists in the gw
+    if agent_id_who_clicked not in gw.registered_agents.keys() and agent_id_who_clicked != "god":
+        return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
+
+    # ignore if called from the god view
+    # if agent_id_who_clicked.lower() == "god":
+    #     return return_error(code=400, message=f"The god view is not an agent and thus cannot show its own context menu.")
+
+    # fetch context menu from agent
+    context_menu = gw.registered_agents[clicked_object_id].create_context_menu_for_other_func(agent_id_who_clicked,
+                                                                                                 clicked_object_id,
+                                                                                                 click_location)
+
+    # encode the object instance of the message
+    for item in context_menu:
+        item['Message'] = jsonpickle.encode(item['Message'])
+
+    return jsonify(context_menu)
+
+
+
+@app.route('/send_message_pickled', methods=['POST'])
+def send_message_pickled():
+    """ This function makes it possible to send a custom message to a MATRX agent via the API as a jsonpickle object.
+    For instance, sending a custom message when a context menu option is clicked.
+    The pre-formatted CustomMessage instance an be jsonpickled and sent via the API.
+    This API call can handle that request and send the CustomMessage to the MATRX agent
+
+        Returns
+    -------
+        Error if api call invalid, or True if valid.
+    """
+
+    # fetch the data
+    data = request.json
+    print(data)
+
+    # check that all required parameters have been passed
+    required_params = ("sender", "message")
+    if not all(k in data for k in required_params):
+        return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
+
+    sender_id = data['sender']
+    mssg = jsonpickle.decode(data['message'])
+
+    # add the received_messages to the api global variable
+    if sender_id not in received_messages:
+        received_messages[sender_id] = []
+    received_messages[sender_id].append(mssg)
+
+    return jsonify(True)
 
 #########################################################################
 # MATRX control api calls
@@ -471,6 +590,13 @@ def shutdown():
 def bad_request(e):
     print("Throwing error", e)
     return jsonify(error=str(e)), 400
+
+
+def return_error(code, message):
+    """ A helper function that returns a specified error code and message """
+    if debug:
+        print(f"api request not valid: code {code}. Message: {message}.")
+    return abort(code, description=message)
 
 
 #########################################################################
