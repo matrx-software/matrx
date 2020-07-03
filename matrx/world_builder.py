@@ -1114,6 +1114,9 @@ class WorldBuilder:
         customizable_props = settings['customizable_properties']
         mandatory_props = settings['mandatory_properties']
 
+        # This is a function unique to the human agent, so only set it if the agent is a human agent
+        cb_create_context_menu_self = agent.create_context_menu_for_self if mandatory_props['is_human_agent'] else None
+
         args = {**mandatory_props,
                 'isAgent': True,
                 'sense_capability': sense_capability,
@@ -1125,6 +1128,8 @@ class WorldBuilder:
                 'callback_agent_get_messages': agent._get_messages,
                 'callback_agent_set_messages': agent._set_messages,
                 'callback_agent_initialize': agent.initialize,
+                'callback_create_context_menu_for_other': agent.create_context_menu_for_other,
+                'callback_create_context_menu_for_self': cb_create_context_menu_self,
                 'customizable_properties': customizable_props,
                 **custom_props}
 

@@ -1,4 +1,6 @@
 import copy
+import json
+
 import numpy as np
 from matrx.actions import GrabObject, RemoveObject, OpenDoorAction, CloseDoorAction
 from matrx.messages import Message
@@ -369,6 +371,57 @@ class AgentBrain:
 
         return action_result.succeeded, action_result
 
+    @property
+    def state(self):
+        return self.__state
+
+    @property
+    def memorize_for_ticks(self):
+        return self.__memorize_for_ticks
+
+
+    def create_context_menu_for_other(self, agent_id_who_clicked, clicked_object_id, click_location):
+        """ Generate options for a context menu for a specific object/location that a user NOT controlling this
+        human agent opened.
+
+        Thus: another human agent selected this agent, opened a context menu by right clicking on an object or location.
+        This function is called. It should return actions, messages, or other info for what this agent can do relevant
+        to that object / location. E.g. pick it up, move to it, display information on it, etc.
+
+        Example usecase: tasking another agent that is not yourself, e.g. to move to a specific location.
+
+        For the default MATRX visualization, the context menu is opened by right clicking on an object. This function
+        should generate a list of options (actions, messages, or something else) which relate to that object or location.
+        Each option is in the shape of a text shown in the context menu, and a message which is send to this agent if
+        the user actually clicks that context menu option.
+
+        Parameters
+        ----------
+        agent_id_who_clicked : str
+            The ID of the (human) agent that selected this agent and requested for a context menu.
+        clicked_object_id : str
+            A string indicating the ID of an object. Is None if the user clicked on a background tile (which has no ID).
+        click_location : list
+            A list containing the [x,y] coordinates of the object on which the user right clicked.
+
+        Returns
+        -------
+         context_menu : list
+            A list containing context menu items. Each context menu item is a dict with a 'OptionText' key, which is
+            the text shown in the menu for the option, and a 'Message' key, which is the message instance that is sent
+            to this agent when the user clicks on the context menu option.
+        """
+        print("Context menu other")
+        context_menu = []
+
+        # Generate a context menu option for every action
+        for action in self.action_set:
+            context_menu.append({
+                "OptionText": f"Do action: {action}",
+                "Message": Message(content=action, from_id=clicked_object_id, to_id=self.agent_id)
+            })
+        return context_menu
+
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
                             customizable_properties, rnd_seed, callback_is_action_possible):
         """ Private MATRX function.
@@ -446,19 +499,39 @@ class AgentBrain:
 
         Note; This method should NOT be overridden!
 
-        :param state: A state description containing all properties of EnvObject that are within a certain range as
-        defined by self.sense_capability. It is a list of properties in a dictionary
-        :param agent_properties: The properties of the agent, which might have been changed by the
-        environment as a result of actions of this or other agents.
-        :param agent_id: the ID of this agent
-        :return: The filtered state of this agent, the agent properties which the agent might have changed,
-        and an action string, which is the class name of one of the actions in the Action package.
+        Parameters
+        ----------
+        state_dict: dict
+            A state description containing all properties of EnvObject that are within a certain range as defined by
+            self.sense_capability. It is a list of properties in a dictionary
+        agent_properties: dict
+            The properties of the agent, which might have been changed by the environment as a result of actions of
+            this or other agents.
+        agent_id: str
+            the ID of this agent
+
+        Returns
+        -------
+         filtered_state : dict
+            The filtered state of this agent
+        agent_properties : dict
+            the agent properties which the agent might have changed,
+        action : str
+            an action string, which is the class name of one of the actions in the Action package.
+        action_kwargs : dict
+            Keyword arguments for the action
+
         """
         # Process any properties of this agent which were updated in the environment as a result of actions
         self.agent_properties = agent_properties
 
         # Call the filter method to filter the observation
-        filtered_state = self.filter_observations(state)
+        self.__state = self.filter_observations(self.__state)
+        if isinstance(self.__state, dict):
+            raise ValueError(f"The filter_observation function of "
+                             f"{self.agent_id} does not return a State "
+                             f"object, but a dictionary. Please return "
+                             f"self.state.")
 
         # Call the method that decides on an action
         action, action_kwargs = self.decide_on_action(filtered_state)

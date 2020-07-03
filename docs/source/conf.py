@@ -112,3 +112,6 @@ html_static_path = ['tutorials/images', '_static', '../build/html/_static']
 # so a file named "default.css" will overwrite the builtin "default.css".
 def setup(app):
     app.add_stylesheet("css/theme_overrides.css")
+
+
+numpydoc_xref_aliases
