@@ -74,8 +74,9 @@ class EnvObject:
         self.obj_name = name
 
         # Obtain a unique ID based on a global object counter, if not already set as an attribute in a super class
+        # spaces are not allowed
         if not hasattr(self, "obj_id"):
-            self.obj_id = f"{self.obj_name}_{_next_obj_id()}"
+            self.obj_id = f"{self.obj_name}_{_next_obj_id()}".replace(" ", "_")
 
         # Make customizable_properties mutable if not given.
         if customizable_properties is None:
@@ -172,19 +173,19 @@ class EnvObject:
             elif property_name == "class_inheritance":
                 assert isinstance(property_value, list)
                 self.class_inheritance = property_value
-            elif property_name == "visualize_size":
+            elif property_name == "visualize_size" or property_name == "visualization_size":
                 assert isinstance(property_value, int)
                 self.visualize_size = property_value
-            elif property_name == "visualize_colour":
+            elif property_name == "visualize_colour" or property_name == "visualization_colour":
                 assert isinstance(property_value, str)
                 self.visualize_colour = property_value
-            elif property_name == "visualize_opacity":
+            elif property_name == "visualize_opacity" or property_name == "visualization_opacity":
                 assert isinstance(property_value, float)
                 self.visualize_opacity = property_value
-            elif property_name == "visualize_shape":
+            elif property_name == "visualize_shape" or property_name == "visualization_shape":
                 assert isinstance(property_value, int)
                 self.visualize_shape = property_value
-            elif property_name == "visualize_depth":
+            elif property_name == "visualize_depth" or property_name == "visualization_depth":
                 assert isinstance(property_value, int)
                 self.visualize_depth = property_value
             elif property_name == "is_movable":

@@ -18,6 +18,18 @@ class Message:
     """
 
     def __init__(self, content, from_id, to_id=None):
+        """ Creates a message
+
+        Parameters
+        ----------
+        content : anything
+           Denotes the content of the message, can be anything: a string, dict, custom object, etc. As long
+           as it is JSON serializable.
+        from_id : str
+           The ID who sent this message.
+        to_id : str or list (optional, default, None)
+           The ID to who to sent this message. If None, the message will be sent to all agents excluding the sender.
+        """
         self.content = content  # content can be anything; a string, a dictionary, or even a custom object
         self.from_id = from_id  # the agent id who creates this message
         self.to_id = to_id  # the agent id who is the sender, when None it means all agents, including the sender
@@ -27,6 +39,19 @@ class Message:
         """ Make this class JSON serializable, such that it can be sent as JSON via the api """
         return json.dumps(self, default=lambda o: o.__dict__,
                           sort_keys=True, indent=4)
+
+    def regen_id(self):
+        """ Regenerates the message ID.
+        When someone copies this message, by default the message_id is not changed. To avoid duplicate mssg IDs, this
+        message can be called to change the regen the ID of a message.
+
+        Examples
+        ---------
+        >>> print(mssg.message_id) # output: 242523098cb176b4
+        >>> mssg.regen_id()
+        >>> print(mssg.message_id) # output: 484de0a68fed7579
+        """
+        self.message_id = self.__gen_random_string()
 
     @staticmethod
     def __gen_random_string(length=32):

@@ -8,9 +8,9 @@ class AgentBody(EnvObject):
     def __init__(self, location, possible_actions, sense_capability, class_callable,
                  callback_agent_get_action, callback_agent_set_action_result, callback_agent_observe,
                  callback_agent_get_messages, callback_agent_set_messages, callback_agent_initialize,
-                 callback_agent_log,
+                 callback_agent_log, callback_create_context_menu_for_other, callback_create_context_menu_for_self,
                  visualize_size, visualize_shape, visualize_colour, visualize_depth, visualize_opacity,
-                 is_traversable, team, name, is_movable,
+                 visualize_when_busy, is_traversable, team, name, is_movable,
                  is_human_agent, customizable_properties,
                  **custom_properties):
         """
@@ -53,6 +53,14 @@ class AgentBody(EnvObject):
         :param callback_agent_set_messages: A callback function that allows the GridWorld to set any message send by
         some agent to a list of received messages in an agent.
 
+        :param callback_create_context_menu_for_other: A callback function that allows the gridworld or API to call the
+        subsequent agent function that generates the menu options of an agent for a context menu opened by a user not
+        controlling that specific agent.
+        :param callback_create_context_menu_for_self: A callback function that allows the gridworld or API to call the
+        subsequent agent function that generates the menu options for a context menu opened by the user controlling
+        the current human agent. If this is not a human agent, it is set to None.
+
+
         :param name: String Defaults to "Agent". The name of the agent, does not need to be unique.
         :param is_human_agent: Boolean. Defaults to False. Boolean to signal that the agent represented by this Agent's
         body is a human controlled agent.
@@ -76,6 +84,7 @@ class AgentBody(EnvObject):
         :param visualize_depth: Integer. Optional, default obtained from defaults.py. A visualization property that
         is used by the Visualizer to draw objects in layers.
         :param visualize_opacity: Integer. Opacity of object. Between 0.0 and 1.0.
+        :param visualize_when_busy: Boolean. Whether to show a loading icon when the agent is busy (performing an action).
         :param **custom_properties: Optional. Any other keyword arguments. All these are treated as custom attributes.
         For example the property 'heat'=2.4 of an EnvObject representing a fire.
         """
@@ -96,6 +105,8 @@ class AgentBody(EnvObject):
         self.set_messages_func = callback_agent_set_messages
         self.get_log_data = callback_agent_log
         self.brain_initialize_func = callback_agent_initialize
+        self.create_context_menu_for_other_func = callback_create_context_menu_for_other
+        self.create_context_menu_for_self_func = callback_create_context_menu_for_self
 
         # Set all mandatory properties
         self.is_traversable = is_traversable
@@ -109,6 +120,7 @@ class AgentBody(EnvObject):
         self.visualize_shape = visualize_shape
         self.visualize_size = visualize_size
         self.visualize_opacity = visualize_opacity
+        self.visualize_when_busy = visualize_when_busy
 
         # Parse the action_set property if set to the wildcard "*" denoting all actions
         if self.action_set == "*":
@@ -244,6 +256,9 @@ class AgentBody(EnvObject):
             elif property_name == "visualize_opacity":
                 assert isinstance(property_value, int)
                 self.visualize_opacity = property_value
+            elif property_name == "visualize_when_busy":
+                assert isinstance(property_value, bool)
+                self.visualize_when_busy = property_value
             elif property_name == "visualize_shape":
                 assert isinstance(property_value, int)
                 self.visualize_shape = property_value
@@ -339,7 +354,8 @@ class AgentBody(EnvObject):
             "shape": self.visualize_shape,
             "colour": self.visualize_colour,
             "depth": self.visualize_depth,
-            "opacity": self.visualize_opacity
+            "opacity": self.visualize_opacity,
+            "show_busy": self.visualize_when_busy
         }
 
         # Add the current action and all of its data

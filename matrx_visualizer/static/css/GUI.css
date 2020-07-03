@@ -51,6 +51,19 @@ html {
 }
 
 
+/* Selection styling */
+.matrx_object_selected {
+    width: 110%;
+    z-index: 999;
+    position: absolute;
+    height: 110%;
+    left: -5%;
+    top: -5%;
+    pointer-events: none;
+}
+
+
+
 /* Chat styling */
 .new_chat_option {
     cursor: pointer;
@@ -126,8 +139,6 @@ html {
 #messages {
     overflow-y: auto;
     max-height: 50vh;
-    display: flex;
-    flex-direction: column-reverse;
 }
 
 .message_you {
@@ -205,4 +216,8 @@ h5 {
 
 .chat-mssg-sender {
     font-weight: bold;
+}
+
+.matrx_object_busy {
+    position: absolute;
 }

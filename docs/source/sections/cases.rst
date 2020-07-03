@@ -9,5 +9,7 @@ Scenarios
 .. autosummary::
    :toctree: _generated_autodoc
 
-    matrx.scenarios.simple_scenario
-    matrx.scenarios.test_scenario
+    matrx.cases.simple_case
+    matrx.cases.test_case
+    matrx.cases.vis_test
+
