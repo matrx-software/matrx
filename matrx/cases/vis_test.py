@@ -50,6 +50,16 @@ def create_builder():
     factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
                             key_action_map=key_action_map, img_name="/static/images/agent.gif", visualize_when_busy=True)
 
-    factory.add_object([6,7], "block")
+    # add a number of blocks to showcase the subtile functionality
+    factory.add_object([6,7], "block", subtiles=[3,3], subtile_loc=[0,0], is_traversable=True, visualize_colour="#c0392b", visualize_shape=2)
+    factory.add_object([6,7], "block", subtiles=[3,3], subtile_loc=[0,1], is_traversable=True, visualize_colour="#9b59b6", visualize_shape=1)
+    factory.add_object([6,7], "block", subtiles=[3,3], subtile_loc=[0,2], is_traversable=True, visualize_colour="#2980b9", visualize_shape=0)
+    factory.add_object([6,7], "block", subtiles=[3,3], subtile_loc=[1,0], is_traversable=True, visualize_colour="#1abc9c", visualize_shape=2, visualize_size=0.75)
+    factory.add_object([6,7], "block", subtiles=[3,3], subtile_loc=[1,1], is_traversable=True, img_name="/static/images/fire.gif")
+    factory.add_object([6,7], "block", subtiles=[3,3], subtile_loc=[1,2], is_traversable=True, visualize_colour="#27ae60", visualize_shape=0)
+    factory.add_object([6,7], "block", subtiles=[3,3], subtile_loc=[2,0], is_traversable=True, visualize_colour="#f1c40f", visualize_shape=2, visualize_size=0.5)
+    factory.add_object([6,7], "block", subtiles=[3,3], subtile_loc=[2,1], is_traversable=True, visualize_colour="#e67e22", visualize_shape=1)
+    factory.add_object([6,7], "block", subtiles=[3,3], subtile_loc=[2,2], is_traversable=True, visualize_colour="#2e4053", visualize_shape=0)
+
 
     return factory

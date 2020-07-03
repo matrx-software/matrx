@@ -120,6 +120,12 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             "busy": (show_busy_condition ? obj['is_blocked_by_action'] : false) // show busy if available and requested
         };
 
+        // Check if any subtiles have been defined and include them in the ob_vis_settings if so
+        if (Object.keys(obj).includes('subtiles') && Object.keys(obj).includes('subtile_loc')) {
+            obj_vis_settings['subtiles'] = obj["subtiles"];
+            obj_vis_settings['subtile_loc'] = obj["subtile_loc"];
+        }
+
         var obj_element = null; // the html element of this object
         var animate_movement = false; // whether any x,y position changes should be animated
         var object_is_new = false; // whether this is a new object, not present in the html yet
@@ -522,13 +528,47 @@ function gen_rectangle(obj_vis_settings, obj_element, element_type = "div") {
     var shape = document.createElement(element_type);
     shape.className = "shape";
 
-    // coords of top left corner, such that it is centered in our tile
-    shape.style.left = ((1 - size) * 0.5 * tile_size) + "px";
-    shape.style.top = ((1 - size) * 0.5 * tile_size) + "px";
+    // use subtiles if they are defined and their location is valid
+    if("subtiles" in obj_vis_settings
+            && "subtile_loc" in obj_vis_settings
+            && obj_vis_settings['subtile_loc'][0] >= 0
+            && obj_vis_settings['subtile_loc'][0] < obj_vis_settings['subtiles'][0]
+            && obj_vis_settings['subtile_loc'][1] >= 0
+            && obj_vis_settings['subtile_loc'][1] < obj_vis_settings['subtiles'][1]) {
 
-    // width and height of rectangle
-    shape.style.width = size * tile_size + "px";
-    shape.style.height = size * tile_size + "px";
+        // get width and height of subtile
+        tileW = tile_size * (1.0 / obj_vis_settings["subtiles"][0]);
+        tileH = tile_size * (1.0 / obj_vis_settings["subtiles"][1]);
+        var subtile_tile_sizes = [tileW, tileH];
+
+        // calc the offset of the subtile within the parent tile
+        var x_offset = tileW * (obj_vis_settings["subtile_loc"][0]);
+        var y_offset = tileH * (obj_vis_settings["subtile_loc"][1]);
+        var subtile_offsets = [x_offset, y_offset];
+
+        // offset of the topleft parent tile to the subtile + offset of the object within that subtile
+        shape.style.left = subtile_offsets[0] + ((1 - size) * 0.5 * subtile_tile_sizes[0]) + "px";
+        shape.style.top = subtile_offsets[1] + ((1 - size) * 0.5 * subtile_tile_sizes[1]) + "px";
+
+        // width and height of rectangle
+        shape.style.width = size * subtile_tile_sizes[0] + "px";
+        shape.style.height = size * subtile_tile_sizes[1] + "px";
+
+    // subtitle are defined but the subtile_loc is not valid, give a warning in the terminal
+    } else if ("subtiles" in obj_vis_settings && "subtile_loc" in obj_vis_settings) {
+        console.log("Object with subtiles", obj_vis_settings['subtiles'], ' has subtile_loc',
+                obj_vis_settings['subtile_loc'] , ' that is out of range. Drawing without subtile.');
+
+    // no subtiles defined, place the rectangle in the usual manner
+    } else {
+        // coords of top left corner, such that it is centered in our tile
+        shape.style.left = ((1 - size) * 0.5 * tile_size) + "px";
+        shape.style.top = ((1 - size) * 0.5 * tile_size) + "px";
+
+        // width and height of rectangle
+        shape.style.width = size * tile_size + "px";
+        shape.style.height = size * tile_size + "px";
+    }
 
     // styling
     shape.style.background = obj_vis_settings['colour'];
@@ -577,19 +617,57 @@ function gen_triangle(obj_vis_settings, obj_element) {
     var shape = document.createElement('div');
     shape.className = "shape";
 
-    // coords of top left corner, such that it is centerd in our tile
-    shape.style.left = ((1 - size) * 0.5 * tile_size) + "px";
-    shape.style.top = ((1 - size) * 0.5 * tile_size) + "px";
-
     // for a triangle, we set the content width/height to 0
     shape.style.width = 0;
     shape.style.height = 0;
 
-    // instead we use borders to create the triangle, it is basically the bottom border with
-    // the left and right side cut off diagonally by transparent borders on the side
-    shape.style.borderBottom = (size * tile_size) + "px solid " + obj_vis_settings['colour'];
-    shape.style.borderLeft = (size * tile_size / 2) + "px solid transparent";
-    shape.style.borderRight = (size * tile_size / 2) + "px solid transparent";
+    // use subtiles if they are defined and their location is valid
+    if("subtiles" in obj_vis_settings
+            && "subtile_loc" in obj_vis_settings
+            && obj_vis_settings['subtile_loc'][0] >= 0
+            && obj_vis_settings['subtile_loc'][0] < obj_vis_settings['subtiles'][0]
+            && obj_vis_settings['subtile_loc'][1] >= 0
+            && obj_vis_settings['subtile_loc'][1] < obj_vis_settings['subtiles'][1]) {
+
+        // get width and height of subtile
+        tileW = tile_size * (1.0 / obj_vis_settings["subtiles"][0]);
+        tileH = tile_size * (1.0 / obj_vis_settings["subtiles"][1]);
+        var subtile_tile_sizes = [tileW, tileH];
+
+        // calc the offset of the subtile within the parent tile
+        var x_offset = tileW * (obj_vis_settings["subtile_loc"][0]);
+        var y_offset = tileH * (obj_vis_settings["subtile_loc"][1]);
+        var subtile_offsets = [x_offset, y_offset];
+
+        // offset of the topleft parent tile to the subtile + offset of the object within that subtile
+        shape.style.left = subtile_offsets[0] + ((1 - size) * 0.5 * subtile_tile_sizes[0]) + "px";
+        shape.style.top = subtile_offsets[1] + ((1 - size) * 0.5 * subtile_tile_sizes[1]) + "px";
+
+        // We use borders to create the triangle, it is basically the bottom border with
+        // the left and right side cut off diagonally by transparent borders on the side
+        shape.style.borderBottom = (size * subtile_tile_sizes[0]) + "px solid " + obj_vis_settings['colour'];
+        shape.style.borderLeft = (size * subtile_tile_sizes[1] / 2) + "px solid transparent";
+        shape.style.borderRight = (size * subtile_tile_sizes[1] / 2) + "px solid transparent";
+
+
+    // subtitle are defined but the subtile_loc is not valid, give a warning in the terminal
+    } else if ("subtiles" in obj_vis_settings && "subtile_loc" in obj_vis_settings) {
+        console.log("Object with subtiles", obj_vis_settings['subtiles'], ' has subtile_loc',
+                obj_vis_settings['subtile_loc'] , ' that is out of range. Drawing without subtile.');
+
+    // no subtiles defined, place the triangle in the usual manner
+     } else {
+
+        // coords of top left corner, such that it is centered in our tile
+        shape.style.left = ((1 - size) * 0.5 * tile_size) + "px";
+        shape.style.top = ((1 - size) * 0.5 * tile_size) + "px";
+
+        // instead we use borders to create the triangle, it is basically the bottom border with
+        // the left and right side cut off diagonally by transparent borders on the side
+        shape.style.borderBottom = (size * tile_size) + "px solid " + obj_vis_settings['colour'];
+        shape.style.borderLeft = (size * tile_size / 2) + "px solid transparent";
+        shape.style.borderRight = (size * tile_size / 2) + "px solid transparent";
+    }
 
     // remove any old shapes
     while (obj_element.firstChild) {
