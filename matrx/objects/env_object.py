@@ -172,19 +172,19 @@ class EnvObject:
             elif property_name == "class_inheritance":
                 assert isinstance(property_value, list)
                 self.class_inheritance = property_value
-            elif property_name == "visualize_size" or property_name == "visualization_size":
+            elif property_name == "visualize_size":
                 assert isinstance(property_value, int)
                 self.visualize_size = property_value
-            elif property_name == "visualize_colour" or property_name == "visualization_colour":
+            elif property_name == "visualize_colour":
                 assert isinstance(property_value, str)
                 self.visualize_colour = property_value
-            elif property_name == "visualize_opacity" or property_name == "visualization_opacity":
+            elif property_name == "visualize_opacity":
                 assert isinstance(property_value, float)
                 self.visualize_opacity = property_value
-            elif property_name == "visualize_shape" or property_name == "visualization_shape":
+            elif property_name == "visualize_shape":
                 assert isinstance(property_value, int)
                 self.visualize_shape = property_value
-            elif property_name == "visualize_depth" or property_name == "visualization_depth":
+            elif property_name == "visualize_depth":
                 assert isinstance(property_value, int)
                 self.visualize_depth = property_value
             elif property_name == "is_movable":

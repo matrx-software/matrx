@@ -9,9 +9,7 @@ below ensure such worlds can be built.
 
 
 .. autosummary::
-    :nosignatures:
-    :toctree: _generated_autodoc
+   :toctree: _generated_autodoc
 
     matrx.world_builder.WorldBuilder
     matrx.grid_world.GridWorld
-

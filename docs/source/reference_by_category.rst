@@ -12,87 +12,78 @@ Reference by category
 
    sections/worlds.rst
    sections/actions.rst
-   sections/agents.rst
+   sections/brains.rst
    sections/objects.rst
    sections/simgoals.rst
    sections/api.rst
-   sections/cases.rst
-   sections/logging.rst
-   sections/messages.rst
+   sections/scenarios.rst
+   sections/utils.rst
 
 
 .. container:: tocdescr
 
- .. container:: descr
+  .. container:: descr
 
-    .. figure:: _static//images/worlds_banner.jpg
-       :target: sections/worlds.html
+     .. figure:: _static/images/worlds_banner.jpg
+        :target: sections/worlds.html
 
-    :ref:`Worlds`
-       Learn MATRX' way of creating worlds.
+     :ref:`Worlds`
+        Learn MATRX' way of creating worlds.
 
- .. container:: descr
+  .. container:: descr
 
-    .. figure:: _static/images/brains_banner.jpg
-       :target: sections/agents.html
+     .. figure:: _static/images/brains_banner.jpg
+        :target: sections/agents.html
 
-    :ref:`Agents`
-      Check this section for a piece of the agents' minds.
+     :ref:`Agents`
+       Check this section for a piece of the agents' minds.
 
- .. container:: descr
+  .. container:: descr
 
-    .. figure:: _static/images/shape_banner.jpg
-       :target: sections/objects.html
+     .. figure:: _static/images/shape_banner.jpg
+        :target: sections/objects.html
 
-    :ref:`Objects`
-       Make the world more worldlike by placing objects in it.
+     :ref:`Object placement`
+        Make the world more worldlike by placing objects in it.
 
- .. container:: descr
+  .. container:: descr
 
-    .. figure:: _static/images/action_banner.jpg
-       :target: sections/actions.html
+     .. figure:: _static/images/action_banner.jpg
+        :target: sections/actions.html
 
-    :ref:`Actions`
-       Agents can perform actions.
+     :ref:`Actions`
+        Agents can perform actions.
 
- .. container:: descr
+  .. container:: descr
 
-    .. figure:: _static/images/goal_banner.jpg
-       :target: sections/simgoals.html
+     .. figure:: _static/images/goal_banner.jpg
+        :target: sections/simgoals.html
 
-    :ref:`Goals`
-       Goals can be specified that track progress and determine when the simulation should end.
-
-
- .. container:: descr
-
-    .. figure:: _static/images/shape_banner.jpg
-       :target: sections/cases.html
-
-    :ref:`Cases`
-       Defining a world containing objects, agents, actions, and simulation goals.
+     :ref:`Simulation goals`
+        A certain goal is set for the simulation to end.
 
 
- .. container:: descr
+  .. container:: descr
 
-    .. figure:: _static/images/utils_banner.jpg
-       :target: sections/api.html
+     .. figure:: _static/images/shape_banner.jpg
+        :target: sections/scenarios.html
 
-    :ref:`API`
-       Connecting MATRX to other software, such as GUIs or frameworks.
+     :ref:`Scenarios`
+        Defining a world containing objects, agents, actions, and simulation goals.
 
- .. container:: descr
 
-    .. figure:: _static/images/action_banner.jpg
-       :target: sections/messages.html
+  .. container:: descr
 
-    :ref:`Messages`
-       Communication between agents via messages.
+     .. figure:: _static/images/utils_banner.jpg
+        :target: sections/api.html
 
- .. container:: descr
+     :ref:`API`
+        Connecting MATRX to other software, such as GUIs or frameworks.
 
-    .. figure:: _static/images/utils_banner.jpg
-       :target: sections/logging.html
+  .. container:: descr
 
-    :ref:`Logging`
-       Logging of results during an simulation.
+     .. figure:: _static/images/utils_banner.jpg
+        :target: sections/utils.html
+
+     :ref:`Utils`
+        Useful functions.

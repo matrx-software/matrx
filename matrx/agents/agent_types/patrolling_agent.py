@@ -5,7 +5,7 @@ from matrx.agents.agent_utils.state_tracker import StateTracker
 
 class PatrollingAgentBrain(AgentBrain):
 
-    def __init__(self, waypoints, move_speed=0):
+    def __init__(self, waypoints, move_speed=1):
         super().__init__()
         self.state_tracker = None
         self.navigator = None

@@ -32,8 +32,7 @@ var firstDraw = true,
     animation_duration_s = null, // is calculated based on animation_duration_perc and tps.
     populate_god_agent_menu = null, // keep track of any new agents
     pop_new_chat_dropdown = null,
-    latest_tick_processed = null,
-    redraw_required = false; // for instance when the window has been resized
+    latest_tick_processed = null;
 
 // tracked HTML objects
 var saved_prev_objs = {}, // obj containing the IDs of objects and their visualization settings of the previous tick
@@ -71,7 +70,7 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
     parse_world_settings(world_settings);
 
     // if we already processed this tick (MATRX is paused), stop and return
-    if (latest_tick_processed == current_tick && !redraw_required) {
+    if (latest_tick_processed == current_tick) {
         return;
     }
 
@@ -105,10 +104,6 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             obj_img = fix_img_url(obj['img_name']);
         }
 
-        var show_busy_condition =  (obj.hasOwnProperty("is_blocked_by_action") &&
-                                    obj['visualization'].hasOwnProperty('show_busy') &&
-                                    obj['visualization']['show_busy']);
-
         // save visualization settings for this object
         var obj_vis_settings = {
             "img": obj_img,
@@ -116,8 +111,7 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             "size": obj['visualization']['size'], // percentage how much of tile is filled
             "colour": hexToRgba(obj['visualization']['colour'], obj['visualization']['opacity']),
             "opacity": obj['visualization']['opacity'],
-            "dimension": tile_size, // width / height of the tile
-            "busy": (show_busy_condition ? obj['is_blocked_by_action'] : false) // show busy if available and requested
+            "dimension": tile_size // width / height of the tile
         };
 
         var obj_element = null; // the html element of this object
@@ -177,10 +171,11 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
 
         // set the visualization depth of this object
         obj_element.style.zIndex = obj['visualization']['depth'];
+//        obj_element.style.zIndex = 0;
 
         // if we need to style this object, e.g. because it's new or visualiation settings changed,
         // regenerate the specfic object shape with its settings
-        if (style_object || redraw_required) {
+        if (style_object) {
             set_tile_dimensions(obj_element);
 
             // draw the object with the correct shape, size and colour
@@ -203,9 +198,6 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             return e !== objID
         })
     });
-
-    // all objects have been redrawn, so this can be set to false again
-    redraw_required = false;
 
     // any objects present in the previous tick but not present in the current
     // tick should be removed
@@ -250,9 +242,6 @@ function fix_grid_size() {
         // resize the grid to exactly encompass all tiles
         grid.style.width = tile_size * grid_size[0] + "px";
         grid.style.height = tile_size * grid_size[1] + "px";
-
-        // next time redraw all objects
-        redraw_required = true;
     }
 
     console.log("Fixed tile and grid size");
@@ -346,11 +335,7 @@ function parse_world_settings(world_settings) {
  */
 function parse_vis_settings(vis_settings) {
     bg_colour = vis_settings['vis_bg_clr'];
-
-    bg_image = null;
-    if (Object.keys(vis_settings).includes('vis_bg_img') && vis_settings['vis_bg_img'] != null) {
-        bg_image = fix_img_url(vis_settings['vis_bg_img']);
-    }
+    bg_image = fix_img_url(vis_settings['vis_bg_img']);
 
     // update background colour / image if needed
     draw_bg();
@@ -522,9 +507,9 @@ function gen_rectangle(obj_vis_settings, obj_element, element_type = "div") {
     var shape = document.createElement(element_type);
     shape.className = "shape";
 
-    // coords of top left corner, such that it is centered in our tile
-    shape.style.left = ((1 - size) * 0.5 * tile_size) + "px";
-    shape.style.top = ((1 - size) * 0.5 * tile_size) + "px";
+    // coords of top left corner, such that it is centerd in our tile
+    shape.style.left = ((1 - size) * 0.5 * tile_size);
+    shape.style.top = ((1 - size) * 0.5 * tile_size);
 
     // width and height of rectangle
     shape.style.width = size * tile_size + "px";
@@ -539,27 +524,12 @@ function gen_rectangle(obj_vis_settings, obj_element, element_type = "div") {
     }
 
     // add a click listener for the context menu
-    add_context_menu(shape);
+    if (lv_agent_type != "agent") {
+        add_context_menu(shape);
+    }
 
     // add the new shape
     obj_element.append(shape);
-
-    // check if we need to show a loading icon
-    if (obj_vis_settings['busy']) {
-        var busy_icon = document.createElement('img');
-        busy_icon.className = "matrx_object_busy";
-        // set the image source
-        busy_icon.setAttribute("src", '/static/images/busy_black_small.gif');
-        // small loading icon
-        busy_icon.style.width = 0.35 * tile_size + "px";
-        busy_icon.style.height = 0.35 * tile_size + "px";
-        // position in the top left corner
-        busy_icon.style.right = "0px";
-        busy_icon.style.top = "0px";
-        obj_element.append(busy_icon);
-    }
-
-
     return shape;
 }
 
@@ -578,8 +548,8 @@ function gen_triangle(obj_vis_settings, obj_element) {
     shape.className = "shape";
 
     // coords of top left corner, such that it is centerd in our tile
-    shape.style.left = ((1 - size) * 0.5 * tile_size) + "px";
-    shape.style.top = ((1 - size) * 0.5 * tile_size) + "px";
+    shape.style.left = ((1 - size) * 0.5 * tile_size);
+    shape.style.top = ((1 - size) * 0.5 * tile_size);
 
     // for a triangle, we set the content width/height to 0
     shape.style.width = 0;
@@ -597,26 +567,12 @@ function gen_triangle(obj_vis_settings, obj_element) {
     }
 
     // add a click listener for the context menu
-    add_context_menu(shape);
+    if (lv_agent_type != "agent") {
+        add_context_menu(shape);
+    }
 
     // add the new shape
     obj_element.append(shape);
-
-       // check if we need to show a loading icon
-    if (obj_vis_settings['busy']) {
-        var busy_icon = document.createElement('img');
-        busy_icon.className = "matrx_object_busy";
-        // set the image source
-        busy_icon.setAttribute("src", '/static/images/busy_black_small.gif');
-        // small loading icon
-        busy_icon.style.width = 0.35 * tile_size + "px";
-        busy_icon.style.height = 0.35 * tile_size + "px";
-        // position in the top left corner
-        busy_icon.style.right = "0px";
-        busy_icon.style.top = "0px";
-        obj_element.append(busy_icon);
-    }
-
     return shape;
 }
 
@@ -700,9 +656,6 @@ function draw_bg_tiles() {
             var pos_x = x * tile_size;
             var pos_y = y * tile_size;
             tile.style = "left:" + pos_x + "px; top:" + pos_y + "px; width: " + tile_size + "px; height: " + tile_size + "px; z-index: 0;";
-
-            // add context menu
-            add_context_menu(tile);
 
             // add to grid
             grid.append(tile);

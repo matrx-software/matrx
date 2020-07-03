@@ -1,5 +1,3 @@
-import os
-
 from matrx.agents.agent_types.human_agent import HumanAgentBrain
 from matrx.agents.agent_types.patrolling_agent import PatrollingAgentBrain
 from matrx.logger.log_agent_actions import LogActions
@@ -8,9 +6,7 @@ from matrx.actions.move_actions import *
 
 
 def create_builder():
-    tick_dur = 0.01
-    factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=tick_dur, verbose=False,
-                           simulation_goal=int(300/tick_dur),
+    factory = WorldBuilder(random_seed=1, shape=[15, 6], tick_duration=0.1, verbose=False, simulation_goal=500,
                            run_matrx_api=True, run_matrx_visualizer=True, visualization_bg_clr="#000000",
                            visualization_bg_img="/static/images/soesterberg_luchtfoto.jpg")
 
@@ -53,18 +49,3 @@ def create_builder():
 
     factory.add_smoke_area([0, 0], width=15, height=6, name="smoke", smoke_thickness_multiplier=0.5)
     return factory
-
-
-def run_test(nr_of_worlds=1):
-    builder = create_builder()
-
-    # startup world-overarching MATRX scripts, such as the api and/or visualizer if requested
-    media_folder = os.path.dirname(os.path.realpath(__file__)) # set our path for media files to our current folder
-    builder.startup(media_folder=media_folder)
-
-    # run each world
-    for world in builder.worlds(nr_of_worlds=nr_of_worlds):
-        world.run(builder.api_info)
-
-    # stop MATRX scripts such as the api and visualizer (if used)
-    builder.stop()

@@ -88,7 +88,7 @@ def _possible_movement(grid_world, agent_id, dx, dy):
     MoveActionResult
         Whether the MoveAction is expected to be possible.
         Can return the following results (see also
-        :class:`matrx.actions.move_actions.MoveActionResult`):
+        :class:`matrxs.actions.move_actions.MoveActionResult`):
 
         * The ActionResult depicting the action's success or failure and reason
           for that result.
@@ -166,10 +166,10 @@ class MoveActionResult(ActionResult):
     ----------
     result : str
         A string representing the reason for a (expected) success
-        or fail of a :class:`matrx.actions.move_actions.Move`.
+        or fail of a :class:`matrxs.actions.move_actions.Move`.
     succeeded : bool
         A boolean representing the (expected) success or fail of a
-        :class:`matrx.actions.move_actions.Move`.
+        :class:`matrxs.actions.move_actions.Move`.
 
     See Also
     --------
@@ -207,7 +207,7 @@ class Move(Action):
         Optional. Default: ``1``. Should be zero or larger.
 
         The default duration of Move in ticks during which the
-        :class:`matrx.grid_world.GridWorld` blocks the agent performing other
+        :class:`matrxs.grid_world.GridWorld` blocks the agent performing other
         actions. By default this is 1, meaning that all Move actions will take
         both the tick in which it was decided upon and the subsequent tick.
 
@@ -231,7 +231,7 @@ class Move(Action):
 
     """
 
-    def __init__(self, duration_in_ticks=0):
+    def __init__(self, duration_in_ticks=1):
         super().__init__(duration_in_ticks)
         self.dx = 0
         self.dy = 0
@@ -249,7 +249,7 @@ class Move(Action):
         Parameters
         ----------
         grid_world : GridWorld
-            The :class:`matrx.grid_world.GridWorld` instance in which the
+            The :class:`matrxs.grid_world.GridWorld` instance in which the
             agent resides whose location should be updated.
         agent_id : str
             The unique identifier for the agent whose location should be
@@ -262,7 +262,7 @@ class Move(Action):
         MoveActionResult
             Whether the MoveAction is expected to be possible.
 
-            See :class:`matrx.actions.move_actions.MoveActionResult` for the
+            See :class:`matrxs.actions.move_actions.MoveActionResult` for the
             results it can contain.
 
         """
@@ -278,7 +278,7 @@ class Move(Action):
         Parameters
         ----------
         grid_world : GridWorld
-            The :class:`matrx.grid_world.GridWorld` instance in which the
+            The :class:`matrxs.grid_world.GridWorld` instance in which the
             agent resides whose location should be updated.
         agent_id : str
             The unique identifier for the agent whose location should be
@@ -297,7 +297,7 @@ class Move(Action):
 class MoveNorth(Move):
     """ Moves the agent North.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = 0
@@ -318,7 +318,7 @@ class MoveNorth(Move):
 class MoveNorthEast(Move):
     """ Moves the agent North-East.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = 1
@@ -339,7 +339,7 @@ class MoveNorthEast(Move):
 class MoveEast(Move):
     """ Moves the agent East.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = 1
@@ -360,7 +360,7 @@ class MoveEast(Move):
 class MoveSouthEast(Move):
     """ Moves the agent South-East.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = 1
@@ -381,7 +381,7 @@ class MoveSouthEast(Move):
 class MoveSouth(Move):
     """ Moves the agent South.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = 0
@@ -402,7 +402,7 @@ class MoveSouth(Move):
 class MoveSouthWest(Move):
     """ Moves the agent South-West.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = -1
@@ -423,7 +423,7 @@ class MoveSouthWest(Move):
 class MoveWest(Move):
     """ Moves the agent West.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = -1
@@ -444,7 +444,7 @@ class MoveWest(Move):
 class MoveNorthWest(Move):
     """ Moves the agent North-West.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrxs.actions.move_action.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = -1

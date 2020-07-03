@@ -9,4 +9,4 @@ Simulation goals
 .. autosummary::
    :toctree: _generated_autodoc
 
-    matrx.goals.goals
+    matrx.sim_goals.sim_goal

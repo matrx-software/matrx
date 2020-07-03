@@ -1,25 +1,20 @@
-import warnings
-
 from matrx.actions.object_actions import GrabObject, DropObject, RemoveObject
 from matrx.actions.door_actions import OpenDoorAction, CloseDoorAction
-from matrx.agents.agent_utils.state import State
 from matrx.agents.agent_utils.state_tracker import StateTracker
 from matrx.agents.agent_brain import AgentBrain
 import numpy as np
 
 
 class HumanAgentBrain(AgentBrain):
-    """ Creates an Human Agent which is an agent that can be controlled by a human.
-    """
 
-    def __init__(self, memorize_for_ticks=None, fov_occlusion=False, max_carry_objects=3,
+    def __init__(self, state_memory_decay=1, fov_occlusion=False, max_carry_objects=3,
                  grab_range=1, drop_range=1, door_range=1, remove_range=1):
-        """ Creates an Human Agent which is an agent that can be controlled by a human.
         """
-        super().__init__(memorize_for_ticks=memorize_for_ticks)
+        Creates an Human Agent which is an agent that can be controlled by a human.
+        """
+        super().__init__()
+        self.__state_memory_decay = state_memory_decay
         self.__fov_occlusion = fov_occlusion
-        if fov_occlusion:
-            warnings.warn("FOV Occlusion is not yet fully implemented. Setting fov_occlusion to True has not effect.")
         self.__max_carry_objects = max_carry_objects
         self.__remove_range = remove_range
         self.__grab_range = grab_range
@@ -29,32 +24,21 @@ class HumanAgentBrain(AgentBrain):
 
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
                             customizable_properties, rnd_seed, callback_is_action_possible, key_action_map=None):
-        """ Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
-        properties.
-        This also sets the random number generator with a seed generated based on the random seed of the
+        """
+        Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
+        properties. This also sets the random number generator with a seed generated based on the random seed of the
         world that is generated.
 
         Note; This method should NOT be overridden!
 
-        Parameters
-        ----------
-        agent_name : str
-            The name of the agent.
-        agent_id: str
-            The unique ID given by the world to this agent's avatar. So the agent knows what body is his.
-        action_set : List
-            The list of action names this agent is allowed to perform.
-        sense_capability : SenseCapability
-            The SenseCapability of the agent denoting what it can see withing what range.
-        agent_properties : dict
-            The dictionary of properties containing all mandatory and custom properties.
-        customizable_properties : list
-            A list of keys in agent_properties that this agent is allowed to change.
-        rnd_seed : int
-            The random seed used to set the random number generator self.rng
-        key_action_map : (optional, default, None)
-            Maps user pressed keys (e.g. arrow key up) to a specific action. See this link for the available keys
-            https://developer.mozilla.org/nl/docs/Web/API/KeyboardEvent/key/Key_Values
+        :param agent_name: The name of the agent.
+        :param agent_id: The unique ID given by the world to this agent's avatar. So the agent knows what body is his.
+        :param action_set: The list of action names this agent is allowed to perform.
+        :param sense_capability: The SenseCapability of the agent denoting what it can see withing what range.
+        :param agent_properties: The dictionary of properties containing all mandatory and custom properties.
+        :param customizable_properties: A list of keys in agent_properties that this agent is allowed to change.
+        :param rnd_seed: The random seed used to set the random number generator self.rng
+        :param key_action_map: maps user pressed keys (e.g. arrow key up) to a specific action
         """
 
         # The name of the agent with which it is also known in the world
@@ -92,8 +76,9 @@ class HumanAgentBrain(AgentBrain):
         else:
             self.key_action_map = key_action_map
 
-        # Initializing the State object
-        self._init_state()
+        # Create the agent's state tracker
+        self.__state_tracker = StateTracker(agent_id, knowledge_decay=self.__state_memory_decay,
+                                            fov_occlusion=self.__fov_occlusion)
 
     def _get_action(self, state, agent_properties, agent_id, user_input):
         """
@@ -106,30 +91,14 @@ class HumanAgentBrain(AgentBrain):
 
         Note; This method should NOT be overridden!
 
-        Parameters
-        ----------
-        state : dict
-            A state description containing all properties of EnvObject that are within a certain range as defined by
-            self.sense_capability. It is a list of properties in a dictionary
-        agent_properties : dict
-            The properties of the agent, which might have been changed by the environment as a result of actions of
-            this or other agents.
-        agent_id : str
-            the ID of this agent
-        user_input : list
-            any user input given by the user for this human agent via the api
-
-        Returns
-        -------
-         filtered_state : dict
-            The filtered state of this agent
-        agent_properties : dict
-            the agent properties which the agent might have changed,
-        action : str
-            an action string, which is the class name of one of the actions in the Action package.
-        action_kwargs : dict
-            Keyword arguments for the action
-
+        :param state: A state description containing all properties of EnvObject that are detectable by this agent,
+        i.e. within the detectable range as defined by self.sense_capability. It is a list of properties in a dictionary
+        :param agent_properties: The properties of the agent, which might have been changed by the
+        environment as a result of actions of this or other agents.
+        :param agent_id: the ID of this agent
+        :param user_input: any user input given by the user for this human agent via the api
+        :return: The filtered state of this agent, the agent properties which the agent might have changed,
+        and an action string, which is the class name of one of the actions in the Action package.
         """
         # Process any properties of this agent which were updated in the environment as a result of
         # actions
@@ -172,7 +141,7 @@ class HumanAgentBrain(AgentBrain):
             A state description containing all properties of EnvObject that are within a certain range as
             defined by self.sense_capability. It is a list of properties in a dictionary
 
-        user_input : list
+        user_input: list
             A dictionary containing the key presses of the user, intended for controlling thus human agent.
 
         Returns
@@ -261,30 +230,17 @@ class HumanAgentBrain(AgentBrain):
 
         This filtering is what you do here.
 
-        Parameters
-        ----------
-        state : dict
-            A state description containing all properties of EnvObject that are within a certain range as
-            defined by self.sense_capability. It is a list of properties in a dictionary
-
-        Returns
-        -------
-         filtered_state : dict
-            The filtered state of this agent
-
+        :param state: A state description containing all properties of EnvObject that are within a certain range as
+        defined by self.sense_capability. It is a list of properties in a dictionary
+        :return: A filtered state.
         """
+        state = self.__state_tracker.update(state)
         return state
 
     def filter_user_input(self, user_input):
         """
         From the received userinput, only keep those which are actually Connected
         to a specific agent action
-
-        Parameters
-        ----------
-        user_input : list
-            A dictionary containing the key presses of the user, intended for controlling thus human agent.
-
         """
         if user_input is None:
             return []
@@ -328,5 +284,3 @@ class HumanAgentBrain(AgentBrain):
             object_id = None
 
         return object_id
-
-
