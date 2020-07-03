@@ -17,11 +17,68 @@ from matrx.api import api
 
 
 class GridWorld:
+    """  The Gridworld is the representation of the world and the core of MATRX
+    """
 
     def __init__(self, shape, tick_duration, simulation_goal, rnd_seed=1,
-                 visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False, world_id=False):
+                 visualization_bg_clr="#C2C2C2", visualization_bg_img=None, verbose=False, world_id=0):
+
+        """ Create a GridWorld instance.
+
+        With the constructor you can set a number of general properties and
+        from the resulting instance you can call numerous methods to add new
+        objects and/or agents.
+
+        Parameters
+        ----------
+        shape : tuple or list
+           Denotes the width and height of the world you create.
+
+        tick_duration : float
+           The duration of a single 'tick' or loop in the game-loop of the
+           world you create.
+
+        simulation_goal : WorldGoal, int, list or tuple
+           The goal or goals of the world, either a single `WorldGoal`, a
+           list of such or a positive non-zero integer to denote the maximum
+           number of 'ticks' the world(s) has to run.
+
+        rnd_seed : bool (optional, default, 1)
+            The master random seed set by the WorldBuilder on which all objects, agents and worlds are
+            seeded. Should be a positive non-zero integer.
+
+        visualization_bg_clr : string (optional, "C2C2C2")
+           The color of the world when visualized using MATRX' own
+           visualisation server. A string representation of hexadecimal color.
+
+        visualization_bg_img : string (optional, None)
+           An optional background image of the world when visualized using
+           MATRX' own visualisation server. A string of the path to the image
+           file. When None, no background image is used.
+
+        verbose : bool (optional, False)
+           Whether the GridWorld should be verbose and print development logs to the console.
+
+        world_id : int (optional, 0)
+           The ID of this world. Every new GridWorld instance should have a unique ID, such that the frontend knows
+           when it has to reinitialize the visualization.
+
+
+        Examples
+        --------
+
+        Create a world builder and generate 10 worlds and run them:
+        >>> from matrx.world_builder import WorldBuilder
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> for gridworld in builder.worlds():
+        >>>     gridworld.run()
+
+        Every `gridworld` received from builder.worlds() is a GridWorld instance.
+
+        """
+
         self.__tick_duration = tick_duration  # How long each tick should take (process sleeps until this time passed)
-        self.__simulation_goal = simulation_goal  # The simulation goal, the simulation end when this/these are reached
+        self.__simulation_goal = simulation_goal  # The world goal, the simulation end when this/these are reached
         self.__shape = shape  # The width and height of the GridWorld
         self.__visualization_bg_clr = visualization_bg_clr  # The background color of the visualisation
         self.__visualization_bg_img = visualization_bg_img  # The background image of the visualisation
@@ -51,6 +108,31 @@ class GridWorld:
         self.message_manager = MessageManager()  # keeps track of all messages and makes them available to the api
 
     def initialize(self, api_info):
+        """ Initializes the gridworld instance and any connected visualizations via the API, then pauses the GridWorld.
+
+        By default the GridWorld starts paused. To make it possible for the user to see the first tick of the
+        GridWorld, before pressing play and starting the simulation, this function initializes the gridworld to
+        tick 0, after which it updates any visualizations via the API, followed by pausing the GridWorld.
+
+        Parameters
+        ----------
+        api_info : dictionary
+           A dictionary which contians information on the API. At least containing the `api_thread` key with the
+           API thread, and the `run_matrx_api` key which contains whether the GridWorld should start paused or not.
+
+        Examples
+        --------
+
+        Create a world builder and generate 10 worlds and run them:
+        >>> from matrx.world_builder import WorldBuilder
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> for gridworld in builder.worlds():
+        >>>     gridworld.run()
+
+        Every `gridworld` received from builder.worlds() is a GridWorld instance.
+
+        """
+
         # Only initialize when we did not already do so
         if not self.__is_initialized:
             # We update the grid, which fills everything with added objects and agents
@@ -89,7 +171,7 @@ class GridWorld:
                 api.matrx_paused = True
 
                 # fetch the initial state of every agent to display
-                self.fetch_initial_states()
+                self._fetch_initial_states()
 
             # Set initialisation boolean
             self.__is_initialized = True
@@ -97,35 +179,28 @@ class GridWorld:
             if self.__verbose:
                 print(f"@{os.path.basename(__file__)}: Initialized the GridWorld.")
 
-    def fetch_initial_states(self):
-        """ MATRX starts paused by default, to prime the api and any connected GUI's, we fetch the first state
-        from all agents to send which can be shown while waiting for the experiment leader to press play.
-        """
-        for agent_id, agent_obj in self.__registered_agents.items():
-            # given the agent's capabilities, get everything the agent can perceive
-            state = self.__get_agent_state(agent_obj)
-
-            # filter other things from the agent state
-            filtered_agent_state = agent_obj.filter_observations(state)
-
-            # save the current agent's state for the api
-            api.add_state(agent_id=agent_id, state=filtered_agent_state,
-                          agent_inheritence_chain=agent_obj.class_inheritance,
-                          world_settings=api.MATRX_info)
-
-        # add god state
-        api.add_state(agent_id="god", state=self.__get_complete_state(), agent_inheritence_chain="god",
-                      world_settings=api.MATRX_info)
-
-        # initialize the message manager
-        self.message_manager.agents = self.__registered_agents.keys()
-        self.message_manager.teams = self.__teams
-
-        # make the information of this tick available via the api, after all
-        # agents have been updated
-        api.next_tick()
-
     def run(self, api_info):
+        """ Runs the gridworld instance until stopped via the visualization or the goal has been achieved.
+
+        The gridworld by default starts paused.
+
+        Parameters
+        ----------
+        api_info : dictionary
+          A dictionary which contians information on the API. At least containing the `api_thread` key with the
+          API thread, and the `run_matrx_api` key which contains whether the GridWorld should start paused or not.
+
+        Examples
+        --------
+
+        Create a world builder and generate 10 worlds and run them:
+        >>> from matrx.world_builder import WorldBuilder
+        >>> builder = WorldBuilder(shape=(10, 10))
+        >>> for gridworld in builder.worlds():
+        >>>     gridworld.run()
+
+        """
+
         # initialize the gridworld
         self.initialize(api_info)
 
@@ -145,8 +220,49 @@ class GridWorld:
                 break
 
     def get_env_object(self, requested_id, obj_type=None):
+        """ Fetch an object or agent from the GridWorld using its ID, optionally checking for its object type.
+
+        Parameters
+        ----------
+        requested_id : dictionary
+          The ID of the object or agent to fetch.
+
+        obj_type : Class (optional, default, None)
+          The object class of which the  object-to-fetch should be. Can be used as a filter: if the object with id
+          `requested_id` is not of this class, it is not returned.
+
+        Returns
+        -------
+        obj : Object or Agent
+            Returns the object or agent with ID `requested_id` of tpe `obj_type` (if not None). If no object can be
+            found that adheres to these filters, None is returned.
+
+        Examples
+        --------
+
+        In an action, world goal, or somewhere else with access to the Gridworld, the function can be used as below.
+        In this example the custom action removes a specific agent from the world when executed.
+
+        >>> from matrx.agents import HumanAgent
+        >>> class YourCustomAction(Action):
+        >>>     def __init__(...):
+        >>>         ...
+        >>>
+        >>>     def mutate(self, grid_world, agent_id, **kwargs):
+        >>>         agent = grid_world.get_env_object("HumanAgent_23", HumanAgent)
+        >>>         del agent
+
+        Alternatively, if you know the object ID and type (object or agent) for certain, it can also be fetched
+        as so:
+
+        >>> reg_ag = grid_world.registered_agents[agent_id] # fetch agent by ID
+        >>> env_obj = grid_world.environment_objects[object_id]  # fetch object by ID
+
+        """
+
         obj = None
 
+        # try to fetch object from agents
         if requested_id in self.__registered_agents.keys():
             if obj_type is not None:
                 if isinstance(self.__registered_agents[requested_id], obj_type):
@@ -154,6 +270,7 @@ class GridWorld:
             else:
                 obj = self.__registered_agents[requested_id]
 
+        # try to fetch object from env objects
         if requested_id in self.__environment_objects.keys():
             if obj_type is not None:
                 if isinstance(self.__environment_objects[requested_id], obj_type):
@@ -164,9 +281,37 @@ class GridWorld:
         return obj
 
     def get_objects_in_range(self, agent_loc, object_type, sense_range):
-        """
-        Get all objects of a obj type (normal objects or agent) within a
-        certain range around the agent's location
+        """ Get all objects of a specific obj type (normal objects or agent) within a certain range around an
+        agent's location.
+
+        Parameters
+        ----------
+        agent_loc : dictionary
+          The location from which to search in a radius around for objects. Can be any [x,y] location within the
+          GridWorld shape dimensions.
+
+        obj_type : Class (optional, default, None)
+          The object class of which the objects-to-find should be.
+
+        sense_range : int
+          The radius around the agent within which to look for objects.
+
+        Returns
+        -------
+        obj : OrderedDict
+            Returns an ordereddict with the objects and agents of tpe `object_type` within `sense_range` blocks of the
+            location passed via `agent_loc`. If not objects were found, the ordered dict is empty.
+
+        Examples
+        --------
+
+        In an action, world goal, or somewhere else with access to the Gridworld, the function can be used as
+        below.
+        In this example all objects of all types (denoted with the "*") within 5 tiles of the coordinate [3,3] are
+        returned.
+
+        >>> objects_in_range = grid_world.get_objects_in_range([3,3], object_type="*", sense_range=5)
+
         """
 
         env_objs = OrderedDict()
@@ -193,12 +338,35 @@ class GridWorld:
         return env_objs
 
     def remove_from_grid(self, object_id, remove_from_carrier=True):
+        """ Remove an object from the grid.
+
+        Parameters
+        ----------
+        object_id : int
+          ID of the object to remove
+
+        remove_from_carrier : Bool (optional, default, True)
+          Whether to also remove from agents that are currently carrying the object.
+
+        Returns
+        -------
+        obj : Bool
+            Whether the object was sucessfully removed from the grid or not.
+
+        Examples
+        --------
+
+        In an action, world goal, or somewhere else with access to the Gridworld, the function can be used as
+        below.
+        In this example the Agent3 is removed from the Grid.
+        >>> succeeded = grid_world.remove_from_grid(object_id="Agent3", remove_from_carrier=False)
+
+        In this example the object Block5 is removed from the Grid, and any Agents that were carrying it.
+        >>> succeeded = grid_world.remove_from_grid(object_id="Block5", remove_from_carrier=True)
+
         """
-        Remove an object from the grid
-        :param object_id: ID of the object to remove
-        :param remove_from_carrier: whether to also remove from agents which carry the
-        object or not.
-        """
+
+
         # Remove object first from grid
         grid_obj = self.get_env_object(object_id)  # get the object
         loc = grid_obj.location  # its location
@@ -244,16 +412,34 @@ class GridWorld:
 
         return success
 
-    def add_to_grid(self, grid_obj):
-        if isinstance(grid_obj, EnvObject):
-            loc = grid_obj.location
-            if self.__grid[loc[1], loc[0]] is not None:
-                self.__grid[loc[1], loc[0]].append(grid_obj.obj_id)
-            else:
-                self.__grid[loc[1], loc[0]] = [grid_obj.obj_id]
-        else:
-            raise BaseException(f"Object is not of type {str(type(EnvObject))} but of {str(type(grid_obj))} when adding"
-                                f" to grid in GridWorld.")
+    def _fetch_initial_states(self):
+        """ MATRX starts paused by default, to prime the api and any connected GUI's, we fetch the first state
+        from all agents to send which can be shown while waiting for the experiment leader to press play.
+        """
+
+        for agent_id, agent_obj in self.__registered_agents.items():
+            # given the agent's capabilities, get everything the agent can perceive
+            state = self.__get_agent_state(agent_obj)
+
+            # filter other things from the agent state
+            filtered_agent_state = agent_obj.filter_observations(state)
+
+            # save the current agent's state for the api
+            api.add_state(agent_id=agent_id, state=filtered_agent_state,
+                          agent_inheritence_chain=agent_obj.class_inheritance,
+                          world_settings=api.MATRX_info)
+
+        # add god state
+        api.add_state(agent_id="god", state=self.__get_complete_state(), agent_inheritence_chain="god",
+                      world_settings=api.MATRX_info)
+
+        # initialize the message manager
+        self.message_manager.agents = self.__registered_agents.keys()
+        self.message_manager.teams = self.__teams
+
+        # make the information of this tick available via the api, after all
+        # agents have been updated
+        api.next_tick()
 
     def _register_agent(self, agent, agent_avatar: AgentBody):
         """ Register human agents and agents to the gridworld environment """
@@ -329,6 +515,18 @@ class GridWorld:
             self.__loggers = [logger]
         else:
             self.__loggers.append(logger)
+
+    def __add_to_grid(self, grid_obj):
+
+        if isinstance(grid_obj, EnvObject):
+            loc = grid_obj.location
+            if self.__grid[loc[1], loc[0]] is not None:
+                self.__grid[loc[1], loc[0]].append(grid_obj.obj_id)
+            else:
+                self.__grid[loc[1], loc[0]] = [grid_obj.obj_id]
+        else:
+            raise BaseException(f"Object is not of type {str(type(EnvObject))} but of {str(type(grid_obj))} when adding"
+                                f" to grid in GridWorld.")
 
     def __validate_obj_placement(self, env_object):
         """
@@ -572,9 +770,9 @@ class GridWorld:
     def __update_grid(self):
         self.__grid = np.array([[None for _ in range(self.__shape[0])] for _ in range(self.__shape[1])])
         for obj_id, obj in self.__environment_objects.items():
-            self.add_to_grid(obj)
+            self.__add_to_grid(obj)
         for agent_id, agent in self.__registered_agents.items():
-            self.add_to_grid(agent)
+            self.__add_to_grid(agent)
 
     # get all objects and agents on the grid
     def __get_complete_state(self):
@@ -728,7 +926,7 @@ class GridWorld:
 
         # Check if the action_name is None, in which case we simply idle for one tick
         if action_name is None:
-            duration_in_ticks = 1
+            duration_in_ticks = 0
 
         else:  # action is not None
 
@@ -779,34 +977,47 @@ class GridWorld:
     def __warn(self, warn_str):
         return f"[@{self.__current_nr_ticks}] {warn_str}"
 
+
     @property
     def registered_agents(self):
+        """Dict: Dictionary of all registered agents, keys are the IDs, values are the registered objects. """
         return self.__registered_agents
 
     @property
     def environment_objects(self):
+        """Dict: Dictionary of all non-agent environment objects, keys are the IDs, values are the registered objects.
+        """
         return self.__environment_objects
 
     @property
     def is_done(self):
+        """Bool: Boolean that indicates whether the GridWorld is done: either stopped by the user or due to the goal
+         having been achieved."""
         return self.__is_done
 
     @property
     def current_nr_ticks(self):
+        """Int: Current tick at which the gridworld is. """
         return self.__current_nr_ticks
 
     @property
     def grid(self):
+        """Numpy 2D array: Numpy array of shape x by y. Each grid[x,y] location contains a list with all
+        object IDs of the objects at that location"""
         return self.__grid
 
     @property
     def shape(self):
+        """list: [x,y] shape of the grid """
         return self.__shape
 
     @property
     def simulation_goal(self):
+        """WorldGoal: The world goal of type WorldGoal, or a class that extends WorldGoal """
         return self.__simulation_goal
 
     @property
     def tick_duration(self):
+        """float: the desired duration of one tick. The real tick_duration might be longer due to a large amount of
+         processing that needs to be done each tick by one or multiple agents. """
         return self.__tick_duration

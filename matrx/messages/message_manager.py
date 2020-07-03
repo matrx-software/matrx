@@ -1,13 +1,17 @@
+import copy
+
 from matrx.messages.message import Message
 
 
 class MessageManager:
     """ A manager inside the GirdWorld that tracks the received and send messages between agents and their teams.
 
-        This gives provides several advantages; - an easier connection between Core, api and Front-end for messages
-        (e.g. to differentiate between messages send between agents and to teams in the Front-end through a simple api
-        call: 'get_team_messages'). - an easy way to log communication (as the messages are easily obtained from a
-        GridWorld instance, through some methods).
+        This provides several advantages:
+        - an easier connection between MATRX Core, MATRX API, and the Front-end for
+        messages (e.g. to differentiate between messages send between agents and to teams in the Front-end through a
+        simple api call: 'get_team_messages').
+        - an easy way to log communication (as the messages are easily obtained from a GridWorld instance, through some
+        methods).
     """
 
     def __init__(self):
@@ -25,23 +29,20 @@ class MessageManager:
     def preprocess_messages(self, tick, messages, all_agent_ids, teams):
         """ Preprocess messages for sending, such that they can be understood by the GridWorld.
 
-        For example: if the receiver=None, this means it must be sent to all agents. This function creates a message
-        directed at every agent.
+        For example: if the receiver=None, this means it must be sent to all agents. This function will process
+         the receiver=None to a seperate message directed at every agent.
 
         Parameters
         ----------
-        tick
+        tick : int
             Current tick of the gridworld
-        messages
+        messages : dict
             All messages sent from the agent brains in the gridworld, and received via the api
-        all_agent_ids
+        all_agent_ids : list
             IDs of all the agents
-        teams
+        teams : list
             ...
 
-        Returns
-        -------
-            Preprocessed messages ready for sending
         -------
         """
         self.teams = teams
@@ -61,11 +62,12 @@ class MessageManager:
             # messages understandable by the GridWorld
             self._decode_message_receiver(mssg, all_agent_ids, teams, tick)
 
+
     def _decode_message_receiver(self, mssg, all_agent_ids, teams, tick):
         """ Processes messages directed at other agents / teams / everyone.
 
-        These types are called private, team, and global messages.
-        Messages of each type are saved for every tick seperatly, as well as a list with all preprocessed messages
+        These messsage types are called private, team, and global messages.
+        Messages of each type are saved for every tick separately, as well as a list with all preprocessed messages
         suitable for sending by the GridWorld.
 
         Possible formats for mssg.to_id
@@ -79,17 +81,18 @@ class MessageManager:
         ----------
         mssg
             The original mssg object sent by the agent, or received via the api
-
         all_agent_ids
             List with IDs of all agents
-
         teams
             Dict with all team names (keys), and a list with all agent IDs in that team (value)
-
         tick
             Current tick of the gridworld
         """
         all_ids_except_me = [agent_id for agent_id in all_agent_ids if agent_id != mssg.from_id]
+
+        # make sure when we copy this mssg to the global, private or team message groups, that we keep the potentially
+        # custom message class and its custom properties. Also make sure that the message has a unique ID
+        new_mssg = copy.copy(mssg).regen_id()
 
         # if the receiver is None, it is a global message which has to be sent to everyone
         if mssg.to_id is None:  # global message
@@ -98,13 +101,13 @@ class MessageManager:
                 self.global_messages[tick] = []
 
             # save in global
-            global_message = Message(content=mssg.content, from_id=mssg.from_id, to_id="global")
+            global_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id="global")
             self.global_messages[tick].append(global_message)
 
             # split in sub mssgs
             for to_id in all_ids_except_me.copy():
                 # create message
-                new_message = Message(content=mssg.content, from_id=mssg.from_id, to_id=to_id)
+                new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=to_id)
 
                 # save in prepr
                 self.preprocessed_messages[tick].append(new_message)  # all messages above combined
@@ -113,7 +116,7 @@ class MessageManager:
         elif isinstance(mssg.to_id, list):
             for receiver_id in mssg.to_id:
                 # create message
-                new_message = Message(content=mssg.content, from_id=mssg.from_id, to_id=receiver_id)
+                new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=receiver_id)
 
                 self._decode_message_receiver(new_message, all_agent_ids, teams, tick)
 
@@ -126,7 +129,7 @@ class MessageManager:
                 to_ids = eval(mssg.to_id)
 
                 # create a new message addressed to this list of IDs, and reprocess
-                new_message = Message(content=mssg.content, from_id=mssg.from_id, to_id=to_ids)
+                new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=to_ids)
                 self._decode_message_receiver(new_message, all_agent_ids, teams, tick)
             except:
                 pass
@@ -147,7 +150,7 @@ class MessageManager:
                 # split in sub mssgs for every agent in the team
                 for to_id in teams[mssg.to_id]:
                     # create a message
-                    new_message = Message(content=mssg.content, from_id=mssg.from_id, to_id=to_id)
+                    new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=to_id)
 
                     # save in prepr
                     self.preprocessed_messages[tick].append(new_message)
@@ -174,15 +177,16 @@ class MessageManager:
                             f" This is required for agents to be able to send and receive them.")
 
     def fetch_chatrooms(self, agent_id=None):
-        """ Fetch all the chatrooms which an agent can view (or all if no ID provided)
+        """ Fetch all the chatrooms, or only those which a specific agent can view.
 
         Parameters
         ----------
-        agent_id
-            ID of the agent for which to fetch all accessible chatrooms
+        agent_id : str (optional, default, None)
+            ID of the agent for which to fetch all accessible chatrooms. if None, all chatrooms are returned.
 
         Returns
         -------
+        chatrooms : dict
             A dictionary containing a list with all "private" chatrooms, all "teams" chatrooms, and a "global" key,
             accessible via likewise named keys.
         """
@@ -211,19 +215,29 @@ class MessageManager:
 
         Parameters
         ----------
-        tick_from
+        tick_from : int
             All messages from `tick_from` onwards to (including) `tick_to` will be collected.
-        tick_to
+        tick_to : int
             All messages from `tick_from` onwards to (including) `tick_to` will be collected.
-        agent_id
-            Only messages received by or sent by this agent will be collected.
+        agent_id : string (optional, default, None)
+            Only messages received by or sent by this agent will be collected. If none, all messages are returned
+            between `tick_from` to `tick_to`.
 
         Returns
         -------
-        Dictionary containing a 'global', 'team', and 'private' subdictionary.
-        Global messages: messages['global'][tick] = [list of messages]
-        Team messages: messages['team'][tick][team] = [list of messages]
-        Private messages: messages['private'][tick] = [list of messages]
+        Messages : dict
+            Dictionary containing a 'global', 'team', and 'private' subdictionary.
+                Global messages: messages['global'][tick] = [list of messages]
+                Team messages: messages['team'][tick][team] = [list of messages]
+                Private messages: messages['private'][tick] = [list of messages]
+
+        Examples
+        ---------
+        In an action, world goal, or somewhere else with access to the Gridworld, the function can be used as below.
+        This example returns all messages between tick 0 and 10.
+
+        >>> messages = grid_world.message_manager.fetch_messages(0, 10, None)
+
 
         """
         messages = {'global': {}, 'team': {}, 'private': {}}
@@ -274,3 +288,36 @@ class MessageManager:
                             messages['private'][t].append(message.to_json())
 
         return messages
+
+    def copy_message(self, mssg, from_id, to_id):
+        """ Copy a message while keeping the potentially custom message type and custom message properties.
+        Global and team messages have to be subdivided into individual messages for each receiving agent.
+        This function copies a message while paying attention to any custom message classes used and their custom
+        properties, in addition to making sure the message has a unique message ID.
+
+        Parameters
+        ----------
+        mssg : (Custom)Message
+            original message instance. Can be the default Message() class, or a class that inherits from it.
+        from_id : str
+            the new sender ID.
+        to_id : str
+             the new receiver ID.
+
+        Returns
+        new_mssg : (Custom)Message
+            the new message instance with the same class and custom properties as mssg, with the provided from_id
+            and to_id.
+        -------
+        """
+        # copy the original message so we are sure we have the correct message class
+        new_mssg = copy.copy(mssg)#
+
+        # make sure the new message has a unique ID
+        new_mssg.regen_id()
+
+        # set the new from and to ID
+        new_mssg.from_id = from_id
+        new_mssg.to_id = to_id
+
+        return new_mssg

@@ -34,7 +34,7 @@ def create_builder():
 
         navigating_agent = PatrollingAgentBrain(waypoints, move_speed=10)
         factory.add_agent(start, navigating_agent, name="navigate " + str(x), visualization_shape=2, has_menu=True,
-                          is_traversable=False)
+                          is_traversable=False, visualize_when_busy=True)
 
     # add human agent
     key_action_map = {
@@ -48,7 +48,7 @@ def create_builder():
                             key_action_map=key_action_map, img_name="/static/images/transparent.png")
 
     factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
-                            key_action_map=key_action_map, img_name="/static/images/agent.gif")
+                            key_action_map=key_action_map, img_name="/static/images/agent.gif", visualize_when_busy=True)
 
     # add a number of blocks to showcase the subtile functionality
     factory.add_object([6,7], "block", subtiles=[3,3], subtile_loc=[0,0], is_traversable=True, visualize_colour="#c0392b", visualize_shape=2)
