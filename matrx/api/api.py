@@ -185,11 +185,16 @@ def get_filtered_latest_state(agent_ids):
 
     # Filter the agent states based on the received properties list
     props = request.json['properties']
-    filters = request.json['filters']
+    if 'filters' in request.json.keys():
+        filters = request.json['filters']
+    else:
+        filters = None
+
     filtered_states = {}
     for agent_id, agent_dict in agent_states.items():
         state_dict = agent_dict['state']
         filtered_state_dict = __filter_dict(state_dict, props, filters)
+        filtered_states[agent_id] = filtered_state_dict
 
     return jsonify(filtered_states)
 
@@ -816,8 +821,53 @@ def __filter_dict(state_dict, props, filters):
     objects that adhere to the filters. A filter is a combination of a
     property and value."""
 
+    def find(obj_dict_pair):
+        # Get the object properties
+        obj_dict = obj_dict_pair[1]
 
-    pass
+        # Check if all the desirable properties are in the object dict
+        if not all([p in obj_dict.keys() for p in props]):
+            return None
+
+        # Check if any filter property is present, if so check its value
+        def filter_applies(filter_):
+            filter_prop = filter_[0]
+            filter_val = filter_[1]
+            if filter_prop in obj_dict.keys():
+                return filter_val == obj_dict[filter_prop] \
+                       or filter_val in obj_dict[filter_prop]
+            else:
+                return False  # if filter is not present, we return False
+
+        # If filters are given, go over each filter to see if it applies
+        if filters is not None:
+            filter_results = map(filter_applies, filters.items())
+
+            # Check if all filters are either not applicable or return true
+            applies = all(filter_results)
+            if applies is False:  # if it does not adhere to the filters
+                return None
+
+        # Filter the dict to only the required properties
+        new_dict = {p: obj_dict[p] for p in props}
+
+        # Return the new tuple
+        return obj_dict_pair[0], new_dict
+
+    # Map our find method to all state objects
+    filtered_objects = map(find, state_dict.items())
+
+    # Extract all state objects that have the required properties and adhere to
+    # the filters
+    objects = [obj_dict_pair for obj_dict_pair in filtered_objects
+               if obj_dict_pair is not None]
+
+    # Transform back to dict
+    objects = {obj_id: obj_dict for obj_id, obj_dict in objects}
+
+    # Return
+    return objects
+
 
 def create_error_response(code, message):
     """ Creates an error code with a custom message """
