@@ -97,7 +97,7 @@ Reference by Category
     .. figure:: _static/images/shape_banner.jpg
        :target: sections/objects.html
 
-    :ref:`Objects`
+    :ref:`Object placement`
        Make the world more worldlike by placing objects in it.
 
  .. container:: descr
@@ -113,16 +113,16 @@ Reference by Category
     .. figure:: _static/images/goal_banner.jpg
        :target: sections/simgoals.html
 
-    :ref:`Goals`
-       Goals can be specified that track progress and determine when the simulation should end.
+    :ref:`Simulation goals`
+       A certain goal is set for the simulation to end.
 
 
  .. container:: descr
 
     .. figure:: _static/images/shape_banner.jpg
-       :target: sections/cases.html
+       :target: sections/scenarios.html
 
-    :ref:`Cases`
+    :ref:`Scenarios`
        Defining a world containing objects, agents, actions, and simulation goals.
 
 
@@ -136,16 +136,8 @@ Reference by Category
 
  .. container:: descr
 
-    .. figure:: _static/images/action_banner.jpg
-       :target: sections/messages.html
-
-    :ref:`Messages`
-       Communication between agents via messages.
-
- .. container:: descr
-
     .. figure:: _static/images/utils_banner.jpg
-       :target: sections/logging.html
+       :target: sections/utils.html
 
-    :ref:`Logging`
-       Logging of results during an simulation.
+    :ref:`Utils`
+       Useful functions.

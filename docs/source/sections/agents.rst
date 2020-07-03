@@ -18,8 +18,8 @@ These are the most basic agents.
 .. autosummary::
    :toctree: _generated_autodoc
 
-   matrx.agents.agent_brain.AgentBrain
-   matrx.agents.agent_types.human_agent.HumanAgentBrain
+   matrxs.agents.agent_brain.AgentBrain
+   matrxs.agents.human_agent_brain.HumanAgentBrain
 
 
 ---------------
@@ -31,7 +31,7 @@ These are agents that show some more complex behavior.
 .. autosummary::
    :toctree: _generated_autodoc
 
-   matrx.agents.agent_types.patrolling_agent.PatrollingAgentBrain
+   matrxs.agents.patrolling_agent.PatrollingAgentBrain
 
 
 ------------------
@@ -45,19 +45,5 @@ perceived by the agent.
 .. autosummary::
    :toctree: _generated_autodoc
 
-   matrx.agents.capabilities.capability.Capability
-   matrx.agents.capabilities.capability.SenseCapability
-
-------------------
-Agent utils
-------------------
-
-These are utilities functions that help ease the development of agents, or creating more advanced agent behaviour.
-
-.. autosummary::
-   :toctree: _generated_autodoc
-
-   matrx.agents.agent_utils.fov
-   matrx.agents.agent_utils.navigator.Navigator
-   matrx.agents.agent_utils.state_tracker.StateTracker
-   matrx.agents.agent_utils.task_manager.TaskManager
+   matrxs.agents.capabilities.capability.Capability
+   matrxs.agents.capabilities.capability.SenseCapability

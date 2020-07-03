@@ -405,21 +405,10 @@ function add_message(chat_room, mssg, type) {
     div.appendChild(document.createTextNode(mssg_content));
 
 
+
     // add the message
     var mssgs_container = document.getElementById("messages");
-    mssgs_container.appendChild(div);
-
-    // scroll to the new message
-    scrollSmoothToBottom(mssgs_container)
-}
-
-/**
- * Scroll smoothly to the end of a div
- */
-function scrollSmoothToBottom (div) {
-   $(div).animate({
-      scrollTop: div.scrollHeight - div.clientHeight
-   }, 500);
+    mssgs_container.insertBefore(div, mssgs_container.firstChild);
 }
 
 /*

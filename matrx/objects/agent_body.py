@@ -10,7 +10,7 @@ class AgentBody(EnvObject):
                  callback_agent_get_messages, callback_agent_set_messages, callback_agent_initialize,
                  callback_agent_log,
                  visualize_size, visualize_shape, visualize_colour, visualize_depth, visualize_opacity,
-                 visualize_when_busy, is_traversable, team, name, is_movable,
+                 is_traversable, team, name, is_movable,
                  is_human_agent, customizable_properties,
                  **custom_properties):
         """
@@ -76,7 +76,6 @@ class AgentBody(EnvObject):
         :param visualize_depth: Integer. Optional, default obtained from defaults.py. A visualization property that
         is used by the Visualizer to draw objects in layers.
         :param visualize_opacity: Integer. Opacity of object. Between 0.0 and 1.0.
-        :param visualize_when_busy: Boolean. Whether to show a loading icon when the agent is busy (performing an action).
         :param **custom_properties: Optional. Any other keyword arguments. All these are treated as custom attributes.
         For example the property 'heat'=2.4 of an EnvObject representing a fire.
         """
@@ -110,7 +109,6 @@ class AgentBody(EnvObject):
         self.visualize_shape = visualize_shape
         self.visualize_size = visualize_size
         self.visualize_opacity = visualize_opacity
-        self.visualize_when_busy = visualize_when_busy
 
         # Parse the action_set property if set to the wildcard "*" denoting all actions
         if self.action_set == "*":
@@ -246,9 +244,6 @@ class AgentBody(EnvObject):
             elif property_name == "visualize_opacity":
                 assert isinstance(property_value, int)
                 self.visualize_opacity = property_value
-            elif property_name == "visualize_when_busy":
-                assert isinstance(property_value, bool)
-                self.visualize_when_busy = property_value
             elif property_name == "visualize_shape":
                 assert isinstance(property_value, int)
                 self.visualize_shape = property_value
@@ -344,8 +339,7 @@ class AgentBody(EnvObject):
             "shape": self.visualize_shape,
             "colour": self.visualize_colour,
             "depth": self.visualize_depth,
-            "opacity": self.visualize_opacity,
-            "show_busy": self.visualize_when_busy
+            "opacity": self.visualize_opacity
         }
 
         # Add the current action and all of its data
