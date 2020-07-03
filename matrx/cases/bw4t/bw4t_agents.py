@@ -43,7 +43,7 @@ class BlockWorldAgent(AgentBrain):
 
         if self.__collect is None:
             pass
-        return self.state.as_dict()
+        return self.state
 
     def decide_on_action(self, state_dict):
         return None, {}
