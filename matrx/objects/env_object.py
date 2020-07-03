@@ -74,9 +74,8 @@ class EnvObject:
         self.obj_name = name
 
         # Obtain a unique ID based on a global object counter, if not already set as an attribute in a super class
-        # spaces are not allowed
         if not hasattr(self, "obj_id"):
-            self.obj_id = f"{self.obj_name}_{_next_obj_id()}".replace(" ", "_")
+            self.obj_id = f"{self.obj_name}_{_next_obj_id()}"
 
         # Make customizable_properties mutable if not given.
         if customizable_properties is None:

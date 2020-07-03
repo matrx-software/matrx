@@ -3,7 +3,7 @@
  */
 $(document).ready(function() {
     // bind key listener
-    document.onkeydown = check_arrow_key;
+    document.onkeydown = checkArrowKey;
 });
 
 
@@ -11,7 +11,7 @@ $(document).ready(function() {
  * Catch user pressed keys with arrow keys
  *
  */
-function check_arrow_key(e) {
+function checkArrowKey(e) {
     e = e || window.event;
 
     // ignore the event if the user is writing in the message input field
@@ -19,17 +19,9 @@ function check_arrow_key(e) {
         return
     }
 
-//    console.log("Userinput:", e);
+    console.log("Userinput:", e);
 
     data = [e.key];
 
     send_userinput_to_MATRX(data);
-}
-
-
-
-
-function select_agent(e) {
-
-
 }

@@ -4,8 +4,7 @@ import sys
 
 import setuptools
 
-requires = ['Flask==1.1.1',
-            'jsonpickle',
+requires = ['Flask>=1.0.2',
             'Flask-SocketIO>=3.3.2',
             'numpy>=1.15.4',
             'requests>=2.21.0',

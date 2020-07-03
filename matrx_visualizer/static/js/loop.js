@@ -204,7 +204,7 @@ function world_loop() {
         lv_this_second = Date.now();
     } else if( (Date.now() - lv_this_second) > 1000) {
         lv_fps = lv_frames_this_second;
-//        console.log("Fps: ", lv_fps);
+        console.log("Fps: ", lv_fps);
         lv_frames_this_second = 0;
         lv_this_second = Date.now();
     } else {
