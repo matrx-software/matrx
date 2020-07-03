@@ -17,8 +17,8 @@ from matrx.objects.agent_body import AgentBody
 from matrx.objects.env_object import EnvObject, _get_inheritence_path
 from matrx import utils
 from matrx.agents.capabilities.capability import create_sense_capability
-from matrx.objects.standard_objects import Wall, Door, AreaTile, SmokeTile
-from matrx.goals.goals import LimitedTimeGoal, WorldGoal
+from matrx.objects.standard_objects import Wall, Door, AreaTile, SmokeTile, CollectionDropOffTile, CollectionTarget
+from matrx.goals.goals import LimitedTimeGoal, WorldGoal, CollectionGoal
 
 import matrx.defaults as defaults
 
@@ -1593,7 +1593,7 @@ class WorldBuilder:
         inh_path = _get_inheritence_path(agent.__class__)
         if 'HumanAgent' not in inh_path:
             ValueError(f"You are adding an agent that does not inherit from HumanAgent with the name {name}. Use "
-                      f"factory.add_agent to add autonomous agents.")
+                       f"factory.add_agent to add autonomous agents.")
 
         # Append the user input map to the custom properties
         custom_properties["key_action_map"] = key_action_map
@@ -2000,8 +2000,8 @@ class WorldBuilder:
         # (with content)
         if width <= 2 or height <= 2:
             raise ValueError(f"While adding room {name}; The width {width} "
-                            f"and/or height {height} should both be larger "
-                            f"than 2.")
+                             f"and/or height {height} should both be larger "
+                             f"than 2.")
 
         # Check if the with_area boolean is True when any area properties are
         # given
@@ -2057,6 +2057,10 @@ class WorldBuilder:
 
         # Add all walls
         names = [f"{name} - wall@{loc}" for loc in all_]
+        if wall_custom_properties is None:
+            wall_custom_properties = {"room_name": name}
+        else:
+            wall_custom_properties = {**wall_custom_properties, "room_name": name}
         self.add_multiple_objects(locations=all_, names=names, callable_classes=Wall,
                                   visualize_colours=wall_visualize_colour,
                                   visualize_opacities=wall_visualize_opacity,
@@ -2066,7 +2070,7 @@ class WorldBuilder:
         # Add all doors
         for door_loc in door_locations:
             self.add_object(location=door_loc, name=f"{name} - door@{door_loc}", callable_class=Door,
-                            is_open=doors_open)
+                            is_open=doors_open, **{"room_name": name})
 
         # Add all area tiles if required
         if with_area_tiles:
@@ -2080,11 +2084,16 @@ class WorldBuilder:
 
             self.add_area(top_left_location=area_top_left, width=area_width, height=area_height, name=f"{name}_area",
                           visualize_colour=area_visualize_colour, visualize_opacity=area_visualize_opacity,
-                          customizable_properties=area_customizable_properties, **area_custom_properties)
+                          customizable_properties=area_customizable_properties,
+                          **{**area_custom_properties, "room_name": name})
 
     @staticmethod
     def get_room_locations(room_top_left, room_width, room_height):
         """ Returns the locations within a room, excluding walls.
+
+        .. deprecated:: 1.1.0
+          `get_room_locations` will be removed in MATRX 1.2.0, it is replaced by
+          `matrx.utils.get_room_locations`.
 
         This is a helper function for adding objects to a room. It returns a
         list of all (x,y) coordinates that fall within the room excluding the
@@ -2111,11 +2120,9 @@ class WorldBuilder:
         WorldBuilder.add_room
 
         """
-        xs = list(range(room_top_left[0] + 1,
-                        room_top_left[0] + room_width - 1))
-        ys = list(range(room_top_left[1] + 1,
-                        room_top_left[1] + room_height -1))
-        locs = list(itertools.product(xs, ys))
+        warnings.warn("This method is deprecated and will be removed in v1.2.0. It is replaced by"
+                      "`matrx.utils.get_room_locations` as of v1.1.0.", DeprecationWarning)
+        locs = utils.get_room_locations(room_top_left, room_width, room_height)
         return locs
 
     def __set_world_settings(self, shape, tick_duration, simulation_goal, rnd_seed,
@@ -2315,7 +2322,7 @@ class WorldBuilder:
                 'class_callable': agent.__class__,
                 'callback_agent_get_action': agent._get_action,
                 'callback_agent_set_action_result': agent._set_action_result,
-                'callback_agent_observe': agent.filter_observations,
+                'callback_agent_observe': agent._fetch_state,
                 'callback_agent_log': agent._get_log_data,
                 'callback_agent_get_messages': agent._get_messages,
                 'callback_agent_set_messages': agent._set_messages,
@@ -2336,7 +2343,19 @@ class WorldBuilder:
         # Checks if all given arguments in the dictionary are not None, and if they are of RandomProperty or
         # RandomLocation, their (random) value is retrieved.
         for k, v in args.items():
-            if isinstance(v, RandomProperty):
+
+            # Check if the values are a RandomProperty. We include a fairly tailored check due to some import issues:
+            # Since the WorldBuilder contains the RandomProperty class and this class is imported by several other
+            # modules. But some of those modules are in turn also (indirectly) imported by the WorldBuilder. This
+            # creates a looping import. To remedy this you can omit importing RandomProperty by using
+            # `matrx.WorldBuilder.RandomProperty` however, this creates different class instance then when using
+            # `from matrx.WorldBuilder import RandomProperty`. The former creates a `WorldBuilder.RandomProperty` the
+            # latter a `RandomProperty` causing an isinstance check to fail. To fix this we also check if the module
+            # name `WorldBuilder` is that of the RandomProperty (e.g. is the set RandomProperty indeed from
+            # WorldBuilder?) and also check its name (e.g. does this RandomProperty is indeed named 'RandomProperty'?).
+            # This is a weaker check than isinstance, as these are referring to two different usages of RandomProperty.
+            if isinstance(v, RandomProperty) or (v.__class__.__module__ in RandomProperty.__module__
+                                                 and v.__class__.__name__ == RandomProperty.__name__):
                 args[k] = v._get_property(self.rng)
 
         return args
@@ -2416,6 +2435,196 @@ class WorldBuilder:
                              + "/shutdown_visualizer")
             self.matrx_visualizer_thread.join()
 
+    def add_goal(self, world_goal, overwrite=False):
+        """ Appends a `WorldGoal` to the worlds this builder creates.
+
+        Parameters
+        ----------
+        world_goal : WorldGoal or list/tuple of WorldGoal
+            A single world goal or a list/tuple of world goals.
+        overwrite : bool (default is False)
+            Whether to overwrite the already existing goal in the builder.
+
+        Examples
+        --------
+        Add a single world goal to a builder, overwriting any previously added goals (e.g. through the builder constructor).
+        >>> builder.add_goal(LimitedTimeGoal(100), overwrite=True)
+
+        """
+        # Check if the simulation_goal is a SimulationGoal, an int or a list or tuple of SimulationGoal
+        if not isinstance(world_goal, (int, WorldGoal, list, tuple)) and len(world_goal) > 0:
+            raise ValueError(f"The given simulation_goal {world_goal} should be of type {WorldGoal.__name__} "
+                             f"or a list/tuple of {WorldGoal.__name__}, or it should be an int denoting the max"
+                             f"number of ticks the world should run (negative for infinite).")
+
+        # Add the world goals
+        curr_goals = self.world_settings["simulation_goal"]
+        if not isinstance(curr_goals, (list, tuple)):
+            curr_goals = (curr_goals,)
+        if not isinstance(world_goal, (list, tuple)):
+            world_goal = (world_goal,)
+
+        if not overwrite:
+            goals = curr_goals + world_goal
+        else:
+            goals = world_goal
+
+        self.world_settings["simulation_goal"] = goals
+
+    def add_collection_goal(self, name, collection_locs, collection_objects, in_order=False,
+                            collection_area_colour="#c87800", collection_area_opacity=1.0, overwrite_goals=False):
+        """ Adds a goal to the world to collect objects and drop them in a specific area.
+
+        This is a helper method to quickly add a `CollectionGoal` to the world. A `CollectionGoal` will check if a set of
+        objects with certain property-value combinations are at specified locations (potentially in a fixed order). To do
+        so, location(s) need to be specified that function as such a "drop off zone". This method add to those locations a
+        `CollectionDropOffTile` object, which are searched by the `CollectionGoal` and checks if there the specified objects
+        are at those tiles.
+
+        In addition, this method receives a list of dictionaries that represent the kind of objects that need to be
+        collected. Since objects are described as a set of properties and their values, these dictionaries contain such
+        property-value pairs (with the property names as keys, and their values as values).
+
+        Finally, this method adds a `CollectionGoal` that links these collection tiles and the requested objects. This goal
+        checks at each tick if the requested objects are at the specified location(s). If multiple locations are given, the
+        requested objects can be spread out over all of those locations! For example, if a Red Block and Blue Block need to
+        be collected on locations (0, 0) and  (1, 0), the goal will be accomplished if both blocks are at either location
+        but also when the Red Block is at (0, 0) and the Blue Block is at (1, 0) or vice versa.
+
+        Parameters
+        ----------
+        collection_locs : (x, y) or list/tuple of (x, y)
+            A single location where the objects need to be collected, or a list/tuple of such locations. A location is a
+            list/tuple of two integers, the x- and y-coordinates respectively.
+        collection_objects : list/tuple of dicts, or a RandomProperty with such list/tuple
+            A list or tuple of dictionaries. Each dictionary represents a the properties and their respective values that
+            identify the to be collected object. It can also be a RandomProperty with as values such a list/tuple. This can
+            be used to generate a different collection_objects per world creation.
+        name : str
+            The name of the `CollectionGoal` and the added `CollectionTarget` and `CollectionDropOffTile` objects.
+        in_order : bool (default is False)
+            Whether the objects need to be collected and dropped of in the order specified by the `collection_objects` list.
+            If all objects are present but not dropped in the right order, the goal will not be accomplished if this is set
+            to True.
+        collection_area_colour : str (default is )
+            The colour of the area on the specified locations representing the drop zone.
+        collection_area_opacity : float (default is 1.0)
+            The opacity of the area on the specified locations representing the drop zone.
+        overwrite_goals : bool (default is False)
+            Whether any previously added goals to the builder should be discarded/overwritten.
+
+        Examples
+        --------
+        Add a collection gaol that requires agents to collect 2 objects in order. The first with the color "#ff0000" (red)
+        and the second with the color "#0000ff" (blue). Objects can be dropped at either location (0, 0) or (1, 0). The drop
+        off are is called "Dropzone".
+        >>> order = [{"visualize_colour": "#ff0000"}, {"visualize_colour": "#0000ff"}]
+        >>> builder.add_collection_goal("Dropzone", [(0, 0), (1, 0)], order, in_order=True)
+
+        Add two collection goals, each with the same collection zone. The first goal needs to collect two objects with the
+        colours "#ff0000" (red) and "##0000ff" (blue). The second goal needs to collect two objects with the custom property
+        "is_candy" set to True. Both goals can be satisfied by dropping a red and blue candy, or by dropping a red and blue
+        object that are not candies, and two candies with different colours than red or blue.
+        >>> colored_objects = [{"visualize_colour": "#ff0000"}, {"visualize_colour": "#0000ff"}]
+        >>> builder.add_collection_goal("Colours", [(0, 0), (1, 0)], colored_objects)
+        >>> candy_objects = [{"is_candy": True}, {"is_candy": True}]
+        >>> builder.add_collection_goal("Candies", [(0, 0), (1, 0)], candy_objects)
+
+        Add a collection goal to collect a red and blue candy but in a different order every time a world is created. The
+        two orders defined here are: first red, then blue OR first blue then red.
+        >>> different_orders = [[{"visualize_colour": "#ff0000"}, {"visualize_colour": "#0000ff"}], \
+        >>>                     [{"visualize_colour": "#0000ff"}, {"visualize_colour": "#ff0000"}]]
+        >>> rp_order = RandomProperty(values=different_orders)
+        >>> builder.add_collection_goal("Colours", [(0, 0), (1, 0)], rp_order, in_order=True)
+
+
+        Notes
+        -----
+        It is important remember that objects might not be traversable, which prevents them from stacking. So if a goal is
+        made that request 2 objects to be collected on the same location where both objects are not traversable, the goal
+        will never be able to succeed.
+
+        See Also
+        --------
+        matrx.goals.CollectionGoal
+            The `CollectionGoal` that performs the logic of check that all object(s) are dropped at the drop off tiles.
+        matrx.objects.CollectionDropTile
+            The tile that represents the location(s) where the object(s) need to be dropped.
+        matrx.objects.CollectionTarget
+            The invisible object representing which object(s) need to be collected and (if needed) in which order.
+        """
+
+        # Check if the `collection_locs` parameter is a list of locations. If it is a single location, make a list out
+        # of it. If it are no locations, then raise an exception.
+        incorrect_locs = True
+        if isinstance(collection_locs, (list, tuple)) and len(collection_locs) > 0:  # locs is indeed a list or tuple
+            if len(collection_locs) == 2 and isinstance(collection_locs[0], int) and isinstance(collection_locs[1],
+                                                                                                int):
+                incorrect_locs = False
+            else:
+                for l in collection_locs:
+                    if isinstance(l, (list, tuple)) and len(l) == 2 and isinstance(l[0], int) and isinstance(l[1], int):
+                        incorrect_locs = False
+        if incorrect_locs:
+            raise ValueError(
+                "The `collection_locs` parameter must be a  list or tuple of length two (e.g. [x, y]) or a "
+                "list of length > 0 containing such lists/tuples (e.g. [[x1, y1], (x2, y2), [x3, y3]]. These "
+                "represent the locations of the area in which the objects need to be collected.")
+
+        # Check if the `collection_objects` is a RandomProperty with values a list/tuple of potential orderings as
+        # represented by its own list/tuple of dictionaries. In other words, if `collection_objects` is of type
+        # [[dict, ...], ...] or a version with tuples instead of lists.
+        vals = collection_objects
+
+        # Check if the values are a RandomProperty. We include a fairly tailored check due to some import issues: Since
+        # the WorldBuilder contains the RandomProperty class and this is imported by the Goals module (because
+        # CollectionGoal imports it), we get a circular import. To fix this, we do not import the RandomProperty in the
+        # CollectionGoal, but instead refer to it in its full module path: matrx.WorldBuilder.RandomProperty. This
+        # causes the RandomProperty in WorldBuilder to be a different one then the one import in CollectionGoal. The
+        # former is of type RandomProperty while the latter is of type WorldBuilder.RandomProperty, failing the
+        # isinstance check. To remedy this we check if their classes are in fact from the same module and have the same
+        # name which is a bit of "softer" instance check.
+        if isinstance(vals, RandomProperty) or (vals.__class__.__module__ in RandomProperty.__module__
+                                                and vals.__class__.__name__ == RandomProperty.__name__):
+            vals = vals.values
+            if not (isinstance(vals, (list, tuple)) and len(vals) > 0  # check if values are a list/tuple of length > 0
+                    and isinstance(vals[0], (list, tuple)) and len(vals[0]) > 0  # check if its items are a list/tuple
+                    and isinstance(vals[0][0], dict)):  # check if the items in the listed orderings are of dicts
+                raise ValueError(
+                    "If `collection_objects` is of type `RandomProperty`, the values it samples from should be a list "
+                    "of (ordered) dictionaries. In other words; `collection_objects.values` should of type "
+                    "[[dict, ...], ...].Representing 'possible_orders[some_specific_order[obj_props1, "
+                    "obj_props2, ...], ...]'.")
+
+        # If `collection_objects` is not a random property, it should be a list/tuple containing dicts. In other words,
+        # be of type [dict, ...] which represents a specific set of objects that need to be collected.
+        elif not (isinstance(vals, (list, tuple)) and len(vals) > 0 and isinstance(vals[0], dict)):
+            raise ValueError(
+                f"The `collection_objects` must be a list or tuple of length > 0 containing dictionaries that "
+                f"represent an object description of the to be collected objects in terms of property-value "
+                f"pairs. In other words, `collection_objects` should be of type [dict, ...] but is "
+                f"{type(collection_objects)}.")
+
+        # Add the `CollectionDropOffTile` at each of the given locations. These tiles will be used by the
+        # `CollectionGoal` to check if all the objects are indeed collected (potentially in the required order as
+        # denoted by the order of the `collect_objects` parameter).
+        for l in collection_locs:
+            self.add_object(location=l, name=name, callable_class=CollectionDropOffTile, collection_area_name=name,
+                            is_traversable=True, is_movable=False, visualize_shape=0,
+                            visualize_colour=collection_area_colour, visualize_depth=0,
+                            visualize_opacity=collection_area_opacity)
+
+        # Add the `CollectionTarget` object with the specified objects to collect. By default, we add it to the first
+        # given collection locations.
+        target_name = f"{name}_target"
+        self.add_object(location=collection_locs[0], name=target_name,
+                        callable_class=CollectionTarget, collection_objects=collection_objects,
+                        collection_zone_name=name)
+
+        # Create and add the collection goal
+        collection_goal = CollectionGoal(name=name, target_name=target_name, in_order=in_order)
+        self.add_goal(collection_goal, overwrite=overwrite_goals)
+
 
 class RandomProperty:
     """ Represents a object property with random values.
@@ -2448,6 +2657,10 @@ class RandomProperty:
             is created or values that were already sampled should be ignored.
         """
 
+        # Check if values is a list of dicts, if so set a flag for it so we handle it correctly (cast each dict to a
+        # list of key-value pair tuples, as these are hashable and recast back to dict when returning value)
+        self.__is_dict_values, self.__dict_at_lvl = RandomProperty.__check_for_dict(values)
+
         # If distribution is None, its uniform (equal probability to all
         # values)
         if distribution is None:
@@ -2461,30 +2674,98 @@ class RandomProperty:
         assert len(distribution) == len(values)
 
         # Assign values and distribution
-        self.values = values
-        self.distribution = distribution
-        self.allow_duplicates = allow_duplicates
-        self.selected_values = set()
+        self.__values = values
+        self.__distribution = distribution
+        self.__allow_duplicates = allow_duplicates
+        self.__selected_values = set()
 
     def _get_property(self, rng: RandomState, size=None):
-        vals = self.values.copy()
-        if not self.allow_duplicates:
-            for it in self.selected_values:
+
+        # if values are a list of dicts, we need to change them to tuples which are hashable
+        if self.__is_dict_values:
+            vals = RandomProperty.__dict_to_tuples(self.__values)
+        else:  # if not a dict, we just copy it
+            vals = self.__values.copy()
+
+        if not self.__allow_duplicates:
+            for it in self.__selected_values:
                 vals.remove(it)
-        choice = rng.choice(vals, p=self.distribution, size=size, replace=self.allow_duplicates)
+
+        # Sample random index and get its respective value. The method `rng.choice(vals,...)` fails when vals is not a
+        # 1-dimensional list. So we just pick a random index from it.
+        idx = rng.choice(len(vals), p=self.__distribution, size=size, replace=self.__allow_duplicates)
+        choice = vals[idx]
 
         # Since the value choice is selected using Numpy, the choice may have changed to a unserializable numpy object
         # which would prevent it the be 'jsonified' for the API. So we check for this and cast it to its Python version.
-        if all(isinstance(n, int) for n in self.values):
+        if all(isinstance(n, int) for n in self.__values):
             choice = int(choice)
-        elif all(isinstance(n, float) for n in self.values):
+        elif all(isinstance(n, float) for n in self.__values):
             choice = float(choice)
 
-        self.selected_values.add(choice)
+        self.__selected_values.add(choice)
+
+        # If values are supposed to be of dict, recast the list of tuples back to such a dict
+        if self.__is_dict_values:
+            choice = RandomProperty.__tuples_to_dict(choice, dict_at_lvl=self.__dict_at_lvl - 1)
+
         return choice
 
+    @property
+    def values(self):
+        return self.__values
+
+    @property
+    def distribution(self):
+        return self.__distribution
+
+    @property
+    def selected_values(self):
+        return self.__selected_values
+
+    @property
+    def allow_duplicates(self):
+        return self.__allow_duplicates
+
+    @classmethod
+    def __dict_to_tuples(cls, list_):
+        new_list = []
+        for v in list_:
+            if isinstance(v, (tuple, list)):
+                new_list.append(RandomProperty.__dict_to_tuples(v))
+            elif isinstance(v, dict):
+                new_v = tuple([(k, v) for k, v in v.items()])
+                new_list.append(new_v)
+            else:
+                new_list.append(v)
+        tuple_ = tuple(new_list)
+        return tuple_
+
+    @classmethod
+    def __tuples_to_dict(cls, list_, dict_at_lvl, lvl=0):
+        new_list = []
+        for v in list_:
+            if (lvl + 1) == dict_at_lvl and isinstance(v, tuple):
+                new_v = {key: val for key, val in v}
+                new_list.append(new_v)
+            elif isinstance(v, (tuple, list)):
+                new_list.append(RandomProperty.__tuples_to_dict(v, dict_at_lvl, lvl=lvl + 1))
+            else:
+                new_list.append(v)
+        return new_list
+
+    @classmethod
+    def __check_for_dict(cls, list_, lvl=0):
+        if isinstance(list_, (tuple, list)):
+            for v in list_:
+                return RandomProperty.__check_for_dict(v, lvl=lvl + 1)
+        elif isinstance(list_, dict):
+            return True, lvl
+        else:
+            return False, lvl
+
     def reset(self):
-        self.selected_values = set()
+        self.__selected_values = set()
 
 
 def _get_line_coords(p1, p2):
