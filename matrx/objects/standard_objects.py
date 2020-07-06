@@ -3,7 +3,7 @@ from matrx.objects.env_object import EnvObject
 
 class SquareBlock(EnvObject):
 
-    def __init__(self, location, name="Block", **custom_properties):
+    def __init__(self, location, name="Block", visualize_colour="#4286f4", **custom_properties):
         """
         An example of a simple object with a set of attributes that are always the same. In this case that it is not
         traversable, and is visualized as a square. Otherwise it takes all default properties from an EnvObject and has
@@ -13,12 +13,13 @@ class SquareBlock(EnvObject):
         """
 
         super().__init__(name=name, location=location, visualize_shape=0, is_traversable=False,
-                         class_callable=SquareBlock, **custom_properties)
+                         class_callable=SquareBlock, visualize_colour=visualize_colour, **custom_properties)
 
 
 class Door(EnvObject):
 
-    def __init__(self, location, is_open, name="Door", open_colour="#006400", closed_colour="#640000"):
+    def __init__(self, location, is_open, name="Door", open_colour="#006400", closed_colour="#640000",
+                 **kwargs):
         """
         Door base object, can be used to define rooms. An example of an object that is and ordinary EnvObject but has
         a method on which two Actions depend; OpenDoorAction and CloseDoorAction. This method alters the is_traversable
@@ -48,7 +49,7 @@ class Door(EnvObject):
 
         super().__init__(location=location, name=name, is_traversable=is_traversable, visualize_colour=current_color,
                          is_open=self.is_open, class_callable=Door, is_movable=False,
-                         customizable_properties=['is_open'])
+                         customizable_properties=['is_open'], **kwargs)
 
     def open_door(self):
         """
@@ -81,7 +82,7 @@ class Door(EnvObject):
 
 class Wall(EnvObject):
 
-    def __init__(self, location, name="Wall", visualize_colour="#000000"):
+    def __init__(self, location, name="Wall", visualize_colour="#000000", **kwargs):
         """
         A simple Wall object. Is not traversable, the colour can be set but has otherwise the default EnvObject property
         values.
@@ -90,7 +91,8 @@ class Wall(EnvObject):
         """
         is_traversable = False  # All walls are always not traversable
         super().__init__(name=name, location=location, visualize_colour=visualize_colour,
-                         is_traversable=is_traversable, class_callable=Wall, is_movable=False)
+                         is_traversable=is_traversable, class_callable=Wall, is_movable=False,
+                         **kwargs)
 
 
 class AreaTile(EnvObject):
@@ -186,3 +188,92 @@ class Battery(EnvObject):
 
         # Return the properties themselves.
         return self.properties
+
+
+class CollectionTarget(EnvObject):
+    def __init__(self, location, collection_objects, collection_zone_name, name="Collection_target"):
+        """ An invisible object that tells which objects needs collection.
+
+        This invisible object is linked to `CollectionDropTile` object(s) and is used by the `CollectionGoal` to
+        identify which objects should be collected and dropped off at the tiles. This object is just a regular object
+        but contains three additional properties:
+        - collection_objects: See parameter doc.
+        - collection_zone_name: See parameter doc.
+        - is_invisible: A boolean denoting that this object is invisible. This boolean has no effect in MATRX, except to
+        denote that this object is not an actual visible object.
+        - is_drop_off_target: Denotes this object as containing the descriptions of the to be collected objects.
+
+        The invisibility is implemented as a block with full opacity, not movable, fully traversable and always below
+        other objects.
+
+        Parameters
+        ----------
+        location : (x, y)
+            The location of this object.
+        collection_objects : List of dicts
+            A list of dictionaries, each dictionary in this list represents an object that should be dropped at this
+            location. The dictionary itself represents the property-value pairs these objects should adhere to. The
+            order of the list matters iff the `CollectionGoal.in_order==True`, in which case the
+            `CollectionGoal` will track if the dropped objects at this tile are indeed dropped in the order of the list.
+        collection_zone_name : str
+            This is the name that links `CollectionDropTile` object(s) to this object. The `CollectionGoal` will check
+            all of these tiles with this name to check if all objects are already dropped and collected.
+        name : str (default is "Collection_target")
+            The name of this object.
+
+        Notes
+        -----
+        It does not matter where this object is added in the world. However, it is good practice to add it on top of
+        the (or one of them) `CollectionDropTile` object(s). The helper method to create collection areas
+        `WorldBuilder.add_collection_goal` follows this practice.
+
+        See Also
+        --------
+        matrx.WorldBuilder.add_collection_goal
+                The handy method in the `WorldBuilder` to add a collection goal to the world and required object(s).
+        matrx.goals.CollectionGoal
+            The `CollectionGoal` that performs the logic of check that all object(s) are dropped at the drop off tiles.
+        matrx.objects.CollectionDropTile
+            The tile that represents the location(s) where the object(s) need to be dropped.
+        """
+        super().__init__(location=location, name=name, class_callable=CollectionTarget, customizable_properties=None,
+                         is_traversable=True, is_movable=False, visualize_size=0, visualize_shape=0,
+                         is_drop_off_target=True, visualize_colour=None, visualize_depth=None, visualize_opacity=0.0,
+                         collection_objects=collection_objects, collection_zone_name=collection_zone_name,
+                         is_invisible=True)
+
+
+class CollectionDropOffTile(AreaTile):
+    def __init__(self, location, name="Collection_zone", collection_area_name="Collection zone",
+                 visualize_colour="#64a064", visualize_opacity=1.0, **kwargs):
+        """
+        An area tile used to denote where one or more objects should be dropped. It is similar to any other `AreaTile`
+        but has two additional properties that identify it as a drop off location for objects and the name of the drop
+        off. These are used by a `CollectionGoal` to help find the drop off area in all world objects.
+
+        Parameters
+        ----------
+        location : (x, y)
+            The location of this tile.
+        name : str (default is "Collection_zone")
+            The name of this tile.
+        collection_area_name: str (default is "Collection_zone")
+            The name of the collection zone this collection tile belongs to. It is used by the respective CollectionGoal
+            to identify where certain objects should be dropped.
+        visualize_colour : String (default is "#64a064", a pale green)
+            The colour of this tile.
+        visualize_opacity : Float (default is 1.0)
+            The opacity of this tile. Should be between 0.0 and 1.0.
+
+        See also
+        --------
+        matrx.WorldBuilder.add_collection_goal
+                The handy method in the `WorldBuilder` to add a collection goal to the world and required object(s).
+        matrx.goals.CollectionGoal
+            The `CollectionGoal` that performs the logic of check that all object(s) are dropped at the drop off tiles.
+        matrx.objects.CollectionTarget
+            The invisible object representing which object(s) need to be collected and (if needed) in which order.
+        """
+        super().__init__(location, name=name, visualize_colour=visualize_colour, visualize_depth=None,
+                         visualize_opacity=visualize_opacity, is_drop_off=True,
+                         collection_area_name=collection_area_name, **kwargs)

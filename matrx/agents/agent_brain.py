@@ -1,72 +1,77 @@
 import copy
+import json
+
 import numpy as np
 from matrx.actions import GrabObject, RemoveObject, OpenDoorAction, CloseDoorAction
+from matrx.agents.agent_utils.state import State
 from matrx.messages import Message
 
 
 class AgentBrain:
-    """ Defines the behavior of an agent.
-
-    This class is the place where all the decision logic of an agent is
-    contained. This class together with the
-    :class:`matrx.objects.agent_body.AgentBody` class represent a full agent.
-
-    This agent brain simply selects a random action from the possible actions
-    it can do.
-
-    When you wish to create a new agent, this is the class you need
-    to extend. In specific these are the functions you should override:
-
-    * :meth:`matrx.agents.agent_brain.initialize`
-        Called before a world starts running. Can be used to initialize
-        variables that can only be initialized after the brain is connected to
-        its body (which is done by the world).
-    * :meth:`matrx.agents.agent_brain.filter_observations`
-        Called before deciding on an action to allow detailed and agent
-        specific filtering of the received world state.
-    * :meth:`matrx.agents.agent_brain.decide_on_action`
-        Called to decide on an action.
-    * :meth:`matrx.agents.agent_brain.get_log_data`
-        Called by data loggers to obtain data that should be logged from this
-        agent internal reasoning.
-
-    Attributes
-    ----------
-    action_set: [str, ...]
-        List of actions this agent can perform.
-    agent_id: str
-        The unique identified of this agent's body in the world.
-    agent_name: str
-        The name of this agent.
-    agent_properties: dict
-        A dictionary of this agent's
-        :class:`matrx.objects.agent_body.AgentBody` properties. With as keys
-        the property name, and as value the property's value.
-
-        These can be adjusted iff they are said to be adjustable (e.g. inside
-        the attribute `keys_of_agent_writable_props`).
-    keys_of_agent_writable_props: [str, ...]
-        List of property names that this agent can adjust.
-    messages_to_send: [Message, ...]
-        List of messages this agent will send. Use the method
-        :meth:`matrx.agents.agent_brain.AgentBrain.send_message` to append to
-        this list.
-    previous_action: str
-        The name of the previous performed or attempted action.
-    previous_action_result: ActionResult
-        The :class:`matrx.actions.action.ActionResult` of the previously
-        performed or attempted action.
-    received_messages: [Message, ...]
-        The list of received messages.
-    rnd_gen: Random
-        The random generator for this agent.
-    rnd_seed: int
-        The random seed with which this agent's `rnd_gen` was initialized. This
-        seed is based on the master random seed given of the
-        :class:`matrx.grid_world.GridWorld`.
+    """ An artificial agent whose behaviour can be programmed to be, for example, (semi-)autonomous.
     """
 
-    def __init__(self):
+    def __init__(self, memorize_for_ticks=None):
+        """ Defines the behavior of an agent.
+
+        This class is the place where all the decision logic of an agent is
+        contained. This class together with the
+        :class:`matrx.objects.agent_body.AgentBody` class represent a full agent.
+
+        This agent brain simply selects a random action from the possible actions
+        it can do.
+
+        When you wish to create a new agent, this is the class you need
+        to extend. In specific these are the functions you should override:
+
+        * :meth:`matrx.agents.agent_brain.initialize`
+            Called before a world starts running. Can be used to initialize
+            variables that can only be initialized after the brain is connected to
+            its body (which is done by the world).
+        * :meth:`matrx.agents.agent_brain.filter_observations`
+            Called before deciding on an action to allow detailed and agent
+            specific filtering of the received world state.
+        * :meth:`matrx.agents.agent_brain.decide_on_action`
+            Called to decide on an action.
+        * :meth:`matrx.agents.agent_brain.get_log_data`
+            Called by data loggers to obtain data that should be logged from this
+            agent internal reasoning.
+
+        Attributes
+        ----------
+        action_set: [str, ...]
+            List of actions this agent can perform.
+        agent_id: str
+            The unique identified of this agent's body in the world.
+        agent_name: str
+            The name of this agent.
+        agent_properties: dict
+            A dictionary of this agent's
+            :class:`matrx.objects.agent_body.AgentBody` properties. With as keys
+            the property name, and as value the property's value.
+
+            These can be adjusted iff they are said to be adjustable (e.g. inside
+            the attribute `keys_of_agent_writable_props`).
+        keys_of_agent_writable_props: [str, ...]
+            List of property names that this agent can adjust.
+        messages_to_send: [Message, ...]
+            List of messages this agent will send. Use the method
+            :meth:`matrx.agents.agent_brain.AgentBrain.send_message` to append to
+            this list.
+        previous_action: str
+            The name of the previous performed or attempted action.
+        previous_action_result: ActionResult
+            The :class:`matrx.actions.action.ActionResult` of the previously
+            performed or attempted action.
+        received_messages: [Message, ...]
+            The list of received messages.
+        rnd_gen: Random
+            The random generator for this agent.
+        rnd_seed: int
+            The random seed with which this agent's `rnd_gen` was initialized. This
+            seed is based on the master random seed given of the
+            :class:`matrx.grid_world.GridWorld`.
+        """
         # Class variables for tracking the past action and its result
         self.previous_action = None
         self.previous_action_result = None
@@ -85,6 +90,10 @@ class AgentBrain:
         self.rnd_seed = None
         self.agent_properties = {}
         self.keys_of_agent_writable_props = []
+        self.__memorize_for_ticks = memorize_for_ticks
+
+        # The central state property (an extended dict with unique searching capabilities)
+        self.__state = None
 
     def initialize(self):
         """ To initialize an agent's brain.
@@ -119,7 +128,7 @@ class AgentBrain:
 
         Parameters
         ----------
-        state: dict
+        state: State
             A state description containing all perceived
             :class:`matrx.objects.env_object.EnvObject` and objects inheriting
             from this class within a certain range as defined by the
@@ -136,7 +145,7 @@ class AgentBrain:
 
         Returns
         -------
-        filtered_state : dict
+        filtered_state : State
             A dictionary similar to `state` but describing the filtered state
             this agent perceives of the world.
 
@@ -173,7 +182,7 @@ class AgentBrain:
 
         Parameters
         ----------
-        state : dict
+        state : State
         A state description as given by the agent's
         :meth:`matrx.agents.agent_brain.AgentBrain.filter_observation` method.
 
@@ -227,30 +236,30 @@ class AgentBrain:
 
         if action == RemoveObject.__name__:
             action_kwargs['object_id'] = None
-            #
-            # # Get all perceived objects
-            # objects = list(state.keys())
-            # # Remove yourself from the object id list
-            # objects.remove(self.agent_properties["obj_id"])
-            # # Remove all objects that have 'agent' in the name (so we do not remove those, though agents without agent
-            # # in their name can still be removed).
-            # objects = [obj for obj in objects if 'agent' not in obj]
-            # # Choose a random object id (safety for when it is empty)
-            # if objects:
-            #     object_id = self.rnd_gen.choice(objects)
-            #     # Assign it
-            #     action_kwargs['object_id'] = object_id
-            #     # Select range as just enough to remove that object
-            #     remove_range = int(np.ceil(np.linalg.norm(
-            #         np.array(state[object_id]['location']) - np.array(
-            #             state[self.agent_properties["obj_id"]]['location']))))
-            #     # Safety for if object and agent are in the same location
-            #     remove_range = max(remove_range, 0)
-            #     # Assign it to the arguments list
-            #     action_kwargs['remove_range'] = remove_range
-            # else:
-            #     action_kwargs['object_id'] = None
-            #     action_kwargs['remove_range'] = 0
+
+            # Get all perceived objects
+            objects = list(state.keys())
+            # Remove yourself from the object id list
+            objects.remove(self.agent_properties["obj_id"])
+            # Remove all objects that have 'agent' in the name (so we do not remove those, though agents without agent
+            # in their name can still be removed).
+            objects = [obj for obj in objects if 'agent' not in obj]
+            # Choose a random object id (safety for when it is empty)
+            if objects:
+                object_id = self.rnd_gen.choice(objects)
+                # Assign it
+                action_kwargs['object_id'] = object_id
+                # Select range as just enough to remove that object
+                remove_range = int(np.ceil(np.linalg.norm(
+                    np.array(state[object_id]['location']) - np.array(
+                        state[self.agent_properties["obj_id"]]['location']))))
+                # Safety for if object and agent are in the same location
+                remove_range = max(remove_range, 0)
+                # Assign it to the arguments list
+                action_kwargs['remove_range'] = remove_range
+            else:
+                action_kwargs['object_id'] = None
+                action_kwargs['remove_range'] = 0
 
         # if the agent randomly chose a grab action, choose a random object to pickup
         elif action == GrabObject.__name__:
@@ -369,6 +378,57 @@ class AgentBrain:
 
         return action_result.succeeded, action_result
 
+    @property
+    def state(self):
+        return self.__state
+
+    @property
+    def memorize_for_ticks(self):
+        return self.__memorize_for_ticks
+
+
+    def create_context_menu_for_other(self, agent_id_who_clicked, clicked_object_id, click_location):
+        """ Generate options for a context menu for a specific object/location that a user NOT controlling this
+        human agent opened.
+
+        Thus: another human agent selected this agent, opened a context menu by right clicking on an object or location.
+        This function is called. It should return actions, messages, or other info for what this agent can do relevant
+        to that object / location. E.g. pick it up, move to it, display information on it, etc.
+
+        Example usecase: tasking another agent that is not yourself, e.g. to move to a specific location.
+
+        For the default MATRX visualization, the context menu is opened by right clicking on an object. This function
+        should generate a list of options (actions, messages, or something else) which relate to that object or location.
+        Each option is in the shape of a text shown in the context menu, and a message which is send to this agent if
+        the user actually clicks that context menu option.
+
+        Parameters
+        ----------
+        agent_id_who_clicked : str
+            The ID of the (human) agent that selected this agent and requested for a context menu.
+        clicked_object_id : str
+            A string indicating the ID of an object. Is None if the user clicked on a background tile (which has no ID).
+        click_location : list
+            A list containing the [x,y] coordinates of the object on which the user right clicked.
+
+        Returns
+        -------
+         context_menu : list
+            A list containing context menu items. Each context menu item is a dict with a 'OptionText' key, which is
+            the text shown in the menu for the option, and a 'Message' key, which is the message instance that is sent
+            to this agent when the user clicks on the context menu option.
+        """
+        print("Context menu other")
+        context_menu = []
+
+        # Generate a context menu option for every action
+        for action in self.action_set:
+            context_menu.append({
+                "OptionText": f"Do action: {action}",
+                "Message": Message(content=action, from_id=clicked_object_id, to_id=self.agent_id)
+            })
+        return context_menu
+
     def _factory_initialise(self, agent_name, agent_id, action_set, sense_capability, agent_properties,
                             customizable_properties, rnd_seed, callback_is_action_possible):
         """ Private MATRX function.
@@ -378,15 +438,6 @@ class AgentBrain:
         Called by the WorldFactory to initialise this agent with all required properties in addition with any custom
         properties. This also sets the random number generator with a seed generated based on the random seed of the
         world that is generated.
-
-
-        :param agent_name:
-        :param agent_id:
-        :param action_set:
-        :param sense_capability:
-        :param agent_properties:
-        :param customizable_properties:
-        :param rnd_seed:
 
         Parameters
         ----------
@@ -422,6 +473,9 @@ class AgentBrain:
         self.rnd_seed = rnd_seed
         self._set_rnd_seed(seed=rnd_seed)
 
+        # Initializing the State object
+        self._init_state()
+
         # The SenseCapability of the agent; what it can see and within what range
         self.sense_capability = sense_capability
 
@@ -446,56 +500,92 @@ class AgentBrain:
 
         Note; This method should NOT be overridden!
 
-        :param state: A state description containing all properties of EnvObject that are within a certain range as
-        defined by self.sense_capability. It is a list of properties in a dictionary
-        :param agent_properties: The properties of the agent, which might have been changed by the
-        environment as a result of actions of this or other agents.
-        :param agent_id: the ID of this agent
-        :return: The filtered state of this agent, the agent properties which the agent might have changed,
-        and an action string, which is the class name of one of the actions in the Action package.
+        Parameters
+        ----------
+        state_dict: dict
+            A state description containing all properties of EnvObject that are within a certain range as defined by
+            self.sense_capability. It is a list of properties in a dictionary
+        agent_properties: dict
+            The properties of the agent, which might have been changed by the environment as a result of actions of
+            this or other agents.
+        agent_id: str
+            the ID of this agent
+
+        Returns
+        -------
+         filtered_state : dict
+            The filtered state of this agent
+        agent_properties : dict
+            the agent properties which the agent might have changed,
+        action : str
+            an action string, which is the class name of one of the actions in the Action package.
+        action_kwargs : dict
+            Keyword arguments for the action
+
         """
         # Process any properties of this agent which were updated in the environment as a result of actions
         self.agent_properties = agent_properties
 
+        # Update the state property of an agent with the GridWorld's state dictionary
+        self.__state.state_update(state)
+
         # Call the filter method to filter the observation
-        filtered_state = self.filter_observations(state)
+        self.__state = self.filter_observations(self.__state)
+        if isinstance(self.__state, dict):
+            raise ValueError(f"The filter_observation function of "
+                             f"{self.agent_id} does not return a State "
+                             f"object, but a dictionary. Please return "
+                             f"self.state.")
 
         # Call the method that decides on an action
-        action, action_kwargs = self.decide_on_action(filtered_state)
+        action, action_kwargs = self.decide_on_action(self.__state)
 
         # Store the action so in the next call the agent still knows what it did
         self.previous_action = action
+
+        # Get the dictionary from the State object
+        filtered_state = self.__state.as_dict()
 
         # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
         # action if needed.
         return filtered_state, self.agent_properties, action, action_kwargs
 
+    def _fetch_state(self, state_dict):
+        self.__state.state_update(state_dict)
+        state = self.filter_observations(self.__state)
+        filtered_state_dict = state.as_dict()
+        return filtered_state_dict
+
     def _get_log_data(self):
         return self.get_log_data()
 
     def _set_action_result(self, action_result):
-        """
-        A function that the environment calls (similarly as the self.get_action method) to set the action_result of the
-        action this agent decided upon. Note, that the result is given AFTER the action is performed (if possible).
+        """ A function that the environment calls (similarly as the self.get_action method) to set the action_result of the
+        action this agent decided upon.
+
+        Note, that the result is given AFTER the action is performed (if possible).
         Hence it is named the self.previous_action_result, as we can read its contents when we should decide on our
         NEXT action after the action whose result this is.
 
         Note; This method should NOT be overridden!
 
-        :param action_result: An object that inherits from ActionResult, containing a boolean whether the action
-        succeeded and a string denoting the reason why it failed (if it did so).
-        :return:
+        Parameters
+        ----------
+        action_result : ActionResult
+            An object that inherits from ActionResult, containing a boolean whether the action succeeded and a string
+            denoting the reason why it failed (if it did so).
         """
         self.previous_action_result = action_result
 
     def _set_rnd_seed(self, seed):
-        """
-        The function that seeds this agent's random seed.
+        """ The function that seeds this agent's random seed.
 
         Note; This method should NOT be overridden!
 
-        :param seed: The random seed this agent needs to be seeded with.
-        :return:
+        Parameters
+        ----------
+        seed : int
+            The random seed this agent needs to be seeded with.
         """
         self.rnd_seed = seed
         self.rnd_gen = np.random.RandomState(self.rnd_seed)
@@ -535,8 +625,11 @@ class AgentBrain:
 
         Note; This method should NOT be overridden!
 
-        :param messages: A list of dictionaries that contain a 'from_id', 'to_id' and 'content.
-        If messages is set to None (or no messages are used as input), only the previous messages are removed
+        Parameters
+        ----------
+        messages : Dict (optional, default, None)
+            A list of dictionaries that contain a 'from_id', 'to_id' and 'content. If messages is set to None (or no
+            messages are used as input), only the previous messages are removed
         """
 
         # We empty all received messages as this is from the previous tick
@@ -554,6 +647,9 @@ class AgentBrain:
 
             # Add the message object to the received messages
             self.received_messages.append(received_message)
+
+    def _init_state(self):
+        self.__state = State(memorize_for_ticks=self.memorize_for_ticks, own_id=self.agent_id)
 
     @staticmethod
     def __check_message(mssg, this_agent_id):

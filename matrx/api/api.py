@@ -2,6 +2,7 @@ import threading
 import copy
 import logging
 
+import jsonpickle
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
@@ -32,6 +33,7 @@ next_tick_info = {}
 add_message_to_agent = None
 received_messages = {}  # messages received via the api, intended for the Gridworld
 gw_message_manager = None  # the message manager of the gridworld, containing all messages of various types
+gw = None
 teams = None  # dict with team names (keys) and IDs of agents who are in that team (values)
 # currently only one world at a time is supported
 current_world_ID = False
@@ -164,6 +166,37 @@ def get_latest_state(agent_ids):
 
     """
     return get_states_specific_agents(current_tick, agent_ids)
+
+
+@app.route('/get_filtered_latest_state/<agent_ids>', methods=['POST'])
+def get_filtered_latest_state(agent_ids):
+    """
+
+    """
+
+    # check for validity and return an error if not valid
+    api_call_valid, error = check_states_API_request(tick=current_tick)
+    if not api_call_valid:
+        print("api request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
+    # Get the agent states
+    agent_states = __fetch_states(current_tick, agent_ids)[0]
+
+    # Filter the agent states based on the received properties list
+    props = request.json['properties']
+    if 'filters' in request.json.keys():
+        filters = request.json['filters']
+    else:
+        filters = None
+
+    filtered_states = {}
+    for agent_id, agent_dict in agent_states.items():
+        state_dict = agent_dict['state']
+        filtered_state_dict = __filter_dict(state_dict, props, filters)
+        filtered_states[agent_id] = filtered_state_dict
+
+    return jsonify(filtered_states)
 
 
 #########################################################################
@@ -359,6 +392,13 @@ def send_message():
     # fetch the data
     data = request.json
 
+    # check that all required parameters have been passed
+    required_params = ("content", "sender", "receiver")
+    if not all(k in data for k in required_params):
+        error = {"error_code": 400, "error_message": f"Missing one of the required parameters: {required_params}"}
+        print("api request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
     # create message
     msg = Message(content=data['content'], from_id=data['sender'], to_id=data['receiver'])
 
@@ -369,6 +409,116 @@ def send_message():
 
     return jsonify(True)
 
+
+#########################################################################
+# MATRX context menu API calls
+#########################################################################
+@app.route('/fetch_context_menu_of_self', methods=['POST'])
+def fetch_context_menu_of_self():
+    """ Fetch the context menu opened for a specific object/location of the agent being controlled by the user.
+    """
+    # fetch the data
+    data = request.json
+
+    # check that all required parameters have been passed
+    required_params = ("agent_id_who_clicked", "clicked_object_id", "click_location", "self_selected")
+    if not all(k in data for k in required_params):
+        return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
+
+    agent_id_who_clicked = data['agent_id_who_clicked']
+    clicked_object_id = data['clicked_object_id']
+    click_location = data['click_location']
+    self_selected = data['self_selected']
+
+    # check if agent_id_who_clicked exists in the gw
+    if agent_id_who_clicked not in gw.registered_agents.keys() and agent_id_who_clicked != "god":
+        return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
+
+    # ignore if called from the god view
+    if agent_id_who_clicked.lower() == "god":
+        return return_error(code=400,
+                            message=f"The god view is not an agent and thus cannot show its own context menu.")
+
+    # fetch context menu from agent
+    context_menu = gw.registered_agents[agent_id_who_clicked].create_context_menu_for_self_func(clicked_object_id,
+                                                                                                 click_location,
+                                                                                                self_selected)
+
+    # encode the object instance of the message
+    for item in context_menu:
+        item['Message'] = jsonpickle.encode(item['Message'])
+
+    return jsonify(context_menu)
+
+
+
+@app.route('/fetch_context_menu_of_other', methods=['POST'])
+def fetch_context_menu_of_other():
+    """ Fetch the context menu opened for a specific object/location of the agent being controlled by the user.
+    """
+    # fetch the data
+    data = request.json
+
+    # check that all required parameters have been passed
+    required_params = ("agent_id_who_clicked", "clicked_object_id", "click_location")
+    if not all(k in data for k in required_params):
+        return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
+
+    agent_id_who_clicked = data['agent_id_who_clicked']
+    clicked_object_id = data['clicked_object_id']
+    click_location = data['click_location']
+
+    # check if agent_id_who_clicked exists in the gw
+    if agent_id_who_clicked not in gw.registered_agents.keys() and agent_id_who_clicked != "god":
+        return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
+
+    # ignore if called from the god view
+    # if agent_id_who_clicked.lower() == "god":
+    #     return return_error(code=400, message=f"The god view is not an agent and thus cannot show its own context menu.")
+
+    # fetch context menu from agent
+    context_menu = gw.registered_agents[clicked_object_id].create_context_menu_for_other_func(agent_id_who_clicked,
+                                                                                                 clicked_object_id,
+                                                                                                 click_location)
+
+    # encode the object instance of the message
+    for item in context_menu:
+        item['Message'] = jsonpickle.encode(item['Message'])
+
+    return jsonify(context_menu)
+
+
+
+@app.route('/send_message_pickled', methods=['POST'])
+def send_message_pickled():
+    """ This function makes it possible to send a custom message to a MATRX agent via the API as a jsonpickle object.
+    For instance, sending a custom message when a context menu option is clicked.
+    The pre-formatted CustomMessage instance an be jsonpickled and sent via the API.
+    This API call can handle that request and send the CustomMessage to the MATRX agent
+
+        Returns
+    -------
+        Error if api call invalid, or True if valid.
+    """
+
+    # fetch the data
+    data = request.json
+    print(data)
+
+    # check that all required parameters have been passed
+    required_params = ("sender", "message")
+    if not all(k in data for k in required_params):
+        return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
+
+    sender_id = data['sender']
+    mssg = jsonpickle.decode(data['message'])
+
+    # add the received_messages to the api global variable
+    if sender_id not in received_messages:
+        received_messages[sender_id] = []
+    received_messages[sender_id].append(mssg)
+
+    return jsonify(True)
 
 #########################################################################
 # MATRX control api calls
@@ -471,6 +621,13 @@ def shutdown():
 def bad_request(e):
     print("Throwing error", e)
     return jsonify(error=str(e)), 400
+
+
+def return_error(code, message):
+    """ A helper function that returns a specified error code and message """
+    if debug:
+        print(f"api request not valid: code {code}. Message: {message}.")
+    return abort(code, description=message)
 
 
 #########################################################################
@@ -657,6 +814,59 @@ def __fetch_states(tick, ids=None):
         filtered_states.append(states_this_tick)
 
     return filtered_states
+
+
+def __filter_dict(state_dict, props, filters):
+    """ Filters a state dictionary to only a dict that contains props for all
+    objects that adhere to the filters. A filter is a combination of a
+    property and value."""
+
+    def find(obj_dict_pair):
+        # Get the object properties
+        obj_dict = obj_dict_pair[1]
+
+        # Check if all the desirable properties are in the object dict
+        if not all([p in obj_dict.keys() for p in props]):
+            return None
+
+        # Check if any filter property is present, if so check its value
+        def filter_applies(filter_):
+            filter_prop = filter_[0]
+            filter_val = filter_[1]
+            if filter_prop in obj_dict.keys():
+                return filter_val == obj_dict[filter_prop] \
+                       or filter_val in obj_dict[filter_prop]
+            else:
+                return False  # if filter is not present, we return False
+
+        # If filters are given, go over each filter to see if it applies
+        if filters is not None:
+            filter_results = map(filter_applies, filters.items())
+
+            # Check if all filters are either not applicable or return true
+            applies = all(filter_results)
+            if applies is False:  # if it does not adhere to the filters
+                return None
+
+        # Filter the dict to only the required properties
+        new_dict = {p: obj_dict[p] for p in props}
+
+        # Return the new tuple
+        return obj_dict_pair[0], new_dict
+
+    # Map our find method to all state objects
+    filtered_objects = map(find, state_dict.items())
+
+    # Extract all state objects that have the required properties and adhere to
+    # the filters
+    objects = [obj_dict_pair for obj_dict_pair in filtered_objects
+               if obj_dict_pair is not None]
+
+    # Transform back to dict
+    objects = {obj_id: obj_dict for obj_id, obj_dict in objects}
+
+    # Return
+    return objects
 
 
 def create_error_response(code, message):

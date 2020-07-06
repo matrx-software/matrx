@@ -6,10 +6,12 @@ from matrx.messages.message import Message
 class MessageManager:
     """ A manager inside the GirdWorld that tracks the received and send messages between agents and their teams.
 
-        This gives provides several advantages; - an easier connection between Core, api and Front-end for messages
-        (e.g. to differentiate between messages send between agents and to teams in the Front-end through a simple api
-        call: 'get_team_messages'). - an easy way to log communication (as the messages are easily obtained from a
-        GridWorld instance, through some methods).
+        This provides several advantages:
+        - an easier connection between MATRX Core, MATRX API, and the Front-end for
+        messages (e.g. to differentiate between messages send between agents and to teams in the Front-end through a
+        simple api call: 'get_team_messages').
+        - an easy way to log communication (as the messages are easily obtained from a GridWorld instance, through some
+        methods).
     """
 
     def __init__(self):
@@ -27,23 +29,20 @@ class MessageManager:
     def preprocess_messages(self, tick, messages, all_agent_ids, teams):
         """ Preprocess messages for sending, such that they can be understood by the GridWorld.
 
-        For example: if the receiver=None, this means it must be sent to all agents. This function creates a message
-        directed at every agent.
+        For example: if the receiver=None, this means it must be sent to all agents. This function will process
+         the receiver=None to a seperate message directed at every agent.
 
         Parameters
         ----------
-        tick
+        tick : int
             Current tick of the gridworld
-        messages
+        messages : dict
             All messages sent from the agent brains in the gridworld, and received via the api
-        all_agent_ids
+        all_agent_ids : list
             IDs of all the agents
-        teams
+        teams : list
             ...
 
-        Returns
-        -------
-            Preprocessed messages ready for sending
         -------
         """
         self.teams = teams
@@ -63,11 +62,12 @@ class MessageManager:
             # messages understandable by the GridWorld
             self._decode_message_receiver(mssg, all_agent_ids, teams, tick)
 
+
     def _decode_message_receiver(self, mssg, all_agent_ids, teams, tick):
         """ Processes messages directed at other agents / teams / everyone.
 
-        These types are called private, team, and global messages.
-        Messages of each type are saved for every tick seperatly, as well as a list with all preprocessed messages
+        These messsage types are called private, team, and global messages.
+        Messages of each type are saved for every tick separately, as well as a list with all preprocessed messages
         suitable for sending by the GridWorld.
 
         Possible formats for mssg.to_id
@@ -81,13 +81,10 @@ class MessageManager:
         ----------
         mssg
             The original mssg object sent by the agent, or received via the api
-
         all_agent_ids
             List with IDs of all agents
-
         teams
             Dict with all team names (keys), and a list with all agent IDs in that team (value)
-
         tick
             Current tick of the gridworld
         """
@@ -180,15 +177,16 @@ class MessageManager:
                             f" This is required for agents to be able to send and receive them.")
 
     def fetch_chatrooms(self, agent_id=None):
-        """ Fetch all the chatrooms which an agent can view (or all if no ID provided)
+        """ Fetch all the chatrooms, or only those which a specific agent can view.
 
         Parameters
         ----------
-        agent_id
-            ID of the agent for which to fetch all accessible chatrooms
+        agent_id : str (optional, default, None)
+            ID of the agent for which to fetch all accessible chatrooms. if None, all chatrooms are returned.
 
         Returns
         -------
+        chatrooms : dict
             A dictionary containing a list with all "private" chatrooms, all "teams" chatrooms, and a "global" key,
             accessible via likewise named keys.
         """
@@ -217,19 +215,29 @@ class MessageManager:
 
         Parameters
         ----------
-        tick_from
+        tick_from : int
             All messages from `tick_from` onwards to (including) `tick_to` will be collected.
-        tick_to
+        tick_to : int
             All messages from `tick_from` onwards to (including) `tick_to` will be collected.
-        agent_id
-            Only messages received by or sent by this agent will be collected.
+        agent_id : string (optional, default, None)
+            Only messages received by or sent by this agent will be collected. If none, all messages are returned
+            between `tick_from` to `tick_to`.
 
         Returns
         -------
-        Dictionary containing a 'global', 'team', and 'private' subdictionary.
-        Global messages: messages['global'][tick] = [list of messages]
-        Team messages: messages['team'][tick][team] = [list of messages]
-        Private messages: messages['private'][tick] = [list of messages]
+        Messages : dict
+            Dictionary containing a 'global', 'team', and 'private' subdictionary.
+                Global messages: messages['global'][tick] = [list of messages]
+                Team messages: messages['team'][tick][team] = [list of messages]
+                Private messages: messages['private'][tick] = [list of messages]
+
+        Examples
+        ---------
+        In an action, world goal, or somewhere else with access to the Gridworld, the function can be used as below.
+        This example returns all messages between tick 0 and 10.
+
+        >>> messages = grid_world.message_manager.fetch_messages(0, 10, None)
+
 
         """
         messages = {'global': {}, 'team': {}, 'private': {}}
@@ -289,14 +297,15 @@ class MessageManager:
 
         Parameters
         ----------
-        mssg
+        mssg : (Custom)Message
             original message instance. Can be the default Message() class, or a class that inherits from it.
-        from_id
+        from_id : str
             the new sender ID.
-        to_id
+        to_id : str
              the new receiver ID.
 
         Returns
+        new_mssg : (Custom)Message
             the new message instance with the same class and custom properties as mssg, with the provided from_id
             and to_id.
         -------

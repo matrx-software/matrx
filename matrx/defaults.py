@@ -1,4 +1,4 @@
-from matrx.goals.goals import LimitedTimeGoal
+# from matrx.goals.goals import LimitedTimeGoal
 
 ######################
 # AgentBody defaults #
@@ -34,7 +34,7 @@ GRIDWORLD_STEP_DURATION = 0.1
 GRIDWORLD_TIME_FOCUS = "step"
 GRIDWORLD_RUN_VIS_SERVER = False
 GRIDWORLD_RUN_API = False
-GRIDWORLD_SIMULATION_GOAL = LimitedTimeGoal
+# GRIDWORLD_SIMULATION_GOAL = LimitedTimeGoal
 GRIDWORLD_SIM_GOAL_ARGUMENTS = {
     "max_nr_ticks": -1
 }
