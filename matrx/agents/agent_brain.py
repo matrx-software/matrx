@@ -93,7 +93,7 @@ class AgentBrain:
         self.__memorize_for_ticks = memorize_for_ticks
 
         # The central state property (an extended dict with unique searching capabilities)
-        self.__state = None
+        self._state = None
 
     def initialize(self):
         """ To initialize an agent's brain.
@@ -380,7 +380,7 @@ class AgentBrain:
 
     @property
     def state(self):
-        return self.__state
+        return self._state
 
     @property
     def memorize_for_ticks(self):
@@ -527,32 +527,32 @@ class AgentBrain:
         self.agent_properties = agent_properties
 
         # Update the state property of an agent with the GridWorld's state dictionary
-        self.__state.state_update(state)
+        self._state.state_update(state)
 
         # Call the filter method to filter the observation
-        self.__state = self.filter_observations(self.__state)
-        if isinstance(self.__state, dict):
+        self._state = self.filter_observations(self._state)
+        if isinstance(self._state, dict):
             raise ValueError(f"The filter_observation function of "
                              f"{self.agent_id} does not return a State "
                              f"object, but a dictionary. Please return "
                              f"self.state.")
 
         # Call the method that decides on an action
-        action, action_kwargs = self.decide_on_action(self.__state)
+        action, action_kwargs = self.decide_on_action(self._state)
 
         # Store the action so in the next call the agent still knows what it did
         self.previous_action = action
 
         # Get the dictionary from the State object
-        filtered_state = self.__state.as_dict()
+        filtered_state = self._state.as_dict()
 
         # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
         # action if needed.
         return filtered_state, self.agent_properties, action, action_kwargs
 
     def _fetch_state(self, state_dict):
-        self.__state.state_update(state_dict)
-        state = self.filter_observations(self.__state)
+        self._state.state_update(state_dict)
+        state = self.filter_observations(self._state)
         filtered_state_dict = state.as_dict()
         return filtered_state_dict
 
@@ -649,7 +649,7 @@ class AgentBrain:
             self.received_messages.append(received_message)
 
     def _init_state(self):
-        self.__state = State(memorize_for_ticks=self.memorize_for_ticks, own_id=self.agent_id)
+        self._state = State(memorize_for_ticks=self.memorize_for_ticks, own_id=self.agent_id)
 
     @staticmethod
     def __check_message(mssg, this_agent_id):

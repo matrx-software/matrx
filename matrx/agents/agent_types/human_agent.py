@@ -138,17 +138,28 @@ class HumanAgentBrain(AgentBrain):
         # actions
         self.agent_properties = agent_properties
 
-        # first filter the state to only show things this particular agent can see
-        filtered_state = self.filter_observations(state)
+        # Update the state property of an agent with the GridWorld's state dictionary
+        self._state.state_update(state)
+
+        # Call the filter method to filter the observation
+        self._state = self.filter_observations(self._state)
+        if isinstance(self._state, dict):
+            raise ValueError(f"The filter_observation function of "
+                             f"{self.agent_id} does not return a State "
+                             f"object, but a dictionary. Please return "
+                             f"self.state.")
 
         # only keep user input which is actually connected to an agent action
         usrinput = self.filter_user_input(user_input)
 
         # Call the method that decides on an action
-        action, action_kwargs = self.decide_on_action(filtered_state, usrinput)
+        action, action_kwargs = self.decide_on_action(self._state, usrinput)
 
         # Store the action so in the next call the agent still knows what it did
         self.previous_action = action
+
+        # Get the dictionary from the State object
+        filtered_state = self._state.as_dict()
 
         # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
         # action if needed.
