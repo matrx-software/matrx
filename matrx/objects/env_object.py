@@ -1,5 +1,5 @@
 import matrx.defaults as defaults
-
+import warnings
 
 class EnvObject:
 
@@ -77,6 +77,10 @@ class EnvObject:
         # spaces are not allowed
         if not hasattr(self, "obj_id"):
             self.obj_id = f"{self.obj_name}_{_next_obj_id()}".replace(" ", "_")
+
+            if "#" in self.obj_id:
+                warnings.warn("Note: # signs are not allowed as part of an agent or object ID, as it breaks the MATRX frontend. Any hashtags will be removed from the ID..")
+                self.obj_id = self.obj_id.replace("#", "")
 
         # Make customizable_properties mutable if not given.
         if customizable_properties is None:
