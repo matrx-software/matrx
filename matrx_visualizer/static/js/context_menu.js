@@ -22,7 +22,8 @@ var matrx_url = 'http://' + window.location.hostname,
                 post_data = {'agent_id_who_clicked': lv_agent_id,
                         'clicked_object_id': obj_id,
                         'click_location': [x,y],
-                        'self_selected': object_selected == lv_agent_id}
+                        'self_selected': object_selected == lv_agent_id,
+                        'agent_selected': object_selected}
 
                 // if no one or only ourselves are selected, send to matrx_context_menu_self,
                 // otherwise send to matrx_context_menu_other

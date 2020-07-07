@@ -153,6 +153,8 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
 
             // add this agent to the dropdown list
             if (obj.hasOwnProperty('isAgent')) {
+
+                console.log("adding selection listener:", obj);
                 populate_god_agent_menu = true;
                 pop_new_chat_dropdown = true;
 
@@ -813,6 +815,7 @@ function draw_bg_tiles() {
 function add_selection_listener(object) {
     $(object).click( function() {
 
+        console.log("clicked on selection listener");
         var obj = $(this);
         var obj_id = obj.attr('id');
 

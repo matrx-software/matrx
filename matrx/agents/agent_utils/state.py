@@ -21,6 +21,20 @@ class State(MutableMapping):
         self.__decays = {}
 
     def state_update(self, state_dict):
+
+        # If decay does not matter, we simply use the given dictionary
+        if self.__decay_val <= 0.0:
+            # Set the previous and new state
+            self.__prev_state_dict = self.__state_dict.copy()
+            self.__state_dict = state_dict.copy()
+
+            # Set the "me"
+            self.__me = self.get_self()
+
+            # Return self
+            return self
+
+        # Else: decay does matter so we need to handle knowledge decay
         prev_state = self.__state_dict.copy()
         state = state_dict.copy()
 
@@ -33,43 +47,41 @@ class State(MutableMapping):
         # Get the ids of all objects that are not perceived any more
         gone_ids = set(prev_state.keys()) - set(state.keys())
 
-        # Handle knowledge decay if decay actually matters (e.g. that stuff need to be memorized)
-        if self.__decay_val > 0:
-            # Decay the decays of all objects that are not perceived any longer
-            for obj_id in gone_ids:
-                self.__decays[obj_id] = max((self.__decays[obj_id] - self.__decay_val), 0)
+        # Decay the decays of all objects that are not perceived any longer
+        for obj_id in gone_ids:
+            self.__decays[obj_id] = max((self.__decays[obj_id] - self.__decay_val), 0)
 
-            # Reset the decays of all objects that are still perceived
-            for obj_id in persistent_ids:
-                self.__decays[obj_id] = 1.0
+        # Reset the decays of all objects that are still perceived
+        for obj_id in persistent_ids:
+            self.__decays[obj_id] = 1.0
 
-            # Add all new decays of the newly perceived objects
-            for obj_id in new_ids:
-                self.__decays[obj_id] = 1.0
+        # Add all new decays of the newly perceived objects
+        for obj_id in new_ids:
+            self.__decays[obj_id] = 1.0
 
-            # Check for non-zero decays and flag them for keeping (this now also includes all new_ids as we just added
-            # them).
-            to_keep_ids = []
-            for obj_id, decay in self.__decays.items():
-                if decay > 0:
-                    to_keep_ids.append(obj_id)
-                else:  # remove all zero decay objects, this reduces the self.__decays of growing with zero decays
-                    self.__decays.pop(obj_id)
-            to_keep_ids = set(to_keep_ids)
-
-        # If decay does not matter, flag all objects for keeping that are newly or still perceived
-        else:
-            to_keep_ids = new_ids.union(persistent_ids)
+        # Check for non-zero decays and flag them for keeping (this now also
+        # includes all new_ids as we just added them).
+        to_keep_ids = []
+        for obj_id, decay in self.__decays.items():
+            if decay > 0:
+                to_keep_ids.append(obj_id)
+            # remove all zero decay objects, this reduces
+            # the self.__decays of growing with zero decays
+            else:
+                self.__decays.pop(obj_id)
+        to_keep_ids = set(to_keep_ids)
 
         # Create new state
         new_state = {}
         for obj_id in to_keep_ids:
-            # If the object id is in the received state, pick that one. This makes sure that any objects that were also
-            # in the previous state get updated with newly perceived properties
+            # If the object id is in the received state, pick that one. This
+            # makes sure that any objects that were also in the previous state
+            # get updated with newly perceived properties
             if obj_id in state.keys():
                 new_state[obj_id] = state[obj_id]
-            # If the object id is not in the received state, it may still be in the previous state (e.g. because its
-            # decay was non-zero). Though this only happens when decay is set.
+            # If the object id is not in the received state, it may still be
+            # in the previous state (e.g. because its decay was non-zero).
+            # Though this only happens when decay is set.
             elif obj_id in prev_state.keys():
                 new_state[obj_id] = prev_state[obj_id]
 
