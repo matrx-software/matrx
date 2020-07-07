@@ -138,28 +138,24 @@ class HumanAgentBrain(AgentBrain):
         # actions
         self.agent_properties = agent_properties
 
-        # Update the state property of an agent with the GridWorld's state dictionary
-        self._state.state_update(state)
+        # Update the state property of an agent with the GridWorld's state
+        # dictionary
+        self.state.state_update(state)
 
         # Call the filter method to filter the observation
-        self._state = self.filter_observations(self._state)
-        if isinstance(self._state, dict):
-            raise ValueError(f"The filter_observation function of "
-                             f"{self.agent_id} does not return a State "
-                             f"object, but a dictionary. Please return "
-                             f"self.state.")
+        self.state = self.filter_observations(self.state)
 
         # only keep user input which is actually connected to an agent action
         usrinput = self.filter_user_input(user_input)
 
         # Call the method that decides on an action
-        action, action_kwargs = self.decide_on_action(self._state, usrinput)
+        action, action_kwargs = self.decide_on_action(self.state, usrinput)
 
         # Store the action so in the next call the agent still knows what it did
         self.previous_action = action
 
         # Get the dictionary from the State object
-        filtered_state = self._state.as_dict()
+        filtered_state = self.state.as_dict()
 
         # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
         # action if needed.
@@ -182,9 +178,9 @@ class HumanAgentBrain(AgentBrain):
 
         Parameters
         ==========
-        state : dict
-            A state description containing all properties of EnvObject that are within a certain range as
-            defined by self.sense_capability. It is a list of properties in a dictionary
+        state : State
+            A state description containing all properties of EnvObject that
+            are within a certain range as defined by self.sense_capability.
 
         user_input : list
             A dictionary containing the key presses of the user, intended for controlling thus human agent.
