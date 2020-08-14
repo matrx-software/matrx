@@ -236,7 +236,7 @@ class CollectionGoal(WorldGoal):
                         and "is_invisible" in obj_props.keys()):
                 continue
             for req_props in self.__target:
-                obj_props = utils.__flatten_dict(obj_props)
+                obj_props = utils._flatten_dict(obj_props)
                 if req_props.items() <= obj_props.items():
                     detected_objs[obj_id] = curr_tick
 
@@ -265,7 +265,7 @@ class CollectionGoal(WorldGoal):
             rank = 0
             for obj_id, tick in sorted_dropped_obj:
                 props = all_[obj_id].properties
-                props = utils.__flatten_dict(props)
+                props = utils._flatten_dict(props)
                 req_props = self.__target[rank]
                 if req_props.items() <= props.items():
                     rank += 1

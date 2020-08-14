@@ -45,7 +45,7 @@ def get_room_locations(room_top_left, room_width, room_height):
     return locs
 
 
-def __flatten_dict(dict_):
+def _flatten_dict(dict_):
     new_dict = {}
     for k, v in dict_.items():
         if isinstance(v, dict):
