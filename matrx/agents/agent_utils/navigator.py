@@ -1,4 +1,5 @@
 import heapq
+import warnings
 from collections import OrderedDict
 
 import numpy as np
@@ -80,14 +81,30 @@ class Navigator:
 
         agent_loc = state_tracker.get_memorized_state()[self.__agent_id]['location']
 
+        # if there is no route and we are done
         if len(route) == 0 and self.is_done:
             return None
+
+        # if there is no route but we are not done, for example because a path
+        # is blocked or we are already at the waypoint.
+        elif len(route) == 0:  #
+            agent_id = self.__agent_id
+            current_wp = self.__get_current_waypoint()
+            warnings.warn(f"The agent {agent_id} at {agent_loc} cannot find a "
+                          f"path to the waypoint at {current_wp.location}, "
+                          f"likely because it is blocked.", RuntimeWarning)
+            return None
+
+        # If the agent's location has a move action assigned to it
         elif agent_loc in route:
             move_action = route[agent_loc]
+
+        # Otherwise we raise an exception that something went wrong
         else:
             agent_id = self.__agent_id
-            raise Exception(f"Something went wrong with the path planning. The location {agent_loc} of agent "
-                            f"{agent_id} is not found in the route.")
+            raise ValueError(f"Something went wrong with the path planning. "
+                            f"The location {agent_loc} of agent {agent_id} "
+                            f"is not found in the route.")
 
         return move_action
 
@@ -147,7 +164,8 @@ class Navigator:
         path = self.__path_planning_algo.plan(start=agent_loc, goal=current_wp.location,
                                               occupation_map=self.__occupation_map)
 
-        # Go over the path and select the action that is required to go from one location to the other
+        # Go over the path and select the action that is required to go from
+        # one location to the other
         route = self.__get_route_from_path(agent_loc, path)
 
         return route
