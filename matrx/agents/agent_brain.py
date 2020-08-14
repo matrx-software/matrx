@@ -1,5 +1,6 @@
 import copy
 import json
+import warnings
 
 import numpy as np
 from matrx.actions import GrabObject, RemoveObject, OpenDoorAction, CloseDoorAction
@@ -382,10 +383,25 @@ class AgentBrain:
     def state(self):
         return self._state
 
+    @state.setter
+    def state(self, new_state):
+
+        # Check if the return filtered state is a differently created State
+        # object, if so, raise the warning that we are overwriting it.
+        if new_state is not self.state:
+            warnings.warn(f"Overwriting State object of {self.agent_id}. This "
+                          f"will cause any stored memory to be gone for good "
+                          f"as this was stored in the previous State object.")
+
+        if isinstance(new_state, dict):
+            raise TypeError(f"The new state should of type State, is of "
+                            f"type {new_state.__class__}")
+
+        self._state = new_state
+
     @property
     def memorize_for_ticks(self):
         return self.__memorize_for_ticks
-
 
     def create_context_menu_for_other(self, agent_id_who_clicked, clicked_object_id, click_location):
         """ Generate options for a context menu for a specific object/location that a user NOT controlling this
@@ -527,32 +543,27 @@ class AgentBrain:
         self.agent_properties = agent_properties
 
         # Update the state property of an agent with the GridWorld's state dictionary
-        self._state.state_update(state)
+        self.state.state_update(state)
 
         # Call the filter method to filter the observation
-        self._state = self.filter_observations(self._state)
-        if isinstance(self._state, dict):
-            raise ValueError(f"The filter_observation function of "
-                             f"{self.agent_id} does not return a State "
-                             f"object, but a dictionary. Please return "
-                             f"self.state.")
+        self.state = self.filter_observations(self.state)
 
         # Call the method that decides on an action
-        action, action_kwargs = self.decide_on_action(self._state)
+        action, action_kwargs = self.decide_on_action(self.state)
 
         # Store the action so in the next call the agent still knows what it did
         self.previous_action = action
 
         # Get the dictionary from the State object
-        filtered_state = self._state.as_dict()
+        filtered_state = self.state.as_dict()
 
         # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
         # action if needed.
         return filtered_state, self.agent_properties, action, action_kwargs
 
     def _fetch_state(self, state_dict):
-        self._state.state_update(state_dict)
-        state = self.filter_observations(self._state)
+        self.state.state_update(state_dict)
+        state = self.filter_observations(self.state)
         filtered_state_dict = state.as_dict()
         return filtered_state_dict
 
@@ -649,7 +660,8 @@ class AgentBrain:
             self.received_messages.append(received_message)
 
     def _init_state(self):
-        self._state = State(memorize_for_ticks=self.memorize_for_ticks, own_id=self.agent_id)
+        self._state = State(memorize_for_ticks=self.memorize_for_ticks,
+                            own_id=self.agent_id)
 
     @staticmethod
     def __check_message(mssg, this_agent_id):

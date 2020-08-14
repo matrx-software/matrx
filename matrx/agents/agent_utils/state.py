@@ -213,6 +213,9 @@ class State(MutableMapping):
 
     def __len__(self):
         return len(self.__state_dict)
+    
+    def keys(self):
+        return self.__state_dict.keys()
 
     def update(self, *args, **kwargs):
         raise ValueError("You cannot update the state, use state.state_update(...) instead.")
