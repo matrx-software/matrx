@@ -202,7 +202,7 @@ def get_filtered_latest_state(agent_ids):
 #########################################################################
 # MATRX fetch messages api calls
 #########################################################################
-@app.route('/get_messages/<tick>', methods=['GET', 'POST'])
+@app.route('/get_messages/<tick>/<last_mssg_id>', methods=['GET', 'POST'])
 def get_messages(tick):
     """ Provides the messages of all agents from tick `tick` onwards to current tick. Also returns
     the chatrooms at the latest tick.
@@ -229,7 +229,7 @@ def get_messages(tick):
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    messages = gw_message_manager.fetch_messages(int(tick), current_tick)
+    messages = gw_message_manager.fetch_messages(last_mssg_id)
     chatrooms = gw_message_manager.fetch_chatrooms()
 
     return jsonify({"messages": messages, "chatrooms": chatrooms})

@@ -3,7 +3,6 @@
 
 # Ignore build related folders and files
 build/
-dist/
 matrx.egg-info/
 .pypirc
 *.pyc

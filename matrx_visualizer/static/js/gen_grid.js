@@ -81,6 +81,8 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
     // process any messages received
     process_messages(new_messages);
 
+    console.log(new_messages);
+
     // move the objects from last tick to another list
     saved_prev_objs = saved_objs;
     saved_objs = {};

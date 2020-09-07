@@ -229,6 +229,22 @@ class HumanAgentBrain(AgentBrain):
             of 0 is no wait, 1 means to wait 1 tick, etc.).
         """
 
+
+        if state['World']['nr_ticks'] == 0:
+            print(f"{self.agent_id} sending messages first tick")
+
+            for obj_id, obj in state.items():
+
+                if obj_id is "World":  # Skip the world properties
+                    continue
+
+                classes = obj['class_inheritance']
+                if "AgentBrain" in classes or "HumanAgentBrain" in classes:  # the object is an agent to which we can send our message
+                    message_content = f"Hello, my name is {self.agent_name}"
+                    self.send_message(Message(content=message_content, from_id=self.agent_id, to_id=obj_id))
+
+
+
         action_kwargs = {}
 
         # if no keys were pressed, do nothing
@@ -505,5 +521,3 @@ class HumanAgentBrain(AgentBrain):
             object_id = None
 
         return object_id
-
-

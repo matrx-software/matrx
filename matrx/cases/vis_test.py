@@ -8,7 +8,7 @@ from matrx.actions import *
 def create_builder():
     tick_dur = 0.1
     factory = WorldBuilder(random_seed=1, shape=[14, 20], tick_duration=tick_dur, verbose=False, run_matrx_api=True,
-                           run_matrx_visualizer=True, visualization_bg_clr="#f0f0f0", simulation_goal=int(10/tick_dur),
+                           run_matrx_visualizer=True, visualization_bg_clr="#f0f0f0", simulation_goal=100000,
                            visualization_bg_img='/static/images/restaurant_bg.png')
 
     factory.add_room(top_left_location=[0, 0], width=14, height=20, name="world_bounds")
