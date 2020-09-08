@@ -202,7 +202,37 @@ def get_filtered_latest_state(agent_ids):
 #########################################################################
 # MATRX fetch messages api calls
 #########################################################################
-@app.route('/get_messages/<tick>/<last_mssg_id>', methods=['GET', 'POST'])
+
+@app.route('/get_messages/', methods=['POST'])
+def get_messages_post():
+    # TODO: get agent_ID(s), or else None
+    # TODO: get offsets
+    return jsonify(True)
+
+
+@app.route('/get_messages/', methods=['GET'])
+def get_messages_get():
+    # TODO: return all chats
+    return jsonify(True)
+
+@app.route('/get_messages/<agent_id>', methods=['GET'])
+def get_messages_get():
+    # TODO: get agent_ID(s)
+    # TODO: return all chats
+    return jsonify(True)
+
+@app.route('/get_messages/<agent_id>/<offsets>', methods=['GET'])
+def get_messages_get():
+    # TODO: get agent_ID(s) (or None)
+    # TODO: get offsets
+    # TODO: return offset messages
+    return jsonify(True)
+
+
+
+
+
+@app.route('/get_messages/', methods=['GET', 'POST'])
 def get_messages(tick):
     """ Provides the messages of all agents from tick `tick` onwards to current tick. Also returns
     the chatrooms at the latest tick.
@@ -235,7 +265,14 @@ def get_messages(tick):
     return jsonify({"messages": messages, "chatrooms": chatrooms})
 
 
-@app.route('/get_messages/<tick>/<agent_id>', methods=['GET', 'POST'])
+
+@app.route('/get_messages/<tick>', methods=['GET', 'POST'])
+def get_messages(tick):
+    # TODO: add deprecated notice
+    return jsonify(True)
+
+
+@app.route('/get_messages/<agent_id>', methods=['GET', 'POST'])
 def get_messages_specific_agent(tick, agent_id):
     """ Provides all messages either send by or addressed to `agent_id`, from tick `tick` onwards.
 
@@ -273,61 +310,14 @@ def get_messages_specific_agent(tick, agent_id):
 
 @app.route('/get_latest_messages', methods=['GET', 'POST'])
 def get_latest_messages():
-    """ Provides all messages of the latest tick.
-
-    Returns
-        Returns a dictionary containing `messages` and `chatrooms`. The chatrooms subdictionary
-        contains all accessible chatrooms at the latest tick. The messages subdictionary contains
-        all messages of the latest tick, subdivided under `global`, `team`, and `private`.
-        Also see the documentation of the
-        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_messages` and
-        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
-    -------
-
-    """
-    # check for validity and return an error if not valid
-    api_call_valid, error = check_messages_API_request(tick=current_tick)
-    if not api_call_valid:
-        print("api request not valid:", error)
-        return abort(error['error_code'], description=error['error_message'])
-
-    messages = gw_message_manager.fetch_messages(current_tick, current_tick)
-    chatrooms = gw_message_manager.fetch_chatrooms()
-
-    return jsonify({"messages": messages, "chatrooms": chatrooms})
+    #TODO: deprecated
+    return jsonify(True)
 
 
 @app.route('/get_latest_messages/<agent_id>', methods=['GET', 'POST'])
 def get_latest_messages_specific_agent(agent_id):
-    """ Provides the messages of the latest tick either sent by or addressed to `agent_id`.
-
-    Parameters
-    ----------
-    agent_id
-        The `agent_id` of the agent of whom the messages should be fetched.
-        All fetched messages are either sent to or by the agent with agent ID `agent_id`.
-
-    Returns
-    -------
-        Returns a dictionary containing `messages` and `chatrooms`. The chatrooms subdictionary
-        contains all accessible chatrooms at the latest tick, set to or by the agent with
-        ID `agent_id`. The messages subdictionary contains
-        all messages of the latest tick, subdivided under `global`, `team`, and `private`.
-        Also see the documentation of the
-        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_messages` and
-        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
-
-    """
-    # check for validity and return an error if not valid
-    api_call_valid, error = check_messages_API_request(tick=current_tick, agent_id=agent_id)
-    if not api_call_valid:
-        print("api request not valid:", error)
-        return abort(error['error_code'], description=error['error_message'])
-
-    messages = gw_message_manager.fetch_messages(current_tick, current_tick, clean_input_ids(agent_id)[0])
-    chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
-
-    return jsonify({"messages": messages, "chatrooms": chatrooms})
+    #TODO: deprecated
+    return jsonify(True)
 
 
 #########################################################################
