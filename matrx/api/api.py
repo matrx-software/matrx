@@ -65,6 +65,61 @@ def get_info():
     return jsonify(MATRX_info)
 
 
+@app.route('/get_latest_state_and_messages/', methods=['GET', 'POST'])
+def get_latest_state_and_messages():
+    """ Provides all most recent information from MATRX for 1 agent: The state from the latest tick , and any new
+    messages.
+
+    Parameters should be passed via GET URL parameters.
+
+    A combination of :func:`~matrx.api.api.get_latest_state` and :func:`~matrx.api.api.get_messages`. See those
+    two functions for their respective documentation.
+
+    Parameters
+    ----------
+    agent_id
+        The ID of the targeted agent. Only the state of that agent, and chatrooms in which that agent is part will be
+        sent.
+
+    offsets : (optional GET URL parameter, default {})
+        It is not efficient to send every message every tick. With this offsets dict the requestee can
+        indicate for every chatroom, which messages they already have, such that only new messages can be sent.
+        The `offsets` URL parmaeter should be a dict with as keys the chatroom ID, and as values the message offset.
+        The message offset is the index of the message.
+        Example of a valid dict: {"0": "10", "3": "5"}.
+        This returns the message with index 10+ for the chatroom with ID 0 (global chat),
+        and messages with index 5+ for chatroom with ID 3.
+
+    Returns
+    -------
+        A dictionary containing the states under the "states" key, and the chatrooms with messages under the
+         "chatrooms" key.
+
+    """
+    # fetch URL parameters
+    agent_id = request.args.get("agent_id")
+    offsets = request.args.get("offsets")
+
+    # agent_id is required
+    if not isinstance(agent_id, str):
+        error_mssg = f"Agent_id passed to /get_latest_state_and_messages API request is not of valid format: " \
+                     f"{agent_id}. Should be string."
+        print("api request not valid:", error_mssg)
+        return abort(400, description=error_mssg)
+
+    # check for validity and return an error if not valid
+    api_call_valid, error = check_states_API_request(ids=[agent_id])
+    if not api_call_valid:
+        print("api request not valid:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
+    # fetch states and chatrooms with messages
+    states_ = __fetch_states(current_tick, agent_id)
+    chatrooms = get_messages(agent_id, offsets)
+    return jsonify({"matrx_paused": matrx_paused, "states": states_, "chatrooms": chatrooms})
+
+
+
 @app.route('/get_latest_state_and_messages/<agent_id>', methods=['GET', 'POST'])
 def get_latest_state_and_messages(agent_id):
     """ Provides all most recent information from MATRX: Both the state and messages from the latest
@@ -75,23 +130,32 @@ def get_latest_state_and_messages(agent_id):
     agent_id
         The ID of the targeted agent
 
+    agent_id : (optional GET URL parameter, default None)
+        Agent ID string that will make this function only return chatrooms of which that agent is part. Defaults to
+        None, returning all chatsrooms and all chat messages.
+
+    offsets : (optional GET URL parameter, default {})
+        GET URL parameter that should be a dict with as key the chatroom ID, and as value the message offset. E.g.
+        {"0": "10", "3": "5"}. This returns the message with index 10+ for the chatroom with ID 0 (global chat),
+        and messages with index 5+ for chatroom with ID 3.
+
     Returns
     -------
         a dictionary containing the states under the "states" key, and the messages under the "messages" key.
 
     """
+    # TODO: deprecated
     # check for validity and return an error if not valid
     api_call_valid, error = check_states_API_request(ids=[agent_id])
     if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    # fetch states and messages
+    # fetch states and chatrooms with messages
     states_ = __fetch_states(current_tick, agent_id)
-    messages = gw_message_manager.fetch_messages(current_tick, current_tick, clean_input_ids(agent_id)[0])
-    chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
+    chatrooms = get_messages(request)
 
-    return jsonify({"matrx_paused": matrx_paused, "states": states_, "messages": messages, "chatrooms": chatrooms})
+    return jsonify({"matrx_paused": matrx_paused, "states": states_, "messages": {}, "chatrooms": chatrooms})
 
 
 #########################################################################
@@ -113,6 +177,9 @@ def get_states(tick):
         state for each agent existing in the simulation, indexed by their agent ID.
 
     """
+    # fetch URL parameters
+    agent_id = request.args.get("agent_id")
+    offsets = request.args.get("offsets")
 
     # check for validity and return an error if not valid
     api_call_valid, error = check_states_API_request(tick=tick)
@@ -170,9 +237,7 @@ def get_latest_state(agent_ids):
 
 @app.route('/get_filtered_latest_state/<agent_ids>', methods=['POST'])
 def get_filtered_latest_state(agent_ids):
-    """
-
-    """
+    """ Return a state from a set of agent IDs, filtered to only return the specified properties """
 
     # check for validity and return an error if not valid
     api_call_valid, error = check_states_API_request(tick=current_tick)
@@ -202,120 +267,74 @@ def get_filtered_latest_state(agent_ids):
 #########################################################################
 # MATRX fetch messages api calls
 #########################################################################
-
-@app.route('/get_messages/', methods=['POST'])
-def get_messages_post():
-    # TODO: get agent_ID(s), or else None
-    # TODO: get offsets
-    return jsonify(True)
-
-
 @app.route('/get_messages/', methods=['GET'])
-def get_messages_get():
-    # TODO: return all chats
-    return jsonify(True)
+def get_messages_apicall():
+    """ Returns chatrooms and chat messages for one agent, or all agents.
 
-@app.route('/get_messages/<agent_id>', methods=['GET'])
-def get_messages_get():
-    # TODO: get agent_ID(s)
-    # TODO: return all chats
-    return jsonify(True)
+    Per chatroom, an offset can be passed from which will only return messages with a higher index than that
+     offset.
 
-@app.route('/get_messages/<agent_id>/<offsets>', methods=['GET'])
-def get_messages_get():
-    # TODO: get agent_ID(s) (or None)
-    # TODO: get offsets
-    # TODO: return offset messages
-    return jsonify(True)
-
-
-
-
-
-@app.route('/get_messages/', methods=['GET', 'POST'])
-def get_messages(tick):
-    """ Provides the messages of all agents from tick `tick` onwards to current tick. Also returns
-    the chatrooms at the latest tick.
+    Parameters should be passed via GET URL parameters.
 
     Parameters
     ----------
-    tick
-        integer indicating from which tick onwards to send the messages.
+    agent_id : (optional URL parameter, default None)
+        Agent ID string that will make this function only return chatrooms of which that agent is part. Defaults to
+        None, returning all chatsrooms and all chat messages.
 
+    offsets : (optional URL parameter, default None)
+        It is not efficient to send every message every tick. With this offsets dict the requestee can
+        indicate for every chatroom, which messages they already have, such that only new messages can be sent.
+        The `offsets` URL parmaeter should be a dict with as keys the chatroom ID, and as values the message offset.
+        The message offset is the index of the message.
+        Example of a valid dict: {"0": "10", "3": "5"}.
+        This returns the message with index 10+ for the chatroom with ID 0 (global chat),
+        and messages with index 5+ for chatroom with ID 3.
     Returns
     -------
-        Returns a dictionary containing `messages` and `chatrooms`. The chatrooms subdictionary
-        contains all accessible chatrooms at the latest tick. The messages subdictionary contains
-        all messages for tick `tick` to the current tick,
-        subdivided under `global`, `team`, and `private`.
+        Returns a dictionary with chatrooms and per chatroom a list per with messages.
+        The dict is in the shape of: {chatroom_ID: [Message1, Message2, ..], chatroom_ID2 : ....}
+
         Also see the documentation of the
         :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_messages` and
         :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
     """
 
-    # check for validity and return an error if not valid
-    api_call_valid, error = check_messages_API_request(tick=tick)
-    if not api_call_valid:
-        print("api request not valid:", error)
-        return abort(error['error_code'], description=error['error_message'])
+    # fetch URL parameters
+    agent_id = request.args.get("agent_id")
+    offsets = request.args.get("offsets")
 
-    messages = gw_message_manager.fetch_messages(last_mssg_id)
-    chatrooms = gw_message_manager.fetch_chatrooms()
-
-    return jsonify({"messages": messages, "chatrooms": chatrooms})
+    return jsonify(get_messages(agent_id, offsets))
 
 
+def get_messages(agent_id, offsets):
+    """ See :func:`~matrx.api..message_manager.get_messages` """
 
+    # validate agent_id: None or str
+    if not isinstance(agent_id, str) and not agent_id is None:
+        error_mssg = f"Agent_id passed to /get_messages API request is not of valid format: {agent_id}. " \
+                     f"Should be string or not passed."
+        print("api request not valid:", error_mssg)
+        return abort(400, description=error_mssg)
+
+    if not isinstance(offsets, dict) and not offsets is None:
+        error_mssg = f"Chatroom message offsets passed to /get_messages API request is not of valid format: " \
+                     f"{offsets}. Should be a dict or not passed."
+        print("api request not valid:", error_mssg)
+        return abort(400, description=error_mssg)
+
+    # fetch chatrooms with messages for the passed agent_id and return it
+    chatrooms = gw_message_manager.fetch_messages(agent_id=agent_id, chatroom_mssg_offsets=offsets)
+
+    return chatrooms
+
+
+@app.route('/get_messages/<tick>/<agent_id>', methods=['GET'])
 @app.route('/get_messages/<tick>', methods=['GET', 'POST'])
-def get_messages(tick):
-    # TODO: add deprecated notice
-    return jsonify(True)
-
-
 @app.route('/get_messages/<agent_id>', methods=['GET', 'POST'])
-def get_messages_specific_agent(tick, agent_id):
-    """ Provides all messages either send by or addressed to `agent_id`, from tick `tick` onwards.
-
-    Parameters
-    ----------
-    tick
-        integer indicating which ticks [`tick`,current_tick] (including `tick` and current_tick)
-        the messages should be fetched from.
-    agent_id
-        The `agent_id` of the agent of whom the messages should be fetched.
-        All fetched messages are either sent to or by the agent with agent ID `agent_id`.
-
-    Returns
-    -------
-        Returns a dictionary containing `messages` and `chatrooms`. The chatrooms subdictionary
-        contains all accessible chatrooms at the latest tick. The messages subdictionary contains
-        all messages sent or received by `agent_id`,
-        subdivided under `global`, `team`, and `private`.
-        Also see the documentation of the
-        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_messages` and
-        :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
-
-    """
-    # check for validity and return an error if not valid
-    api_call_valid, error = check_messages_API_request(tick=tick, agent_id=agent_id)
-    if not api_call_valid:
-        print("api request not valid:", error)
-        return abort(error['error_code'], description=error['error_message'])
-
-    messages = gw_message_manager.fetch_messages(int(tick), current_tick, clean_input_ids(agent_id)[0])
-    chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
-
-    return jsonify({"messages": messages, "chatrooms": chatrooms})
-
-
 @app.route('/get_latest_messages', methods=['GET', 'POST'])
-def get_latest_messages():
-    #TODO: deprecated
-    return jsonify(True)
-
-
 @app.route('/get_latest_messages/<agent_id>', methods=['GET', 'POST'])
-def get_latest_messages_specific_agent(agent_id):
+def deprecated_get_messages(agent_id):
     #TODO: deprecated
     return jsonify(True)
 
@@ -424,6 +443,12 @@ def fetch_context_menu_of_self():
     if agent_id_who_clicked not in gw.registered_agents.keys() and agent_id_who_clicked != "god":
         return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
 
+    # check if it is a human agent
+    if agent_id_who_clicked in gw.registered_agents.keys() and \
+            not gw.registered_agent_keys[agent_id_who_clicked].is_human_agent:
+        return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} is not a human agent and thus does"
+                                              f" not have a context_menu_of_self() function.")
+
     # ignore if called from the god view
     if agent_id_who_clicked.lower() == "god":
         return return_error(code=400,
@@ -488,7 +513,7 @@ def fetch_context_menu_of_other():
 def send_message_pickled():
     """ This function makes it possible to send a custom message to a MATRX agent via the API as a jsonpickle object.
     For instance, sending a custom message when a context menu option is clicked.
-    The pre-formatted CustomMessage instance an be jsonpickled and sent via the API.
+    The pre-formatted CustomMessage instance can be jsonpickled and sent via the API.
     This API call can handle that request and send the CustomMessage to the MATRX agent
 
         Returns

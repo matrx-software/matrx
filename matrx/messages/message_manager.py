@@ -147,7 +147,7 @@ class MessageManager:
                 is_team_message = True
 
                 # get the ID of the chatroom if already exists
-                chatroom_ID = fetch_chatroom_ID(chatroom_type="team", team_name=mssg.to_id)
+                chatroom_ID = self.fetch_chatroom_ID(chatroom_type="team", team_name=mssg.to_id)
 
                 # create the chatroom if it doesn't exist yet
                 if chatroom_ID is False:
@@ -181,7 +181,7 @@ class MessageManager:
                 private_chatroom_name = ids_sorted[0] + "_" + ids_sorted[1]
 
                 # get the ID of the chatroom if already exists
-                chatroom_ID = fetch_chatroom_ID(chatroom_type="private", agent_IDs=[mssg.to_id, mssg.from_id])
+                chatroom_ID = self.fetch_chatroom_ID(chatroom_type="private", agent_IDs=[mssg.to_id, mssg.from_id])
 
                 # create the chatroom if it doesn't exist yet
                 if chatroom_ID is False:
@@ -191,7 +191,7 @@ class MessageManager:
                     self.chatrooms.append(chatroom)
 
                 # register what the index of this message is in this private chatroom
-                mssg.chat_mssg_count = len(self.private_messages[private_chat_id])
+                mssg.chat_mssg_count = len(self.private_messages[chatroom_ID])
 
                 # save the mssg to the chatroom
                 self.chatrooms[chatroom_ID].append(mssg)
@@ -220,7 +220,7 @@ class MessageManager:
         if chatroom_type == "private":
             # The name of a private chat is the two agent IDs concatenated
             # alphabetically with an underscore
-            ids_sorted = [mssg.to_id, mssg.from_id]
+            ids_sorted = agent_IDs
             ids_sorted.sort()
             private_chat_name = ids_sorted[0] + "_" + ids_sorted[1]
 
@@ -262,7 +262,7 @@ class MessageManager:
         for unique_agent_combination in unique_agent_combinations:
 
             # get the ID of the chatroom if already exists
-            chatroom_ID = fetch_chatroom_ID(chatroom_type="private", agent_IDs=unique_agent_combination)
+            chatroom_ID = self.fetch_chatroom_ID(chatroom_type="private", agent_IDs=unique_agent_combination)
 
             # create the chatroom if it doesn't exist yet
             if chatroom_ID is False:
@@ -274,7 +274,7 @@ class MessageManager:
 
                 chatroom_ID = len(self.chatrooms)
                 chatroom = Chatroom(ID=chatroom_ID, name=private_chatroom_name,
-                        type="private", agent_IDs=[mssg.to_id, mssg.from_id])
+                        type="private", agent_IDs=[ids_sorted[0], ids_sorted[1]])
                 self.chatrooms.append(chatroom)
 
 
@@ -337,17 +337,18 @@ class MessageManager:
         chatrooms = {}
 
         # fetch the relevant chatrooms for this agent (or all)
-        chatroom_IDs = fetch_chatrooms(agent_id=agent_id).keys()
+        chatroom_IDs = self.fetch_chatrooms(agent_id=agent_id).keys()
 
         for chatroom_ID in chatroom_IDs:
 
             # send only the messages in this chatroom from the offset onwards
-            if offset in chatroom_mssg_offsets:
-                chatrooms[chatroomID] = self.chatrooms[chatroom_ID][offset:]
+            if chatroom_ID in chatroom_mssg_offsets:
+                offset = chatroom_mssg_offsets[chatroom_ID]
+                chatrooms[chatroom_ID] = self.chatrooms[chatroom_ID].messages[offset:]
 
-            # just send all messages for this chatroom
+            # otherwise just send all messages for this chatroom
             else:
-                chatrooms[chatroomID] = self.chatrooms[chatroom_ID]
+                chatrooms[chatroom_ID] = self.chatrooms[chatroom_ID]
 
         return chatrooms
 
@@ -387,7 +388,7 @@ class MessageManager:
 
 
 class Chatroom:
-""" A chatroom object, containing the messages from various agents from that chatroom. """
+    """ A chatroom object, containing the messages from various agents from that chatroom. """
 
     def __init__(self, ID, name, type="private", agent_IDs = []):
         """ Add a message to the chatroom
