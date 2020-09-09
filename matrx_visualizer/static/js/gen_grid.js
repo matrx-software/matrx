@@ -457,48 +457,48 @@ function process_messages(new_messages) {
  */
 function process_message(type, message, team = null) {
 
-    var chat_room = null;
+    var chatroom = null;
 
     // for team messages, the team is sent along, which has the same name of our target chat room
     if (type == "team" && team != null) {
-        chat_room = team;
+        chatroom = team;
 
         // global messages go in the global chat
     } else if (type == "global") {
-        chat_room = "global";
+        chatroom = "global";
 
         // for private messages, the chat room's name is that of the ID of the other agent
     } else if (type == "private") {
-        chat_room = (message.from_id != lv_agent_id ? message.from_id : message.to_id);
+        chatroom = (message.from_id != lv_agent_id ? message.from_id : message.to_id);
     }
 
     // open new chatrooms if needed, and display all old messages
-    if (!(type == "global") && !chatrooms_added[type].includes(chat_room)) {
-        add_chatroom(chat_room, type, set_active = false);
+    if (!(type == "global") && !chatrooms_added[type].includes(chatroom)) {
+        add_chatroom(chatroom, type, set_active = false);
         // repopulate the new chat room dropdown
         populate_new_chat_dropdown(all_chatrooms);
     }
 
-    // add chat_room if needed
-    if (!Object.keys(messages).includes(chat_room)) {
-        messages[chat_room] = [];
+    // add chatroom if needed
+    if (!Object.keys(messages).includes(chatroom)) {
+        messages[chatroom] = [];
     }
 
     // add message to list
-    messages[chat_room].push(message);
+    messages[chatroom].push(message);
 
-    console.log("Message:", message, " type ", type, " chat_room ", chat_room);
+    console.log("Message:", message, " type ", type, " chatroom ", chatroom);
 
     if (type == "global") {
         console.log("adding global message");
     }
 
     // add message to GUI
-    if (current_chatwindow['name'] == chat_room && current_chatwindow['type'] == type) {
-        add_message(chat_room, message, type);
+    if (current_chatwindow['name'] == chatroom && current_chatwindow['type'] == type) {
+        add_message(chatroom, message, type);
     } else {
         // show the notification for the chat room
-        document.getElementById("chatroom_" + chat_room + "_notification").style.display = "inline-block";
+        document.getElementById("chatroom_" + chatroom + "_notification").style.display = "inline-block";
     }
 
     // repopulate the new chat room dropdown
