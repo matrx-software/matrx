@@ -226,7 +226,7 @@ function populate_new_chat_dropdown(matrx_chatrooms) {
         } else if (chatroom['type'] == 'team' && !chatrooms_added['team'].includes(chatroom_ID)) {
             new_team_chatrooms.append(chatroom_ID);
         }
-    }
+    });
 
     // add new private chatroom options
     private_chatroom_options.forEach(function(chatroom_ID) {

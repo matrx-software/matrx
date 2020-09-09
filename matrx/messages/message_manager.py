@@ -62,6 +62,9 @@ class MessageManager:
         # set the agent IDs of the global chat to be all agent IDs
         self.chatrooms[0].agent_IDs = self.agents
 
+        # init a list for the messages this tick
+        self.preprocessed_messages[tick] = []
+
         # process every message
         for mssg in messages:
 
@@ -102,7 +105,8 @@ class MessageManager:
         all_ids_except_me = [agent_id for agent_id in all_agent_ids if agent_id != mssg.from_id]
 
         # Make sure that the message has a unique ID, and keep its custom class / properties
-        new_mssg = copy.copy(mssg).regen_id()
+        new_mssg = copy.copy(mssg)
+        new_mssg.regen_id()
         new_mssg.tick = tick
 
         # if the receiver is None, it is a global message which has to be sent to everyone
@@ -117,7 +121,7 @@ class MessageManager:
                 new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=to_id)
 
                 # save in preprocessed, which is all individual messages combined
-                self.preprocessed_messages.append(new_message)
+                self.preprocessed_messages[tick].append(new_message)
 
         # if it is a list, decode every receiver_id in that list again
         elif isinstance(mssg.to_id, list):
@@ -157,17 +161,17 @@ class MessageManager:
                     self.chatrooms.append(chatroom)
 
                 # register what the index of this message is in the chatroom
-                mssg.chat_mssg_count = len(self.team_messages[mssg.to_id])
+                mssg.chat_mssg_count = len(self.chatrooms[chatroom_ID].messages)
 
                 # save the mssg to the chatroom
-                self.chatrooms[chatroom_ID].append(mssg)
+                self.chatrooms[chatroom_ID].add_message(mssg)
 
                 # split in sub mssgs for every agent in the team
                 for to_id in teams[mssg.to_id]:
                     # create a message
                     new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=to_id)
                     # save in prepr
-                    self.preprocessed_messages.append(new_message)
+                    self.preprocessed_messages[tick].append(new_message)
 
             # check if it is an agent ID (as well)
             # If no team is set by the user, the agent is added to a new team with the same name as the agent's ID.
@@ -191,15 +195,15 @@ class MessageManager:
                     self.chatrooms.append(chatroom)
 
                 # register what the index of this message is in this private chatroom
-                mssg.chat_mssg_count = len(self.private_messages[chatroom_ID])
+                mssg.chat_mssg_count = len(self.chatrooms[chatroom_ID].messages)
 
                 # save the mssg to the chatroom
-                self.chatrooms[chatroom_ID].append(mssg)
+                self.chatrooms[chatroom_ID].add_message(mssg)
 
                 # if the message was not already saved in the preprocessed list, save it there as well
                 if not is_team_message:
                     new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=mssg.to_id)
-                    self.preprocessed_messages.append(new_message)
+                    self.preprocessed_messages[tick].append(new_message)
 
 
 
@@ -348,7 +352,7 @@ class MessageManager:
 
             # otherwise just send all messages for this chatroom
             else:
-                chatrooms[chatroom_ID] = self.chatrooms[chatroom_ID]
+                chatrooms[chatroom_ID] = self.chatrooms[chatroom_ID].messages
 
         return chatrooms
 

@@ -120,43 +120,43 @@ def get_latest_state_and_messages():
     return jsonify({"matrx_paused": matrx_paused, "states": states_, "chatrooms": chatrooms, "messages": messages})
 
 
-
-@app.route('/get_latest_state_and_messages/<agent_id>', methods=['GET', 'POST'])
-def get_latest_state_and_messages(agent_id):
-    """ Provides all most recent information from MATRX: Both the state and messages from the latest
-    tick for one particular agent, as well as the current MATRX status (paused or not).
-
-    Parameters
-    ----------
-    agent_id
-        The ID of the targeted agent
-
-    agent_id : (optional GET URL parameter, default None)
-        Agent ID string that will make this function only return chatrooms of which that agent is part. Defaults to
-        None, returning all chatsrooms and all chat messages.
-
-    offsets : (optional GET URL parameter, default {})
-        GET URL parameter that should be a dict with as key the chatroom ID, and as value the message offset. E.g.
-        {"0": "10", "3": "5"}. This returns the message with index 10+ for the chatroom with ID 0 (global chat),
-        and messages with index 5+ for chatroom with ID 3.
-
-    Returns
-    -------
-        a dictionary containing the states under the "states" key, and the messages under the "messages" key.
-
-    """
-    # TODO: deprecated
-    # check for validity and return an error if not valid
-    api_call_valid, error = check_states_API_request(ids=[agent_id])
-    if not api_call_valid:
-        print("api request not valid:", error)
-        return abort(error['error_code'], description=error['error_message'])
-
-    # fetch states and chatrooms with messages
-    states_ = __fetch_states(current_tick, agent_id)
-    chatrooms = get_messages(request)
-
-    return jsonify({"matrx_paused": matrx_paused, "states": states_, "messages": {}, "chatrooms": chatrooms})
+#
+# @app.route('/get_latest_state_and_messages/<agent_id>', methods=['GET', 'POST'])
+# def get_latest_state_and_messages(agent_id):
+#     """ Provides all most recent information from MATRX: Both the state and messages from the latest
+#     tick for one particular agent, as well as the current MATRX status (paused or not).
+#
+#     Parameters
+#     ----------
+#     agent_id
+#         The ID of the targeted agent
+#
+#     agent_id : (optional GET URL parameter, default None)
+#         Agent ID string that will make this function only return chatrooms of which that agent is part. Defaults to
+#         None, returning all chatsrooms and all chat messages.
+#
+#     offsets : (optional GET URL parameter, default {})
+#         GET URL parameter that should be a dict with as key the chatroom ID, and as value the message offset. E.g.
+#         {"0": "10", "3": "5"}. This returns the message with index 10+ for the chatroom with ID 0 (global chat),
+#         and messages with index 5+ for chatroom with ID 3.
+#
+#     Returns
+#     -------
+#         a dictionary containing the states under the "states" key, and the messages under the "messages" key.
+#
+#     """
+#     # TODO: deprecated
+#     # check for validity and return an error if not valid
+#     api_call_valid, error = check_states_API_request(ids=[agent_id])
+#     if not api_call_valid:
+#         print("api request not valid:", error)
+#         return abort(error['error_code'], description=error['error_message'])
+#
+#     # fetch states and chatrooms with messages
+#     states_ = __fetch_states(current_tick, agent_id)
+#     chatrooms = get_messages(request)
+#
+#     return jsonify({"matrx_paused": matrx_paused, "states": states_, "messages": {}, "chatrooms": chatrooms})
 
 
 #########################################################################
@@ -333,14 +333,14 @@ def get_messages(agent_id, offsets):
     return chatrooms, messages
 
 
-@app.route('/get_messages/<tick>/<agent_id>', methods=['GET'])
-@app.route('/get_messages/<tick>', methods=['GET', 'POST'])
-@app.route('/get_messages/<agent_id>', methods=['GET', 'POST'])
-@app.route('/get_latest_messages', methods=['GET', 'POST'])
-@app.route('/get_latest_messages/<agent_id>', methods=['GET', 'POST'])
-def deprecated_get_messages(agent_id):
-    #TODO: deprecated
-    return jsonify(True)
+# @app.route('/get_messages/<tick>/<agent_id>', methods=['GET'])
+# @app.route('/get_messages/<tick>', methods=['GET', 'POST'])
+# @app.route('/get_messages/<agent_id>', methods=['GET', 'POST'])
+# @app.route('/get_latest_messages', methods=['GET', 'POST'])
+# @app.route('/get_latest_messages/<agent_id>', methods=['GET', 'POST'])
+# def deprecated_get_messages(agent_id):
+#     #TODO: deprecated
+#     return jsonify(True)
 
 
 #########################################################################
