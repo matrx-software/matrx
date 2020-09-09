@@ -67,8 +67,8 @@ def get_info():
 
 @app.route('/get_latest_state_and_messages/', methods=['GET', 'POST'])
 def get_latest_state_and_messages():
-    """ Provides all most recent information from MATRX for 1 agent: The state from the latest tick , and any new
-    messages.
+    """ Provides all most recent information from MATRX for 1 agent: The state from the latest tick, and any new
+    messages and chatrooms.
 
     Parameters should be passed via GET URL parameters.
 
@@ -113,10 +113,11 @@ def get_latest_state_and_messages():
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    # fetch states and chatrooms with messages
+    # fetch states, chatrooms and messages
     states_ = __fetch_states(current_tick, agent_id)
-    chatrooms = get_messages(agent_id, offsets)
-    return jsonify({"matrx_paused": matrx_paused, "states": states_, "chatrooms": chatrooms})
+    chatrooms, messages = get_messages(agent_id, offsets)
+
+    return jsonify({"matrx_paused": matrx_paused, "states": states_, "chatrooms": chatrooms, "messages": messages})
 
 
 
@@ -304,7 +305,9 @@ def get_messages_apicall():
     agent_id = request.args.get("agent_id")
     offsets = request.args.get("offsets")
 
-    return jsonify(get_messages(agent_id, offsets))
+    chatrooms, messages = get_messages(agent_id, offsets)
+
+    return jsonify({"chatrooms": chatrooms, "messages": messages})
 
 
 def get_messages(agent_id, offsets):
@@ -324,9 +327,10 @@ def get_messages(agent_id, offsets):
         return abort(400, description=error_mssg)
 
     # fetch chatrooms with messages for the passed agent_id and return it
-    chatrooms = gw_message_manager.fetch_messages(agent_id=agent_id, chatroom_mssg_offsets=offsets)
+    chatrooms = gw_message_manager.fetch_chatrooms(agent_id=agent_id)
+    messages = gw_message_manager.fetch_messages(agent_id=agent_id, chatroom_mssg_offsets=offsets)
 
-    return chatrooms
+    return chatrooms, messages
 
 
 @app.route('/get_messages/<tick>/<agent_id>', methods=['GET'])

@@ -59,12 +59,11 @@ function initialize_grid() {
  * Generate the grid and all its objects
  * @param state: the MATRX state
  * @param world_settings: the MATRX World object, containing all settings of the current MATRX World
- * @param new_messages: object containing lists with "private", "team", and "global" messages for the current agent
- * @param accessible_chatrooms: object containing the "private", "teams" and "global" chatrooms accessible by the
- *                              current agent.
+ * @param new_messages: object with for every chatroom (ID), the new messages
+ * @param accessible_chatrooms: object with for every chatroom (ID), another object with the "name" and "type".
  * @param new_tick: whether this is the first draw after a new tick/update
  */
-function draw(state, world_settings, new_messages, accessible_chatrooms, new_tick) {
+function draw(state, world_settings, accessible_chatrooms, new_tick) {
     // whether to (re)populate the dropdown menu with links to all agents
     populate_god_agent_menu = false;
     pop_new_chat_dropdown = false
@@ -504,22 +503,6 @@ function process_message(type, message, team = null) {
 
     // repopulate the new chat room dropdown
     pop_new_chat_dropdown = true;
-}
-
-/*
- * On pageload, all relevant messages are request from MATRX, and sent to this function for
- * processing and visualizing in the GUI.
- */
-function process_mssgs_pageload(initial_mssgs, initial_chatrooms) {
-    console.log("Processing mssgs initial pageload:");
-    console.log(initial_mssgs);
-    console.log(initial_chatrooms);
-
-    // process the chatrooms
-    populate_new_chat_dropdown(initial_chatrooms);
-
-    // add every message, adding chatrooms if needed
-    process_messages(initial_mssgs);
 }
 
 

@@ -40,7 +40,6 @@ var lv_base_url = window.location.hostname,
     lv_init_url = 'http://' + lv_base_url + ':3001/get_info',
     lv_update_url = 'http://' + lv_base_url + ':3001/get_latest_state_and_messages/',
     lv_send_userinput_url = 'http://' + lv_base_url + ':3001/send_userinput/',
-    lv_sync_messages_url = 'http://' + lv_base_url + ':3001/get_messages/',
     lv_agent_id = "",
     lv_agent_type = null;
 
@@ -96,9 +95,6 @@ function init() {
 
         // if MATRX is running, change the start/pause button to match that
         sync_play_button(lv_matrx_paused);
-
-        // get the messages for all agents (god view), or this specific agent (human-agent / agent)
-        initial_mssgs_sync();
     });
 
     // if the request gave an error, print to console and try again
@@ -161,37 +157,6 @@ function parse_initial_state(data) {
     lv_matrx_paused = data.matrx_paused;
 }
 
-
-/*
- * On page load, fetch all messages from MATRX, and show them in the GUI
- */
-function initial_mssgs_sync() {
-    // preprare the url
-    var lv_temp_url = lv_sync_messages_url + "0";
-    if (lv_agent_type == "human-agent") {
-        lv_temp_url += "/" + lv_agent_id;
-    }
-
-    // fetch the messages
-    var mssgs_request = jQuery.getJSON(lv_temp_url);
-
-    // start the world_loop if the request was succesfull
-    mssgs_request.done(function(data2) {
-        console.log("Succesfully received messages from MATRX");
-        // unpack messages
-        process_mssgs_pageload(data2.messages, data2.chatrooms);
-
-        // start the visualization loop
-        world_loop();
-    });
-
-    // catch a failed request
-    mssgs_request.fail(function(data2) {
-        console.log("Could not fetch messages from MATRX API for initial sync, retrying in 0.5s");
-        lv_reinitialize_vis = true;
-        return
-    });
-}
 
 /*
  * The visualization loop for a MATRX world
