@@ -42,4 +42,4 @@ The changes more in depth:
 
 
 Questions:
-- should an agent be able to start a chat with anyone? Or any team?
+- should an agent be able to start a chat with any single agent? Now: yes 

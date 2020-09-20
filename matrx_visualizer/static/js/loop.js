@@ -44,8 +44,8 @@ var lv_base_url = window.location.hostname,
     lv_agent_type = null;
 
 // check if message offsets are defined and used in gen_grid.js
-if (typeof variable !== 'undefined') {
-    var lv_chat_offsets = {}
+if (typeof chat_offsets !== 'undefined') {
+    var chat_offsets = {};
 }
 
 
@@ -264,7 +264,7 @@ function get_MATRX_update() {
 
     // the get request is async, meaning the (success) function is only executed when
     // the response has been received
-    var lv_update_request = jQuery.getJSON(lv_update_url + "?agent_id=" + lv_agent_id + "&chat_offsets=" + lv_chat_offsets, function(data) {
+    var lv_update_request = jQuery.getJSON(lv_update_url + "?agent_id=" + lv_agent_id + "&chat_offsets=" + chat_offsets, function(data) {
         //        console.log("Received update request:", lv_update_request);
         lv_messages = data.messages;
         lv_chatrooms = data.chatrooms;

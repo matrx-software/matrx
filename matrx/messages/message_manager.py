@@ -348,7 +348,12 @@ class MessageManager:
             # send only the messages in this chatroom from the offset onwards
             if chatroom_ID in chatroom_mssg_offsets:
                 offset = chatroom_mssg_offsets[chatroom_ID]
-                chatrooms[chatroom_ID] = self.chatrooms[chatroom_ID].messages[offset:]
+
+                # if the offset is X, we want messages with index > X (if they exist)
+                if offset + 1 <= len(self.chatrooms[chatroom_ID].messages):
+                    chatrooms[chatroom_ID] = self.chatrooms[chatroom_ID].messages[offset:]
+                else:
+                    chatrooms[chatroom_ID] = []
 
             # otherwise just send all messages for this chatroom
             else:

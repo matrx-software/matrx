@@ -295,6 +295,9 @@ function add_chatroom(chat_name, chat_display_name, chatroom_ID, room_type, set_
     // add a new list that will keep track of the messages of this chatroom
     messages[chatroom_ID] = [];
 
+    // set the offset to the first message
+    chat_offsets[chatroom_ID] = null;
+
     // set the previously open chatroom to inactive
     if (set_active) {
         var active_contacts = document.getElementsByClassName("contact_active");
@@ -485,6 +488,7 @@ function reset_chat() {
     // reset the vars
     chatrooms_added = [];
     all_chatrooms = {};
+    chat_offsets = {};
     current_chatwindow = {
         'chatroom_ID': 0,
         'name': 'global',
@@ -525,7 +529,8 @@ function process_messages(new_messages, chatrooms) {
 
             // add each message to our database and the GUI
             new_chatroom_mssgs.forEach(function(mssg) {
-                messages[chatroom_ID].push(message); // add to db
+                chat_offsets[chatroom_ID] = mssg['chat_mssg_count']; // memorize the last mssg index
+                messages[chatroom_ID].push(mssg); // add to db
                 add_message(chatroom_ID, JSON.parse(mssg)); // add to GUI
                 console.log("Adding message:", mssg, " type ", all_chatrooms[chatroom_ID]['type'], " chatroom ", all_chatrooms[chatroom_ID]['name']);
             });
@@ -534,7 +539,8 @@ function process_messages(new_messages, chatrooms) {
         // only add messages to our database but don't show
         } else {
             new_chatroom_mssgs.forEach(function(mssg) {
-                messages[chatroom_ID].push(message);
+                chat_offsets[chatroom_ID] = mssg['chat_mssg_count']; // memorize the last mssg index
+                messages[chatroom_ID].push(message); // add to db
                 console.log("Adding message:", mssg, " type ", all_chatrooms[chatroom_ID]['type'], " chatroom ", all_chatrooms[chatroom_ID]['name']);
             })
             // show the notification for the chat room
