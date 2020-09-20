@@ -43,6 +43,11 @@ var lv_base_url = window.location.hostname,
     lv_agent_id = "",
     lv_agent_type = null;
 
+// check if message offsets are defined and used in gen_grid.js
+if (typeof variable !== 'undefined') {
+    var lv_chat_offsets = {}
+}
+
 
 console.log("lv_send_userinput_url:", lv_send_userinput_url);
 
@@ -256,9 +261,10 @@ function request_new_frame() {
 function get_MATRX_update() {
     // console.log("Fetching matrx state with old wait:", lv_wait_for_next_tick);
 
+
     // the get request is async, meaning the (success) function is only executed when
     // the response has been received
-    var lv_update_request = jQuery.getJSON(lv_update_url + "['" + lv_agent_id + "']", function(data) {
+    var lv_update_request = jQuery.getJSON(lv_update_url + "?agent_id=" + lv_agent_id + "&chat_offsets=" + lv_chat_offsets, function(data) {
         //        console.log("Received update request:", lv_update_request);
         lv_messages = data.messages;
         lv_chatrooms = data.chatrooms;

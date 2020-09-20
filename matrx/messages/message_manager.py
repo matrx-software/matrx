@@ -182,7 +182,7 @@ class MessageManager:
                 #  alphabetically concatenated and split with a underscore
                 ids_sorted = [mssg.to_id, mssg.from_id]
                 ids_sorted.sort()
-                private_chatroom_name = ids_sorted[0] + "_" + ids_sorted[1]
+                private_chatroom_name = ids_sorted[0] + "__" + ids_sorted[1]
 
                 # get the ID of the chatroom if already exists
                 chatroom_ID = self.fetch_chatroom_ID(chatroom_type="private", agent_IDs=[mssg.to_id, mssg.from_id])
@@ -274,7 +274,7 @@ class MessageManager:
                 #  alphabetically concatenated and split with a underscore
                 ids_sorted = [unique_agent_combination[0], unique_agent_combination[1]]
                 ids_sorted.sort()
-                private_chatroom_name = ids_sorted[0] + "_" + ids_sorted[1]
+                private_chatroom_name = ids_sorted[0] + "__" + ids_sorted[1]
 
                 chatroom_ID = len(self.chatrooms)
                 chatroom = Chatroom(ID=chatroom_ID, name=private_chatroom_name,
@@ -353,6 +353,9 @@ class MessageManager:
             # otherwise just send all messages for this chatroom
             else:
                 chatrooms[chatroom_ID] = self.chatrooms[chatroom_ID].messages
+
+            # convert each message to json
+            chatrooms[chatroom_ID] = [mssg.to_json() for mssg in chatrooms[chatroom_ID]]
 
         return chatrooms
 

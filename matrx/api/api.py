@@ -98,7 +98,7 @@ def get_latest_state_and_messages():
     """
     # fetch URL parameters
     agent_id = request.args.get("agent_id")
-    offsets = request.args.get("offsets")
+    offsets = request.args.get("chat_offsets")
 
     # agent_id is required
     if not isinstance(agent_id, str):
@@ -115,7 +115,7 @@ def get_latest_state_and_messages():
 
     # fetch states, chatrooms and messages
     states_ = __fetch_states(current_tick, agent_id)
-    chatrooms, messages = get_messages(agent_id, offsets)
+    chatrooms, messages = get_messages(agent_id, chat_offsets)
 
     return jsonify({"matrx_paused": matrx_paused, "states": states_, "chatrooms": chatrooms, "messages": messages})
 
@@ -180,7 +180,7 @@ def get_states(tick):
     """
     # fetch URL parameters
     agent_id = request.args.get("agent_id")
-    offsets = request.args.get("offsets")
+    chat_offsets = request.args.get("chat_offsets")
 
     # check for validity and return an error if not valid
     api_call_valid, error = check_states_API_request(tick=tick)
@@ -283,10 +283,10 @@ def get_messages_apicall():
         Agent ID string that will make this function only return chatrooms of which that agent is part. Defaults to
         None, returning all chatsrooms and all chat messages.
 
-    offsets : (optional URL parameter, default None)
-        It is not efficient to send every message every tick. With this offsets dict the requestee can
+    chat_offsets : (optional URL parameter, default None)
+        It is not efficient to send every message every tick. With this chat_offsets dict the requestee can
         indicate for every chatroom, which messages they already have, such that only new messages can be sent.
-        The `offsets` URL parmaeter should be a dict with as keys the chatroom ID, and as values the message offset.
+        The `chat_offsets` URL parmaeter should be a dict with as keys the chatroom ID, and as values the message offset.
         The message offset is the index of the message.
         Example of a valid dict: {"0": "10", "3": "5"}.
         This returns the message with index 10+ for the chatroom with ID 0 (global chat),
@@ -303,14 +303,14 @@ def get_messages_apicall():
 
     # fetch URL parameters
     agent_id = request.args.get("agent_id")
-    offsets = request.args.get("offsets")
+    chat_offsets = request.args.get("chat_offsets")
 
-    chatrooms, messages = get_messages(agent_id, offsets)
+    chatrooms, messages = get_messages(agent_id, chat_offsets)
 
     return jsonify({"chatrooms": chatrooms, "messages": messages})
 
 
-def get_messages(agent_id, offsets):
+def get_messages(agent_id, chat_offsets):
     """ See :func:`~matrx.api..message_manager.get_messages` """
 
     # validate agent_id: None or str
@@ -320,15 +320,15 @@ def get_messages(agent_id, offsets):
         print("api request not valid:", error_mssg)
         return abort(400, description=error_mssg)
 
-    if not isinstance(offsets, dict) and not offsets is None:
-        error_mssg = f"Chatroom message offsets passed to /get_messages API request is not of valid format: " \
-                     f"{offsets}. Should be a dict or not passed."
+    if not isinstance(chat_offsets, dict) and not chat_offsets is None:
+        error_mssg = f"Chatroom message chat_offsets passed to /get_messages API request is not of valid format: " \
+                     f"{chat_offsets}. Should be a dict or not passed."
         print("api request not valid:", error_mssg)
         return abort(400, description=error_mssg)
 
     # fetch chatrooms with messages for the passed agent_id and return it
     chatrooms = gw_message_manager.fetch_chatrooms(agent_id=agent_id)
-    messages = gw_message_manager.fetch_messages(agent_id=agent_id, chatroom_mssg_offsets=offsets)
+    messages = gw_message_manager.fetch_messages(agent_id=agent_id, chatroom_mssg_offsets=chat_offsets)
 
     return chatrooms, messages
 

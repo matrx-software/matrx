@@ -16,8 +16,7 @@ var tps = null,
     current_tick = null,
     world_ID = null,
     grid_size = null;
-    vis_settings = null,
-    messages = {}; // our database with messages, indexed by chat room name
+    vis_settings = null;
 
 // Visualization settings
 var prev_bg_image = null,
@@ -66,7 +65,7 @@ function initialize_grid() {
 function draw(state, world_settings, accessible_chatrooms, new_tick) {
     // whether to (re)populate the dropdown menu with links to all agents
     populate_god_agent_menu = false;
-    pop_new_chat_dropdown = false
+    pop_new_chat_dropdown = false;
 
     // parse the new word settings, and change the grid, background, and tiles based on any changes
     // in the settings
@@ -78,7 +77,7 @@ function draw(state, world_settings, accessible_chatrooms, new_tick) {
     }
 
     // process any messages received
-    process_messages(new_messages);
+    process_messages(new_messages, accessible_chatrooms);
 
     console.log(new_messages);
 
@@ -405,105 +404,6 @@ function update_grid_size(new_grid_size) {
     }
 }
 
-
-/*********************************************************************
- * Processing of new messages
- ********************************************************************/
-/*
- * Process the object containing messages of various types, received from MATRX, and process them
- * into individual messages.
- */
-function process_messages(new_messages) {
-    var mssg_types = ["global", "team", "private"];
-
-    // process all messages of all types
-    mssg_types.forEach(function(mssg_type) {
-
-        // loop through the ticks in the message objects
-        Object.keys(new_messages[mssg_type]).forEach(function(tick) {
-            // skip this tick if we have no messages
-            if (new_messages[mssg_type][tick] == null) {
-                return;
-
-                // Team messages go one layer deeper, divided into teams, before getting to the messgs
-            } else if (mssg_type == "team") {
-                Object.keys(new_messages[mssg_type][tick]).forEach(function(team) {
-                    // add every message of every tick
-                    (new_messages[mssg_type][tick][team]).forEach(function(mssg) {
-                        process_message(mssg_type, JSON.parse(mssg), team);
-                    });
-                });
-
-
-            // skip private messages for the god view, as there is no good method (yet) to display
-            // these, seeing as the ID of the other is normally used as chatroom name, but the
-            // "god" view wants to see every private conversation
-            } else if (mssg_type == "private" && lv_agent_id == "god") {
-                return;
-
-            // private / global messages are all directly listed under tick
-            } else {
-                // add every message of every tick
-                new_messages[mssg_type][tick].forEach(function(mssg) {
-                    process_message(mssg_type, JSON.parse(mssg));
-                });
-            }
-        });
-    });
-}
-
-/*
- * Process an individual message
- */
-function process_message(type, message, team = null) {
-
-    var chatroom = null;
-
-    // for team messages, the team is sent along, which has the same name of our target chat room
-    if (type == "team" && team != null) {
-        chatroom = team;
-
-        // global messages go in the global chat
-    } else if (type == "global") {
-        chatroom = "global";
-
-        // for private messages, the chat room's name is that of the ID of the other agent
-    } else if (type == "private") {
-        chatroom = (message.from_id != lv_agent_id ? message.from_id : message.to_id);
-    }
-
-    // open new chatrooms if needed, and display all old messages
-    if (!(type == "global") && !chatrooms_added[type].includes(chatroom)) {
-        add_chatroom(chatroom, type, set_active = false);
-        // repopulate the new chat room dropdown
-        populate_new_chat_dropdown(all_chatrooms);
-    }
-
-    // add chatroom if needed
-    if (!Object.keys(messages).includes(chatroom)) {
-        messages[chatroom] = [];
-    }
-
-    // add message to list
-    messages[chatroom].push(message);
-
-    console.log("Message:", message, " type ", type, " chatroom ", chatroom);
-
-    if (type == "global") {
-        console.log("adding global message");
-    }
-
-    // add message to GUI
-    if (current_chatwindow['name'] == chatroom && current_chatwindow['type'] == type) {
-        add_message(chatroom, message, type);
-    } else {
-        // show the notification for the chat room
-        document.getElementById("chatroom_" + chatroom + "_notification").style.display = "inline-block";
-    }
-
-    // repopulate the new chat room dropdown
-    pop_new_chat_dropdown = true;
-}
 
 
 /*********************************************************************
