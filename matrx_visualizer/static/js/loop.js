@@ -100,6 +100,9 @@ function init() {
 
         // if MATRX is running, change the start/pause button to match that
         sync_play_button(lv_matrx_paused);
+
+        // start the visualization loop
+        world_loop();
     });
 
     // if the request gave an error, print to console and try again
@@ -261,44 +264,53 @@ function request_new_frame() {
 function get_MATRX_update() {
     // console.log("Fetching matrx state with old wait:", lv_wait_for_next_tick);
 
+    data = {"agent_id": lv_agent_id, "chat_offsets": chat_offsets};
 
-    // the get request is async, meaning the (success) function is only executed when
+    // the request is async, meaning the (success) function is only executed when
     // the response has been received
-    var lv_update_request = jQuery.getJSON(lv_update_url + "?agent_id=" + lv_agent_id + "&chat_offsets=" + chat_offsets, function(data) {
-        //        console.log("Received update request:", lv_update_request);
-        lv_messages = data.messages;
-        lv_chatrooms = data.chatrooms;
+    var lv_update_request = $.ajax({
+        method: "POST",
+        url: lv_update_url,
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json',
+        data: JSON.stringify(data),
+        success: function(data) {
+            //        console.log("Received update request:", lv_update_request);
+            lv_messages = data.messages;
+            lv_chatrooms = data.chatrooms;
 
-        // decode lv_state and other info from the request
-        lv_state = data['states'][data['states'].length - 1][lv_agent_id]['state'];
-        var lv_new_tick = lv_state['World']['nr_ticks'];
-        curr_tick_timestamp = lv_state['World']['curr_tick_timestamp'];
-        lv_tick_duration = lv_state['World']['tick_duration'];
-        lv_tps = (1.0 / lv_tick_duration).toFixed(1); // round to 1 decimal behind the dot
+            // decode lv_state and other info from the request
+            lv_state = data['states'][data['states'].length - 1][lv_agent_id]['state'];
+            var lv_new_tick = lv_state['World']['nr_ticks'];
+            curr_tick_timestamp = lv_state['World']['curr_tick_timestamp'];
+            lv_tick_duration = lv_state['World']['tick_duration'];
+            lv_tps = (1.0 / lv_tick_duration).toFixed(1); // round to 1 decimal behind the dot
 
-        lv_world_settings = lv_state['World'];
+            lv_world_settings = lv_state['World'];
 
-        // check what the ID of this world is. Is it still the same world we were expecting, or a different world?
-        lv_new_world_ID = lv_state['World']['world_ID'];
+            // check what the ID of this world is. Is it still the same world we were expecting, or a different world?
+            lv_new_world_ID = lv_state['World']['world_ID'];
 
-        // we request more often than the lv_tick_duration, as to not miss any ticks
-        lv_wait_for_next_tick = lv_tick_duration * 1000 * 0.6;
+            // we request more often than the lv_tick_duration, as to not miss any ticks
+            lv_wait_for_next_tick = lv_tick_duration * 1000 * 0.6;
 
-        // request at least every half second
-        if (lv_wait_for_next_tick > 500) {
-            lv_wait_for_next_tick = 500;
-        }
+            // request at least every half second
+            if (lv_wait_for_next_tick > 500) {
+                lv_wait_for_next_tick = 500;
+            }
 
-        // note our new current tick
-        lv_current_tick = lv_new_tick;
+            // note our new current tick
+            lv_current_tick = lv_new_tick;
 
-        // make sure to synchronize the play/pause button of the frontend with the current MATRX version
-        var matrx_paused = data.matrx_paused;
-        if (matrx_paused != lv_matrx_paused) {
-            lv_matrx_paused = matrx_paused;
-            sync_play_button(lv_matrx_paused);
-        }
+            // make sure to synchronize the play/pause button of the frontend with the current MATRX version
+            var matrx_paused = data.matrx_paused;
+            if (matrx_paused != lv_matrx_paused) {
+                lv_matrx_paused = matrx_paused;
+                sync_play_button(lv_matrx_paused);
+            }
+        },
     });
+
     return lv_update_request;
 }
 

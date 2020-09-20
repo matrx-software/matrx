@@ -77,11 +77,11 @@ def get_latest_state_and_messages():
 
     Parameters
     ----------
-    agent_id
+    agent_id : (required GET URL parameter, default {})
         The ID of the targeted agent. Only the state of that agent, and chatrooms in which that agent is part will be
         sent.
 
-    offsets : (optional GET URL parameter, default {})
+    chat_offsets : (optional GET URL parameter, default {})
         It is not efficient to send every message every tick. With this offsets dict the requestee can
         indicate for every chatroom, which messages they already have, such that only new messages can be sent.
         The `offsets` URL parmaeter should be a dict with as keys the chatroom ID, and as values the message offset.
@@ -96,9 +96,22 @@ def get_latest_state_and_messages():
          "chatrooms" key.
 
     """
-    # fetch URL parameters
-    agent_id = request.args.get("agent_id")
-    offsets = request.args.get("chat_offsets")
+
+    # from GET requests fetch URL parameters
+    if request.method == "GET":
+        agent_id = request.args.get("agent_id")
+        chat_offsets = request.args.get("chat_offsets")
+
+    # For POST requests fetch json data
+    elif request.method == "POST":
+        data = request.json
+        agent_id = None if "agent_id" not in data else data['agent_id']
+        chat_offsets = None if "chat_offsets" not in data else data['chat_offsets']
+
+    else:
+        error_mssg = f"API call only allows POST or GET requests."
+        print("api request not valid:", error_mssg)
+        return abort(400, description=error_mssg)
 
     # agent_id is required
     if not isinstance(agent_id, str):
@@ -301,9 +314,21 @@ def get_messages_apicall():
         :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
     """
 
-    # fetch URL parameters
-    agent_id = request.args.get("agent_id")
-    chat_offsets = request.args.get("chat_offsets")
+    # from GET requests fetch URL parameters
+    if request.method == "GET":
+        agent_id = request.args.get("agent_id")
+        chat_offsets = request.args.get("chat_offsets")
+
+    # For POST requests fetch json data
+    elif request.method == "POST":
+        data = request.json
+        agent_id = None if "agent_id" not in data else data['agent_id']
+        chat_offsets = None if "chat_offsets" not in data else data['chat_offsets']
+
+    else:
+        error_mssg = f"API call only allows POST or GET requests."
+        print("api request not valid:", error_mssg)
+        return abort(400, description=error_mssg)
 
     chatrooms, messages = get_messages(agent_id, chat_offsets)
 
@@ -324,6 +349,7 @@ def get_messages(agent_id, chat_offsets):
         error_mssg = f"Chatroom message chat_offsets passed to /get_messages API request is not of valid format: " \
                      f"{chat_offsets}. Should be a dict or not passed."
         print("api request not valid:", error_mssg)
+        print(chat_offsets)
         return abort(400, description=error_mssg)
 
     # fetch chatrooms with messages for the passed agent_id and return it

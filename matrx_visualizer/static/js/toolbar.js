@@ -217,7 +217,7 @@ function populate_new_chat_dropdown(matrx_chatrooms) {
 
     // check if there are any new chatrooms that have to be added to the
     // dropdown chatroom list
-    matrx_chatrooms.forEach(function(chatroom_ID) {
+    Object.keys(matrx_chatrooms).forEach(function(chatroom_ID) {
         chatroom = matrx_chatrooms[chatroom_ID];
 
         // add the chatroom option if not already added
@@ -229,12 +229,15 @@ function populate_new_chat_dropdown(matrx_chatrooms) {
             list_item.classList.add('new_chat_option');
             list_item.appendChild(document.createTextNode(chatroom['name'])); // name
             list_item.chat_name = chatroom['name'];
-            list_item.chat_display_name = get_chat_display_name();
+            list_item.chat_display_name = get_chat_display_name(chatroom);
             list_item.chatroom_ID = chatroom_ID;
-            list_item.room_type = chatroom['type']
+            list_item.room_type = chatroom['type'];
+
+            console.log("Added chatroom with ID:", chatroom_ID);
 
             // on click add this chat room
             list_item.addEventListener('click', function(event) {
+
                 add_chatroom(event.currentTarget.chat_name, event.currentTarget.chat_display_name,
                     event.currentTarget.chatroom_ID, event.currentTarget.room_type);
                 open_chatroom(event.currentTarget.chat_display_name, event.currentTarget.chatroom_ID,
@@ -258,17 +261,26 @@ function get_chat_display_name(chatroom) {
     // by default the display name is the same as the chatroom name
     var display_name = chatroom['name'];
 
+    console.log("get_chat_display_name", chatroom['type'], lv_agent_id, chatroom['type'] == "private" && !(lv_agent_id == "god"));
+
     // special care for the displayed name of private chats. These chatroom names are in the
     // form of agentID1__agentID2. However that is not a very useful or nice chatroom name.
     // So we remove our own agent ID from the name
-    if (chatroom['type'] == "private" && !lv_agent_id == "god") {
+    if (chatroom['type'] == "private" && !(lv_agent_id == "god")) {
         // split the chatroom name at the double underscore agent ID divider
-        chatroom['name'].split("__").forEach(function(id)) {
+        chatroom['name'].split("__").forEach(function(id) {
             if (id != lv_agent_id) {
                 display_name = id;
             }
         });
     }
+
+    // for teams add it to the name
+    else if (chatroom['type'] == 'team') {
+        chatroom['name'] += " (team chat)";
+    }
+
+
     return display_name
 }
 
@@ -307,11 +319,11 @@ function add_chatroom(chat_name, chat_display_name, chatroom_ID, room_type, set_
     }
 
     var chatrooms = document.getElementById("chatrooms_list");
-    var global_chatroom = document.getElementById("chatroom_global");
+    var new_chat_button = document.getElementById("new_chat_button");
 
     // create a new item and add the chatroom to the list
     var new_chatroom = document.createElement('div');
-    new_chatroom.id = chatroom_ID;
+    new_chatroom.chatroom_ID = chatroom_ID;
     new_chatroom.room_type = room_type;
     new_chatroom.name = chat_name;
     new_chatroom.chat_display_name = chat_display_name;
@@ -333,7 +345,7 @@ function add_chatroom(chat_name, chat_display_name, chatroom_ID, room_type, set_
     new_chatroom.addEventListener('click', chatroom_click);
 
     // add the new chatroom before the global chatroom
-    chatrooms.insertBefore(new_chatroom, global_chatroom);
+    chatrooms.insertBefore(new_chatroom, new_chat_button);
 
     // note that we opened this chatroom
     chatrooms_added.push(chatroom_ID);
@@ -376,11 +388,12 @@ function open_chatroom(chatroom_display_name, chatroom_ID, chatroom_type) {
     };
 
     // set the receiver for team and private messages
-    if (chatroom_type == 'team' || chatroom_type == 'private') {
-        current_chatwindow['receiver'] = chatroom_display_name
+    if (chatroom_type == 'private') {
+        current_chatwindow['receiver'] = chatroom_display_name;
     }
 
-    console.log("Opening", chatroom_type, "chatroom: ", chatroom_name, " displayed as ",
+    console.log(all_chatrooms, chatroom_ID);
+    console.log("Opening", chatroom_type, "chatroom: ", all_chatrooms[chatroom_ID]['name'], " displayed as ",
             chatroom_display_name, " with ID ", chatroom_ID);
 
     // hide the notification of new messages for our goal chat room
@@ -432,9 +445,6 @@ function add_message(chatroom_ID, mssg) {
     var mssgs_container = document.getElementById("messages");
     mssgs_container.appendChild(div);
 
-    // add the message to our message database
-    messages[chatroom_ID].push(mssg);
-
     // scroll to the new message
     scrollSmoothToBottom(mssgs_container)
 }
@@ -475,9 +485,9 @@ function send_message(event) {
  */
 function reset_chat() {
     // remove the chat room buttons
-    chatrooms_added.forEach(function(chatroom_ID)) {
+    chatrooms_added.forEach(function(chatroom_ID) {
         document.getElementById("chatroom_" + chatroom_ID).remove();
-    }
+    });
 
     // remove old messages
     var mssgs_container = document.getElementById("messages");
@@ -507,18 +517,20 @@ function process_messages(new_messages, chatrooms) {
 
     // the messages are in a object with as key the chatroom ID in which they belong
     // Process the new messages for each chatroom
-    new_messages.forEach(function(chatroom_ID) {
+    Object.keys(new_messages).forEach(function(chatroom_ID) {
 
         // add the chatroom if it is new
         if (!chatrooms_added.includes(chatroom_ID)) {
             // fetch the chatroom data
             chatroom = chatrooms[chatroom_ID];
+            console.log("adding chatroom", chatroom);
 
             // add the chatroom to our GUI (but don't show it yet)
             add_chatroom(chatroom['name'], get_chat_display_name(chatroom), chatroom_ID, chatroom['type'], set_active=false)
 
             // repopulate the chatroom dropdown
-            populate_new_chat_dropdown(all_chatrooms);
+            populate_new_chat_dropdown(chatrooms);
+            console.log("all chatrooms:", all_chatrooms);
         }
 
         // fetch the messages for this chatroom
@@ -529,6 +541,7 @@ function process_messages(new_messages, chatrooms) {
 
             // add each message to our database and the GUI
             new_chatroom_mssgs.forEach(function(mssg) {
+                mssg = jQuery.parseJSON(mssg);
                 chat_offsets[chatroom_ID] = mssg['chat_mssg_count']; // memorize the last mssg index
                 messages[chatroom_ID].push(mssg); // add to db
                 add_message(chatroom_ID, JSON.parse(mssg)); // add to GUI
@@ -539,12 +552,15 @@ function process_messages(new_messages, chatrooms) {
         // only add messages to our database but don't show
         } else {
             new_chatroom_mssgs.forEach(function(mssg) {
+                mssg = jQuery.parseJSON(mssg);
                 chat_offsets[chatroom_ID] = mssg['chat_mssg_count']; // memorize the last mssg index
-                messages[chatroom_ID].push(message); // add to db
+                messages[chatroom_ID].push(mssg); // add to db
                 console.log("Adding message:", mssg, " type ", all_chatrooms[chatroom_ID]['type'], " chatroom ", all_chatrooms[chatroom_ID]['name']);
             })
-            // show the notification for the chat room
-            document.getElementById("chatroom_" + chatroom + "_notification").style.display = "inline-block";
+            if (new_chatroom_mssgs.length != 0) {
+                // show the notification for the chat room
+                document.getElementById("chatroom_" + chatroom_ID + "_notification").style.display = "inline-block";
+            }
         }
     });
 }

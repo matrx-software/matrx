@@ -48,10 +48,10 @@ def create_builder():
         'a': MoveWest.__name__,
         'r': RemoveObject.__name__
     }
-    factory.add_human_agent([5, 5], HumanAgentBrain(), name="human",
+    factory.add_human_agent([5, 5], HumanAgentBrain(), name="huma__n",
                             key_action_map=key_action_map, img_name="/static/images/transparent.png")
 
-    factory.add_human_agent([6, 6], HumanAgentBrain(), name="human2",
+    factory.add_human_agent([6, 6], HumanAgentBrain(), name="human  2",
                             key_action_map=key_action_map, img_name="/static/images/agent.gif", visualize_when_busy=True)
 
     # add a number of blocks to showcase the subtile functionality

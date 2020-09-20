@@ -1,6 +1,3 @@
-- in loop.js, changed lv_update_url to work with GET parameters
-- in loop.js change lv_update_url to have GET parameters
-- add offsets as a variable to gen_grid
 - removed API calls:
 ```
 @app.route('/get_messages/<tick>/<agent_id>', methods=['GET'])
@@ -12,6 +9,10 @@ def deprecated_get_messages(agent_id):
     #TODO: deprecated
     return jsonify(True)
 ```
+
+- in loop.js:
+    - In `get_MATRX_update` changed `var lv_update_request =` to .. (see new visualizer)
+    - many, just replace the file and add your changes afterwards
 - changes in toolbar.js, all related to the chat:
     - `populate_new_chat_dropdown`
     - `open_chatroom`
@@ -24,6 +25,9 @@ def deprecated_get_messages(agent_id):
     - Removed `process_messages` and `process_message` (have been moved to toolbar.js).
     - Removed `messages` var from gen_grid.js
     - Changed `process_messages(new_messages)` to `process_messages(new_messages, accessible_chatrooms)`
+
+- Remove from templates:
+    - `<div class="contact contact_active" id="chatroom_global" onclick="chatroom_click(event)">Global<span class="chat-notification" id="chatroom_global_notification"></span></div>`
 
 
 
@@ -41,5 +45,10 @@ The changes more in depth:
 
 
 
-Questions:
-- should an agent be able to start a chat with any single agent? Now: yes 
+
+Todo:
+- Test with get
+- fill chatroom dropdown correctly
+- teams missing?
+- double chatroom with other person
+- check send_message function. chat_display_name undefined?

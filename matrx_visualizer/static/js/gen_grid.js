@@ -62,7 +62,7 @@ function initialize_grid() {
  * @param accessible_chatrooms: object with for every chatroom (ID), another object with the "name" and "type".
  * @param new_tick: whether this is the first draw after a new tick/update
  */
-function draw(state, world_settings, accessible_chatrooms, new_tick) {
+function draw(state, world_settings, new_messages, accessible_chatrooms, new_tick) {
     // whether to (re)populate the dropdown menu with links to all agents
     populate_god_agent_menu = false;
     pop_new_chat_dropdown = false;
@@ -78,8 +78,6 @@ function draw(state, world_settings, accessible_chatrooms, new_tick) {
 
     // process any messages received
     process_messages(new_messages, accessible_chatrooms);
-
-    console.log(new_messages);
 
     // move the objects from last tick to another list
     saved_prev_objs = saved_objs;
@@ -154,7 +152,7 @@ function draw(state, world_settings, accessible_chatrooms, new_tick) {
             // add this agent to the dropdown list
             if (obj.hasOwnProperty('isAgent')) {
 
-                console.log("adding selection listener:", obj);
+                console.log("adding selection listener:", objID);
                 populate_god_agent_menu = true;
                 pop_new_chat_dropdown = true;
 

@@ -308,7 +308,8 @@ class MessageManager:
 
         # create a dict with chatroom IDs and chatroom names for all relevant
         # chatrooms
-        for chatroom_ID, chatroom in enumerate(self.chatrooms):
+        for chatroom in self.chatrooms:
+            chatroom_ID = chatroom.ID
             # add the chatroom if not agent_id was passed, or
             # the agent is present in the chat
             if agent_id is None or agent_id in chatroom.agent_IDs:
@@ -345,12 +346,19 @@ class MessageManager:
 
         for chatroom_ID in chatroom_IDs:
 
+            # data is sent as JSON to the API, which makes the keys of objects/dicts strings by
+            # default, so convert the chatroom ID temporarily to str to find a match
+            str_chatroom_ID = str(chatroom_ID)
+
             # send only the messages in this chatroom from the offset onwards
-            if chatroom_ID in chatroom_mssg_offsets:
-                offset = chatroom_mssg_offsets[chatroom_ID]
+            if str_chatroom_ID in chatroom_mssg_offsets.keys():
+                offset = chatroom_mssg_offsets[str_chatroom_ID]
+                # start with the first message if it is none
+                if offset is None:
+                    offset = -1
 
                 # if the offset is X, we want messages with index > X (if they exist)
-                if offset + 1 <= len(self.chatrooms[chatroom_ID].messages):
+                if offset + 1 < len(self.chatrooms[chatroom_ID].messages):
                     chatrooms[chatroom_ID] = self.chatrooms[chatroom_ID].messages[offset:]
                 else:
                     chatrooms[chatroom_ID] = []
