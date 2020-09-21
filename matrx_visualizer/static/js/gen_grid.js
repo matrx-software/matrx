@@ -16,8 +16,7 @@ var tps = null,
     current_tick = null,
     world_ID = null,
     grid_size = null;
-    vis_settings = null,
-    messages = {}; // our database with messages, indexed by chat room name
+    vis_settings = null;
 
 // Visualization settings
 var prev_bg_image = null,
@@ -59,15 +58,14 @@ function initialize_grid() {
  * Generate the grid and all its objects
  * @param state: the MATRX state
  * @param world_settings: the MATRX World object, containing all settings of the current MATRX World
- * @param new_messages: object containing lists with "private", "team", and "global" messages for the current agent
- * @param accessible_chatrooms: object containing the "private", "teams" and "global" chatrooms accessible by the
- *                              current agent.
+ * @param new_messages: object with for every chatroom (ID), the new messages
+ * @param accessible_chatrooms: object with for every chatroom (ID), another object with the "name" and "type".
  * @param new_tick: whether this is the first draw after a new tick/update
  */
 function draw(state, world_settings, new_messages, accessible_chatrooms, new_tick) {
     // whether to (re)populate the dropdown menu with links to all agents
     populate_god_agent_menu = false;
-    pop_new_chat_dropdown = false
+    pop_new_chat_dropdown = false;
 
     // parse the new word settings, and change the grid, background, and tiles based on any changes
     // in the settings
@@ -79,7 +77,7 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
     }
 
     // process any messages received
-    process_messages(new_messages);
+    process_messages(new_messages, accessible_chatrooms);
 
     // move the objects from last tick to another list
     saved_prev_objs = saved_objs;
@@ -154,7 +152,7 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             // add this agent to the dropdown list
             if (obj.hasOwnProperty('isAgent')) {
 
-                console.log("adding selection listener:", obj);
+                console.log("adding selection listener:", objID);
                 populate_god_agent_menu = true;
                 pop_new_chat_dropdown = true;
 
@@ -195,7 +193,6 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             // repopulate the agent list, when the visualization settings changed of an agent
             if (obj.hasOwnProperty('isAgent')) {
                 populate_god_agent_menu = true;
-                pop_new_chat_dropdown = true;
             }
 
             set_tile_dimensions(obj_element);
@@ -404,121 +401,6 @@ function update_grid_size(new_grid_size) {
     }
 }
 
-
-/*********************************************************************
- * Processing of new messages
- ********************************************************************/
-/*
- * Process the object containing messages of various types, received from MATRX, and process them
- * into individual messages.
- */
-function process_messages(new_messages) {
-    var mssg_types = ["global", "team", "private"];
-
-    // process all messages of all types
-    mssg_types.forEach(function(mssg_type) {
-
-        // loop through the ticks in the message objects
-        Object.keys(new_messages[mssg_type]).forEach(function(tick) {
-            // skip this tick if we have no messages
-            if (new_messages[mssg_type][tick] == null) {
-                return;
-
-                // Team messages go one layer deeper, divided into teams, before getting to the messgs
-            } else if (mssg_type == "team") {
-                Object.keys(new_messages[mssg_type][tick]).forEach(function(team) {
-                    // add every message of every tick
-                    (new_messages[mssg_type][tick][team]).forEach(function(mssg) {
-                        process_message(mssg_type, JSON.parse(mssg), team);
-                    });
-                });
-
-
-            // skip private messages for the god view, as there is no good method (yet) to display
-            // these, seeing as the ID of the other is normally used as chatroom name, but the
-            // "god" view wants to see every private conversation
-            } else if (mssg_type == "private" && lv_agent_id == "god") {
-                return;
-
-            // private / global messages are all directly listed under tick
-            } else {
-                // add every message of every tick
-                new_messages[mssg_type][tick].forEach(function(mssg) {
-                    process_message(mssg_type, JSON.parse(mssg));
-                });
-            }
-        });
-    });
-}
-
-/*
- * Process an individual message
- */
-function process_message(type, message, team = null) {
-
-    var chat_room = null;
-
-    // for team messages, the team is sent along, which has the same name of our target chat room
-    if (type == "team" && team != null) {
-        chat_room = team;
-
-        // global messages go in the global chat
-    } else if (type == "global") {
-        chat_room = "global";
-
-        // for private messages, the chat room's name is that of the ID of the other agent
-    } else if (type == "private") {
-        chat_room = (message.from_id != lv_agent_id ? message.from_id : message.to_id);
-    }
-
-    // open new chatrooms if needed, and display all old messages
-    if (!(type == "global") && !chatrooms_added[type].includes(chat_room)) {
-        add_chatroom(chat_room, type, set_active = false);
-        // repopulate the new chat room dropdown
-        populate_new_chat_dropdown(all_chatrooms);
-    }
-
-    // add chat_room if needed
-    if (!Object.keys(messages).includes(chat_room)) {
-        messages[chat_room] = [];
-    }
-
-    // add message to list
-    messages[chat_room].push(message);
-
-    console.log("Message:", message, " type ", type, " chat_room ", chat_room);
-
-    if (type == "global") {
-        console.log("adding global message");
-    }
-
-    // add message to GUI
-    if (current_chatwindow['name'] == chat_room && current_chatwindow['type'] == type) {
-        add_message(chat_room, message, type);
-    } else {
-        // show the notification for the chat room
-        document.getElementById("chatroom_" + chat_room + "_notification").style.display = "inline-block";
-    }
-
-    // repopulate the new chat room dropdown
-    pop_new_chat_dropdown = true;
-}
-
-/*
- * On pageload, all relevant messages are request from MATRX, and sent to this function for
- * processing and visualizing in the GUI.
- */
-function process_mssgs_pageload(initial_mssgs, initial_chatrooms) {
-    console.log("Processing mssgs initial pageload:");
-    console.log(initial_mssgs);
-    console.log(initial_chatrooms);
-
-    // process the chatrooms
-    populate_new_chat_dropdown(initial_chatrooms);
-
-    // add every message, adding chatrooms if needed
-    process_messages(initial_mssgs);
-}
 
 
 /*********************************************************************
@@ -918,26 +800,18 @@ function hexToRgba(hex, opacity) {
 }
 
 /**
- * Compares two objects on equality
+ * Compares two objects on equality. Assumes identical order
  */
 function compare_objects(o1, o2) {
     if (o1 === undefined || o2 === undefined) {
         return false;
     }
-    for (var p in o1) {
-        if (o1.hasOwnProperty(p)) {
-            if (o1[p] !== o2[p]) {
-                return false;
-            }
-        }
+
+    // stringify to JSON so we can also check nested objects
+    if (JSON.stringify(o1) != JSON.stringify(o2)) {
+        return false;
     }
-    for (var p in o2) {
-        if (o2.hasOwnProperty(p)) {
-            if (o1[p] !== o2[p]) {
-                return false;
-            }
-        }
-    }
+
     return true;
 };
 

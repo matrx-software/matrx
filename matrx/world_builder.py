@@ -693,7 +693,6 @@ class WorldBuilder:
         >>> builder.add_team(brains, locs, "The A Team")
 
         """
-
         self.add_multiple_agents(agent_brains, locations,
                                  custom_properties=custom_properties,
                                  sense_capabilities=sense_capability,

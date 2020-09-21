@@ -40,9 +40,13 @@ var lv_base_url = window.location.hostname,
     lv_init_url = 'http://' + lv_base_url + ':3001/get_info',
     lv_update_url = 'http://' + lv_base_url + ':3001/get_latest_state_and_messages/',
     lv_send_userinput_url = 'http://' + lv_base_url + ':3001/send_userinput/',
-    lv_sync_messages_url = 'http://' + lv_base_url + ':3001/get_messages/',
     lv_agent_id = "",
     lv_agent_type = null;
+
+// check if message offsets are defined and used in gen_grid.js
+if (typeof chat_offsets !== 'undefined') {
+    var chat_offsets = {};
+}
 
 
 console.log("lv_send_userinput_url:", lv_send_userinput_url);
@@ -97,8 +101,8 @@ function init() {
         // if MATRX is running, change the start/pause button to match that
         sync_play_button(lv_matrx_paused);
 
-        // get the messages for all agents (god view), or this specific agent (human-agent / agent)
-        initial_mssgs_sync();
+        // start the visualization loop
+        world_loop();
     });
 
     // if the request gave an error, print to console and try again
@@ -161,37 +165,6 @@ function parse_initial_state(data) {
     lv_matrx_paused = data.matrx_paused;
 }
 
-
-/*
- * On page load, fetch all messages from MATRX, and show them in the GUI
- */
-function initial_mssgs_sync() {
-    // preprare the url
-    var lv_temp_url = lv_sync_messages_url + "0";
-    if (lv_agent_type == "human-agent") {
-        lv_temp_url += "/" + lv_agent_id;
-    }
-
-    // fetch the messages
-    var mssgs_request = jQuery.getJSON(lv_temp_url);
-
-    // start the world_loop if the request was succesfull
-    mssgs_request.done(function(data2) {
-        console.log("Succesfully received messages from MATRX");
-        // unpack messages
-        process_mssgs_pageload(data2.messages, data2.chatrooms);
-
-        // start the visualization loop
-        world_loop();
-    });
-
-    // catch a failed request
-    mssgs_request.fail(function(data2) {
-        console.log("Could not fetch messages from MATRX API for initial sync, retrying in 0.5s");
-        lv_reinitialize_vis = true;
-        return
-    });
-}
 
 /*
  * The visualization loop for a MATRX world
@@ -291,43 +264,53 @@ function request_new_frame() {
 function get_MATRX_update() {
     // console.log("Fetching matrx state with old wait:", lv_wait_for_next_tick);
 
-    // the get request is async, meaning the (success) function is only executed when
+    data = {"agent_id": lv_agent_id, "chat_offsets": chat_offsets};
+
+    // the request is async, meaning the (success) function is only executed when
     // the response has been received
-    var lv_update_request = jQuery.getJSON(lv_update_url + "['" + lv_agent_id + "']", function(data) {
-        //        console.log("Received update request:", lv_update_request);
-        lv_messages = data.messages;
-        lv_chatrooms = data.chatrooms;
+    var lv_update_request = $.ajax({
+        method: "POST",
+        url: lv_update_url,
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json',
+        data: JSON.stringify(data),
+        success: function(data) {
+            //        console.log("Received update request:", lv_update_request);
+            lv_messages = data.messages;
+            lv_chatrooms = data.chatrooms;
 
-        // decode lv_state and other info from the request
-        lv_state = data['states'][data['states'].length - 1][lv_agent_id]['state'];
-        var lv_new_tick = lv_state['World']['nr_ticks'];
-        curr_tick_timestamp = lv_state['World']['curr_tick_timestamp'];
-        lv_tick_duration = lv_state['World']['tick_duration'];
-        lv_tps = (1.0 / lv_tick_duration).toFixed(1); // round to 1 decimal behind the dot
+            // decode lv_state and other info from the request
+            lv_state = data['states'][data['states'].length - 1][lv_agent_id]['state'];
+            var lv_new_tick = lv_state['World']['nr_ticks'];
+            curr_tick_timestamp = lv_state['World']['curr_tick_timestamp'];
+            lv_tick_duration = lv_state['World']['tick_duration'];
+            lv_tps = (1.0 / lv_tick_duration).toFixed(1); // round to 1 decimal behind the dot
 
-        lv_world_settings = lv_state['World'];
+            lv_world_settings = lv_state['World'];
 
-        // check what the ID of this world is. Is it still the same world we were expecting, or a different world?
-        lv_new_world_ID = lv_state['World']['world_ID'];
+            // check what the ID of this world is. Is it still the same world we were expecting, or a different world?
+            lv_new_world_ID = lv_state['World']['world_ID'];
 
-        // we request more often than the lv_tick_duration, as to not miss any ticks
-        lv_wait_for_next_tick = lv_tick_duration * 1000 * 0.6;
+            // we request more often than the lv_tick_duration, as to not miss any ticks
+            lv_wait_for_next_tick = lv_tick_duration * 1000 * 0.6;
 
-        // request at least every half second
-        if (lv_wait_for_next_tick > 500) {
-            lv_wait_for_next_tick = 500;
-        }
+            // request at least every half second
+            if (lv_wait_for_next_tick > 500) {
+                lv_wait_for_next_tick = 500;
+            }
 
-        // note our new current tick
-        lv_current_tick = lv_new_tick;
+            // note our new current tick
+            lv_current_tick = lv_new_tick;
 
-        // make sure to synchronize the play/pause button of the frontend with the current MATRX version
-        var matrx_paused = data.matrx_paused;
-        if (matrx_paused != lv_matrx_paused) {
-            lv_matrx_paused = matrx_paused;
-            sync_play_button(lv_matrx_paused);
-        }
+            // make sure to synchronize the play/pause button of the frontend with the current MATRX version
+            var matrx_paused = data.matrx_paused;
+            if (matrx_paused != lv_matrx_paused) {
+                lv_matrx_paused = matrx_paused;
+                sync_play_button(lv_matrx_paused);
+            }
+        },
     });
+
     return lv_update_request;
 }
 
