@@ -234,7 +234,6 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
 
     // update the list with accessible chatrooms
     if (pop_new_chat_dropdown) {
-        console.log("populate chat dropdown called from front");
         populate_new_chat_dropdown(accessible_chatrooms);
     }
 

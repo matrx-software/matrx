@@ -47,11 +47,12 @@ The changes more in depth:
 - Fixed bug where API tries to fetch states from non-existing agents 
 
 Vragen: 
-- kan je een message naar jezelf sturen? 
+- kan je een message naar jezelf sturen? Nu wel 
+- Kan je een message naar iedere andere agent sturen? nu wel
+- Kan je een message naar andere teams sturen? Nee, alleen als je erin zit 
 
-Todo:
-- Test with get
+To do: 
+- Set a chatroom to active
 
 Final testing: 
-- test with god?
 - put online

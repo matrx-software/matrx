@@ -316,7 +316,7 @@ class MessageManager:
             chatroom_ID = chatroom.ID
             # add the chatroom if not agent_id was passed, or
             # the agent is present in the chat
-            if agent_id is None or agent_id in chatroom.agent_IDs:
+            if agent_id is None or agent_id in chatroom.agent_IDs or agent_id == "god":
                 chatrooms[chatroom_ID] = {"name": chatroom.name, "type": chatroom.type}
 
         return chatrooms
