@@ -44,18 +44,14 @@ The changes more in depth:
     - The API call `/get_latest_state_and_messages` has been updated to `message_manager` changes. The API call now accepts the `agent_id` and `chat_offsets` URL parameters.
     - In the default MATRX visualizer have the `toolbar.js` and `loop.js` files been upgraded to work with the changes in the API changes for fetching MATRX messages and use the `chat_offsets` for robust message fetching.
 - God agents can now see all other chats (but not respond)
-
+- Fixed bug where API tries to fetch states from non-existing agents 
 
 Vragen: 
 - kan je een message naar jezelf sturen? 
 
 Todo:
 - Test with get
-- test with other agent
 
 Final testing: 
-- test with get? (or remove for now)
-- test with global messages
-- test DASH like bugs. 
-- test with default messages send to everyone
 - test with god?
+- put online

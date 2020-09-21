@@ -99,8 +99,10 @@ def get_latest_state_and_messages():
 
     # from GET requests fetch URL parameters
     if request.method == "GET":
-        agent_id = request.args.get("agent_id")
-        chat_offsets = request.args.get("chat_offsets")
+        error_mssg = f"The /get_latest_state_and_messages/ API call only allows POST requests for MATRX Version 2.0.0 " \
+                     f"and higher. Please see https://matrx-software.com/docs/upgrading-matrx on how to upgrade."
+        print("api request not valid:", error_mssg)
+        return abort(400, description=error_mssg)
 
     # For POST requests fetch json data
     elif request.method == "POST":
@@ -109,7 +111,7 @@ def get_latest_state_and_messages():
         chat_offsets = None if "chat_offsets" not in data else data['chat_offsets']
 
     else:
-        error_mssg = f"API call only allows POST or GET requests."
+        error_mssg = f"API call only allows POST requests."
         print("api request not valid:", error_mssg)
         return abort(400, description=error_mssg)
 
@@ -281,7 +283,7 @@ def get_filtered_latest_state(agent_ids):
 #########################################################################
 # MATRX fetch messages api calls
 #########################################################################
-@app.route('/get_messages/', methods=['GET'])
+@app.route('/get_messages/', methods=['GET', 'POST'])
 def get_messages_apicall():
     """ Returns chatrooms and chat messages for one agent, or all agents.
 
@@ -316,8 +318,10 @@ def get_messages_apicall():
 
     # from GET requests fetch URL parameters
     if request.method == "GET":
-        agent_id = request.args.get("agent_id")
-        chat_offsets = request.args.get("chat_offsets")
+        error_mssg = f"The /get_messages/ API call only allows POST requests for MATRX Version 2.0.0 and higher. " \
+                     f"Please see https://matrx-software.com/docs/upgrading-matrx on how to upgrade."
+        print("api request not valid:", error_mssg)
+        return abort(400, description=error_mssg)
 
     # For POST requests fetch json data
     elif request.method == "POST":
@@ -326,7 +330,7 @@ def get_messages_apicall():
         chat_offsets = None if "chat_offsets" not in data else data['chat_offsets']
 
     else:
-        error_mssg = f"API call only allows POST or GET requests."
+        error_mssg = f"API call only allows POST requests."
         print("api request not valid:", error_mssg)
         return abort(400, description=error_mssg)
 
@@ -860,7 +864,8 @@ def __fetch_states(tick, ids=None):
 
         # add each agent's state for this tick
         for agent_id in ids:
-            states_this_tick[agent_id] = states[t][agent_id]
+            if agent_id in states[t]:
+                states_this_tick[agent_id] = states[t][agent_id]
 
         # save the states of all filtered agents for this tick
         filtered_states.append(states_this_tick)

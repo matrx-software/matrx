@@ -265,7 +265,6 @@ function get_MATRX_update() {
     // console.log("Fetching matrx state with old wait:", lv_wait_for_next_tick);
 
     data = {"agent_id": lv_agent_id, "chat_offsets": chat_offsets};
-    console.log("fetch with data:", data);
 
     // the request is async, meaning the (success) function is only executed when
     // the response has been received

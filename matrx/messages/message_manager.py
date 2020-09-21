@@ -345,6 +345,9 @@ class MessageManager:
         """
         chatrooms = {}
 
+        if chatroom_mssg_offsets is None:
+            chatroom_mssg_offsets = {}
+
         # fetch the relevant chatrooms for this agent (or all)
         chatroom_IDs = self.fetch_chatrooms(agent_id=agent_id).keys()
 
