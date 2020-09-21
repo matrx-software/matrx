@@ -243,8 +243,6 @@ class HumanAgentBrain(AgentBrain):
                     message_content = f"Hello, my name is {self.agent_name}"
                     self.send_message(Message(content=message_content, from_id=self.agent_id, to_id=obj_id))
 
-
-
         action_kwargs = {}
 
         # if no keys were pressed, do nothing

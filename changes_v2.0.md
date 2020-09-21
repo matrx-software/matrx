@@ -51,8 +51,5 @@ Vragen:
 - Kan je een message naar iedere andere agent sturen? nu wel
 - Kan je een message naar andere teams sturen? Nee, alleen als je erin zit 
 
-To do: 
-- Set a chatroom to active
-
 Final testing: 
 - put online
