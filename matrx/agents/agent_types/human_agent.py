@@ -241,7 +241,7 @@ class HumanAgentBrain(AgentBrain):
                 classes = obj['class_inheritance']
                 if "AgentBrain" in classes or "HumanAgentBrain" in classes:  # the object is an agent to which we can send our message
                     message_content = f"Hello, my name is {self.agent_name}"
-                    self.send_message(Message(content=message_content, from_id=self.agent_id, to_id=obj_id))
+                    # self.send_message(Message(content=message_content, from_id=self.agent_id, to_id=obj_id))
 
 
 

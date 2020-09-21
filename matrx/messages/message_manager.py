@@ -1,7 +1,7 @@
 import copy
 
 from matrx.messages.message import Message
-
+from itertools import combinations
 
 class MessageManager:
     """ A manager inside the GirdWorld that tracks the received and send messages between agents and their teams.
@@ -21,6 +21,8 @@ class MessageManager:
         # add the global chatroom
         global_chatroom = Chatroom(ID=len(self.chatrooms), name="Global", type="global")
         self.chatrooms.append(global_chatroom)
+        # check if we have initialized the chatrooms during the first tick of the simulation
+        self.initialized_chatrooms = False
 
         # contains all messages unpacked to the corresponding individual messages
         self.preprocessed_messages = {}
@@ -53,9 +55,10 @@ class MessageManager:
         self.teams = teams
 
         # create private chats for any new agents
-        if self.agents != all_agent_ids:
+        if self.agents != all_agent_ids or not self.initialized_chatrooms:
+            self.initialized_chatrooms = True
             # create private chats
-            self.create_private_chats(all_agent_ids)
+            self._create_chatrooms(all_agent_ids)
 
         self.agents = all_agent_ids
 
@@ -178,17 +181,18 @@ class MessageManager:
             # As such, a message can be targeted at a team and individual agent at the same time.
             if mssg.to_id in all_agent_ids:
 
-                # The name of a private chat are the IDs of both agents
-                #  alphabetically concatenated and split with a underscore
-                ids_sorted = [mssg.to_id, mssg.from_id]
-                ids_sorted.sort()
-                private_chatroom_name = ids_sorted[0] + "__" + ids_sorted[1]
-
                 # get the ID of the chatroom if already exists
                 chatroom_ID = self.fetch_chatroom_ID(chatroom_type="private", agent_IDs=[mssg.to_id, mssg.from_id])
 
                 # create the chatroom if it doesn't exist yet
                 if chatroom_ID is False:
+                    # The name of a private chat are the IDs of both agents
+                    #  alphabetically concatenated and split with a underscore
+                    ids_sorted = [mssg.to_id, mssg.from_id]
+                    ids_sorted.sort()
+                    private_chatroom_name = ids_sorted[0] + "__" + ids_sorted[1]
+
+                    # add the chatroom
                     chatroom_ID = len(self.chatrooms)
                     chatroom = Chatroom(ID=chatroom_ID, name=private_chatroom_name,
                             type="private", agent_IDs=[mssg.to_id, mssg.from_id])
@@ -224,9 +228,9 @@ class MessageManager:
         if chatroom_type == "private":
             # The name of a private chat is the two agent IDs concatenated
             # alphabetically with an underscore
-            ids_sorted = agent_IDs
+            ids_sorted = list(agent_IDs)
             ids_sorted.sort()
-            private_chat_name = ids_sorted[0] + "_" + ids_sorted[1]
+            private_chat_name = ids_sorted[0] + "__" + ids_sorted[1]
 
             # return the chatroom ID of the chatroom with that name
             for chatroom in self.chatrooms:
@@ -243,24 +247,10 @@ class MessageManager:
         return False
 
 
-    @staticmethod
-    def __unique_permutations(elements):
-        """ Create all unique permutations for a set of elements """
-        if len(elements) == 1:
-            yield (elements[0],)
-        else:
-            unique_elements = set(elements)
-            for first_element in unique_elements:
-                remaining_elements = list(elements)
-                remaining_elements.remove(first_element)
-                for sub_permutation in MessageManager.__unique_permutations(remaining_elements):
-                    yield (first_element,) + sub_permutation
-
-
-    def create_private_chats(self, all_agent_ids):
+    def _create_chatrooms(self, all_agent_ids):
         """ Create any private chats not yet initialized for known agent pairs """
         # get all unique agent-agent combinations
-        unique_agent_combinations = MessageManager.__unique_permutations(all_agent_ids)
+        unique_agent_combinations = [comb for comb in combinations(all_agent_ids, 2)]
 
         # create a private chat for every agent-agent combination
         for unique_agent_combination in unique_agent_combinations:
@@ -280,6 +270,20 @@ class MessageManager:
                 chatroom = Chatroom(ID=chatroom_ID, name=private_chatroom_name,
                         type="private", agent_IDs=[ids_sorted[0], ids_sorted[1]])
                 self.chatrooms.append(chatroom)
+
+
+        # create the team chatrooms
+        for team_name, team_members in self.teams.items():
+            # get the ID of the chatroom if already exists
+            chatroom_ID = self.fetch_chatroom_ID(chatroom_type="team", team_name=team_name)
+
+            # create the chatroom if it doesn't exist yet
+            if chatroom_ID is False:
+                chatroom_ID = len(self.chatrooms)
+                chatroom = Chatroom(ID=chatroom_ID, name=team_name,
+                                    type="team", agent_IDs=team_members)
+                self.chatrooms.append(chatroom)
+        return
 
 
     @staticmethod
@@ -359,7 +363,7 @@ class MessageManager:
 
                 # if the offset is X, we want messages with index > X (if they exist)
                 if offset + 1 < len(self.chatrooms[chatroom_ID].messages):
-                    chatrooms[chatroom_ID] = self.chatrooms[chatroom_ID].messages[offset:]
+                    chatrooms[chatroom_ID] = self.chatrooms[chatroom_ID].messages[offset + 1:]
                 else:
                     chatrooms[chatroom_ID] = []
 

@@ -431,6 +431,8 @@ def send_message():
     # fetch the data
     data = request.json
 
+    print("Received message to send with data:", data)
+
     # check that all required parameters have been passed
     required_params = ("content", "sender", "receiver")
     if not all(k in data for k in required_params):

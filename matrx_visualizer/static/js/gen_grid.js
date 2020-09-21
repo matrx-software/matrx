@@ -193,7 +193,6 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             // repopulate the agent list, when the visualization settings changed of an agent
             if (obj.hasOwnProperty('isAgent')) {
                 populate_god_agent_menu = true;
-                pop_new_chat_dropdown = true;
             }
 
             set_tile_dimensions(obj_element);
@@ -235,6 +234,7 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
 
     // update the list with accessible chatrooms
     if (pop_new_chat_dropdown) {
+        console.log("populate chat dropdown called from front");
         populate_new_chat_dropdown(accessible_chatrooms);
     }
 
@@ -801,26 +801,18 @@ function hexToRgba(hex, opacity) {
 }
 
 /**
- * Compares two objects on equality
+ * Compares two objects on equality. Assumes identical order
  */
 function compare_objects(o1, o2) {
     if (o1 === undefined || o2 === undefined) {
         return false;
     }
-    for (var p in o1) {
-        if (o1.hasOwnProperty(p)) {
-            if (o1[p] !== o2[p]) {
-                return false;
-            }
-        }
+
+    // stringify to JSON so we can also check nested objects
+    if (JSON.stringify(o1) != JSON.stringify(o2)) {
+        return false;
     }
-    for (var p in o2) {
-        if (o2.hasOwnProperty(p)) {
-            if (o1[p] !== o2[p]) {
-                return false;
-            }
-        }
-    }
+
     return true;
 };
 

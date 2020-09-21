@@ -25,7 +25,9 @@ def deprecated_get_messages(agent_id):
     - Removed `process_messages` and `process_message` (have been moved to toolbar.js).
     - Removed `messages` var from gen_grid.js
     - Changed `process_messages(new_messages)` to `process_messages(new_messages, accessible_chatrooms)`
-
+    - line 196 removed `pop_new_chat_dropdown = true;`
+    - updated `function compare_objects` 
+    
 - Remove from templates:
     - `<div class="contact contact_active" id="chatroom_global" onclick="chatroom_click(event)">Global<span class="chat-notification" id="chatroom_global_notification"></span></div>`
 
@@ -44,11 +46,16 @@ The changes more in depth:
 - God agents can now see all other chats (but not respond)
 
 
-
+Vragen: 
+- kan je een message naar jezelf sturen? 
 
 Todo:
 - Test with get
-- fill chatroom dropdown correctly
-- teams missing?
-- double chatroom with other person
-- check send_message function. chat_display_name undefined?
+- test with other agent
+
+Final testing: 
+- test with get? (or remove for now)
+- test with global messages
+- test DASH like bugs. 
+- test with default messages send to everyone
+- test with god?
