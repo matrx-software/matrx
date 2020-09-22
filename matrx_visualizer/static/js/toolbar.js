@@ -417,10 +417,14 @@ function open_chatroom(chatroom_display_name, chatroom_ID, chatroom_type) {
  * Add 1 message to the currently opened chatroom
  */
 function add_message(chatroom_ID, mssg) {
+    mssg_content = "";
     // cleanup and validate the input
-    mssg_content = mssg.content.trim();
-    if (!mssg_content || mssg_content.length === 0) {
-        return;
+    if (typeof mssg.content == "string") {
+        mssg_content = mssg.content.trim();
+    }
+    // show objects as strings by default
+    else {
+        mssg_content = JSON.stringify(mssg.content);
     }
 
     var div = document.createElement("div");

@@ -66,7 +66,8 @@ class MessageManager:
         self.chatrooms[0].agent_IDs = self.agents
 
         # init a list for the messages this tick
-        self.preprocessed_messages[tick] = []
+        if tick not in self.preprocessed_messages and len(messages) != 0:
+            self.preprocessed_messages[tick] = []
 
         # process every message
         for mssg in messages:
