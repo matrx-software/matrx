@@ -127,6 +127,9 @@ class GridWorld:
            A dictionary which contians information on the API. At least containing the `api_thread` key with the
            API thread, and the `run_matrx_api` key which contains whether the GridWorld should start paused or not.
 
+           Optionally the `nr_states_to_store` key telling the API how many past states (including the current) should
+           be stored (minimum of 1, the current state). Note; too big of a number increases RAM usage!
+
         Examples
         --------
 
@@ -162,6 +165,9 @@ class GridWorld:
                 api.gw_message_manager = self.message_manager
                 api.gw = self
                 api.teams = self.__teams
+                if 'nr_states_to_store' in self.__api_info.keys():  # if not given, defaults to 5 in api.py (reset_api)
+                    nr_states_to_store = max(self.__api_info['nr_states_to_store'], 1)
+                    api.nr_states_to_store = nr_states_to_store
 
                 # init api with world info
                 api.MATRX_info = {
