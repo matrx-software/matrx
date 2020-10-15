@@ -697,8 +697,8 @@ class GridWorld:
 
             # make the information of this tick available via the api, after all
             # agents have been updated
-            api.next_tick()
             api.current_tick = self.__current_nr_ticks
+            api.next_tick()
             self.__tick_duration = api.tick_duration
             api.grid_size = self.shape
 
