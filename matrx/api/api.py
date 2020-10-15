@@ -1009,7 +1009,7 @@ def next_tick():
     -------
     """
     # save the new general info
-    global MATRX_info, next_tick_info, states, nr_states_to_store, current_tick, stored_state_ticks
+    global MATRX_info, next_tick_info, states
     MATRX_info = copy.copy(next_tick_info)
     next_tick_info = {}
     # print("Next ticK:", MATRX_info);
@@ -1024,7 +1024,6 @@ def next_tick():
         for tick in stored_ticks:
             if tick <= forget_from:
                 states.pop(tick)
-        print(len(states))
 
 
 def pop_userinput(agent_id):
