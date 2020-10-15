@@ -1,5 +1,6 @@
 import matrx.defaults as defaults
 import warnings
+import re
 
 class EnvObject:
 
@@ -76,11 +77,22 @@ class EnvObject:
         # Obtain a unique ID based on a global object counter, if not already set as an attribute in a super class
         # spaces are not allowed
         if not hasattr(self, "obj_id"):
-            self.obj_id = f"{self.obj_name}_{_next_obj_id()}".replace(" ", "_")
+            # remove double spaces
+            tmp_obj_name = " ".join(name.split())
+            # append a object ID to the end of the object name
+            self.obj_id = f"{tmp_obj_name}_{_next_obj_id()}".replace(" ", "_")
 
+            # prevent breaking of the frontend
             if "#" in self.obj_id:
-                warnings.warn("Note: # signs are not allowed as part of an agent or object ID, as it breaks the MATRX frontend. Any hashtags will be removed from the ID..")
+                warnings.warn("Note: # signs are not allowed as part of an agent or object ID, " +
+                                "as it breaks the MATRX frontend. Any hashtags will be removed " +
+                                "from the ID..")
                 self.obj_id = self.obj_id.replace("#", "")
+            if "__" in self.obj_id:
+                warnings.warn("Note: double __ signs are not allowed as part of an agent or " +
+                                "object ID, as it breaks the MATRX frontend. Any double " +
+                                "underscores will be removed from the ID..")
+                self.obj_id = re.sub('_+', '_', self.obj_id)
 
         # Make customizable_properties mutable if not given.
         if customizable_properties is None:

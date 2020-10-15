@@ -1,7 +1,7 @@
 import copy
 
 from matrx.messages.message import Message
-
+from itertools import combinations
 
 class MessageManager:
     """ A manager inside the GirdWorld that tracks the received and send messages between agents and their teams.
@@ -15,16 +15,23 @@ class MessageManager:
     """
 
     def __init__(self):
-        # there are three types of messages
-        self.global_messages = {}  # messages send to everyone
-        self.team_messages = {}  # messages send to a team
-        self.private_messages = {}  # messages send to individual agents
+        # contains all chatrooms and their messages
+        self.chatrooms = []
 
-        self.preprocessed_messages = {}  # all types of messages above unpacked to the corresponding individual messages
+        # add the global chatroom
+        global_chatroom = Chatroom(ID=len(self.chatrooms), name="Global", type="global")
+        self.chatrooms.append(global_chatroom)
+        # check if we have initialized the chatrooms during the first tick of the simulation
+        self.initialized_chatrooms = False
+
+        # contains all messages unpacked to the corresponding individual messages
+        self.preprocessed_messages = {}
 
         self.agents = None
         self.teams = None
         self.current_available_tick = 0
+
+        self.message_id = 0
 
     def preprocess_messages(self, tick, messages, all_agent_ids, teams):
         """ Preprocess messages for sending, such that they can be understood by the GridWorld.
@@ -46,14 +53,24 @@ class MessageManager:
         -------
         """
         self.teams = teams
+
+        # create private chats for any new agents
+        if self.agents != all_agent_ids or not self.initialized_chatrooms:
+            self.initialized_chatrooms = True
+            # create private chats
+            self._create_chatrooms(all_agent_ids)
+
         self.agents = all_agent_ids
+
+        # set the agent IDs of the global chat to be all agent IDs
+        self.chatrooms[0].agent_IDs = self.agents
+
+        # init a list for the messages this tick
+        if tick not in self.preprocessed_messages and len(messages) != 0:
+            self.preprocessed_messages[tick] = []
 
         # process every message
         for mssg in messages:
-
-            # initialize a list for messages for this tick
-            if tick not in self.preprocessed_messages:
-                self.preprocessed_messages[tick] = []
 
             # check the message for validity
             MessageManager.__check_message(mssg, mssg.from_id)
@@ -66,9 +83,10 @@ class MessageManager:
     def _decode_message_receiver(self, mssg, all_agent_ids, teams, tick):
         """ Processes messages directed at other agents / teams / everyone.
 
-        These messsage types are called private, team, and global messages.
-        Messages of each type are saved for every tick separately, as well as a list with all preprocessed messages
-        suitable for sending by the GridWorld.
+        Messages are saved in chatroom objects, which have a name and ID.
+        All messages are processed into their individual messages as well and
+        saved in a seperate list (`self.preprocess_messages`) with all
+        preprocessed messages suitable for sending by the GridWorld.
 
         Possible formats for mssg.to_id
         "agent1"                  = private message to agent1 + team "agent1" if it exists
@@ -90,34 +108,31 @@ class MessageManager:
         """
         all_ids_except_me = [agent_id for agent_id in all_agent_ids if agent_id != mssg.from_id]
 
-        # make sure when we copy this mssg to the global, private or team message groups, that we keep the potentially
-        # custom message class and its custom properties. Also make sure that the message has a unique ID
-        new_mssg = copy.copy(mssg).regen_id()
+        # Make sure that the message has a unique ID, and keep its custom class / properties
+        new_mssg = copy.copy(mssg)
+        new_mssg.regen_id()
+        new_mssg.tick = tick
 
         # if the receiver is None, it is a global message which has to be sent to everyone
-        if mssg.to_id is None:  # global message
-            # create a list in memory for global messages for this tick
-            if tick not in self.global_messages:
-                self.global_messages[tick] = []
-
-            # save in global
+        if mssg.to_id is None:
+            # save a copy in global
             global_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id="global")
-            self.global_messages[tick].append(global_message)
+            self.chatrooms[0].add_message(global_message)
 
             # split in sub mssgs
             for to_id in all_ids_except_me.copy():
                 # create message
                 new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=to_id)
 
-                # save in prepr
-                self.preprocessed_messages[tick].append(new_message)  # all messages above combined
+                # save in preprocessed, which is all individual messages combined
+                self.preprocessed_messages[tick].append(new_message)
 
         # if it is a list, decode every receiver_id in that list again
         elif isinstance(mssg.to_id, list):
             for receiver_id in mssg.to_id:
                 # create message
                 new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=receiver_id)
-
+                # decode as individual messages
                 self._decode_message_receiver(new_message, all_agent_ids, teams, tick)
 
         # a string might be: a list encoded as a string, a team, or an agent_id.
@@ -134,24 +149,31 @@ class MessageManager:
             except:
                 pass
 
+
             # Check if mssg_to is a team name. Note: an agent can only send a message to a team if they are in it.
             if mssg.to_id in teams.keys() and mssg.from_id in teams[mssg.to_id]:
-                # create a list in memory for this team for this tick
-                if tick not in self.team_messages:
-                    self.team_messages[tick] = {}
-                if mssg.to_id not in self.team_messages[tick]:
-                    self.team_messages[tick][mssg.to_id] = []
-
                 is_team_message = True
 
-                # save in team mssgs as a message for that specific team
-                self.team_messages[tick][mssg.to_id].append(mssg)
+                # get the ID of the chatroom if already exists
+                chatroom_ID = self.fetch_chatroom_ID(chatroom_type="team", team_name=mssg.to_id)
+
+                # create the chatroom if it doesn't exist yet
+                if chatroom_ID is False:
+                    chatroom_ID = len(self.chatrooms)
+                    chatroom = Chatroom(ID=chatroom_ID, name=mssg.to_id,
+                                    type="team", agent_IDs=teams[mssg.to_id])
+                    self.chatrooms.append(chatroom)
+
+                # register what the index of this message is in the chatroom
+                mssg.chat_mssg_count = len(self.chatrooms[chatroom_ID].messages)
+
+                # save the mssg to the chatroom
+                self.chatrooms[chatroom_ID].add_message(mssg)
 
                 # split in sub mssgs for every agent in the team
                 for to_id in teams[mssg.to_id]:
                     # create a message
                     new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=to_id)
-
                     # save in prepr
                     self.preprocessed_messages[tick].append(new_message)
 
@@ -159,16 +181,111 @@ class MessageManager:
             # If no team is set by the user, the agent is added to a new team with the same name as the agent's ID.
             # As such, a message can be targeted at a team and individual agent at the same time.
             if mssg.to_id in all_agent_ids:
-                # create a list in memory for private messages for this tick
-                if tick not in self.private_messages:
-                    self.private_messages[tick] = []
 
-                # save in private_messages mssgs
-                self.private_messages[tick].append(mssg)
+                # get the ID of the chatroom if already exists
+                chatroom_ID = self.fetch_chatroom_ID(chatroom_type="private", agent_IDs=[mssg.to_id, mssg.from_id])
+
+                # create the chatroom if it doesn't exist yet
+                if chatroom_ID is False:
+                    # The name of a private chat are the IDs of both agents
+                    #  alphabetically concatenated and split with a underscore
+                    ids_sorted = [mssg.to_id, mssg.from_id]
+                    ids_sorted.sort()
+                    private_chatroom_name = ids_sorted[0] + "__" + ids_sorted[1]
+
+                    # add the chatroom
+                    chatroom_ID = len(self.chatrooms)
+                    chatroom = Chatroom(ID=chatroom_ID, name=private_chatroom_name,
+                            type="private", agent_IDs=[mssg.to_id, mssg.from_id])
+                    self.chatrooms.append(chatroom)
+
+                # register what the index of this message is in this private chatroom
+                mssg.chat_mssg_count = len(self.chatrooms[chatroom_ID].messages)
+
+                # save the mssg to the chatroom
+                self.chatrooms[chatroom_ID].add_message(mssg)
 
                 # if the message was not already saved in the preprocessed list, save it there as well
                 if not is_team_message:
-                    self.preprocessed_messages[tick].append(mssg)
+                    new_message = self.copy_message(mssg=mssg, from_id=mssg.from_id, to_id=mssg.to_id)
+                    self.preprocessed_messages[tick].append(new_message)
+
+
+
+    def fetch_chatroom_ID(self, chatroom_type, agent_IDs=[], team_name=False):
+        """ Fetch the ID of a chatroom using various bits of info
+
+        Parameters
+        ----------
+        chatroom_type : str
+            Either "private" for private charooms send between 2 agents, or
+            "team" for messages between teams.
+        agent_IDs : list (optional)
+            List of the agent IDs part of that chatroom
+        team_name : str (optional)
+            The name of the team, which is used as chatroom name
+        """
+
+        if chatroom_type == "private":
+            # The name of a private chat is the two agent IDs concatenated
+            # alphabetically with an underscore
+            ids_sorted = list(agent_IDs)
+            ids_sorted.sort()
+            private_chat_name = ids_sorted[0] + "__" + ids_sorted[1]
+
+            # return the chatroom ID of the chatroom with that name
+            for chatroom in self.chatrooms:
+                if chatroom.name == private_chat_name:
+                    return chatroom.ID
+
+        elif chatroom_type == "team":
+            for chatroom in self.chatrooms:
+
+                # fetch the ID of a team chat by name
+                if chatroom.type == chatroom_type and chatroom.name == team_name:
+                    return chatroom.ID
+
+        return False
+
+
+    def _create_chatrooms(self, all_agent_ids):
+        """ Create any private chats not yet initialized for known agent pairs """
+        # get all unique agent-agent combinations
+        unique_agent_combinations = [comb for comb in combinations(all_agent_ids, 2)]
+
+        # create a private chat for every agent-agent combination
+        for unique_agent_combination in unique_agent_combinations:
+
+            # get the ID of the chatroom if already exists
+            chatroom_ID = self.fetch_chatroom_ID(chatroom_type="private", agent_IDs=unique_agent_combination)
+
+            # create the chatroom if it doesn't exist yet
+            if chatroom_ID is False:
+                # The name of a private chat are the IDs of both agents
+                #  alphabetically concatenated and split with a underscore
+                ids_sorted = [unique_agent_combination[0], unique_agent_combination[1]]
+                ids_sorted.sort()
+                private_chatroom_name = ids_sorted[0] + "__" + ids_sorted[1]
+
+                chatroom_ID = len(self.chatrooms)
+                chatroom = Chatroom(ID=chatroom_ID, name=private_chatroom_name,
+                        type="private", agent_IDs=[ids_sorted[0], ids_sorted[1]])
+                self.chatrooms.append(chatroom)
+
+
+        # create the team chatrooms
+        for team_name, team_members in self.teams.items():
+            # get the ID of the chatroom if already exists
+            chatroom_ID = self.fetch_chatroom_ID(chatroom_type="team", team_name=team_name)
+
+            # create the chatroom if it doesn't exist yet
+            if chatroom_ID is False:
+                chatroom_ID = len(self.chatrooms)
+                chatroom = Chatroom(ID=chatroom_ID, name=team_name,
+                                    type="team", agent_IDs=team_members)
+                self.chatrooms.append(chatroom)
+        return
+
 
     @staticmethod
     def __check_message(mssg, this_agent_id):
@@ -176,8 +293,9 @@ class MessageManager:
             raise Exception(f"A message to {this_agent_id} is not, nor inherits from, the class {Message.__name__}."
                             f" This is required for agents to be able to send and receive them.")
 
+
     def fetch_chatrooms(self, agent_id=None):
-        """ Fetch all the chatrooms, or only those which a specific agent can view.
+        """ Fetch all the chatrooms, or only those of which a specific agent is part.
 
         Parameters
         ----------
@@ -191,103 +309,77 @@ class MessageManager:
             accessible via likewise named keys.
         """
 
-        chatrooms = {"private": [], "team": [], "global": None}
+        chatrooms = {}
 
-        # add agents with which can be conversed
-        for agent_id in self.agents:
-            if agent_id != agent_id:
-                chatrooms['private'].append(agent_id)
-
-        # add teams with which can be conversed
-        for team_name, team_members in self.teams.items():
-            # if a specific agent ID is provided, only add teams of which that agent is a member
-            if agent_id is not None:
-                if agent_id in team_members or agent_id == "god":
-                    chatrooms['team'].append(team_name)
-            # otherwise, all teams can be conversed with
-            else:
-                chatrooms['team'].append(team_name)
+        # create a dict with chatroom IDs and chatroom names for all relevant
+        # chatrooms
+        for chatroom in self.chatrooms:
+            chatroom_ID = chatroom.ID
+            # add the chatroom if not agent_id was passed, or
+            # the agent is present in the chat
+            if agent_id is None or agent_id in chatroom.agent_IDs or agent_id == "god":
+                chatrooms[chatroom_ID] = {"name": chatroom.name, "type": chatroom.type}
 
         return chatrooms
 
-    def fetch_messages(self, tick_from, tick_to, agent_id=None):
+
+
+    def fetch_messages(self, agent_id=None, chatroom_mssg_offsets=None):
         """ Fetch messages, optionally filtered by start tick and/or agent id.
 
         Parameters
         ----------
-        tick_from : int
-            All messages from `tick_from` onwards to (including) `tick_to` will be collected.
-        tick_to : int
-            All messages from `tick_from` onwards to (including) `tick_to` will be collected.
-        agent_id : string (optional, default, None)
-            Only messages received by or sent by this agent will be collected. If none, all messages are returned
-            between `tick_from` to `tick_to`.
+        agent_id : string (optional, default=None)
+            Only messages received by or sent by this agent will be collected. If none, all messages
+            will be returned.
+
+        chatroom_mssg_offsets: dict (optional, default=None)
+            A dict of chat IDs, with for each ID from which message onward to send new messages.
+
 
         Returns
         -------
-        Messages : dict
-            Dictionary containing a 'global', 'team', and 'private' subdictionary.
-                Global messages: messages['global'][tick] = [list of messages]
-                Team messages: messages['team'][tick][team] = [list of messages]
-                Private messages: messages['private'][tick] = [list of messages]
-
-        Examples
-        ---------
-        In an action, world goal, or somewhere else with access to the Gridworld, the function can be used as below.
-        This example returns all messages between tick 0 and 10.
-
-        >>> messages = grid_world.message_manager.fetch_messages(0, 10, None)
-
+        Chatrooms : dict
+            Dictionary with as key the chatroom IDs, followed by the chatroom objects containing
+            among others the chatroom messages.
 
         """
-        messages = {'global': {}, 'team': {}, 'private': {}}
+        chatrooms = {}
 
-        # loop through all requested ticks
-        for t in range(tick_from, tick_to + 1):
-            # initialize the message objects to return
-            # messages['global'][t] = None
-            # messages['team'][t] = None
-            # messages['private'][t] = None
+        if chatroom_mssg_offsets is None:
+            chatroom_mssg_offsets = {}
 
-            # fetch any existing glolbal messages for this tick
-            if t in self.global_messages:
-                # make the messages JSON serializable and add
-                messages['global'][t] = [mssg.to_json() for mssg in self.global_messages[t]]
+        # fetch the relevant chatrooms for this agent (or all)
+        chatroom_IDs = self.fetch_chatrooms(agent_id=agent_id).keys()
 
-            # fetch any team messages
-            if t in self.team_messages:
-                if t not in messages['team']:
-                    messages['team'][t] = {}
+        for chatroom_ID in chatroom_IDs:
 
-                # fetch all team messages
-                if agent_id is None:
-                    # make them JSON serializable
-                    messages['team'][t] = [mssg.to_json() for mssg in self.team_messages[t]]
+            # data is sent as JSON to the API, which makes the keys of objects/dicts strings by
+            # default, so convert the chatroom ID temporarily to str to find a match
+            str_chatroom_ID = str(chatroom_ID)
 
-                # fetch team messages of the team of which the agent is a member
+            # send only the messages in this chatroom from the offset onwards
+            if str_chatroom_ID in chatroom_mssg_offsets.keys():
+                offset = chatroom_mssg_offsets[str_chatroom_ID]
+                # start with the first message if it is none
+                if offset is None:
+                    offset = -1
+
+                # if the offset is X, we want messages with index > X (if they exist)
+                if offset + 1 < len(self.chatrooms[chatroom_ID].messages):
+                    chatrooms[chatroom_ID] = self.chatrooms[chatroom_ID].messages[offset + 1:]
                 else:
-                    for team in self.teams:
-                        if (agent_id in team or agent_id == "god") and team in self.team_messages[t]:
-                            # make the messages JSON serializable and add
-                            messages['team'][t][team] = [mssg.to_json() for mssg in self.team_messages[t][team]]
+                    chatrooms[chatroom_ID] = []
 
-            # fetch private messages
-            if t in self.private_messages:
-                # fetch all private messages
-                if agent_id is None:
-                    # make the messages JSON serializable and add
-                    messages['private'][t] = [mssg.to_json() for mssg in self.private_messages[t]]
+            # otherwise just send all messages for this chatroom
+            else:
+                chatrooms[chatroom_ID] = self.chatrooms[chatroom_ID].messages
 
-                # fetch private messages sent to or received by the specified agent
-                else:
-                    messages['private'][t] = []
-                    for message in self.private_messages[t]:
-                        # only private messages addressed to or sent by our agent are requested
-                        if message.from_id == agent_id or message.to_id == agent_id or agent_id == "god":
-                            # make the messages JSON serializable and add
-                            messages['private'][t].append(message.to_json())
+            # convert each message to json
+            chatrooms[chatroom_ID] = [mssg.to_json() for mssg in chatrooms[chatroom_ID]]
 
-        return messages
+        return chatrooms
+
 
     def copy_message(self, mssg, from_id, to_id):
         """ Copy a message while keeping the potentially custom message type and custom message properties.
@@ -321,3 +413,35 @@ class MessageManager:
         new_mssg.to_id = to_id
 
         return new_mssg
+
+
+class Chatroom:
+    """ A chatroom object, containing the messages from various agents from that chatroom. """
+
+    def __init__(self, ID, name, type="private", agent_IDs = []):
+        """ Add a message to the chatroom
+
+        Parameters
+        ----------
+        mssg : Message
+            The message to be added
+        """
+        self.ID = ID
+        self.messages = []
+        self.name = name
+        self.type = type
+        self.agent_IDs = agent_IDs
+
+    def add_message(self, mssg):
+        """ Add a message to the chatroom
+
+        Parameters
+        ----------
+        mssg : Message
+            The message to be added
+        """
+        # register what the index of this message is in the chatroom
+        mssg.chat_mssg_count = len(self.messages)
+
+        # add the message
+        self.messages.append(mssg)

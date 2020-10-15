@@ -1,7 +1,7 @@
 var matrx_url = 'http://' + window.location.hostname,
     port = "3001",
-    matrx_context_menu_other = "fetch_context_menu_of_self";
-    matrx_context_menu_self = "fetch_context_menu_of_other";
+    matrx_context_menu_other = "fetch_context_menu_of_other";
+    matrx_context_menu_self = "fetch_context_menu_of_self";
 
 (function ($, window) {
 
@@ -27,7 +27,7 @@ var matrx_url = 'http://' + window.location.hostname,
 
                 // if no one or only ourselves are selected, send to matrx_context_menu_self,
                 // otherwise send to matrx_context_menu_other
-                var url = ( (!object_selected || post_data['self_selected']) ? matrx_context_menu_other : matrx_context_menu_self);
+                var url = ( (!object_selected || post_data['self_selected']) ? matrx_context_menu_self : matrx_context_menu_other);
 
                 var context_menu_request = $.ajax({
                     method: "POST",

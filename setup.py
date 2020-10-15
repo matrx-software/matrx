@@ -87,7 +87,7 @@ def build_and_upload(mode):
                + ' dist/* '
     else:
         print("Uploading to PyPi servers...")
-        cmd_ = 'python -m twine upload -u __token__ -p ' + token + ' dist/*'
+        cmd_ = 'python -m twine upload --verbose -u __token__ -p ' + token + ' dist/*'
     os.system(cmd_)
 
 
