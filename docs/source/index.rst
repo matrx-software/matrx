@@ -116,7 +116,6 @@ Reference by Category
     :ref:`Goals`
        Goals can be specified that track progress and determine when the simulation should end.
 
-
  .. container:: descr
 
     .. figure:: _static/images/shape_banner.jpg
@@ -124,7 +123,6 @@ Reference by Category
 
     :ref:`Cases`
        Defining a world containing objects, agents, actions, and simulation goals.
-
 
  .. container:: descr
 
