@@ -63,6 +63,7 @@ autoapi_type = 'python'
 autoapi_options = ['members', 'inherited-members', 'show-inheritance']
 autoapi_add_toctree_entry = False
 autoapi_python_class_content = "class"
+autoclass_content = 'both'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -114,4 +115,4 @@ def setup(app):
     app.add_stylesheet("css/theme_overrides.css")
 
 
-numpydoc_xref_aliases
+# numpydoc_xref_aliases

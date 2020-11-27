@@ -8,6 +8,21 @@ from matrx.actions.move_actions import *
 
 
 class Navigator:
+    """ A navigator object that can be used for path planning and navigation
+
+    Parameters
+    ----------
+    agent_id: string.
+        ID of the agent that wants to navigate
+    action_set: list
+        List of actions the agent can perform
+    algorithm: string. Optional, default "a_star"
+        The pathplanning algorithm to use. As of now only a_star is supported.
+    is_circular: Boolean. Optional, default=False.
+        Whether to continuously navigate from point A to B, and back, until infinity.
+    """
+
+
     A_STAR_ALGORITHM = "a_star"
 
     def __init__(self, agent_id, action_set, algorithm=A_STAR_ALGORITHM, is_circular=False):
