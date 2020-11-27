@@ -254,7 +254,8 @@ def get_latest_state(agent_ids):
 
 @app.route('/get_filtered_latest_state/<agent_ids>', methods=['POST'])
 def get_filtered_latest_state(agent_ids):
-    """ Return a state from a set of agent IDs, filtered to only return the specified properties """
+    """ Return a state for a set of agent IDs, filtered to only return the specified properties
+    """
 
     # check for validity and return an error if not valid
     api_call_valid, error = check_states_API_request(tick=current_tick)
@@ -551,7 +552,7 @@ def send_message_pickled():
     The pre-formatted CustomMessage instance can be jsonpickled and sent via the API.
     This API call can handle that request and send the CustomMessage to the MATRX agent
 
-        Returns
+    Returns
     -------
         Error if api call invalid, or True if valid.
     """
@@ -812,7 +813,22 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
 
 
 def check_input(tick=None, ids=None):
-    # check if tick is a valid format
+    """
+    Checks if the passed parameters are valid.
+
+    Parameters
+    ----------
+    tick: integer. Optional
+        Tick for which to fetch a state or message. Checks for existence.
+    ids: List. Optional
+        Agent IDs to check.
+
+    Returns
+    -------
+    Validity: Boolean.
+        Whether the tick and/or agent IDs are valid
+    """
+
     if tick is not None:
         try:
             tick = int(tick)
@@ -987,7 +1003,6 @@ def add_state(agent_id, state, agent_inheritence_chain, world_settings):
         This object contains all information on the MATRX world, such as tick and grid_size. Some agents might filter
         these out of their state, as such it is sent along seperatly to make sure the world settings, required by the
         visualization, are passed along.
-    -------
     """
     # save the new general info on the MATRX World (once)
     global next_tick_info
@@ -1006,7 +1021,6 @@ def add_state(agent_id, state, agent_inheritence_chain, world_settings):
 
 def next_tick():
     """ Proceed to the next tick, publicizing data of the new tick via the api (the new states).
-    -------
     """
     # save the new general info
     global MATRX_info, next_tick_info, states
@@ -1073,7 +1087,6 @@ def register_world(world_id):
     ----------
     world_id
         The ID of the world
-    -------
     """
     global current_world_ID
     current_world_ID = world_id
@@ -1085,7 +1098,6 @@ def register_world(world_id):
 
 def flask_thread():
     """ Starts the Flask server on localhost:3001
-    -------
     """
     if not debug:
         log = logging.getLogger('werkzeug')
@@ -1097,8 +1109,8 @@ def flask_thread():
 def run_api(verbose=False):
     """ Creates a separate Python thread in which the api (Flask) is started
     Returns
-        MATRX api Python thread
     -------
+        MATRX api Python thread
     """
     print("Starting background api server")
     global debug

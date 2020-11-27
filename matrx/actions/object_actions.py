@@ -174,7 +174,7 @@ class RemoveObjectResult(ActionResult):
 
     See Also
     --------
-    RemoveObjectAction
+    :class:`matrx.actions.object_actions.RemoveObjectAction`
 
     """
 

@@ -4,6 +4,103 @@ from matrx.objects.env_object import EnvObject
 
 
 class AgentBody(EnvObject):
+    """This class is a representation of an agent's body in the GridWorld.
+
+    It is used as a measure to keep the AgentBrain code and Environment code separate. This AgentBody is used by
+    the environment to update the GUI, perform actions, and update properties. It is kept in sync with the Agent's
+    brain every iteration.
+
+    It inherits from EnvObject which allows you set any custom properties you want. In addition it also has all the
+    mandatory properties of an EnvObject plus a few extra. Which is the team name the agent is part of (if any) and
+    what the Agent's body is carrying.
+
+    In addition the Agent's body keeps a set of callbacks to methods inside the Agent. This forms the connection
+    between the GridWorld (that calls them) and the Agent (that defined them).
+
+    Parameters
+    ----------
+    location: List or tuple of length two.
+        The location of the Agent's body in the grid world.
+    possible_actions: list
+        The list of Action class names this agent may be able to perform. This allows you to create agents that can
+        only perform a couple of the available actions.
+    sense_capability: The SenseCapability object.
+    class_callable: Agent class
+        The Agent class; in other words, the class of the agent's brain. This is stored here so that the Visualizer
+        (which visualizes an agent based on this Agent's body object) and agents knows what kind of agent
+        it is. Allows you to visualize certain agent types in a certain way.
+
+    callback_agent_get_action: function
+        The callback function as defined by the Agent instance of which this is an Agent's body of. It is called each
+        tick by the GridWorld. As such the GridWorld determines when the Agent can
+        perform an action by calling this function which is stored in the Agent's Agent's body.
+    callback_agent_set_action_result: function
+        Same as the callback_get_action but is used by GridWorld to set the
+        ActionResult object in the Agent after performing the action. This allows the Agent to know how its planned
+        action went.
+    callback_agent_observe: function
+        Similar to callback_agent_get_action, is used by GridWorld to obtain the
+        processed state dictionary of the Agent. As the GridWorld does not know exactly what the Agent is allowed to
+        see or not, the 'observe' preprocesses the given state further. But to accurately visualize what the agent sees
+        we have to obtain that pre-processed state, which is done through this callback.
+    callback_agent_initialize: function
+        Call the initialize function in an Agent's Brain. Is done at the initialize
+        of a GridWorld.
+
+    callback_agent_get_messages: function
+        A callback function that allows the GridWorld to obtain the agent's messages
+        that need to be send to different agents.
+    callback_agent_set_messages: function
+        A callback function that allows the GridWorld to set any message send by
+        some agent to a list of received messages in an agent.
+
+    callback_create_context_menu_for_other: function
+        A callback function that allows the gridworld or API to call the
+        subsequent agent function that generates the menu options of an agent for a context menu opened by a user not
+        controlling that specific agent.
+    callback_create_context_menu_for_self: function
+        A callback function that allows the gridworld or API to call the
+        subsequent agent function that generates the menu options for a context menu opened by the user controlling
+        the current human agent. If this is not a human agent, it is set to None.
+
+    name: string. Optional, default="Agent"
+        Defaults to "Agent". The name of the agent, does not need to be unique.
+    is_human_agent: Boolean. Optional, default=False.
+        Boolean to signal that the agent represented by this Agent's
+        body is a human controlled agent.
+    customizable_properties: List. Optional, default=obtained from defaults.py.
+        The list of attribute names
+        that can be customized by other objects (including Agent's body and as an extension any Agent).
+    is_traversable: Boolean. Optional, default obtained from defaults.py.
+        Signals whether other objects can be placed on top of this object.
+    carried_by: List. Optional, default obtained from defaults.py.
+        A list of who is carrying this object.
+    team: string. Optional, default is ID of agent
+        The team name the agent is part of.
+        Defaults to the team name similar to the Agent's body unique
+        ID, as such denoting that by default each Agent's body belongs to its own team and as an extension so does its
+        "brain" the Agent.
+
+    visualize_size: Float. Optional, default obtained from defaults.py.
+        A visualization property used by
+        the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualization (e.g. a
+        value of 0.5 is half of a square, object is in the center, a value of 2 is twice the square's size centered on
+        its location.)
+    visualize_shape: Int. Optional, default obtained from defaults.py.
+        A visualization property used by the
+        Visualizer. Denotes the shape of the object in the visualization.
+    visualize_colour: Hexcode string. Optional, default obtained from defaults.py.
+        A visualization property used by the Visualizer. Denotes the
+    visualize_depth: Integer. Optional, default obtained from defaults.py.
+        A visualization property that s used by the Visualizer to draw objects in layers.
+    visualize_opacity: Integer.
+        Opacity of object. Between 0.0 and 1.0.
+    visualize_when_busy: Boolean.
+        Whether to show a loading icon when the agent is busy (performing an action).
+    **custom_properties: dict, optional
+        Any other keyword arguments. All these are treated as custom attributes.
+        For example the property 'heat'=2.4 of an EnvObject representing a fire.
+    """
 
     def __init__(self, location, possible_actions, sense_capability, class_callable,
                  callback_agent_get_action, callback_agent_set_action_result, callback_agent_observe,
@@ -13,81 +110,6 @@ class AgentBody(EnvObject):
                  visualize_when_busy, is_traversable, team, name, is_movable,
                  is_human_agent, customizable_properties,
                  **custom_properties):
-        """
-        This class is a representation of an agent's body in the GridWorld.
-
-        It is used as a measure to keep the AgentBrain code and Environment code separate. This AgentBody is used by
-        the environment to update the GUI, perform actions, and update properties. It is kept in sync with the Agent's
-        brain every iteration.
-
-        It inherits from EnvObject which allows you set any custom properties you want. In addition it also has all the
-        mandatory properties of an EnvObject plus a few extra. Which is the team name the agent is part of (if any) and
-        what the Agent's body is carrying.
-
-        In addition the Agent's body keeps a set of callbacks to methods inside the Agent. This forms the connection
-        between the GridWorld (that calls them) and the Agent (that defined them).
-
-        :param location: List or tuple of length two. Mandatory. The location of the Agent's body in the grid world.
-        :param possible_actions: The list of Action class names this agent may be able to perform. This allows you to
-        create agents that can only perform a couple of the available actions.
-        :param sense_capability: The SenseCapability object.
-        :param class_callable: The Agent class; in other words, the class of the agent's brain. This is stored here so
-        that the Visualizer (which visualizes an agent based on this Agent's body object) and agents knows what kind of agent
-        it is. Allows you to visualize certain agent types in a certain way.
-
-        :param callback_agent_get_action: The callback function as defined by the Agent instance of which this is an
-        Agent's body of. It is called each tick by the GridWorld. As such the GridWorld determines when the Agent can
-        perform an action by calling this function which is stored in the Agent's Agent's body.
-        :param callback_agent_set_action_result: Same as the callback_get_action but is used by GridWorld to set the
-        ActionResult object in the Agent after performing the action. This allows the Agent to know how its planned
-        action went.
-        :param callback_agent_observe: Similar to callback_agent_get_action, is used by GridWorld to obtain the
-        processed state dictionary of the Agent. As the GridWorld does not know exactly what the Agent is allowed to
-        see or not, the 'observe' preprocesses the given state further. But to accurately visualize what the agent sees
-        we have to obtain that pre-processed state, which is done through this callback.
-        :param callback_agent_initialize: Call the initialize function in an Agent's Brain. Is done at the initialize
-        of a GridWorld.
-
-        :param callback_agent_get_messages: A callback function that allows the GridWorld to obtain the agent's messages
-        that need to be send to different agents.
-        :param callback_agent_set_messages: A callback function that allows the GridWorld to set any message send by
-        some agent to a list of received messages in an agent.
-
-        :param callback_create_context_menu_for_other: A callback function that allows the gridworld or API to call the
-        subsequent agent function that generates the menu options of an agent for a context menu opened by a user not
-        controlling that specific agent.
-        :param callback_create_context_menu_for_self: A callback function that allows the gridworld or API to call the
-        subsequent agent function that generates the menu options for a context menu opened by the user controlling
-        the current human agent. If this is not a human agent, it is set to None.
-
-
-        :param name: String Defaults to "Agent". The name of the agent, does not need to be unique.
-        :param is_human_agent: Boolean. Defaults to False. Boolean to signal that the agent represented by this Agent's
-        body is a human controlled agent.
-        :param customizable_properties: List. Optional, default obtained from defaults.py. The list of attribute names
-        that can be customized by other objects (including Agent's body and as an extension any Agent).
-        :param is_traversable: Boolean. Optional, default obtained from defaults.py. Signals whether other objects can
-        be placed on top of this object.
-        :param carried_by: List. Optional, default obtained from defaults.py. A list of who is carrying this object.
-        :param team: The team name the agent is part of. Defaults to the team name similar to the Agent's body unique
-        ID, as such denoting that by default each Agent's body belongs to its own team and as an extension so does its
-        "brain" the Agent.
-
-        :param visualize_size: Float. Optional, default obtained from defaults.py. A visualization property used by
-        the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualization (e.g. a
-        value of 0.5 is half of a square, object is in the center, a value of 2 is twice the square's size centered on
-        its location.)
-        :param visualize_shape: Int. Optional, default obtained from defaults.py. A visualization property used by the
-        Visualizer. Denotes the shape of the object in the visualization.
-        :param visualize_colour: Hexcode string. Optional, default obtained from defaults.py. A visualization property
-        used by the Visualizer. Denotes the
-        :param visualize_depth: Integer. Optional, default obtained from defaults.py. A visualization property that
-        is used by the Visualizer to draw objects in layers.
-        :param visualize_opacity: Integer. Opacity of object. Between 0.0 and 1.0.
-        :param visualize_when_busy: Boolean. Whether to show a loading icon when the agent is busy (performing an action).
-        :param **custom_properties: Optional. Any other keyword arguments. All these are treated as custom attributes.
-        For example the property 'heat'=2.4 of an EnvObject representing a fire.
-        """
 
         # A list of EnvObjects or any class that inherits from it. Denotes all objects the Agent's body is currently
         # carrying. Note that these objects do not exist on the WorldGrid anymore, so removing them in this list deletes
@@ -226,9 +248,17 @@ class AgentBody(EnvObject):
     def change_property(self, property_name, property_value):
         """
         Changes the value of an existing (!) property.
-        :param property_name: The name of the property.
-        :param property_value:  The value of the property.
-        :return: The new properties.
+
+        Parameters
+        ----------
+        property_name: string
+            The name of the property.
+        property_value:
+            The value of the property.
+
+        Returns
+        ----------
+        The new properties
         """
 
         # We check if it is a custom property and if so change it simply in the dictionary
@@ -288,8 +318,12 @@ class AgentBody(EnvObject):
     @property
     def location(self):
         """
-        We override the location pythonic property here so we can override its setter.
-        :return: The location tuple of the form; (x, y).
+        We override the location. Pythonic property here so we can override its setter.
+
+        Returns
+        -------
+        Location: tuple
+            The location tuple of the form; (x, y).
         """
         return tuple(self.__location)
 
@@ -298,8 +332,10 @@ class AgentBody(EnvObject):
         """
         Overrides the setter of the location (pythonic) property so we can transfer also all carried objects with us
         on any location change made anywhere.
-        :param loc:
-        :return:
+        Parameters
+        ----------
+        loc: tuple
+            The new location
         """
         assert isinstance(loc, list) or isinstance(loc, tuple)
         assert len(loc) == 2
@@ -329,7 +365,10 @@ class AgentBody(EnvObject):
 
         In the case we return the properties of a class that inherits from EnvObject, we check if that class has
 
-        :return: All mandatory and custom properties in a dictionary.
+        Returns
+        -------
+        Properties: dict
+            All mandatory and custom properties in a dictionary.
         """
 
         # Copy the custom properties

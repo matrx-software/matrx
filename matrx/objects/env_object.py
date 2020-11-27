@@ -3,73 +3,86 @@ import warnings
 import re
 
 class EnvObject:
+    """
+     The basic class for all objects in the world. This includes the AgentAvatar. All objects that are added to the
+     GridWorld should inherit this class.
+
+     An EnvObject always needs a location and a name. Since we have no idea where you want to put the object or how
+     you want to call it.
+
+     In addition agents may alter properties of objects, but only if they are specifically told to be customizable.
+     This is done by providing a list of property names in the customizable_properties list.
+     Any custom property is allowed to be customizable if in that list, but any keyword argument (e.g.
+     is_traversable) may only be influenced by an Action indirectly. For example, the is_traversable property cannot
+     be changed in any way, whereas the location property can only be changed indirectly through the PickUpObject
+     action.
+
+     A few properties are mandatory for the GridWorld, some Actions and the Visualizer to function. These are
+     keyword arguments (e.g. is_traversable). If these are not set, they are obtained from the defaults.py file.
+
+     This class specific allows you to create any object you desire that only differs in the properties it holds. For
+     example both a simple block or complex object such as a 'fire' can be modeled with this class. They only differ
+     in their mandatory and custom properties (a block is simply a colored square, whereas a 'fire' has potentially
+     many more properties). In such a case you simply provide more keyword arguments to the constructor, these
+     are automatically added to the self.custom_attributes dictionary. Allowing you to intuitively extend the
+     properties of any EnvObject.
+
+     If you want an object that can be altered by an action in a specific way, you can create it as long as it
+     inherits from this class. For example the Door object is such an example which has a unique method that 'opens'
+     or 'closes' the door. Which is called by the OpenDoor and CloseDoor actions.
+
+     If you want an object that needs to update some of its own properties during the simulation, you can again
+     create your own object as long as it inherits from this class. Then you can implement the update_properties
+     method. The Battery object is such an example, which simply decreases its energy level property each time step.
+
+     If you have a specific object you need to create a lot and you do not want to keep on setting every property
+     every time for the custom_properties, you can make your own class again which must inherit from this class and
+     only implement its constructor where these custom properties are set with your default value
+     of choosing.
+
+    Parameters
+    ----------
+    name: String
+        The name of object, does not need to be unique.
+    location: List or tuple of length two
+        The location of the object in the grid world.
+    customizable_properties: List. Optional, default obtained from defaults.py
+        The list of attribute names
+        that can be customized by other objects (including AgentAvatars and as an extension any Agent).
+    is_traversable: Boolean. Optional, default obtained from defaults.py
+        Signals whether other objects can be placed on top of this object.
+    carried_by: List. Optional, default obtained from defaults.py
+        A list of who is carrying this object.
+    class_callable: Callable class. Optional, defaults to EnvObject
+        This is required to make a distinction
+        between what kind of object is actually seen or visualized. The last element is always the lowest level class,
+        whereas the first element is always EnvObject and everything in between are potential other classes in the
+        inheritance chain.
+    visualize_size: Float. Optional, default obtained from defaults.py
+        A visualization property used by
+        the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualization (e.g. a
+        value of 0.5 is half of a square, object is in the center, a value of 2 is twice the square's size centered on
+        its location.)
+    visualize_shape: Int. Optional, default obtained from defaults.py
+        A visualization property used by the
+        Visualizer. Denotes the shape of the object in the visualization. 0=Rectangle, 1=Triangle, 2=Circle
+    visualize_colour: Hexcode string. Optional, default obtained from defaults.py
+        A visualization property
+        used by the Visualizer. Denotes the colour of the object in visualization.
+    visualize_depth: Integer. Optional, default obtained from defaults.py
+        A visualization property that
+        is used by the Visualizer to draw objects in layers.
+    visualize_opacity: Integer. Optional, default obtained from defaults.py
+        Opacity of the object. From 0.0 to 1.0.
+    **custom_properties: Dict. Optional
+        Any other keyword arguments. All these are treated as custom attributes.
+        For example the property 'heat'=2.4 of an EnvObject representing a fire.
+     """
 
     def __init__(self, location, name, class_callable, customizable_properties=None,
                  is_traversable=None, is_movable=None,
                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
                  visualize_opacity=None, **custom_properties):
-        """
-        The basic class for all objects in the world. This includes the AgentAvatar. All objects that are added to the
-        GridWorld should inherit this class.
-
-        An EnvObject always needs a location and a name. Since we have no idea where you want to put the object or how
-        you want to call it.
-
-        In addition agents may alter properties of objects, but only if they are specifically told to be customizable.
-        This is done by providing a list of property names in the customizable_properties list.
-        Any custom property is allowed to be customizable if in that list, but any keyword argument (e.g.
-        is_traversable) may only be influenced by an Action indirectly. For example, the is_traversable property cannot
-        be changed in any way, whereas the location property can only be changed indirectly through the PickUpObject
-        action.
-
-        A few properties are mandatory for the GridWorld, some Actions and the Visualizer to function. These are
-        keyword arguments (e.g. is_traversable). If these are not set, they are obtained from the defaults.py file.
-
-        This class specific allows you to create any object you desire that only differs in the properties it holds. For
-        example both a simple block or complex object such as a 'fire' can be modeled with this class. They only differ
-        in their mandatory and custom properties (a block is simply a colored square, whereas a 'fire' has potentially
-        many more properties). In such a case you simply provide more keyword arguments to the constructor, these
-        are automatically added to the self.custom_attributes dictionary. Allowing you to intuitively extend the
-        properties of any EnvObject.
-
-        If you want an object that can be altered by an action in a specific way, you can create it as long as it
-        inherits from this class. For example the Door object is such an example which has a unique method that 'opens'
-        or 'closes' the door. Which is called by the OpenDoor and CloseDoor actions.
-
-        If you want an object that needs to update some of its own properties during the simulation, you can again
-        create your own object as long as it inherits from this class. Then you can implement the update_properties
-        method. The Battery object is such an example, which simply decreases its energy level property each time step.
-
-        If you have a specific object you need to create a lot and you do not want to keep on setting every property
-        every time for the custom_properties, you can make your own class again which must inherit from this class and
-        only implement its constructor where these custom properties are set with your default value
-        of choosing.
-
-        :param name: String. Mandatory. The name of object, does not need to be unique.
-        :param location: List or tuple of length two. Mandatory. The location of the object in the grid world.
-        :param customizable_properties: List. Optional, default obtained from defaults.py. The list of attribute names
-        that can be customized by other objects (including AgentAvatars and as an extension any Agent).
-        :param is_traversable: Boolean. Optional, default obtained from defaults.py. Signals whether other objects can
-        be placed on top of this object.
-        :param carried_by: List. Optional, default obtained from defaults.py. A list of who is carrying this object.
-        :param class_callable: Callable class. Optional, defaults to EnvObject. This is required to make a distinction
-        between what kind of object is actually seen or visualized. The last element is always the lowest level class,
-        whereas the first element is always EnvObject and everything in between are potential other classes in the
-        inheritance chain.
-        :param visualize_size: Float. Optional, default obtained from defaults.py. A visualization property used by
-        the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualization (e.g. a
-        value of 0.5 is half of a square, object is in the center, a value of 2 is twice the square's size centered on
-        its location.)
-        :param visualize_shape: Int. Optional, default obtained from defaults.py. A visualization property used by the
-        Visualizer. Denotes the shape of the object in the visualization. 0=Rectangle, 1=Triangle, 2=Circle
-        :param visualize_colour: Hexcode string. Optional, default obtained from defaults.py. A visualization property
-        used by the Visualizer. Denotes the colour of the object in visualization.
-        :param visualize_depth: Integer. Optional, default obtained from defaults.py. A visualization property that
-        is used by the Visualizer to draw objects in layers.
-        :param visualize_opacity: Integer. Opacity of the object. From 0.0 to 1.0.
-        :param **custom_properties: Optional. Any other keyword arguments. All these are treated as custom attributes.
-        For example the property 'heat'=2.4 of an EnvObject representing a fire.
-        """
 
         # Set the object's name.
         self.obj_name = name
@@ -168,9 +181,17 @@ class EnvObject:
     def change_property(self, property_name, property_value):
         """
         Changes the value of an existing (!) property.
-        :param property_name: The name of the property.
-        :param property_value:  The value of the property.
-        :return: The new properties.
+
+        Parameters
+        ----------
+        property_name: string
+            The name of the property.
+        property_value:
+            The value of the property.
+
+        Returns
+        -------
+        The new properties.
         """
 
         # We check if it is a custom property and if so change it simply in the dictionary
@@ -213,6 +234,13 @@ class EnvObject:
     def add_property(self, property_name, property_value):
         """
         Adds a new(!) property with its value to the object.
+
+        Parameters
+        ----------
+        property_name: string
+            The name of the property.
+        property_value:
+            The value of the property.
         """
         if property_name in self.custom_properties:
             raise Exception("Attribute already exists, alter value with change_property instead")
@@ -226,7 +254,11 @@ class EnvObject:
         """
         The location of any object is a pythonic property, this allows us to do various checks on it. One of them is the
         setter that is overridden in AgentAvatar to also transfer all carried objects with it.
-        :return: The current location as a tuple; (x, y)
+
+        Returns
+        -------
+        Current Location: tuple
+            The current location as a tuple; (x, y)
         """
         return tuple(self.__location)
 
@@ -235,7 +267,11 @@ class EnvObject:
         """
         The setter than can be overridden if a location change might also affect some other things inside the
         EnvObject (such as in the case of an AgentAvatar; all the objects its holding change their locations as well).
-        :param loc: The new location
+
+        Parameters
+        ----------
+        loc: tuple
+            The new location
         """
         assert isinstance(loc, list) or isinstance(loc, tuple)
         assert len(loc) == 2
@@ -249,7 +285,9 @@ class EnvObject:
 
         In the case we return the properties of a class that inherits from EnvObject, we check if that class has
 
-        :return: All mandatory and custom properties in a dictionary.
+        Returns
+        -------
+        All mandatory and custom properties in a dictionary.
         """
 
         # Copy the custom properties
