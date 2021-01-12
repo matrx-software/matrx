@@ -16,3 +16,7 @@ log_data/
 # Ignore generated documentation files
 docs/build
 docs/source/sections/_generated_autodoc
+
+*.whl
+
+*.gz
