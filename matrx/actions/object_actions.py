@@ -489,7 +489,7 @@ class DropObject(Action):
         if 'object_id' in kwargs:
             obj_id = kwargs['object_id']
         elif len(reg_ag.is_carrying) > 0:
-            obj_id = reg_ag.is_carrying[-1]
+            obj_id = reg_ag.is_carrying[-1].obj_id
         else:
             return DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
 
@@ -543,7 +543,8 @@ class DropObject(Action):
 
         # If no object id is given, the last item is dropped
         if 'object_id' in kwargs:
-            env_obj = kwargs['object_id']
+            obj_id = kwargs['object_id']
+            env_obj = [obj for obj in reg_ag.is_carrying if obj.obj_id == obj_id][0]
         elif len(reg_ag.is_carrying) > 0:
             env_obj = reg_ag.is_carrying[-1]
         else:
@@ -877,7 +878,7 @@ def _possible_drop(grid_world, agent_id, obj_id, drop_range):
         return DropObjectResult(DropObjectResult.RESULT_NONE_GIVEN, False)
 
     # No object with that name
-    if not (obj_id in reg_ag.is_carrying):
+    if isinstance(obj_id, str) and not any([obj_id == obj.obj_id for obj in reg_ag.is_carrying]):
         return DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
 
     if len(loc_obj_ids) == 1:
