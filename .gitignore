@@ -18,3 +18,5 @@ docs/build
 docs/source/sections/_generated_autodoc
 
 *.whl
+
+*.gz
