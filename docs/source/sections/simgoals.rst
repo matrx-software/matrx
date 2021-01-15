@@ -1,4 +1,4 @@
-.. _Simulation goals:
+.. _Goals:
 
 ================
 Simulation goals

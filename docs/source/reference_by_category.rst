@@ -1,4 +1,4 @@
-.. _Reference by category page
+.. _Reference:
 
 ================
 Reference by category
@@ -25,7 +25,7 @@ Reference by category
 
  .. container:: descr
 
-    .. figure:: _static//images/worlds_banner.jpg
+    .. figure:: _static/images/worlds_banner.jpg
        :target: sections/worlds.html
 
     :ref:`Worlds`

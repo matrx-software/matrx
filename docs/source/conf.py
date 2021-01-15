@@ -32,11 +32,11 @@ sys.path.insert(0, os.path.abspath("../.."))
 
 # -- Project information -----------------------------------------------------
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '2.0'
 
 project = 'MATRX %s Manual' % release
-copyright = '2019, The MATRX Team at TNO.nl'
-author = 'The MATRX Team at TNO.nl'
+copyright = '2020, The MATRX Team at matrx-software.com'
+author = 'The MATRX Team at matrx-software.com'
 
 
 # -- General configuration ---------------------------------------------------
@@ -106,7 +106,7 @@ highlight_language = 'python3'
 
 html_theme = 'sphinx_rtd_theme'
 
-html_static_path = ['tutorials/images', '_static', '../build/html/_static']
+html_static_path = ['_static', '../build/html/_static']
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
