@@ -1,4 +1,4 @@
-.. _Object placement:
+.. _Objects:
 
 ================
 Object placement

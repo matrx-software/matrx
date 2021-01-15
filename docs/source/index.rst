@@ -13,46 +13,17 @@
 MATRX documentation
 ======================
 
-Welcome! This is the documentation for Man-Agent Teaming; Rapid eXperimentation Software (MATRX).
+Welcome! This is the class and function reference documentation for the huMan-Agent Teaming; Rapid eXperimentation Software (MATRX).
 
-MATRX a 2D-discrete testbed to facilitate Human Agent Teaming (HAT) research. The original use case in MATRX is an urban search and rescue operation in which pairs of a human and an autonomous system have to locate and rescue victims. However, MATRX is very versatile and can, therefore, also be used in many other cases.
+After having installed MATRX (|matrx_install_guide|) and having tried out one or more tutorials (see the tutorials on the |matrx_tutorials|), additional information can be found here on specific classes, functions and parameters that are not described in a tutorial.
 
+.. |matrx_install_guide| raw:: html
 
-Getting started
-===============
+    <a href="https://matrx-software.com/docs/tutorials/basics/installation/" target="_blank">see installing MATRX</a>
 
-.. container:: hidden_caption
+.. |matrx_tutorials| raw:: html
 
-   .. toctree::
-      :caption: Getting started
-      :maxdepth: 1
-
-      general_info/aboutmatrx.rst
-      installation/installing.rst
-      tutorials/tutorials.rst
-      tutorials/examples.rst
-      reference_by_category.rst
-
-
-For developers
-===============
-
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-   :caption: For Developers
-
-   developer_info/how_to_contribute.rst
-   developer_info/changelog.rst
-
-.. container:: bullet_list
-
-   * :ref:`How to contribute`
-   * :ref:`Changelog`
-   * :ref:`genindex`
-
-
-
+    <a href="https://matrx-software.com/tutorials/" target="_blank">MATRX website</a>
 
 .. _Reference by Category:
 Reference by Category
@@ -78,7 +49,7 @@ Reference by Category
 
  .. container:: descr
 
-    .. figure:: _static//images/worlds_banner.jpg
+    .. figure:: _static/images/worlds_banner.jpg
        :target: sections/worlds.html
 
     :ref:`Worlds`
@@ -116,7 +87,6 @@ Reference by Category
     :ref:`Goals`
        Goals can be specified that track progress and determine when the simulation should end.
 
-
  .. container:: descr
 
     .. figure:: _static/images/shape_banner.jpg
@@ -124,7 +94,6 @@ Reference by Category
 
     :ref:`Cases`
        Defining a world containing objects, agents, actions, and simulation goals.
-
 
  .. container:: descr
 

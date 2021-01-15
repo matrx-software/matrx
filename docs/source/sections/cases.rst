@@ -1,4 +1,4 @@
-.. _Scenarios:
+.. _Cases:
 
 ==============
 Scenarios
