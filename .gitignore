@@ -20,3 +20,6 @@ docs/source/sections/_generated_autodoc
 *.whl
 
 *.gz
+
+# ignore any (example) log data 
+Results/
