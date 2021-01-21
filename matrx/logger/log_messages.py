@@ -24,7 +24,7 @@ class MessageLogger(GridWorldLogger):
                 # create a field for messages sent and messages received
                 self.log_statement_template[agent_id + "_sent"] = None
                 self.log_statement_template[agent_id + "_received"] = None
-                self.log_statement_template[agent_id + "_json"] = None
+                self.log_statement_template[agent_id + "_mssg_json"] = None
 
             self.agent_ids_initialized = True
 

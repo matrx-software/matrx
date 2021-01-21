@@ -245,7 +245,7 @@ class HumanAgentBrain(AgentBrain):
             # If we found multiple agents, randomly select the ID of one of them or otherwise the ID of the only agent
             to_id = self.rnd_gen.choice(agents)['obj_id'] if isinstance(agents, list) else agents['obj_id']
 
-            self.send_message(Message(content=f"Hello, my name is {self.agent_name} and I sent this message at "
+            self.send_message(Message(content=f"Hello, my name is (human agent) {self.agent_name} and I sent this message at "
                                               f"tick {state['World']['nr_ticks']}",
                                       from_id=self.agent_id,
                                       to_id=to_id))
