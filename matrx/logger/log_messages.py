@@ -24,11 +24,12 @@ class MessageLogger(GridWorldLogger):
                 # create a field for messages sent and messages received
                 self.log_statement_template[agent_id + "_sent"] = None
                 self.log_statement_template[agent_id + "_received"] = None
+                # field specific for logging the entire message as json
                 self.log_statement_template[agent_id + "_mssg_json"] = None
 
             self.agent_ids_initialized = True
 
-        # create a copy of the log template and fill it in with the messages of this tick
+        # create a copy of the log template for the messages of the tick we are now processing
         log_statement = copy.copy(self.log_statement_template)
 
         # we check the messages of the previous tick, as the messages of this tick haven't been processed yet
