@@ -320,9 +320,6 @@ class HumanAgentBrain(AgentBrain):
                 action_kwargs['object_id'] = \
                     self.rnd_gen.choice(doors_in_range)
 
-        action_kwargs['duration_in_ticks'] = 1
-        print(f"{self.agent_id} doing {action} with kwargs {action_kwargs}")
-
         return action, action_kwargs
 
     def filter_observations(self, state):

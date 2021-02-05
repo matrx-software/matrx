@@ -2394,7 +2394,7 @@ class WorldBuilder:
         """
         # startup the MATRX API if requested
         if self.run_matrx_api:
-            self.api_info["api_thread"] = api.run_api(self.verbose)
+            self.api_info["api_thread"] = api._run_api(self.verbose)
 
         # check that the MATRX API is set to True if the MATRX visualizer is
         # requested
