@@ -212,7 +212,7 @@ class HumanAgentBrain(AgentBrain):
             controlling thus human agent.
 
         Returns
-        =======
+        =============
         action_name : str
             A string of the class name of an action that is also in
             self.action_set. To ensure backwards compatibility you could use

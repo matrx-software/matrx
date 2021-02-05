@@ -252,7 +252,7 @@ class GrabObject(Action):
         agent_id: str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id: str
+        object_id : str
             Optional. Default: ``None``
 
             The string representing the unique identifier of the
@@ -302,10 +302,10 @@ class GrabObject(Action):
         grid_world : GridWorld
             The :class:`matrx.grid_world.GridWorld` instance in which the
             object is sought according to the `object_id` parameter.
-        agent_id: str
+        agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id: str
+        object_id : str
             Optional. Default: ``None``
 
             The string representing the unique identifier of the
@@ -387,11 +387,11 @@ class GrabObjectResult(ActionResult):
 
     Parameters
     ----------
-    result: str
+    result : str
         A string representing the reason for a
         :class:`matrx.actions.object_actions.GrabObjectAction` (expected)
         success or fail.
-    succeeded: bool
+    succeeded : bool
         A boolean representing the (expected) success or fail of a
         :class:`matrx.actions.object_actions.GrabObjectAction`.
 
@@ -480,10 +480,10 @@ class DropObject(Action):
         grid_world : GridWorld
             The :class:`matrx.grid_world.GridWorld` instance in which the
             :class:`matrx.objects.env_object.EnvObject` is dropped.
-        agent_id: str
+        agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id: str
+        object_id : str
             Optional. Default: ``None``
 
             The string representing the unique identifier of the
@@ -529,10 +529,10 @@ class DropObject(Action):
         grid_world : GridWorld
             The :class:`matrx.grid_world.GridWorld` instance in which the
             :class:`matrx.objects.env_object.EnvObject` is dropped.
-        agent_id: str
+        agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id: str
+        object_id : str
             Optional. Default: ``None``
 
             The string representing the unique identifier of the
@@ -621,10 +621,10 @@ class DropObjectResult(ActionResult):
 
     Parameters
     ----------
-    result: str
+    result : str
         A string representing the reason for the (expected) success or fail of
         an :class:`matrx.actions.object_actions.DropObjectAction`.
-    succeeded: bool
+    succeeded : bool
         A boolean representing the (expected) success or fail of a
         :class:`matrx.actions.object_actions.DropObjectAction`.
 
@@ -672,10 +672,10 @@ def _is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
     grid_world : GridWorld
         The :class:`matrx.grid_world.GridWorld` instance in which the
         object is sought according to the `object_id` parameter.
-    agent_id: str
+    agent_id : str
         The string representing the unique identified that represents the
          agent performing this action.
-    object_id: str
+    object_id : str
         Optional. Default: ``None``
 
         The string representing the unique identifier of the

@@ -1,8 +1,8 @@
 .. _Messages:
 
-======
+============
 Messages
-======
+============
 
 Agents can communicate with eachother by sending and receiving messages, containing a variety of possible contents.
 

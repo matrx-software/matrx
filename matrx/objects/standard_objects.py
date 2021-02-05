@@ -149,7 +149,7 @@ class SmokeTile(AreaTile):
     ----------
     location : tuple
         The location of the area.
-    name : String. Optiona, default:"SmokeTile"
+    name : String. Optional,default:"SmokeTile"
         The name, default "SmokeTile".
     visualize_colour : string. Optional, default is "#b7b7b7"
         hex colour code for tile. default is grey.
@@ -240,7 +240,7 @@ class Battery(EnvObject):
 class CollectionTarget(EnvObject):
     """ An invisible object that tells which objects needs collection.
 
-    This invisible object is linked to `CollectionDropTile` object(s) and is used by the `CollectionGoal` to
+    This invisible object is linked to `CollectionDropOffTile` object(s) and is used by the `CollectionGoal` to
     identify which objects should be collected and dropped off at the tiles. This object is just a regular object
     but contains three additional properties:
     - collection_objects: See parameter doc.
@@ -262,7 +262,7 @@ class CollectionTarget(EnvObject):
         order of the list matters iff the `CollectionGoal.in_order==True`, in which case the
         `CollectionGoal` will track if the dropped objects at this tile are indeed dropped in the order of the list.
     collection_zone_name : str
-        This is the name that links `CollectionDropTile` object(s) to this object. The `CollectionGoal` will check
+        This is the name that links `CollectionDropOffTile` object(s) to this object. The `CollectionGoal` will check
         all of these tiles with this name to check if all objects are already dropped and collected.
     name : str (default is "Collection_target")
         The name of this object.
@@ -270,16 +270,16 @@ class CollectionTarget(EnvObject):
     Notes
     -----
     It does not matter where this object is added in the world. However, it is good practice to add it on top of
-    the (or one of them) `CollectionDropTile` object(s). The helper method to create collection areas
+    the (or one of them) `CollectionDropOffTile` object(s). The helper method to create collection areas
     `WorldBuilder.add_collection_goal` follows this practice.
 
     See Also
     --------
-    matrx.WorldBuilder.add_collection_goal
+    matrx.world_builder.WorldBuilder.add_collection_goal
             The handy method in the `WorldBuilder` to add a collection goal to the world and required object(s).
-    matrx.goals.CollectionGoal
+    matrx.goals.goals.CollectionGoal
         The `CollectionGoal` that performs the logic of check that all object(s) are dropped at the drop off tiles.
-    matrx.objects.CollectionDropTile
+    matrx.objects.standard_objects.CollectionDropOffTile
         The tile that represents the location(s) where the object(s) need to be dropped.
     """
     def __init__(self, location, collection_objects, collection_zone_name, name="Collection_target"):
@@ -303,7 +303,7 @@ class CollectionDropOffTile(AreaTile):
         The location of this tile.
     name : str (default is "Collection_zone")
         The name of this tile.
-    collection_area_name: str (default is "Collection_zone")
+    collection_area_name : str (default is "Collection_zone")
         The name of the collection zone this collection tile belongs to. It is used by the respective CollectionGoal
         to identify where certain objects should be dropped.
     visualize_colour : String (default is "#64a064", a pale green)
@@ -313,11 +313,11 @@ class CollectionDropOffTile(AreaTile):
 
     See also
     --------
-    matrx.WorldBuilder.add_collection_goal
+    matrx.world_builder.WorldBuilder.add_collection_goal
             The handy method in the `WorldBuilder` to add a collection goal to the world and required object(s).
-    matrx.goals.CollectionGoal
+    matrx.goals.goals.CollectionGoal
         The `CollectionGoal` that performs the logic of check that all object(s) are dropped at the drop off tiles.
-    matrx.objects.CollectionTarget
+    matrx.objects.standard_objects.CollectionTarget
         The invisible object representing which object(s) need to be collected and (if needed) in which order.
     """
     def __init__(self, location, name="Collection_zone", collection_area_name="Collection zone",

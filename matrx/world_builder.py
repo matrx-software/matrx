@@ -232,7 +232,7 @@ class WorldBuilder:
 
         See Also
         --------
-        :any:`~matrx.GridWorld.run`:
+        :meth:`~matrx.grid_world.GridWorld.run`:
             Start a GridWorld instance.
 
         Examples
@@ -324,10 +324,10 @@ class WorldBuilder:
 
         See Also
         --------
-        :any:`matrx.logger.GridWorldLogger`:
+        :class:`matrx.logger.logger.GridWorldLogger`:
             The interface class to which the passed `logger_class` should
-            from. inherit
-        :any:`matrx.logger`:
+            inherit from.
+        :any:`Logging`:
             The module with predefined loggers for you to use.
 
         Examples
@@ -2347,7 +2347,7 @@ class WorldBuilder:
             # Since the WorldBuilder contains the RandomProperty class and this class is imported by several other
             # modules. But some of those modules are in turn also (indirectly) imported by the WorldBuilder. This
             # creates a looping import. To remedy this you can omit importing RandomProperty by using
-            # `matrx.WorldBuilder.RandomProperty` however, this creates different class instance then when using
+            # `matrx.world_builder.WorldBuilder.RandomProperty` however, this creates different class instance then when using
             # `from matrx.WorldBuilder import RandomProperty`. The former creates a `WorldBuilder.RandomProperty` the
             # latter a `RandomProperty` causing an isinstance check to fail. To fix this we also check if the module
             # name `WorldBuilder` is that of the RandomProperty (e.g. is the set RandomProperty indeed from
@@ -2545,11 +2545,11 @@ class WorldBuilder:
 
         See Also
         --------
-        matrx.goals.CollectionGoal
+        matrx.goals.goals.CollectionGoal
             The `CollectionGoal` that performs the logic of check that all object(s) are dropped at the drop off tiles.
-        matrx.objects.CollectionDropTile
+        matrx.objects.standard_objects.CollectionDropOffTile
             The tile that represents the location(s) where the object(s) need to be dropped.
-        matrx.objects.CollectionTarget
+        matrx.objects.standard_objects.CollectionTarget
             The invisible object representing which object(s) need to be collected and (if needed) in which order.
         """
 
@@ -2578,7 +2578,7 @@ class WorldBuilder:
         # Check if the values are a RandomProperty. We include a fairly tailored check due to some import issues: Since
         # the WorldBuilder contains the RandomProperty class and this is imported by the Goals module (because
         # CollectionGoal imports it), we get a circular import. To fix this, we do not import the RandomProperty in the
-        # CollectionGoal, but instead refer to it in its full module path: matrx.WorldBuilder.RandomProperty. This
+        # CollectionGoal, but instead refer to it in its full module path: matrx.world_builder.WorldBuilder.RandomProperty. This
         # causes the RandomProperty in WorldBuilder to be a different one then the one import in CollectionGoal. The
         # former is of type RandomProperty while the latter is of type WorldBuilder.RandomProperty, failing the
         # isinstance check. To remedy this we check if their classes are in fact from the same module and have the same
