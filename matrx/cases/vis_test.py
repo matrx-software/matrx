@@ -87,6 +87,7 @@ def run_vis_test(nr_of_worlds=2):
 
     # run each world
     for world in builder.worlds(nr_of_worlds=nr_of_worlds):
+        # builder.api_info['matrx_paused'] = False
         world.run(builder.api_info)
 
     # stop MATRX scripts such as the api and visualizer (if used)

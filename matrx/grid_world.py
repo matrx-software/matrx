@@ -126,6 +126,8 @@ class GridWorld:
         api_info : dictionary
            A dictionary which contians information on the API. At least containing the `api_thread` key with the
            API thread, and the `run_matrx_api` key which contains whether the GridWorld should start paused or not.
+           The `matrx_paused` key can be used to start MATRX paused (default behaviour) or unpaused when using a
+           visualizer and API. If the API is disabled, MATRX always starts unpaused by default.
 
            Optionally the `nr_states_to_store` key telling the API how many past states (including the current) should
            be stored (minimum of 1, the current state). Note; too big of a number increases RAM usage!
@@ -181,11 +183,12 @@ class GridWorld:
                         "vis_bg_img": self.__visualization_bg_img
                     }
                 }
-                # start paused
-                api.matrx_paused = True
 
-                # fetch the initial state of every agent to display
-                self._fetch_initial_states()
+                # start paused
+                api.matrx_paused = True if 'matrx_paused' not in api_info else api_info['matrx_paused']
+
+            # fetch the initial state of every agent to display
+            self._fetch_initial_states()
 
             # Set initialisation boolean
             self.__is_initialized = True

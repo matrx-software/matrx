@@ -21,5 +21,7 @@ docs/source/sections/_generated_autodoc
 
 *.gz
 
-# ignore any (example) log data 
+
+# ignore any log data 
 Results/
+
