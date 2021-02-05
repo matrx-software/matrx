@@ -12,11 +12,21 @@ class Action:
     Parameters
     ----------
     duration_in_ticks : int
-        The default duration of the action in ticks during which the
-        GridWorld blocks the Agent performing other actions. By default
-        this is 1, meaning that the action will take both the tick in which
-        it was decided upon and the subsequent tick. When creating your
-        own Action, you can override this default value.
+        Optional, default: ``1``. Should be zero or larger.
+
+        The default duration of this action in ticks during which the
+        :class:`matrx.grid_world.GridWorld` blocks the agent performing other
+        actions. By default this is 1, meaning that all actions of this type will take
+        both the tick in which it was decided upon and the subsequent tick.
+        When the agent is blocked / busy with an action, only the
+        :meth:`matrx.agents.agent_brain.AgentBrain.filter_observations` method is called for that agent, and the
+        :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method is skipped.
+        This means that agents that are busy with an action can only perceive the world but not decide on
+        a new action untill the action has completed.
+
+        An agent can overwrite the duration of an action by returning the ``action_duration`` in the ``action_kwargs``
+        in the :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method, as so:
+        ``return >action_name<, {'action_duration': >ticks<}``
 
     """
 

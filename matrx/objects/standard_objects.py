@@ -10,9 +10,9 @@ class SquareBlock(EnvObject):
 
     Parameters
     ----------
-    location: tuple
+    location : tuple
         Location of door.
-    name: string. Optional, default "Block"
+    name : string. Optional, default "Block"
         Name of block, defaults to "Block"
     **custom_properties:
         Additional properties that should be added to the object.
@@ -34,13 +34,13 @@ class Door(EnvObject):
 
     Parameters
     ----------
-    location: tuple
+    location : tuple
         Location of door.
-    name: string. Optional, default "Door"
+    name : string. Optional, default "Door"
         Name of object, defaults to "Door"
-    open_colour: string. Optional, default "#006400"
+    open_colour : string. Optional, default "#006400"
         Colour when open
-    closed_colour: string. Optional, default "#640000"
+    closed_colour : string. Optional, default "#640000"
         Colour when closed
     **kwargs:
         Dict of additional properties that should be added to the object as well.
@@ -99,9 +99,9 @@ class Wall(EnvObject):
 
     Parameters
     ----------
-    location: tuple
+    location : tuple
         The location of the wall.
-    name: string. Optional, default "Wall"
+    name : string. Optional, default "Wall"
         The name, default "Wall".
     """
     def __init__(self, location, name="Wall", visualize_colour="#000000", **kwargs):
@@ -119,17 +119,17 @@ class AreaTile(EnvObject):
 
     Parameters
     ----------
-    location: tuple
+    location : tuple
         The location of the area.
-    name: string. Optional, default "AreaTile"
+    name : string. Optional, default "AreaTile"
         The name, default "AreaTile".
-    visualize_colour: string. Optional, default is "#b7b7b7"
+    visualize_colour : string. Optional, default is "#b7b7b7"
         hex colour code for tile. default is grey.
-    visualize_opacity: float. Optional, default 0.8.
+    visualize_opacity : float. Optional, default 0.8.
         Opacity of the object. By default 0.8
-    visualize_depth: int. Optional, default=101
+    visualize_depth : int. Optional, default=101
         depth of visualization. By default 101: just above agent and other objects Higher means higher priority.
-    **kwargs: Optional.
+    **kwargs : Optional.
         Set of additional properties that should be added to the object as well.
     """
     def __init__(self, location, name="AreaTile", visualize_colour="#8ca58c", visualize_depth=None,
@@ -147,15 +147,15 @@ class SmokeTile(AreaTile):
 
     Parameters
     ----------
-    location: tuple
+    location : tuple
         The location of the area.
-    name: String. Optiona, default:"SmokeTile"
+    name : String. Optiona, default:"SmokeTile"
         The name, default "SmokeTile".
-    visualize_colour: string. Optional, default is "#b7b7b7"
+    visualize_colour : string. Optional, default is "#b7b7b7"
         hex colour code for tile. default is grey.
-    visualize_opacity: float. Optional, default 0.8.
+    visualize_opacity : float. Optional, default 0.8.
         Opacity of the object. By default 0.8
-    visualize_depth: int. Optional, default=101
+    visualize_depth : int. Optional, default=101
         depth of visualization. By default 101: just above agent and other objects Higher means higher priority.
     """
     def __init__(self, location, name="SmokeTile", visualize_colour="#b7b7b7", visualize_opacity=0.8,
@@ -180,7 +180,7 @@ class Battery(EnvObject):
 
     Parameters
     ----------
-    location: list
+    location : list
         The location of the battery.
     name: String (optional).
         Defaults to 'Battery'.

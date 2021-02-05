@@ -206,10 +206,19 @@ class Move(Action):
     duration_in_ticks : int
         Optional. Default: ``1``. Should be zero or larger.
 
-        The default duration of Move in ticks during which the
+        The default duration of this action in ticks during which the
         :class:`matrx.grid_world.GridWorld` blocks the agent performing other
-        actions. By default this is 1, meaning that all Move actions will take
+        actions. By default this is 1, meaning that all actions of this type will take
         both the tick in which it was decided upon and the subsequent tick.
+        When the agent is blocked / busy with an action, only the
+        :meth:`matrx.agents.agent_brain.AgentBrain.filter_observations` method is called for that agent, and the
+        :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method is skipped.
+        This means that agents that are busy with an action can only perceive the world but not decide on
+        a new action untill the action has completed.
+
+        An agent can overwrite the duration of an action by returning the ``action_duration`` in the ``action_kwargs``
+        in the :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method, as so:
+        ``return >action_name<, {'action_duration': >ticks<}``
 
     Attributes
     ----------
@@ -297,7 +306,7 @@ class Move(Action):
 class MoveNorth(Move):
     """ Moves the agent North.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrx.actions.move_actions.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = 0
@@ -318,7 +327,7 @@ class MoveNorth(Move):
 class MoveNorthEast(Move):
     """ Moves the agent North-East.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrx.actions.move_actions.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = 1
@@ -339,7 +348,7 @@ class MoveNorthEast(Move):
 class MoveEast(Move):
     """ Moves the agent East.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrx.actions.move_actions.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = 1
@@ -360,7 +369,7 @@ class MoveEast(Move):
 class MoveSouthEast(Move):
     """ Moves the agent South-East.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrx.actions.move_actions.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = 1
@@ -381,7 +390,7 @@ class MoveSouthEast(Move):
 class MoveSouth(Move):
     """ Moves the agent South.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrx.actions.move_actions.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = 0
@@ -402,7 +411,7 @@ class MoveSouth(Move):
 class MoveSouthWest(Move):
     """ Moves the agent South-West.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrx.actions.move_actions.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = -1
@@ -423,7 +432,7 @@ class MoveSouthWest(Move):
 class MoveWest(Move):
     """ Moves the agent West.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrx.actions.move_actions.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = -1
@@ -444,7 +453,7 @@ class MoveWest(Move):
 class MoveNorthWest(Move):
     """ Moves the agent North-West.
 
-    Inherits from :class:`matrx.actions.move_action.Move` and sets the delta-x
+    Inherits from :class:`matrx.actions.move_actions.Move` and sets the delta-x
     and delta-y as follows:
 
     * delta-x = -1

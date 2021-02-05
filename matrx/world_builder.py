@@ -43,18 +43,18 @@ class WorldBuilder:
 
         Parameters
         ----------
-        shape: tuple or list
+        shape : tuple or list
             Denotes the width and height of the world you create.
 
-        tick_duration: float (optional, default 0.5)
+        tick_duration : float (optional, default 0.5)
             The duration of a single 'tick' or loop in the game-loop of the
             world you create.
 
-        random_seed: int, (optional, default 1)
+        random_seed : int, (optional, default 1)
             The master random seed on which all objects, agents and worlds are
             seeded. Should be a positive non-zero integer.
 
-        simulation_goal: WorldGoal, int, list or tuple (optional, default 1000)
+        simulation_goal : WorldGoal, int, list or tuple (optional, default 1000)
             The goal or goals of the world, either a single `WorldGoal`, a
             list of such or a positive non-zero integer to denote the maximum
             number of 'ticks' the world(s) has to run.
@@ -63,21 +63,21 @@ class WorldBuilder:
             Whether to run the API. This API is used to connect the default
             MATRX visualizer or a custom one.
 
-        run_matrx_visualizer: bool (optional, default False)
+        run_matrx_visualizer : bool (optional, default False)
             Whether to run the default MATRX visualizer, this requires the API
             to be run. When set to True, it starts the visualization that is
             accessible through http://localhost:3000.
 
-        visualization_bg_clr: string (optional, default "C2C2C2")
+        visualization_bg_clr : string (optional, default "C2C2C2")
             The color of the world when visualized using MATRX' own
             visualisation server. A string representation of hexadecimal color.
 
-        visualization_bg_img: string (optional, None)
+        visualization_bg_img : string (optional, None)
             An optional background image of the world when visualized using
             MATRX' own visualisation server. A string of the path to the image
             file. When None, no background image is used.
 
-        verbose: bool (optional, False)
+        verbose : bool (optional, False)
             Whether the subsequent created world should be verbose or not.
 
         Raises
@@ -216,7 +216,7 @@ class WorldBuilder:
 
         Parameters
         ----------
-        nr_of_worlds: int (default, 100)
+        nr_of_worlds : int (default, 100)
             The number of worlds that should be generated.
 
         Yields
@@ -260,7 +260,7 @@ class WorldBuilder:
 
         Returns
         -------
-        world: GridWorld
+        world : GridWorld
             A GridWorld instance representing the create world using this
             builder.
 
@@ -282,10 +282,10 @@ class WorldBuilder:
 
         Parameters
         ----------
-        logger_class: Logger
+        logger_class : Logger
             The class of Logger you wish to add.
 
-        log_strategy: int, str (default, None)
+        log_strategy : int, str (default, None)
             The logging strategy used. Supports either an integer denoting the
             number of ticks the logger should be called. Or either one of the
             following:
@@ -297,19 +297,19 @@ class WorldBuilder:
             * GridWorldLogger.LOG_ON_GOAL_REACHED: Log whenever a goal is
               reached.
 
-        save_path: string (default, None)
+        save_path : string (default, None)
             A path to a folder where to save the data. When set to None, a
             folder "logs" is created and used.
 
-        file_name: string (default, None)
+        file_name : string (default, None)
             The file name of the stored data. When set to None, a name of
             "_<time_stamp>" will be used. With <time_stamp> the time of world
             creation.
 
-        file_extension: string (default, None)
+        file_extension : string (default, None)
             The extension of the file. When set to None, ".csv" is used.
 
-        delimiter: string (default, None)
+        delimiter : string (default, None)
             The delimiter of the columns in the data file. When set to None,
             the ";" is used.
 
@@ -397,53 +397,53 @@ class WorldBuilder:
 
         Parameters
         ----------
-        location: tuple or list
+        location : tuple or list
             The location (x,y) of the to be added agent.
 
-        agent_brain: AgentBrain
+        agent_brain : AgentBrain
             The AgentBrain instance that will control the agent.
 
-        name: string
+        name : string
             The name of the agent, should be unique to allow the visualisation
             to have a single web page per agent. If the name is already used,
             an exception is thrown.
 
-        customizable_properties: list (optional, None)
+        customizable_properties : list (optional, None)
             A list or tuple of names of properties for this agent that can be
             altered or customized. Either by the agent itself or by other
             agents or objects. If a property value gets changed that is not
             in this list than an exception is thrown.
 
-        sense_capability: SenseCapability (optional, None)
+        sense_capability : SenseCapability (optional, None)
             The SenseCapability object belonging this this agent's AgentBody.
             Used by the GridWorld to pre-filter objects and agents from this
             agent's states when querying for actions. Defaults to a
             SenseCapability that sees all object types within the entire world.
 
-        is_traversable: bool (optional, None)
+        is_traversable : bool (optional, None)
             Denotes whether other agents and object can move over this agent.
             It also throws an exception when this is set to False and another
             object/agent with this set to False is added to the same location.
 
-        team: string (optional, None)
+        team : string (optional, None)
             The team name. Used to group agents together. Defaults to this
             agent's name + "_team" to signify it forms its own team.
 
-        possible_actions: list (optional, None)
+        possible_actions : list (optional, None)
             A list or tuple of the names of the Action classes this agent can
             perform. With this you can limit the actions this agent can
             perform.
 
-        is_movable: bool (optional, None)
+        is_movable : bool (optional, None)
             Whether this agent can be moved by other agents (currently this
             only happens with the DropObjectAction and PickUpAction).
 
-        visualize_size: float (optional, None)
+        visualize_size : float (optional, None)
             The size of this agent in its visualisation. A value of 1.0
             denotes the full grid location square, whereas a value of 0.5
             denotes half, and 0.0 an infinitesimal small size.
 
-        visualize_shape: int or string (optional, None)
+        visualize_shape : int or string (optional, None)
             The shape of this agent in its visualisation. Depending on the
             value it obtains this shape:
 
@@ -455,25 +455,25 @@ class WorldBuilder:
 
             * Path to image or GIF = that image scaled to match the size.
 
-        visualize_colour: string (optional, None)
+        visualize_colour : string (optional, None)
             The colour of this agent in its visualisation. Should be a string
             hexadecimal colour value.
 
-        visualize_depth: int (optional, None)
+        visualize_depth : int (optional, None)
             The visualisation depth of this agent in its visualisation. It
             denotes the 'layer' on which it is visualized. A larger value is
             more on 'top'.
 
-        visualize_opacity: float (optional, None)
+        visualize_opacity : float (optional, None)
             The opacity of this agent in its visualization. A value of 1.0
             means full opacity and 0.0 no opacity.
 
-        visualize_when_busy: bool (optional, None)
+        visualize_when_busy : bool (optional, None)
             Whether to visualize when an agent is busy with a action. True
             means show this using a loading icon, false means do not show
             this in the visualizer.
 
-        **custom_properties: dict (optional, None)
+        **custom_properties : dict (optional, None)
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
@@ -611,41 +611,41 @@ class WorldBuilder:
 
         Parameters
         ----------
-        agent_brains: list or tuple
+        agent_brains : list or tuple
             The list or tuple of AgentBrain that will control each agent in
             the team. Should be of the same size as `locations`.
 
-        locations: list or tuple
+        locations : list or tuple
             The list or tuple of locations in the form of (x, y) at which
             coordinates each agent starts in the team. Should be of the same
             size as `locations`.
 
-        team_name: string
+        team_name : string
             The name of the team these agents are part of.
 
-        custom_properties: dict or list (optional, default None)
+        custom_properties : dict or list (optional, default None)
             A dictionary of custom properties and their values for all agents
             or a list of such dictionaries for every agent.
 
-        sense_capability: SenseCapability or list (optional, default None)
+        sense_capability : SenseCapability or list (optional, default None)
             A single `SenseCapability` used for every agent, or a list of those
             for every given agent.
 
-        customizable_properties: list (optional, default None)
+        customizable_properties : list (optional, default None)
             A list of property names that each agent can edit. When it is a
             list of listed properties, it denotes a unique set of customizable
             properties for every agent.
 
-        is_traversable: bool or list (optional, default None)
+        is_traversable : bool or list (optional, default None)
             A list of booleans or a single boolean denoting either for each
             agent or all agents their traversability.
 
-        visualize_size: float or list (optional, default None)
+        visualize_size : float or list (optional, default None)
             A list of floats or a single float denoting either for each
             agent or all agents their traversability. A value of 0.0 means no
             size, and a value of 1.0 fills the entire tile.
 
-        visualize_shape: int, string or list (optional, default None)
+        visualize_shape : int, string or list (optional, default None)
             The shape of the agents in the visualisation. When a list, denotes
             the shape of every agent. Depending on the value it obtains this
             shape:
@@ -658,17 +658,17 @@ class WorldBuilder:
 
             * Path to image or GIF = that image scaled to match the size.
 
-        visualize_colour: string or list (optional, default None)
+        visualize_colour : string or list (optional, default None)
             The colours the agents in the visualisation. When a list, denotes
             the colour separately of every agent. Should be a string
             hexadecimal colour value.
 
-        visualize_opacity: float or list (optional, default None)
+        visualize_opacity : float or list (optional, default None)
             The opacities of the agents in the visualization. When a list,
             denotes the opacity separately of every agent A value of 1.0
             means full opacity and 0.0 no opacity.
 
-        visualize_when_busy: bool or list (optional, default None)
+        visualize_when_busy : bool or list (optional, default None)
             Whether to visualize when an agent is busy with a action. True
             means show this using a loading icon, false means do not show
             this in the visualizer. When a list, specifies this for every
@@ -718,40 +718,40 @@ class WorldBuilder:
 
         Parameters
         ----------
-        agents: list or tuple
+        agents : list or tuple
             The list or tuple of agent brains that will control each agent.
             Should be of the same size as `locations`.
 
-        locations: list or tuple
+        locations : list or tuple
             The list or tuple of all agent locations.
 
-        custom_properties: dict or list (optional, default None)
+        custom_properties : dict or list (optional, default None)
             A dictionary of custom properties and their values for all agents
             or a list of such dictionaries for every agent.
 
-        sense_capability: SenseCapability or list (optional, default None)
+        sense_capability : SenseCapability or list (optional, default None)
             A single `SenseCapability` used for every agent, or a list of those
             for every given agent.
 
-        customizable_properties: list (optional, default None)
+        customizable_properties : list (optional, default None)
             A list of property names that each agent can edit. When it is a
             list of listed properties, it denotes a unique set of customizable
             properties for every agent.
 
-        is_traversable: bool or list (optional, default None)
+        is_traversable : bool or list (optional, default None)
             A list of booleans or a single boolean denoting either for each
             agent or all agents their traversability.
 
-        teams: string or list (optional, default None)
+        teams : string or list (optional, default None)
             The team name of all agents or a list of the team for every
             separate agent.
 
-        visualize_sizes: float or list (optional, default None)
+        visualize_sizes : float or list (optional, default None)
             A list of floats or a single float denoting either for each
             agent or all agents their traversability. A value of 0.0 means no
             size, and a value of 1.0 fills the entire tile.
 
-        visualize_shapes: int, string or list (optional, default None)
+        visualize_shapes : int, string or list (optional, default None)
             The shape of the agents in the visualisation. When a list, denotes
             the shape of every agent. Depending on the value it obtains this
             shape:
@@ -764,22 +764,22 @@ class WorldBuilder:
 
             * Path to image or GIF = that image scaled to match the size.
 
-        visualize_colours: string or list (optional, default None)
+        visualize_colours : string or list (optional, default None)
             The colours the agents in the visualisation. When a list, denotes
             the colour separately of every agent. Should be a string
             hexadecimal colour value.
 
-        visualize_opacities: float or list (optional, default None)
+        visualize_opacities : float or list (optional, default None)
             The opacities of the agents in the visualization. When a list,
             denotes the opacity separately of every agent A value of 1.0
             means full opacity and 0.0 no opacity.
 
-        visualize_depths: int or list (optional, default None)
+        visualize_depths : int or list (optional, default None)
             The visualization depths of the agents. When a list, denotes the
             depths separately of every agent. Larger values, means that they
             will be visiualized on top.
 
-        visualize_when_busy: bool or list (optional, default None)
+        visualize_when_busy : bool or list (optional, default None)
             Whether to visualize when an agent is busy with a action. True
             means show this using a loading icon, false means do not show
             this in the visualizer. When a list, specifies this for every
@@ -899,57 +899,57 @@ class WorldBuilder:
 
         Parameters
         ----------
-        location: tuple or list
+        location : tuple or list
             The location (x,y) of the to be added agent.
 
-        agent_brain: AgentBrain
+        agent_brain : AgentBrain
             The AgentBrain instance that will control the agent.
 
-        probability: float
+        probability : float
             A float between 0.0 and 1.0. Denotes the probability with which
             to add this agent when a world is created.
 
-        name: string
+        name : string
             The name of the agent, should be unique to allow the visualisation
             to have a single web page per agent. If the name is already used,
             an exception is thrown.
 
-        customizable_properties: list (optional, None)
+        customizable_properties : list (optional, None)
             A list or tuple of names of properties for this agent that can be
             altered or customized. Either by the agent itself or by other
             agents or objects. If a property value gets changed that is not
             in this list than an exception is thrown.
 
-        sense_capability: SenseCapability (optional, None)
+        sense_capability : SenseCapability (optional, None)
             The SenseCapability object belonging this this agent's AgentBody.
             Used by the GridWorld to pre-filter objects and agents from this
             agent's states when querying for actions. Defaults to a
             SenseCapability that sees all object types within the entire world.
 
-        is_traversable: bool (optional, None)
+        is_traversable : bool (optional, None)
             Denotes whether other agents and object can move over this agent.
             It also throws an exception when this is set to False and another
             object/agent with this set to False is added to the same location.
 
-        team: string (optional, None)
+        team : string (optional, None)
             The team name. Used to group agents together. Defaults to this
             agent's name + "_team" to signify it forms its own team.
 
-        possible_actions: list (optional, None)
+        possible_actions : list (optional, None)
             A list or tuple of the names of the Action classes this agent can
             perform. With this you can limit the actions this agent can
             perform.
 
-        is_movable: bool (optional, None)
+        is_movable : bool (optional, None)
              Whether this agent can be moved by other agents, for example by
              picking it up and dropping it.
 
-        visualize_size: float (optional, None)
+        visualize_size : float (optional, None)
             The size of this agent in its visualisation. A value of 1.0
             denotes the full grid location square, whereas a value of 0.5
             denotes half, and 0.0 an infinitesimal small size.
 
-        visualize_shape: int or string (optional, None)
+        visualize_shape : int or string (optional, None)
             The shape of this agent in its visualisation. Depending on the
             value it obtains this shape:
 
@@ -961,25 +961,25 @@ class WorldBuilder:
 
             * Path to image or GIF = that image scaled to match the size.
 
-        visualize_colour: string (optional, None)
+        visualize_colour : string (optional, None)
             The colour of this agent in its visualisation. Should be a string
             hexadecimal colour value.
 
-        visualize_depth: int (optional, None)
+        visualize_depth : int (optional, None)
             The visualisation depth of this agent in its visualisation. It
             denotes the 'layer' on which it is visualized. A larger value is
             more on 'top'.
 
-        visualize_opacity: float (optional, None)
+        visualize_opacity : float (optional, None)
             The opacity of this agent in its visualization. A value of 1.0
             means full opacity and 0.0 no opacity.
 
-        visualize_when_busy: bool (optional, None)
+        visualize_when_busy : bool (optional, None)
             Whether to visualize when an agent is busy with a action. True
             means show this using a loading icon, false means do not show
             this in the visualizer.
 
-        **custom_properties: dict (optional, None)
+        **custom_properties : dict (optional, None)
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
@@ -1032,31 +1032,31 @@ class WorldBuilder:
 
         Parameters
         ----------
-        location: list or tuple
+        location : list or tuple
             The location of the object of the form (x,y).
 
-        name: string
+        name : string
             The name of the object.
 
-        callable_class: class
+        callable_class : class
             A class object of the to be added object. Should be `EnvObject` or
             any class that inherits from this.
 
-        customizable_properties: list (optional, None)
+        customizable_properties : list (optional, None)
             A list or tuple of names of properties for this object that can be
             altered or customized. Either by an agent, itself or other objects.
             If a property value gets changed that is not in this list than an
             exception is thrown.
 
-        is_traversable: bool (optional, default None)
+        is_traversable : bool (optional, default None)
             Whether this object allows other (traversable) agents and objects
             to be at the same location.
 
-        is_movable: bool (optional, default None)
+        is_movable : bool (optional, default None)
             Whether this object can be moved by an agent. For example, by
             picking it up and dropping it.
 
-        visualize_shape: int or string (optional, None)
+        visualize_shape : int or string (optional, None)
             The shape of this object in its visualisation. Depending on the
             value it obtains this shape:
 
@@ -1068,20 +1068,20 @@ class WorldBuilder:
 
             * Path to image or GIF = that image scaled to match the size.
 
-        visualize_colour: string (optional, None)
+        visualize_colour : string (optional, None)
             The colour of this object in its visualisation. Should be a string
             hexadecimal colour value.
 
-        visualize_depth: int (optional, None)
+        visualize_depth : int (optional, None)
             The visualisation depth of this object in its visualisation. It
             denotes the 'layer' on which it is visualized. A larger value is
             more on 'top'.
 
-        visualize_opacity: float (optional, None)
+        visualize_opacity : float (optional, None)
             The opacity of this object in its visualization. A value of 1.0
             means full opacity and 0.0 no opacity.
 
-        **custom_properties: dict (optional, None)
+        **custom_properties : dict (optional, None)
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
@@ -1169,35 +1169,35 @@ class WorldBuilder:
 
         Parameters
         ----------
-        location: list or tuple
+        location : list or tuple
             The location of the object of the form (x,y).
 
-        name: string
+        name : string
             The name of the object.
 
-        probability: float
+        probability : float
             A float between 0.0 and 1.0 that denotes the probability of adding
             this object to the world when it is created.
 
-        callable_class: class
+        callable_class : class
             A class object of the to be added object. Should be `EnvObject` or
             any class that inherits from this.
 
-        customizable_properties: list (optional, None)
+        customizable_properties : list (optional, None)
             A list or tuple of names of properties for this object that can be
             altered or customized. Either by an agent, itself or other objects.
             If a property value gets changed that is not in this list than an
             exception is thrown.
 
-        is_traversable: bool (optional, default None)
+        is_traversable : bool (optional, default None)
             Whether this obejct allows other (traversable) agents and objects
             to be at the same location.
 
-        is_movable: bool (optional, None)
+        is_movable : bool (optional, None)
              Whether this agent can be moved by other agents, for example by
              picking it up and dropping it.
 
-        visualize_shape: int or string (optional, None)
+        visualize_shape : int or string (optional, None)
             The shape of this object in its visualisation. Depending on the
             value it obtains this shape:
 
@@ -1209,20 +1209,20 @@ class WorldBuilder:
 
             * Path to image or GIF = that image scaled to match the size.
 
-        visualize_colour: string (optional, None)
+        visualize_colour : string (optional, None)
             The colour of this object in its visualisation. Should be a string
             hexadecimal colour value.
 
-        visualize_depth: int (optional, None)
+        visualize_depth : int (optional, None)
             The visualisation depth of this object in its visualisation. It
             denotes the 'layer' on which it is visualized. A larger value is
             more on 'top'.
 
-        visualize_opacity: float (optional, None)
+        visualize_opacity : float (optional, None)
             The opacity of this object in its visualization. A value of 1.0
             means full opacity and 0.0 no opacity.
 
-        **custom_properties: dict (optional, None)
+        **custom_properties : dict (optional, None)
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
@@ -1271,34 +1271,34 @@ class WorldBuilder:
 
         Parameters
         ----------
-        locations: tuple or list
+        locations : tuple or list
             A tuple or list of the form [(x, y), ...] specifying each object's
             location.
 
-        names: string or list (optional, default None)
+        names : string or list (optional, default None)
             A single name for all objects or a list of names for every object.
             When None, defaults to the name of the provided `callable_classes`.
 
-        callable_classes: EnvObject or list (optional, default None)
+        callable_classes : EnvObject or list (optional, default None)
             A single class specifying a environment object or a list of classes
             for every object. When None, defaults to EnvObject
 
-        custom_properties: dict or list (optional, None)
+        custom_properties : dict or list (optional, None)
             A dictionary containing all custom property names and their values
             of a list of such dictionaries for every object.
 
-        customizable_properties: list (optional, None)
+        customizable_properties : list (optional, None)
             A list of properties that agents and objects are allowed to change
             or a list of such lists for every object.
 
-        is_traversable: bool or list (optional, None)
+        is_traversable : bool or list (optional, None)
             Whether all objects are traversable or a list of such booleans to
             specify this for every object.
 
-        visualize_sizes: float or list (optional, None)
+        visualize_sizes : float or list (optional, None)
             The size of all objects or a list of such sizes for every object.
 
-        visualize_shapes: int, string or list (optional, None)
+        visualize_shapes : int, string or list (optional, None)
             The shape of the objects in the visualisation or list of shapes for
             every object. Depending on the value it obtains this shape:
 
@@ -1310,21 +1310,21 @@ class WorldBuilder:
 
             * Path to image or GIF = that image scaled to match the size.
 
-        visualize_colours: string or list (optional, None)
+        visualize_colours : string or list (optional, None)
             The colour of the objects or a list of such colours. As a
             hexidecimal string.
 
-        visualize_depths: int or list (optional, None)
+        visualize_depths : int or list (optional, None)
             The visualisation depth of the objects in the visualisation or a
             list of such depths for every object. It denotes the 'layer' on
             which it is visualized. A larger value is more on 'top'.
 
-        visualize_opacities: float (optional, None)
+        visualize_opacities : float (optional, None)
             The opacity of the objects in the visualisation or a list of
             opacities for every object. A value of 1.0 means full opacity and
             0.0 no opacity.
 
-        is_movable: bool or list (optional, None)
+        is_movable : bool or list (optional, None)
             Whether the objects can be moved by an agent or list denoting this
             for every object. For example, by picking it up and dropping it.
 
@@ -1431,54 +1431,54 @@ class WorldBuilder:
 
         Parameters
         ----------
-        location: tuple or list
+        location : tuple or list
             The location (x,y) of the to be added agent.
 
-        agent: HumanAgentBrain
+        agent : HumanAgentBrain
             The human agent brain that is linked to this agent. Should be of
             type `HumanAgentBrain` or inherit from it.
 
-        name: string (optional, default "HumanAgent")
+        name : string (optional, default "HumanAgent")
             The name of the agent, should be unique to allow the visualisation
             to have a single web page per agent. If the name is already used,
             an exception is raised.
 
-        customizable_properties: list (optional, None)
+        customizable_properties : list (optional, None)
             A list or tuple of names of properties for this agent that can be
             altered or customized. Either by the agent itself or by other
             agents or objects. If a property value gets changed that is not
             in this list than an exception is thrown.
 
-        sense_capability: SenseCapability (optional, None)
+        sense_capability : SenseCapability (optional, None)
             The SenseCapability object belonging this this agent's AgentBody.
             Used by the GridWorld to pre-filter objects and agents from this
             agent's states when querying for actions. Defaults to a
             SenseCapability that sees all object types within the entire world.
 
-        is_traversable: bool (optional, None)
+        is_traversable : bool (optional, None)
             Denotes whether other agents and object can move over this agent.
             It also throws an exception when this is set to False and another
             object/agent with this set to False is added to the same location.
 
-        team: string (optional, None)
+        team : string (optional, None)
             The team name. Used to group agents together. Defaults to this
             agent's name + "_team" to signify it forms its own team.
 
-        possible_actions: list (optional, None)
+        possible_actions : list (optional, None)
             A list or tuple of the names of the Action classes this agent can
             perform. With this you can limit the actions this agent can
             perform.
 
-        is_movable: bool (optional, None)
+        is_movable : bool (optional, None)
             Whether this agent can be moved by other agents (currently this
             only happens with the DropObjectAction and PickUpAction).
 
-        visualize_size: float (optional, None)
+        visualize_size : float (optional, None)
             The size of this agent in its visualisation. A value of 1.0
             denotes the full grid location square, whereas a value of 0.5
             denotes half, and 0.0 an infinitesimal small size.
 
-        visualize_shape: int or string (optional, None)
+        visualize_shape : int or string (optional, None)
             The shape of this agent in its visualisation. Depending on the
             value it obtains this shape:
 
@@ -1490,30 +1490,30 @@ class WorldBuilder:
 
             * Path to image or GIF = that image scaled to match the size.
 
-        visualize_colour: string (optional, None)
+        visualize_colour : string (optional, None)
             The colour of this agent in its visualisation. Should be a string
             hexadecimal colour value.
 
-        visualize_depth: int (optional, None)
+        visualize_depth : int (optional, None)
             The visualisation depth of this agent in its visualisation. It
             denotes the 'layer' on which it is visualized. A larger value is
             more on 'top'.
 
-        visualize_opacity: float (optional, None)
+        visualize_opacity : float (optional, None)
             The opacity of this agent in its visualization. A value of 1.0
             means full opacity and 0.0 no opacity.
 
-        visualize_when_busy: bool (optional, None)
+        visualize_when_busy : bool (optional, None)
             Whether to visualize when an agent is busy with a action. True
             means show this using a loading icon, false means do not show
             this in the visualizer.
 
-        key_action_map: dict (optional, None)
+        key_action_map : dict (optional, None)
             A dictionary that maps keyboard keys in ASCII to action classes. It
             can be used to translate keystrokes to the agent performing a
             certain action.
 
-        **custom_properties: dict (optional, None)
+        **custom_properties : dict (optional, None)
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
@@ -1543,7 +1543,7 @@ class WorldBuilder:
         >>> from matrx.actions import *
         >>> builder = WorldBuilder(shape=(10, 10)))
         >>> brain = HumanAgentBrain()
-        >>> keymap = {8: MoveNorth, 6: MoveEast, 2: MoveSouth, 4: MoveWest}
+        >>> keymap = {8 : MoveNorth, 6: MoveEast, 2: MoveSouth, 4: MoveWest}
         >>> builder.add_human_agent((5, 5), brain, name="Morpheus", \
         >>>     key_action_map=keymap)
 
@@ -1633,31 +1633,31 @@ class WorldBuilder:
 
         Parameters
         ----------
-        top_left_location: list or tuple
+        top_left_location : list or tuple
             A location of the form (x, y) that specifies the top-left location
             of the rectangle.
 
-        width: int
+        width : int
             The width in number of grid squares.
 
-        height: int
+        height : int
             The height in number of grid squares.
 
-        name: string
+        name : string
             The name of the area.
 
-        customizable_properties: list (optional, default None)
+        customizable_properties : list (optional, default None)
             The properties that agents and objects can modify in all the
             created tiles.
 
-        visualize_colour: string (optional, default None)
+        visualize_colour : string (optional, default None)
             The colour of the tiles as a hexidecimal string.
 
-        visualize_opacity: float (optional, default None)
+        visualize_opacity : float (optional, default None)
             The opacity of the tiles. A value of 1.0 means full opacity and
             0.0 no opacity.
 
-        **custom_properties: list (optional, None)
+        **custom_properties : list (optional, None)
         Any additional given keyword arguments will be encapsulated in
         this dictionary. These will be added to all the tiles as
         custom_properties which can be perceived by other agents and
@@ -1712,28 +1712,28 @@ class WorldBuilder:
 
         Parameters
         ----------
-        top_left_location: list or tuple
+        top_left_location : list or tuple
             A location of the form (x, y) that specifies the top-left location
             of the rectangle.
 
-        width: int
+        width : int
             The width in number of grid squares.
 
-        height: int
+        height : int
             The height in number of grid squares.
 
-        name: string
+        name : string
             The name of the area.
 
-        visualize_colour: string (optional, default None)
+        visualize_colour : string (optional, default None)
             The colour of the tiles as a hexadecimal string.
 
-        visualize_depth: int (optional, default None)
+        visualize_depth : int (optional, default None)
             The visualisation depth of the area in the visualisation. It
             denotes the 'layer' on which it is visualized. A larger value is
             more on 'top'.
 
-        **custom_properties: list (optional, None)
+        **custom_properties : list (optional, None)
         Any additional given keyword arguments will be encapsulated in
         this dictionary. These will be added to all the tiles as
         custom_properties which can be perceived by other agents and
@@ -1803,37 +1803,37 @@ class WorldBuilder:
 
         Parameters
         ----------
-        start: list or tuple
+        start : list or tuple
             A location of form (x, y) denoting the start of the line.
         end
             A location of form (x, y) denoting the end of the line.
 
-        name: string
+        name : string
             The name of the line of objects.
 
-        callable_class: EnvObject (optional, None)
+        callable_class : EnvObject (optional, None)
             The object class denoting the objects that should be added. This
             is `EnvObject` by default or must be any other class or inherit
             from this class.
 
-        customizable_properties: list (optional, None)
+        customizable_properties : list (optional, None)
             A list or tuple of names of properties for these objects that can
             be altered or customized. Either by an agent, itself or other
             objects. If a property value gets changed that is not in this list,
             an exception is thrown.
 
-        is_traversable: bool (optional, default None)
+        is_traversable : bool (optional, default None)
             Whether this object allows other (traversable) agents and objects
             to be at the same location.
 
-        is_movable: bool (optional, None)
+        is_movable : bool (optional, None)
              Whether these objects can be moved by  agents, for example by
              picking it up and dropping it.
 
-        visualize_size: float or list (optional, None)
+        visualize_size : float or list (optional, None)
             The size of all objects or a list of such sizes for every object.
 
-        visualize_shape: int or string (optional, None)
+        visualize_shape : int or string (optional, None)
             The shape of this object in its visualisation. Depending on the
             value it obtains this shape:
 
@@ -1845,20 +1845,20 @@ class WorldBuilder:
 
             * Path to image or GIF = that image scaled to match the size.
 
-        visualize_colour: string (optional, None)
+        visualize_colour : string (optional, None)
             The colour of this object in its visualisation. Should be a string
             hexadecimal colour value.
 
-        visualize_depth: int (optional, None)
+        visualize_depth : int (optional, None)
             The visualisation depth of this object in its visualisation. It
             denotes the 'layer' on which it is visualized. A larger value is
             more on 'top'.
 
-        visualize_opacity: float (optional, None)
+        visualize_opacity : float (optional, None)
             The opacity of this object in its visualization. A value of 1.0
             means full opacity and 0.0 no opacity.
 
-        **custom_properties: dict (optional, None)
+        **custom_properties : dict (optional, None)
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
@@ -1918,57 +1918,57 @@ class WorldBuilder:
 
         Parameters
         ----------
-        top_left_location: list or tuple
+        top_left_location : list or tuple
             A location of the form (x, y) that specifies the top-left location
             of the rectangle.
 
-        width: int
+        width : int
             The width in number of grid squares.
 
-        height: int
+        height : int
             The height in number of grid squares.
 
-        name: string
+        name : string
             The name of the room. Shared with all objects.
 
-        door_locations: list, (optional, None)
+        door_locations : list, (optional, None)
             A list of locations on the wall locations that should be replaced
             by doors. When set to None, no doors will be added.
 
-        with_area_tiles: bool (optional, False)
+        with_area_tiles : bool (optional, False)
             Whether the area within the walls should be filled with `AreaTile`
             objects. If set to True, the area parameters are used and passed.
 
-        doors_open: bool (optional, False)
+        doors_open : bool (optional, False)
             Whether the doors are initially open or closed.
 
-        wall_visualize_colour: string (optional, default None)
+        wall_visualize_colour : string (optional, default None)
             The colour of the walls.
 
-        wall_visualize_opacity: string (optional, default None)
+        wall_visualize_opacity : string (optional, default None)
             The opacity of the walls.
 
-        wall_custom_properties: dict (optional, default None)
+        wall_custom_properties : dict (optional, default None)
             A dictionary of custom properties and their values passed to every
             wall object.
 
-        wall_customizable_properties: list (optional, default None)
+        wall_customizable_properties : list (optional, default None)
             A list of property names that other objects and agents are allowed
             to adjust.
 
-        area_custom_properties:  (optional, default None)
+        area_custom_properties :  (optional, default None)
             A dictionary of custom properties and their values passed to every
             area object. Only used when area tiles are added.
 
-        area_customizable_properties:  (optional, default None)
+        area_customizable_properties :  (optional, default None)
             A list of property names that other objects and agents are allowed
             to adjust. Only used when area tiles are added.
 
-        area_visualize_colour:  (optional, default None)
+        area_visualize_colour :  (optional, default None)
             The colour of the areas as a hexadeciamal string. Only used when
             area tiles are added.
 
-        area_visualize_opacity:  (optional, default None)
+        area_visualize_opacity :  (optional, default None)
             The opacity of the added area tiles. Only used when area tiles are
             added.
 
@@ -2009,7 +2009,7 @@ class WorldBuilder:
                 area_customizable_properties is not None or
                 area_visualize_colour is not None or
                 area_visualize_opacity is not None):
-            warnings.warn(f"While adding room {name}: The boolean with_area_"
+            warnings.warn(f"While adding room {name} : The boolean with_area_"
                           f"tiles is set to {with_area_tiles} while also "
                           f"providing specific area statements. Treating with_"
                           f"area_tiles as True.")
@@ -2100,12 +2100,12 @@ class WorldBuilder:
 
         Parameters
         ----------
-        room_top_left: tuple, (x, y)
+        room_top_left : tuple, (x, y)
             The top left coordinates of a room, as used to add that room with
             methods such as `add_room`.
-        room_width: int
+        room_width : int
             The width of the room.
-        room_height: int
+        room_height : int
             The height of the room.
 
         Returns
@@ -2372,7 +2372,7 @@ class WorldBuilder:
 
         Parameters
         ----------
-        media_folder: string
+        media_folder : string
             The path to a folder where additional figures are stored. Providing
             this path makes those media files accessible to MATRX. It is
             required if you pass your figures to object shapes.
@@ -2644,14 +2644,14 @@ class RandomProperty:
 
         Parameters
         ----------
-        values: list
+        values : list
             A list of possible values.
 
-        distribution: list (optional, default None)
+        distribution : list (optional, default None)
             A list of probabilities for each respective value to be sampled. If
             set to None, a uniform distribution will be used.
 
-        allow_duplicates: bool (optional, default True)
+        allow_duplicates : bool (optional, default True)
             Whether the values should be sampled a fresh each time a new world
             is created or values that were already sampled should be ignored.
         """

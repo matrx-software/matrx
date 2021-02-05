@@ -5,26 +5,31 @@ from matrx.objects.standard_objects import Door
 
 
 class OpenDoorAction(Action):
-    """ Action that opens doors. """
+    """ Action that opens doors.
+
+    The action that opens a specific door within a given range from the agent.
+
+    Parameters
+    ----------
+    duration_in_ticks : int
+        Optional, default: ``1``. Should be zero or larger.
+
+        The default duration of this action in ticks during which the
+        :class:`matrx.grid_world.GridWorld` blocks the agent performing other
+        actions. By default this is 1, meaning that all actions of this type will take
+        both the tick in which it was decided upon and the subsequent tick.
+        When the agent is blocked / busy with an action, only the
+        :meth:`matrx.agents.agent_brain.AgentBrain.filter_observations` method is called for that agent, and the
+        :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method is skipped.
+        This means that agents that are busy with an action can only perceive the world but not decide on
+        a new action untill the action has completed.
+
+        An agent can overwrite the duration of an action by returning the ``action_duration`` in the ``action_kwargs``
+        in the :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method, as so:
+        ``return >action_name<, {'action_duration': >ticks<}``
+    """
 
     def __init__(self, duration_in_ticks=0):
-        """ Action that opens doors.
-
-        The action that opens a specific door within a given range from the agent.
-
-        Parameters
-        ----------
-        duration_in_ticks : int
-            Optional, default: ``1``. Should be zero or larger.
-
-            The default duration of this action in ticks during which the
-            :class:`matrx.grid_world.GridWorld` blocks the
-            :class:`matrx.agents.agent.Agent` performing other actions. By default
-            this is 1, meaning that this action  will take both the tick in which
-            it was decided upon and the subsequent tick.
-
-        """
-
         super().__init__(duration_in_ticks)
 
     def mutate(self, grid_world, agent_id, **kwargs):
@@ -125,24 +130,31 @@ class OpenDoorAction(Action):
 
 
 class CloseDoorAction(Action):
-    """ Action that closes doors. """
+    """ Action that closes doors.
+
+    The action that closes a specific door within a given range from the agent.
+
+    Parameters
+    ----------
+    duration_in_ticks : int
+        Optional, default: ``1``. Should be zero or larger.
+
+        The default duration of this action in ticks during which the
+        :class:`matrx.grid_world.GridWorld` blocks the agent performing other
+        actions. By default this is 1, meaning that all actions of this type will take
+        both the tick in which it was decided upon and the subsequent tick.
+        When the agent is blocked / busy with an action, only the
+        :meth:`matrx.agents.agent_brain.AgentBrain.filter_observations` method is called for that agent, and the
+        :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method is skipped.
+        This means that agents that are busy with an action can only perceive the world but not decide on
+        a new action untill the action has completed.
+
+        An agent can overwrite the duration of an action by returning the ``action_duration`` in the ``action_kwargs``
+        in the :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method, as so:
+        ``return >action_name<, {'action_duration': >ticks<}``
+    """
 
     def __init__(self, duration_in_ticks=0):
-        """ Action that closes doors.
-
-        The action that closes a specific door within a given range from the agent.
-
-        Parameters
-        ----------
-        duration_in_ticks : int
-            Optional. Default: ``1``. Should be zero or larger.
-
-            The default duration of this action in ticks during which the
-            :class:`matrx.grid_world.GridWorld` blocks the agent performing
-            other actions. By default this is 1, meaning that this action will take
-            both the tick in which it was decided upon and the subsequent tick.
-
-        """
         super().__init__(duration_in_ticks)
 
     def mutate(self, grid_world, agent_id, **kwargs):

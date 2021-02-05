@@ -42,39 +42,39 @@ class EnvObject:
 
     Parameters
     ----------
-    name: String
+    name : String
         The name of object, does not need to be unique.
-    location: List or tuple of length two
+    location : List or tuple of length two
         The location of the object in the grid world.
-    customizable_properties: List. Optional, default obtained from defaults.py
+    customizable_properties : List. Optional, default obtained from defaults.py
         The list of attribute names
         that can be customized by other objects (including AgentAvatars and as an extension any Agent).
-    is_traversable: Boolean. Optional, default obtained from defaults.py
+    is_traversable : Boolean. Optional, default obtained from defaults.py
         Signals whether other objects can be placed on top of this object.
-    carried_by: List. Optional, default obtained from defaults.py
+    carried_by : List. Optional, default obtained from defaults.py
         A list of who is carrying this object.
-    class_callable: Callable class. Optional, defaults to EnvObject
+    class_callable : Callable class. Optional, defaults to EnvObject
         This is required to make a distinction
         between what kind of object is actually seen or visualized. The last element is always the lowest level class,
         whereas the first element is always EnvObject and everything in between are potential other classes in the
         inheritance chain.
-    visualize_size: Float. Optional, default obtained from defaults.py
+    visualize_size : Float. Optional, default obtained from defaults.py
         A visualization property used by
         the Visualizer. Denotes the size of the object, its unit is a single grid square in the visualization (e.g. a
         value of 0.5 is half of a square, object is in the center, a value of 2 is twice the square's size centered on
         its location.)
-    visualize_shape: Int. Optional, default obtained from defaults.py
+    visualize_shape : Int. Optional, default obtained from defaults.py
         A visualization property used by the
         Visualizer. Denotes the shape of the object in the visualization. 0=Rectangle, 1=Triangle, 2=Circle
-    visualize_colour: Hexcode string. Optional, default obtained from defaults.py
+    visualize_colour : Hexcode string. Optional, default obtained from defaults.py
         A visualization property
         used by the Visualizer. Denotes the colour of the object in visualization.
-    visualize_depth: Integer. Optional, default obtained from defaults.py
+    visualize_depth : Integer. Optional, default obtained from defaults.py
         A visualization property that
         is used by the Visualizer to draw objects in layers.
-    visualize_opacity: Integer. Optional, default obtained from defaults.py
+    visualize_opacity : Integer. Optional, default obtained from defaults.py
         Opacity of the object. From 0.0 to 1.0.
-    **custom_properties: Dict. Optional
+    **custom_properties : Dict. Optional
         Any other keyword arguments. All these are treated as custom attributes.
         For example the property 'heat'=2.4 of an EnvObject representing a fire.
      """
@@ -184,7 +184,7 @@ class EnvObject:
 
         Parameters
         ----------
-        property_name: string
+        property_name : string
             The name of the property.
         property_value:
             The value of the property.
@@ -237,7 +237,7 @@ class EnvObject:
 
         Parameters
         ----------
-        property_name: string
+        property_name : string
             The name of the property.
         property_value:
             The value of the property.
@@ -257,7 +257,7 @@ class EnvObject:
 
         Returns
         -------
-        Current Location: tuple
+        Current Location : tuple
             The current location as a tuple; (x, y)
         """
         return tuple(self.__location)
@@ -270,7 +270,7 @@ class EnvObject:
 
         Parameters
         ----------
-        loc: tuple
+        loc : tuple
             The new location
         """
         assert isinstance(loc, list) or isinstance(loc, tuple)

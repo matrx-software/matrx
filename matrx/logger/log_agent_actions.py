@@ -2,6 +2,7 @@ from matrx.logger.logger import GridWorldLogger
 
 
 class LogActions(GridWorldLogger):
+    """ Logs per agent the action performed per tick"""
 
     def __init__(self, save_path="", file_name_prefix="", file_extension=".csv", delimeter=";"):
         super().__init__(save_path=save_path, file_name=file_name_prefix, file_extension=file_extension,
