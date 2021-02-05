@@ -184,8 +184,8 @@ class GridWorld:
                 # start paused
                 api.matrx_paused = True
 
-                # fetch the initial state of every agent to display
-                self._fetch_initial_states()
+            # fetch the initial state of every agent to display
+            self._fetch_initial_states()
 
             # Set initialisation boolean
             self.__is_initialized = True

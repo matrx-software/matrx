@@ -1,0 +1,26 @@
+correct_tick;navigate_1_73_sent;navigate_1_73_received;navigate_1_73_mssg_json;navigate_2_74_sent;navigate_2_74_received;navigate_2_74_mssg_json;navigate_3_75_sent;navigate_3_75_received;navigate_3_75_mssg_json;navigate_4_76_sent;navigate_4_76_received;navigate_4_76_mssg_json;navigate_5_77_sent;navigate_5_77_received;navigate_5_77_mssg_json;human_78_sent;human_78_received;human_78_mssg_json;human2_79_sent;human2_79_received;human2_79_mssg_json;world_nr;tick_nr
+-1;;;;;;;;;;;;;;;;;;;;;;1;0
+0;;;;;;;;;;;;;;;;;;;;;;1;1
+1;;;;;;;;;;;;;;;;;;;;;;1;2
+2;;;;;Hello, my name is (human agent) human and I sent this message at tick 2;;;;;;;;;;;Hello, my name is (human agent) human and I sent this message at tick 2;;"{""content"": ""Hello, my name is (human agent) human and I sent this message at tick 2"", ""from_id"": ""human_78"", ""to_id"": ""navigate_2_74"", ""message_id"": ""1b995ab5572243654a417edff7286f7b"", ""chat_mssg_count"": 0}";;;;1;3
+3;;;;;;;;;;;;;;;;;;;;;;1;4
+4;;;;;;;;;;;;;;;;;;;;;;1;5
+5;;;;;;;;Hello, my name is (human agent) human and I sent this message at tick 5;;;;;;;;Hello, my name is (human agent) human and I sent this message at tick 5;;"{""content"": ""Hello, my name is (human agent) human and I sent this message at tick 5"", ""from_id"": ""human_78"", ""to_id"": ""navigate_3_75"", ""message_id"": ""d7eee57da4762ae3a79d6327ff9a384e"", ""chat_mssg_count"": 0}";;;;1;6
+6;;;;;;;;;;;;;;;;;;;;;;1;7
+7;;;;;;;;;;;;;;;;;;;;;;1;8
+8;;;;;Hello, my name is (human agent) human2 and I sent this message at tick 8;;;;;;;;;;;;;;Hello, my name is (human agent) human2 and I sent this message at tick 8;;"{""content"": ""Hello, my name is (human agent) human2 and I sent this message at tick 8"", ""from_id"": ""human2_79"", ""to_id"": ""navigate_2_74"", ""message_id"": ""1534a28b7219e14f9c6674161692b2c3"", ""chat_mssg_count"": 0}";1;9
+9;;;;;;;;Hello, my name is (human agent) human2 and I sent this message at tick 9;;;;;;;;;;;Hello, my name is (human agent) human2 and I sent this message at tick 9;;"{""content"": ""Hello, my name is (human agent) human2 and I sent this message at tick 9"", ""from_id"": ""human2_79"", ""to_id"": ""navigate_3_75"", ""message_id"": ""3678eda08ee15d19348d47cba06ed415"", ""chat_mssg_count"": 0}";1;10
+10;;;;;;;;;;;;;;;;;;;;;;1;11
+11;;;;;;;;Hello, my name is (human agent) human2 and I sent this message at tick 11;;;;;;;;;;;Hello, my name is (human agent) human2 and I sent this message at tick 11;;"{""content"": ""Hello, my name is (human agent) human2 and I sent this message at tick 11"", ""from_id"": ""human2_79"", ""to_id"": ""navigate_3_75"", ""message_id"": ""eb112ab6f17d61e839ccfd101e84dd63"", ""chat_mssg_count"": 1}";1;12
+12;;;;;;;;;;;;;;;;;;;;;;1;13
+13;;;;;Hello, my name is (human agent) human2 and I sent this message at tick 13;;;;;;;;;;;;;;Hello, my name is (human agent) human2 and I sent this message at tick 13;;"{""content"": ""Hello, my name is (human agent) human2 and I sent this message at tick 13"", ""from_id"": ""human2_79"", ""to_id"": ""navigate_2_74"", ""message_id"": ""24d0143df90c95351a30e8494f42a41a"", ""chat_mssg_count"": 1}";1;14
+14;;;;;;;;;;;;;;;;;;;;;;1;15
+15;;;;;;;;;;;;;;;;;;;;;;1;16
+16;;;;;;;;;;;;;;;;;;;;;;1;17
+17;;;;;;;;;;;;;;;;;;;;;;1;18
+18;;;;;;;;;;;;;;;;;;;;;;1;19
+19;;;;;;;;Hello, my name is (human agent) human2 and I sent this message at tick 19;;;;;;;;;;;Hello, my name is (human agent) human2 and I sent this message at tick 19;;"{""content"": ""Hello, my name is (human agent) human2 and I sent this message at tick 19"", ""from_id"": ""human2_79"", ""to_id"": ""navigate_3_75"", ""message_id"": ""95b68c8dee971cef44647ca860ec7f1c"", ""chat_mssg_count"": 2}";1;20
+20;;;;;;;;;;;Hello, my name is (human agent) human and I sent this message at tick 20;;;;;Hello, my name is (human agent) human and I sent this message at tick 20;;"{""content"": ""Hello, my name is (human agent) human and I sent this message at tick 20"", ""from_id"": ""human_78"", ""to_id"": ""navigate_4_76"", ""message_id"": ""776136bb04fe6bfe4f82dd5e612ab9b5"", ""chat_mssg_count"": 0}";;;;1;21
+21;;;;;;;;;;;;;;;;;;;;;;1;22
+22;;;;;;;;;;;;;;;;;;;;;;1;23
+23;;;;;;;;;;;;;;;;Hello, my name is (human agent) human and I sent this message at tick 23;Hello, my name is (human agent) human and I sent this message at tick 23;"{""content"": ""Hello, my name is (human agent) human and I sent this message at tick 23"", ""from_id"": ""human_78"", ""to_id"": ""human_78"", ""message_id"": ""f44fbefc368e470cfb4d17e827d3dff5"", ""chat_mssg_count"": 0}";;;;1;24
