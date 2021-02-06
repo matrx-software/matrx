@@ -14,9 +14,11 @@ __app = Flask(__name__)
 CORS(__app)
 _port = 3001
 
-# variables to be set by MATRX
 # states is a list of length '_current_tick' with a dictionary containing all states of that tick, indexed by agent_id
 __states = {}
+
+# variables to be set by MATRX
+_matrx_version = None
 _current_tick = 0
 tick_duration = 0.5
 _grid_size = [1, 1]
@@ -62,6 +64,7 @@ def get_info():
     -------
     """
     _MATRX_info['matrx_paused'] = _matrx_paused
+    _MATRX_info['matrx_version'] = _matrx_version
     return jsonify(_MATRX_info)
 
 @__app.route('/get_latest_state_and_messages/', methods=['GET', 'POST'])

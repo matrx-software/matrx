@@ -88,6 +88,14 @@ class GridWorld:
         self.__registered_agents = OrderedDict()  # The dictionary of all existing agents in the GridWorld
         self.__environment_objects = OrderedDict()  # The dictionary of all existing objects in the GridWorld
 
+        # Load about file and fetch MATRX version
+        about = {}
+        about_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), '__version__.py')
+        with open(about_file, 'r') as f:
+            exec(f.read(), about)
+        self.__matrx_version = about['__version__']
+        print(f"Running MATRX version {self.__matrx_version}")
+
         # The simulation goal, the simulation ends when this/these are reached.
         # Copy and reset all simulation goals, this to make sure that this world has its own goals independent of any
         # other world that potentially received the same simulation goal instance (or list of them)
@@ -166,6 +174,7 @@ class GridWorld:
                 # point the api towards our message manager, for making messages available via the api
                 api._gw_message_manager = self.message_manager
                 api._gw = self
+                api._matrx_version = self.__matrx_version
                 api._teams = self.__teams
                 if 'nr_states_to_store' in self.__api_info.keys():  # if not given, defaults to 5 in api.py (_reset_api)
                     _nr_states_to_store = max(self.__api_info['nr_states_to_store'], 1)

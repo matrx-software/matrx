@@ -221,3 +221,10 @@ h5 {
 .matrx_object_busy {
     position: absolute;
 }
+
+.matrx_core_version {
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    font-size: 0.8em;
+}

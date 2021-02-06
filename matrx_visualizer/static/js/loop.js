@@ -18,7 +18,8 @@ var lv_tick_duration = 0.5,
     lv_current_tick = 0,
     lv_grid_size_loop = [1, 1],
     lv_open_update_request = false, // whether a new request to MATRX is pending right now
-    lv_first_tick = true;
+    lv_first_tick = true,
+    lv_matrx_version = null;
 
 // save the timestamp of our first tick, which we use to match the clock of MATRX and the visualizer
 var lv_world_ID = null, // ID of the world we received when initializing
@@ -163,6 +164,8 @@ function parse_initial_state(data) {
     lv_wait_for_next_tick = 0;
     lv_tps = Math.floor(1.0 / lv_tick_duration); // calc ticks per second
     lv_matrx_paused = data.matrx_paused;
+    lv_matrx_version = data.matrx_version;
+    console.log("matrx core version:", lv_matrx_version);
 }
 
 
