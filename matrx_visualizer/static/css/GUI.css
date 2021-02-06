@@ -243,3 +243,12 @@ h5 {
 .disconnected_notification span {
     font-size: 1rem;
 }
+
+/* subtile + context menu bug fix. Subtile objects only block when exactly on top of eachother. */
+.object {
+    pointer-events: none;
+}
+
+.shape {
+    pointer-events: auto;
+}
