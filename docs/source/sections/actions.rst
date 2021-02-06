@@ -1,8 +1,8 @@
 .. _Actions:
 
-=======
+=============
 Actions
-=======
+=============
 
 Agents can change (or mutate) the world through performing actions. When an
 agent decides on an action it will communicate the action name and potential

@@ -8,68 +8,72 @@ from flask_cors import CORS
 
 from matrx.messages.message import Message
 
-'''
-This file holds the code for the MATRX RESTful api.
-External scripts can send POST and/or GET requests to retrieve state, tick and other information, and send
-userinput or other information to MATRX. The api is a Flask (Python) webserver.
+_debug = True
 
-For visualization, see the seperate MATRX visualization folder / package.
-'''
+__app = Flask(__name__)
+CORS(__app)
+_port = 3001
 
-debug = True
-
-app = Flask(__name__)
-CORS(app)
-port = 3001
+# states is a list of length '_current_tick' with a dictionary containing all states of that tick, indexed by agent_id
+__states = {}
 
 # variables to be set by MATRX
-# states is a list of length 'current_tick' with a dictionary containing all states of that tick, indexed by agent_id
-states = {}
-current_tick = 0
+_matrx_version = None
+_current_tick = 0
 tick_duration = 0.5
-grid_size = [1, 1]
-nr_states_to_store = 5
-MATRX_info = {}
-next_tick_info = {}
-add_message_to_agent = None
-received_messages = {}  # messages received via the api, intended for the Gridworld
-gw_message_manager = None  # the message manager of the gridworld, containing all messages of various types
-gw = None
-teams = None  # dict with team names (keys) and IDs of agents who are in that team (values)
+_grid_size = [1, 1]
+_nr_states_to_store = 5
+_MATRX_info = {}
+_next_tick_info = {}
+_received_messages = {}  # messages received via the api, intended for the Gridworld
+_gw_message_manager = None  # the message manager of the gridworld, containing all messages of various types
+_gw = None
+_teams = None  # dict with team names (keys) and IDs of agents who are in that team (values)
 # currently only one world at a time is supported
-current_world_ID = False
+__current_world_ID = False
 
 # a temporary state for the current tick, which will be written to states after all
 # agents have been updated
-temp_state = {}
+_temp_state = {}
 
 # variables to be read (only!) by MATRX and set (only!) through api calls
-userinput = {}
-matrx_paused = False
-matrx_done = False
+_userinput = {}
+_matrx_paused = False
+_matrx_done = False
 
+
+""" The MATRX RESTful API that connects external scripts or visualizers to MATRX core. 
+
+Requests should be sent to >MATRX_server_IP<:3001. 
+
+For visualization, see the seperate MATRX visualization folder / package.
+"""
 
 #########################################################################
 # api connection methods
 #########################################################################
-
-
-@app.route('/get_info', methods=['GET', 'POST'])
+@__app.route('/get_info/', methods=['GET', 'POST'])
+@__app.route('/get_info', methods=['GET', 'POST'])
 def get_info():
     """ Provides the general information on the world, contained in the world object.
+
+    API Path: ``http://>MATRX_core_ip<:3001/get_info``
 
     Returns
         MATRX world object, containing general information on the world and scenario.
     -------
     """
-    MATRX_info['matrx_paused'] = matrx_paused
-    return jsonify(MATRX_info)
+    _MATRX_info['matrx_paused'] = _matrx_paused
+    _MATRX_info['matrx_version'] = _matrx_version
+    return jsonify(_MATRX_info)
 
-
-@app.route('/get_latest_state_and_messages/', methods=['GET', 'POST'])
+@__app.route('/get_latest_state_and_messages/', methods=['GET', 'POST'])
+@__app.route('/get_latest_state_and_messages', methods=['GET', 'POST'])
 def get_latest_state_and_messages():
     """ Provides all most recent information from MATRX for 1 agent: The state from the latest tick, and any new
     messages and chatrooms.
+
+    API Path: ``http://>MATRX_core_ip<:3001/get_latest_state_and_messages``
 
     Parameters should be passed via GET URL parameters.
 
@@ -124,64 +128,28 @@ def get_latest_state_and_messages():
         return abort(400, description=error_mssg)
 
     # check for validity and return an error if not valid
-    api_call_valid, error = check_states_API_request(ids=[agent_id])
+    api_call_valid, error = __check_states_API_request(ids=[agent_id])
     if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
     # fetch states, chatrooms and messages
-    states_ = __fetch_states(current_tick, agent_id)
-    chatrooms, messages = get_messages(agent_id, chat_offsets)
+    states_ = __fetch_states(_current_tick, agent_id)
+    chatrooms, messages = __get_messages(agent_id, chat_offsets)
 
-    return jsonify({"matrx_paused": matrx_paused, "states": states_, "chatrooms": chatrooms, "messages": messages})
-
-
-#
-# @app.route('/get_latest_state_and_messages/<agent_id>', methods=['GET', 'POST'])
-# def get_latest_state_and_messages(agent_id):
-#     """ Provides all most recent information from MATRX: Both the state and messages from the latest
-#     tick for one particular agent, as well as the current MATRX status (paused or not).
-#
-#     Parameters
-#     ----------
-#     agent_id
-#         The ID of the targeted agent
-#
-#     agent_id : (optional GET URL parameter, default None)
-#         Agent ID string that will make this function only return chatrooms of which that agent is part. Defaults to
-#         None, returning all chatsrooms and all chat messages.
-#
-#     offsets : (optional GET URL parameter, default {})
-#         GET URL parameter that should be a dict with as key the chatroom ID, and as value the message offset. E.g.
-#         {"0": "10", "3": "5"}. This returns the message with index 10+ for the chatroom with ID 0 (global chat),
-#         and messages with index 5+ for chatroom with ID 3.
-#
-#     Returns
-#     -------
-#         a dictionary containing the states under the "states" key, and the messages under the "messages" key.
-#
-#     """
-#     # TODO: deprecated
-#     # check for validity and return an error if not valid
-#     api_call_valid, error = check_states_API_request(ids=[agent_id])
-#     if not api_call_valid:
-#         print("api request not valid:", error)
-#         return abort(error['error_code'], description=error['error_message'])
-#
-#     # fetch states and chatrooms with messages
-#     states_ = __fetch_states(current_tick, agent_id)
-#     chatrooms = get_messages(request)
-#
-#     return jsonify({"matrx_paused": matrx_paused, "states": states_, "messages": {}, "chatrooms": chatrooms})
+    return jsonify({"matrx_paused": _matrx_paused, "states": states_, "chatrooms": chatrooms, "messages": messages})
 
 
 #########################################################################
 # MATRX fetch state api calls
 #########################################################################
 
-@app.route('/get_states/<tick>', methods=['GET', 'POST'])
+@__app.route('/get_states/<tick>/', methods=['GET', 'POST'])
+@__app.route('/get_states/<tick>', methods=['GET', 'POST'])
 def get_states(tick):
     """ Provides the states of all agents (including the god view) from tick `tick` onwards to current tick.
+
+    API Path: ``http://>MATRX_core_ip<:3001/get_states/<tick>``
 
     Parameters
     ----------
@@ -199,7 +167,7 @@ def get_states(tick):
     chat_offsets = request.args.get("chat_offsets")
 
     # check for validity and return an error if not valid
-    api_call_valid, error = check_states_API_request(tick=tick)
+    api_call_valid, error = __check_states_API_request(tick=tick)
     if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -207,9 +175,12 @@ def get_states(tick):
     return jsonify(__fetch_states(tick))
 
 
-@app.route('/get_states/<tick>/<agent_ids>', methods=['GET', 'POST'])
+@__app.route('/get_states/<tick>/<agent_ids>/', methods=['GET', 'POST'])
+@__app.route('/get_states/<tick>/<agent_ids>', methods=['GET', 'POST'])
 def get_states_specific_agents(tick, agent_ids):
     """ Provides the states starting from tick `tick` to current_tick, for the agents specified in `agent_ids`.
+
+    API Path: ``http://>MATRX_core_ip<:3001/get_states/<tick>/<agent_ids>``
 
     Parameters
     ----------
@@ -225,7 +196,7 @@ def get_states_specific_agents(tick, agent_ids):
 
     """
     # check for validity and return an error if not valid
-    api_call_valid, error = check_states_API_request(tick=tick)
+    api_call_valid, error = __check_states_API_request(tick=tick)
     if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -233,9 +204,12 @@ def get_states_specific_agents(tick, agent_ids):
     return jsonify(__fetch_states(tick, agent_ids))
 
 
-@app.route('/get_latest_state/<agent_ids>', methods=['GET', 'POST'])
+@__app.route('/get_latest_state/<agent_ids>/', methods=['GET', 'POST'])
+@__app.route('/get_latest_state/<agent_ids>', methods=['GET', 'POST'])
 def get_latest_state(agent_ids):
     """ Provides the latest state of one or multiple agents
+
+    API Path: ``http://>MATRX_core_ip<:3001/get_latest_state/<agent_ids>``
 
     Parameters
     ----------
@@ -249,22 +223,23 @@ def get_latest_state(agent_ids):
         agent as specified in `agent_ids`, indexed by their agent ID.
 
     """
-    return get_states_specific_agents(current_tick, agent_ids)
+    return get_states_specific_agents(_current_tick, agent_ids)
 
 
-@app.route('/get_filtered_latest_state/<agent_ids>', methods=['POST'])
+@__app.route('/get_filtered_latest_state/<agent_ids>/', methods=['POST'])
+@__app.route('/get_filtered_latest_state/<agent_ids>', methods=['POST'])
 def get_filtered_latest_state(agent_ids):
     """ Return a state for a set of agent IDs, filtered to only return the specified properties
     """
 
     # check for validity and return an error if not valid
-    api_call_valid, error = check_states_API_request(tick=current_tick)
+    api_call_valid, error = __check_states_API_request(tick=_current_tick)
     if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
     # Get the agent states
-    agent_states = __fetch_states(current_tick, agent_ids)[0]
+    agent_states = __fetch_states(_current_tick, agent_ids)[0]
 
     # Filter the agent states based on the received properties list
     props = request.json['properties']
@@ -285,12 +260,15 @@ def get_filtered_latest_state(agent_ids):
 #########################################################################
 # MATRX fetch messages api calls
 #########################################################################
-@app.route('/get_messages/', methods=['GET', 'POST'])
+@__app.route('/get_messages/', methods=['GET', 'POST'])
+@__app.route('/get_messages', methods=['GET', 'POST'])
 def get_messages_apicall():
     """ Returns chatrooms and chat messages for one agent, or all agents.
 
     Per chatroom, an offset can be passed from which will only return messages with a higher index than that
      offset.
+
+    API Path: ``http://>MATRX_core_ip<:3001/get_messages/``
 
     Parameters should be passed via GET URL parameters.
 
@@ -336,13 +314,15 @@ def get_messages_apicall():
         print("api request not valid:", error_mssg)
         return abort(400, description=error_mssg)
 
-    chatrooms, messages = get_messages(agent_id, chat_offsets)
+    chatrooms, messages = __get_messages(agent_id, chat_offsets)
 
     return jsonify({"chatrooms": chatrooms, "messages": messages})
 
 
-def get_messages(agent_id, chat_offsets):
-    """ See :func:`~matrx.api..message_manager.get_messages` """
+def __get_messages(agent_id, chat_offsets):
+    """ Fetch the messages from the Gridworld Message Manager.
+
+    See :meth:`~matrx.messages.message_manager.MessageManager.fetch_messages` """
 
     # validate agent_id: None or str
     if not isinstance(agent_id, str) and not agent_id is None:
@@ -359,29 +339,22 @@ def get_messages(agent_id, chat_offsets):
         return abort(400, description=error_mssg)
 
     # fetch chatrooms with messages for the passed agent_id and return it
-    chatrooms = gw_message_manager.fetch_chatrooms(agent_id=agent_id)
-    messages = gw_message_manager.fetch_messages(agent_id=agent_id, chatroom_mssg_offsets=chat_offsets)
+    chatrooms = _gw_message_manager.fetch_chatrooms(agent_id=agent_id)
+    messages = _gw_message_manager.fetch_messages(agent_id=agent_id, chatroom_mssg_offsets=chat_offsets)
 
     return chatrooms, messages
-
-
-# @app.route('/get_messages/<tick>/<agent_id>', methods=['GET'])
-# @app.route('/get_messages/<tick>', methods=['GET', 'POST'])
-# @app.route('/get_messages/<agent_id>', methods=['GET', 'POST'])
-# @app.route('/get_latest_messages', methods=['GET', 'POST'])
-# @app.route('/get_latest_messages/<agent_id>', methods=['GET', 'POST'])
-# def deprecated_get_messages(agent_id):
-#     #TODO: deprecated
-#     return jsonify(True)
 
 
 #########################################################################
 # MATRX user input api calls
 #########################################################################
 
-@app.route('/send_userinput/<agent_ids>', methods=['POST'])
+@__app.route('/send_userinput/<agent_ids>/', methods=['POST'])
+@__app.route('/send_userinput/<agent_ids>', methods=['POST'])
 def send_userinput(agent_ids):
     """ Can be used to send user input from the user (pressed keys) to the specified human agent(s) in MATRX
+
+    API Path: ``http://>MATRX_core_ip<:3001/send_userinput/<agent_ids>``
 
     Parameters
     ----------
@@ -394,9 +367,9 @@ def send_userinput(agent_ids):
     -------
 
     """
-    global userinput
+    global _userinput
 
-    api_call_valid, error = check_states_API_request(current_tick, agent_ids, ids_required=True)
+    api_call_valid, error = __check_states_API_request(_current_tick, agent_ids, ids_required=True)
     if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
@@ -415,20 +388,23 @@ def send_userinput(agent_ids):
         for pressed_key in data:
 
             # add  the agent_id if not existing yet
-            if agent_id not in userinput:
-                userinput[agent_id] = []
+            if agent_id not in _userinput:
+                _userinput[agent_id] = []
 
             # save the pressed key of the agent
-            userinput[agent_id].append(pressed_key)
+            _userinput[agent_id].append(pressed_key)
 
     return jsonify(True)
 
 
-@app.route('/send_message', methods=['POST'])
+@__app.route('/send_message/', methods=['POST'])
+@__app.route('/send_message', methods=['POST'])
 def send_message():
     """ Send a message containing information to one or multiple specific agent, the agent's team, or all agents.
 
     Message as defined in matrx.utils.message
+
+    API Path: ``http://>MATRX_core_ip<:3001/send_message``
 
     Returns
     -------
@@ -449,10 +425,10 @@ def send_message():
     # create message
     msg = Message(content=data['content'], from_id=data['sender'], to_id=data['receiver'])
 
-    # add the received_messages to the api global variable
-    if data['sender'] not in received_messages:
-        received_messages[data['sender']] = []
-    received_messages[data['sender']].append(msg)
+    # add the _received_messages to the api global variable
+    if data['sender'] not in _received_messages:
+        _received_messages[data['sender']] = []
+    _received_messages[data['sender']].append(msg)
 
     return jsonify(True)
 
@@ -460,9 +436,12 @@ def send_message():
 #########################################################################
 # MATRX context menu API calls
 #########################################################################
-@app.route('/fetch_context_menu_of_self', methods=['POST'])
+@__app.route('/fetch_context_menu_of_self/', methods=['POST'])
+@__app.route('/fetch_context_menu_of_self', methods=['POST'])
 def fetch_context_menu_of_self():
     """ Fetch the context menu opened for a specific object/location of the agent being controlled by the user.
+
+        API Path: ``http://>MATRX_core_ip<:3001/fetch_context_menu_of_self``
     """
     # fetch the data
     data = request.json
@@ -470,7 +449,7 @@ def fetch_context_menu_of_self():
     # check that all required parameters have been passed
     required_params = ("agent_id_who_clicked", "clicked_object_id", "click_location", "self_selected")
     if not all(k in data for k in required_params):
-        return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
+        return __return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
 
     agent_id_who_clicked = data['agent_id_who_clicked']
     clicked_object_id = data['clicked_object_id']
@@ -478,22 +457,22 @@ def fetch_context_menu_of_self():
     self_selected = data['self_selected']
 
     # check if agent_id_who_clicked exists in the gw
-    if agent_id_who_clicked not in gw.registered_agents.keys() and agent_id_who_clicked != "god":
-        return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
+    if agent_id_who_clicked not in _gw.registered_agents.keys() and agent_id_who_clicked != "god":
+        return __return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
 
     # check if it is a human agent
-    if agent_id_who_clicked in gw.registered_agents.keys() and \
-            not gw.registered_agent_keys[agent_id_who_clicked].is_human_agent:
-        return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} is not a human agent and thus does"
+    if agent_id_who_clicked in _gw.registered_agents.keys() and \
+            not _gw.registered_agents[agent_id_who_clicked].is_human_agent:
+        return __return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} is not a human agent and thus does"
                                               f" not have a context_menu_of_self() function.")
 
     # ignore if called from the god view
     if agent_id_who_clicked.lower() == "god":
-        return return_error(code=400,
+        return __return_error(code=400,
                             message=f"The god view is not an agent and thus cannot show its own context menu.")
 
     # fetch context menu from agent
-    context_menu = gw.registered_agents[agent_id_who_clicked].create_context_menu_for_self_func(clicked_object_id,
+    context_menu = _gw.registered_agents[agent_id_who_clicked].create_context_menu_for_self_func(clicked_object_id,
                                                                                                 click_location,
                                                                                                 self_selected)
 
@@ -504,9 +483,12 @@ def fetch_context_menu_of_self():
     return jsonify(context_menu)
 
 
-@app.route('/fetch_context_menu_of_other', methods=['POST'])
+@__app.route('/fetch_context_menu_of_other/', methods=['POST'])
+@__app.route('/fetch_context_menu_of_other', methods=['POST'])
 def fetch_context_menu_of_other():
     """ Fetch the context menu opened for a specific object/location of the agent being controlled by the user.
+
+        API Path: ``http://>MATRX_core_ip<:3001/fetch_context_menu_of_other``
     """
     # fetch the data
     data = request.json
@@ -514,27 +496,27 @@ def fetch_context_menu_of_other():
     # check that all required parameters have been passed
     required_params = ("agent_id_who_clicked", "clicked_object_id", "click_location", "agent_selected")
     if not all(k in data for k in required_params):
-        return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
+        return __return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
 
     agent_id_who_clicked = data['agent_id_who_clicked']
     clicked_object_id = data['clicked_object_id']
     click_location = data['click_location']
     agent_selected = data['agent_selected']
 
-    # check if agent_id_who_clicked exists in the gw
-    if agent_id_who_clicked not in gw.registered_agents.keys() and agent_id_who_clicked != "god":
-        return return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
+    # check if agent_id_who_clicked exists in the _gw
+    if agent_id_who_clicked not in _gw.registered_agents.keys() and agent_id_who_clicked != "god":
+        return __return_error(code=400, message=f"Agent with ID {agent_id_who_clicked} does not exist.")
 
     # check if the selected agent exists
-    if agent_selected not in gw.registered_agents.keys():
-        return return_error(code=400, message=f"Selected agent with ID {agent_selected} does not exist.")
+    if agent_selected not in _gw.registered_agents.keys():
+        return __return_error(code=400, message=f"Selected agent with ID {agent_selected} does not exist.")
 
     # ignore if called from the god view
     # if agent_id_who_clicked.lower() == "god":
-    #     return return_error(code=400, message=f"The god view is not an agent and thus cannot show its own context menu.")
+    #     return __return_error(code=400, message=f"The god view is not an agent and thus cannot show its own context menu.")
 
     # fetch context menu from agent
-    context_menu = gw.registered_agents[agent_selected].create_context_menu_for_other_func(agent_id_who_clicked,
+    context_menu = _gw.registered_agents[agent_selected].create_context_menu_for_other_func(agent_id_who_clicked,
                                                                                            clicked_object_id,
                                                                                            click_location)
 
@@ -545,12 +527,15 @@ def fetch_context_menu_of_other():
     return jsonify(context_menu)
 
 
-@app.route('/send_message_pickled', methods=['POST'])
+@__app.route('/send_message_pickled/', methods=['POST'])
+@__app.route('/send_message_pickled', methods=['POST'])
 def send_message_pickled():
     """ This function makes it possible to send a custom message to a MATRX agent via the API as a jsonpickle object.
     For instance, sending a custom message when a context menu option is clicked.
     The pre-formatted CustomMessage instance can be jsonpickled and sent via the API.
     This API call can handle that request and send the CustomMessage to the MATRX agent
+
+    API Path: ``http://>MATRX_core_ip<:3001/send_message_pickled``
 
     Returns
     -------
@@ -564,15 +549,15 @@ def send_message_pickled():
     # check that all required parameters have been passed
     required_params = ("sender", "message")
     if not all(k in data for k in required_params):
-        return return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
+        return __return_error(code=400, message=f"Missing one of the required parameters: {required_params}")
 
     sender_id = data['sender']
     mssg = jsonpickle.decode(data['message'])
 
-    # add the received_messages to the api global variable
-    if sender_id not in received_messages:
-        received_messages[sender_id] = []
-    received_messages[sender_id].append(mssg)
+    # add the _received_messages to the api global variable
+    if sender_id not in _received_messages:
+        _received_messages[sender_id] = []
+    _received_messages[sender_id].append(mssg)
 
     return jsonify(True)
 
@@ -581,61 +566,72 @@ def send_message_pickled():
 # MATRX control api calls
 #########################################################################
 
-
-@app.route('/pause', methods=['GET', 'POST'])
+@__app.route('/pause/', methods=['GET', 'POST'])
+@__app.route('/pause', methods=['GET', 'POST'])
 def pause_MATRX():
     """ Pause the MATRX simulation
+
+    API Path: ``http://>MATRX_core_ip<:3001/pause``
 
     Returns
         True if paused, False if already paused
     -------
     """
-    global matrx_paused
-    if not matrx_paused:
-        matrx_paused = True
+    global _matrx_paused
+    if not _matrx_paused:
+        _matrx_paused = True
         return jsonify(True)
     else:
         return jsonify(False)
 
 
-@app.route('/start', methods=['GET', 'POST'])
+@__app.route('/start/', methods=['GET', 'POST'])
+@__app.route('/start', methods=['GET', 'POST'])
 def start_MATRX():
     """ Starts / unpauses the MATRX simulation
+
+    API Path: ``http://>MATRX_core_ip<:3001/start``
 
     Returns
         True if it has been started, False if it is already running
     -------
 
     """
-    global matrx_paused
-    if matrx_paused:
-        matrx_paused = False
+    global _matrx_paused
+    if _matrx_paused:
+        _matrx_paused = False
         return jsonify(True)
     else:
         return jsonify(False)
 
 
-@app.route('/stop', methods=['GET', 'POST'])
+@__app.route('/stop/', methods=['GET', 'POST'])
+@__app.route('/stop', methods=['GET', 'POST'])
 def stop_MATRX():
     """ Stops MATRX scenario
+
+    API Path: ``http://>MATRX_core_ip<:3001/stop``
 
     Returns
         True
     -------
     """
-    global matrx_done
-    matrx_done = True
+    global _matrx_done
+    _matrx_done = True
     return jsonify(True)
 
 
-@app.route('/change_tick_duration/<tick_dur>', methods=['GET', 'POST'])
+@__app.route('/change_tick_duration/<tick_dur>/', methods=['GET', 'POST'])
+@__app.route('/change_tick_duration/<tick_dur>', methods=['GET', 'POST'])
 def change_MATRX_speed(tick_dur):
     """ Change the tick duration / simulation speed of MATRX
+
+    API Path: ``http://>MATRX_core_ip<:3001/change_tick_duration/<tick_dur>``
 
     Parameters
     ----------
     tick_dur
-        The duration of 1 tick
+        The duration of 1 tick in seconds
 
     Returns
     -------
@@ -654,9 +650,12 @@ def change_MATRX_speed(tick_dur):
     return jsonify(True)
 
 
-@app.route('/shutdown_API', methods=['GET', 'POST'])
+@__app.route('/shutdown_API/', methods=['GET', 'POST'])
+@__app.route('/shutdown_API', methods=['GET', 'POST'])
 def shutdown():
     """ Shuts down the api by stopping the Flask thread
+
+    API Path: ``http://>MATRX_core_ip<:3001/shutdown_API``
 
     Returns
         True
@@ -674,15 +673,15 @@ def shutdown():
 # Errors
 #########################################################################
 
-@app.errorhandler(400)
-def bad_request(e):
+@__app.errorhandler(400)
+def __bad_request(e):
     print("Throwing error", e)
     return jsonify(error=str(e)), 400
 
 
-def return_error(code, message):
+def __return_error(code, message):
     """ A helper function that returns a specified error code and message """
-    if debug:
+    if _debug:
         print(f"api request not valid: code {code}. Message: {message}.")
     return abort(code, description=message)
 
@@ -692,7 +691,7 @@ def return_error(code, message):
 #########################################################################
 
 
-def clean_input_ids(ids):
+def __clean_input_ids(ids):
     """ Clean a received api variable ids to valid Python code
 
     Parameters
@@ -721,7 +720,7 @@ def clean_input_ids(ids):
         return [ids]
 
 
-def check_messages_API_request(tick=None, agent_id=None):
+def __check_messages_API_request(tick=None, agent_id=None):
     """ Checks if the variables of the api request are valid, and if the requested information exists
 
     Parameters
@@ -734,20 +733,20 @@ def check_messages_API_request(tick=None, agent_id=None):
     -------
 
     """
-    if gw_message_manager is None:
+    if _gw_message_manager is None:
         return False, {'error_code': 400,
                        'error_message': f'MATRX hasn\'t started yet.'}
 
-    tick = current_tick if tick is None else tick
+    tick = _current_tick if tick is None else tick
     # check user input, such as tick
-    check_passed, error_message = check_input(tick)
+    check_passed, error_message = __check_input(tick)
     if not check_passed:
         return False, error_message
 
     return True, None
 
 
-def check_states_API_request(tick=None, ids=None, ids_required=False):
+def __check_states_API_request(tick=None, ids=None, ids_required=False):
     """ Checks if the variables of the api request are valid, and if the requested information exists
 
     Parameters
@@ -767,17 +766,17 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
 
 
     """
-    if gw_message_manager is None:
+    if _gw_message_manager is None:
         return False, {'error_code': 400,
                        'error_message': f'MATRX hasn\'t started yet.'}
 
     # check user input, such as tick and agent id
-    check_passed, error_message = check_input(tick)
+    check_passed, error_message = __check_input(tick)
     if not check_passed:
         return False, error_message
 
     # Don't throw an error if MATRX is paused the first tick, and thus still has no states
-    # if current_tick is 0 and matrx_paused:
+    # if _current_tick is 0 and _matrx_paused:
     #     return True, None
 
     # if this api call requires ids, check this variable on validity as well
@@ -793,16 +792,16 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
             # e.g. "god"), or a list of ' f'IDs(string) for requesting states of multiple agents'}
 
         # check if the api was reset during this time
-        if len(states) is 0:
+        if len(__states) is 0:
             return False, {'error_code': 400,
                            'error_message': f'api is reconnecting to a new world'}
 
         # check if the provided ids exist for all requested ticks
         ids = [ids] if isinstance(ids, str) else ids
-        for t in range(tick, current_tick + 1):
+        for t in range(tick, _current_tick + 1):
             for id in ids:
 
-                if id not in states[t]:
+                if id not in __states[t]:
                     return False, {'error_code': 400,
                                    'error_message': f'Trying to fetch the state for agent with ID "{id}" for tick {t}, '
                                                     f'but no data on that agent exists for that tick. Is the agent ID '
@@ -812,7 +811,7 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
     return True, None
 
 
-def check_input(tick=None, ids=None):
+def __check_input(tick=None, ids=None):
     """
     Checks if the passed parameters are valid.
 
@@ -837,16 +836,16 @@ def check_input(tick=None, ids=None):
                            'error_message': f'Tick has to be an integer, but is of type {type(tick)}'}
 
         # check if the tick has actually occurred
-        if not tick in range(0, current_tick + 1):
+        if not tick in range(0, _current_tick + 1):
             return False, {'error_code': 400,
-                           'error_message': f'Indicated tick does not exist, has to be in range 0 - {current_tick}, '
+                           'error_message': f'Indicated tick does not exist, has to be in range 0 - {_current_tick}, '
                                             f'but is {tick}'}
 
         # check if the tick was stored
-        if tick not in states.keys():
+        if tick not in __states.keys():
             return False, {'error_code': 400,
-                           'error_message': f'Indicated tick {tick} is not stored, only the {nr_states_to_store} ticks '
-                                            f'are stored that occurred before the current tick {current_tick}'}
+                           'error_message': f'Indicated tick {tick} is not stored, only the {_nr_states_to_store} ticks '
+                                            f'are stored that occurred before the current tick {_current_tick}'}
 
     return True, None
 
@@ -870,7 +869,7 @@ def __fetch_states(tick, ids=None):
 
     """
     # Verify tick
-    check_passed, error_message = check_input(tick)
+    check_passed, error_message = __check_input(tick)
     if not check_passed:
         return False, error_message
     tick = int(tick)
@@ -878,7 +877,7 @@ def __fetch_states(tick, ids=None):
     # return all states
     if ids is None:
         # Get the right states based on the tick and return them
-        return_states = [state for t, state in states.items() if t >= tick <= current_tick]
+        return_states = [state for t, state in __states.items() if t >= tick <= _current_tick]
         return return_states
 
     # convert ints to lists so we can use 1 uniform approach
@@ -889,13 +888,13 @@ def __fetch_states(tick, ids=None):
 
     # create a list containing the states from tick to current_tick containing the states of all desired agents/god
     filtered_states = []
-    for t in range(tick, current_tick + 1):
+    for t in range(tick, _current_tick + 1):
         states_this_tick = {}
 
         # add each agent's state for this tick
         for agent_id in ids:
-            if agent_id in states[t]:
-                states_this_tick[agent_id] = states[t][agent_id]
+            if agent_id in __states[t]:
+                states_this_tick[agent_id] = __states[t][agent_id]
 
         # save the states of all filtered agents for this tick
         filtered_states.append(states_this_tick)
@@ -956,13 +955,6 @@ def __filter_dict(state_dict, props, filters):
     return objects
 
 
-def create_error_response(code, message):
-    """ Creates an error code with a custom message """
-    response = jsonify({'message': message})
-    response.status_code = code
-    return response
-
-
 def __reorder_state(state):
     """ This private function makes the MATRX state ready for sending as a JSON object
 
@@ -988,7 +980,7 @@ def __reorder_state(state):
     return new_state
 
 
-def add_state(agent_id, state, agent_inheritence_chain, world_settings):
+def _add_state(agent_id, state, agent_inheritence_chain, world_settings):
     """ Saves the state of an agent for use via the api
 
     Parameters
@@ -1000,47 +992,47 @@ def add_state(agent_id, state, agent_inheritence_chain, world_settings):
     agent_inheritence_chain
          inheritance_chain of classes, can be used to figure out type of agent
     world_settings
-        This object contains all information on the MATRX world, such as tick and grid_size. Some agents might filter
+        This object contains all information on the MATRX world, such as tick and _grid_size. Some agents might filter
         these out of their state, as such it is sent along seperatly to make sure the world settings, required by the
         visualization, are passed along.
     """
     # save the new general info on the MATRX World (once)
-    global next_tick_info
-    if next_tick_info == {}:
-        next_tick_info = world_settings
+    global _next_tick_info
+    if _next_tick_info == {}:
+        _next_tick_info = world_settings
 
     # Make sure the world settings are in the state, as these are used by the visualization
     if 'World' not in state:
         state['World'] = world_settings
 
-    # state['World']['matrx_paused'] = matrx_paused
+    # state['World']['matrx_paused'] = _matrx_paused
 
     # reorder and save the new state along with some meta information
-    temp_state[agent_id] = {'state': __reorder_state(state), 'agent_inheritence_chain': agent_inheritence_chain}
+    _temp_state[agent_id] = {'state': __reorder_state(state), 'agent_inheritence_chain': agent_inheritence_chain}
 
 
-def next_tick():
+def _next_tick():
     """ Proceed to the next tick, publicizing data of the new tick via the api (the new states).
     """
     # save the new general info
-    global MATRX_info, next_tick_info, states
-    MATRX_info = copy.copy(next_tick_info)
-    next_tick_info = {}
-    # print("Next ticK:", MATRX_info);
+    global _MATRX_info, _next_tick_info, __states
+    _MATRX_info = copy.copy(_next_tick_info)
+    _next_tick_info = {}
+    # print("Next ticK:", _MATRX_info);
 
     # publicize the states of the previous tick
-    states[current_tick] = copy.copy(temp_state)
+    __states[_current_tick] = copy.copy(_temp_state)
 
     # Limit the states stored
-    if len(states) > nr_states_to_store:
-        stored_ticks = list(states.keys())
-        forget_from = current_tick - nr_states_to_store
+    if len(__states) > _nr_states_to_store:
+        stored_ticks = list(__states.keys())
+        forget_from = _current_tick - _nr_states_to_store
         for tick in stored_ticks:
             if tick <= forget_from:
-                states.pop(tick)
+                __states.pop(tick)
 
 
-def pop_userinput(agent_id):
+def _pop_userinput(agent_id):
     """ Pop the user input for an agent from the userinput dictionary and return it
 
     Parameters
@@ -1053,31 +1045,31 @@ def pop_userinput(agent_id):
         A list of keys pressed. See this link for the encoding of keys:
         https://developer.mozilla.org/nl/docs/Web/API/KeyboardEvent/key/Key_Values
     """
-    global userinput
-    return userinput.pop(agent_id, None)
+    global _userinput
+    return _userinput.pop(agent_id, None)
 
 
-def reset_api():
+def _reset_api():
     """ Reset the MATRX api variables """
-    global temp_state, userinput, matrx_paused, matrx_done, states, current_tick, tick_duration, grid_size, \
-        nr_states_to_store
-    global MATRX_info, next_tick_info, received_messages, current_world_ID
-    temp_state = {}
-    userinput = {}
-    matrx_paused = False
-    matrx_done = False
-    states = {}
-    current_tick = 0
+    global _temp_state, _userinput, _matrx_paused, _matrx_done, __states, _current_tick, tick_duration, _grid_size, \
+        _nr_states_to_store
+    global _MATRX_info, _next_tick_info, _received_messages, __current_world_ID
+    _temp_state = {}
+    _userinput = {}
+    _matrx_paused = False
+    _matrx_done = False
+    __states = {}
+    _current_tick = 0
     tick_duration = 0.0
-    grid_size = [1, 1]
-    nr_states_to_store = 5
-    MATRX_info = {}
-    next_tick_info = {}
-    received_messages = {}
-    current_world_ID = False
+    _grid_size = [1, 1]
+    _nr_states_to_store = 5
+    _MATRX_info = {}
+    _next_tick_info = {}
+    _received_messages = {}
+    __current_world_ID = False
 
 
-def register_world(world_id):
+def _register_world(world_id):
     """ Register a new simulation world
 
     At the moment simulation of only one world at a time is supported, so this calling this function will discard
@@ -1088,39 +1080,39 @@ def register_world(world_id):
     world_id
         The ID of the world
     """
-    global current_world_ID
-    current_world_ID = world_id
+    global __current_world_ID
+    __current_world_ID = world_id
 
 
 #########################################################################
 # api Flask methods
 #########################################################################
 
-def flask_thread():
+def _flask_thread():
     """ Starts the Flask server on localhost:3001
     """
-    if not debug:
+    if not _debug:
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
 
-    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
+    __app.run(host='0.0.0.0', port=_port, debug=False, use_reloader=False)
 
 
-def run_api(verbose=False):
+def _run_api(verbose=False):
     """ Creates a separate Python thread in which the api (Flask) is started
     Returns
     -------
         MATRX api Python thread
     """
     print("Starting background api server")
-    global debug
-    debug = verbose
+    global _debug
+    _debug = verbose
 
-    print("Initialized app:", app)
-    api_thread = threading.Thread(target=flask_thread)
+    print("Initialized app:", __app)
+    api_thread = threading.Thread(target=_flask_thread)
     api_thread.start()
     return api_thread
 
 
 if __name__ == "__main__":
-    run_api()
+    _run_api()

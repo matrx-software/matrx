@@ -2,6 +2,7 @@ from matrx.logger.logger import GridWorldLogger
 
 
 class LogDuration(GridWorldLogger):
+    """ Log the number of ticks the Gridworld was running on completion """
 
     def __init__(self, save_path="", file_name_prefix="", file_extension=".csv", delimeter=";"):
         super().__init__(save_path=save_path, file_name=file_name_prefix, file_extension=file_extension,

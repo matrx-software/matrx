@@ -129,7 +129,7 @@ class AgentBrain:
 
         Parameters
         ----------
-        state: State
+        state : State
             A state description containing all perceived
             :class:`matrx.objects.env_object.EnvObject` and objects inheriting
             from this class within a certain range as defined by the
@@ -184,8 +184,8 @@ class AgentBrain:
         Parameters
         ----------
         state : State
-        A state description as given by the agent's
-        :meth:`matrx.agents.agent_brain.AgentBrain.filter_observation` method.
+            A state description as given by the agent's
+            :meth:`matrx.agents.agent_brain.AgentBrain.filter_observations` method.
 
         Returns
         -------
@@ -344,7 +344,7 @@ class AgentBrain:
 
         Parameters
         ----------
-        message: Message
+        message : Message
             A message object that needs to be send. Should be of type Message. It's to_id can contain a single
             recipient, a list of recipients or None. If None, it is send to all other agents.
 

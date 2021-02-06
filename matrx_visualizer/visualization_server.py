@@ -127,7 +127,7 @@ def external_media(filename):
 # Visualization Flask methods
 #########################################################################
 
-def flask_thread():
+def _flask_thread():
     """
     Starts the Flask server on localhost:3000
     """
@@ -149,7 +149,7 @@ def run_matrx_visualizer(verbose, media_folder):
 
     print("Starting visualization server")
     print("Initialized app:", app)
-    vis_thread = threading.Thread(target=flask_thread)
+    vis_thread = threading.Thread(target=_flask_thread)
     vis_thread.start()
     return vis_thread
 

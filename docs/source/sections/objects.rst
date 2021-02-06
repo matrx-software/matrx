@@ -1,8 +1,8 @@
 .. _Objects:
 
-================
-Object placement
-================
+================================
+Objects
+================================
 
 The world of MATRX can contain a various amount of objects. Below such object classes can be found.
 

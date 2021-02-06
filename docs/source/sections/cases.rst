@@ -4,7 +4,7 @@
 Scenarios
 ==============
 
-
+Defining a world containing objects, agents, actions, and simulation goals.
 
 .. autosummary::
    :toctree: _generated_autodoc

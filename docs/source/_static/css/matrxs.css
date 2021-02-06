@@ -1240,3 +1240,11 @@ table.sk-sponsor-table td {
 .highlight .vi { color: #bb60d5 } /* Name.Variable.Instance */
 .highlight .vm { color: #bb60d5 } /* Name.Variable.Magic */
 .highlight .il { color: #208050 } /* Literal.Number.Integer.Long */
+
+
+/* Space between parameter name and type */
+.section dt span.classifier {
+    margin-left: 5px;
+    border-left: 2px solid grey;
+    padding-left: 5px;
+}
