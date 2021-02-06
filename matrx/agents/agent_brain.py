@@ -129,7 +129,7 @@ class AgentBrain:
 
         Parameters
         ----------
-        state: State
+        state : State
             A state description containing all perceived
             :class:`matrx.objects.env_object.EnvObject` and objects inheriting
             from this class within a certain range as defined by the
@@ -184,8 +184,8 @@ class AgentBrain:
         Parameters
         ----------
         state : State
-        A state description as given by the agent's
-        :meth:`matrx.agents.agent_brain.AgentBrain.filter_observation` method.
+            A state description as given by the agent's
+            :meth:`matrx.agents.agent_brain.AgentBrain.filter_observations` method.
 
         Returns
         -------
@@ -213,20 +213,24 @@ class AgentBrain:
         for learning agents.
         """
 
-        # Send a message to a random agent
-        agents = []
-        for obj_id, obj in state.items():
+        # send a random message once in a while
+        if self.rnd_gen.random() < 0.1:
+            # Get all agents in our state.
+            # The codeline below can return three things:
+            # - None                    -> no agents found (impossible as we are in an agent right now)
+            # - an agent object         -> only a single agent found
+            # - a list of agent objects -> multiple agents found
+            # Also see for state usage:
+            # https://github.com/matrx-software/matrx/blob/master/matrx/cases/bw4t/bw4t_agents.py
+            agents = state[{"isAgent": True}]
 
-            if obj_id is "World":  # Skip the world properties
-                continue
+            # If we found multiple agents, randomly select the ID of one of them or otherwise the ID of the only agent
+            to_id = self.rnd_gen.choice(agents)['obj_id'] if isinstance(agents, list) else agents['obj_id']
 
-            classes = obj['class_inheritance']
-            if AgentBrain.__name__ in classes:  # the object is an agent to which we can send our message
-                agents.append(obj)
-        selected_agent = self.rnd_gen.choice(agents)
-        message_content = f"Hello, my name is {self.agent_name}"
-        self.send_message(Message(content=message_content, from_id=self.agent_id, to_id=selected_agent['obj_id']))
-
+            self.send_message(Message(content=f"Hello, my name is (agent) {self.agent_name} and I sent this message at "
+                                              f"tick {state['World']['nr_ticks']}",
+                                      from_id=self.agent_id,
+                                      to_id=to_id))
         # Select a random action
         if self.action_set:
             action = self.rnd_gen.choice(self.action_set)
@@ -340,7 +344,7 @@ class AgentBrain:
 
         Parameters
         ----------
-        message: Message
+        message : Message
             A message object that needs to be send. Should be of type Message. It's to_id can contain a single
             recipient, a list of recipients or None. If None, it is send to all other agents.
 

@@ -221,3 +221,34 @@ h5 {
 .matrx_object_busy {
     position: absolute;
 }
+
+.matrx_core_version {
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    font-size: 0.8em;
+}
+
+.disconnected_notification {
+    position:absolute;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+    top: 10px;
+    color: red;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.disconnected_notification span {
+    font-size: 1rem;
+}
+
+/* subtile + context menu bug fix. Subtile objects only block when exactly on top of eachother. */
+.object {
+    pointer-events: none;
+}
+
+.shape {
+    pointer-events: auto;
+}

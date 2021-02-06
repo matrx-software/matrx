@@ -2,6 +2,7 @@ from matrx.logger.logger import GridWorldLogger
 
 
 class LogIdleAgents(GridWorldLogger):
+    """ Logs the number of idle agents per tick """
 
     def __init__(self, log_strategy=1, save_path="", file_name_prefix="", file_extension=".csv", delimeter=";"):
         super().__init__(log_strategy=log_strategy, save_path=save_path, file_name=file_name_prefix,

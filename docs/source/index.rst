@@ -11,7 +11,7 @@
    :width: 150%
 
 MATRX documentation
-======================
+======================================
 
 Welcome! This is the class and function reference documentation for the huMan-Agent Teaming; Rapid eXperimentation Software (MATRX).
 
@@ -26,8 +26,9 @@ After having installed MATRX (|matrx_install_guide|) and having tried out one or
     <a href="https://matrx-software.com/tutorials/" target="_blank">MATRX website</a>
 
 .. _Reference by Category:
+
 Reference by Category
-================================
+================================================================
 .. The image ratio is: width: 350px; height: 350/4 + (2x5) ~= 98px
 .. toctree::
    :maxdepth: 2
@@ -40,8 +41,9 @@ Reference by Category
    sections/objects.rst
    sections/simgoals.rst
    sections/api.rst
-   sections/scenarios.rst
-   sections/utils.rst
+   sections/cases.rst
+   sections/logging.rst
+   sections/messages.rst
 
 
 

@@ -351,9 +351,9 @@ class CollectionGoal(WorldGoal):
 
         See Also
         --------
-        :any:`~matrx.WorldBuilder.add_collection_goal`
+        :meth:`matrx.world_builder.WorldBuilder.add_collection_goal`
             The method that receives this return value.
-        :any:`~matrx.WorldBuilder.RandomProperty`
+        :class:`matrx.world_builder.RandomProperty`
             The class representing a property with a random value each world creation.
 
         """

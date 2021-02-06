@@ -1,8 +1,11 @@
 import os
 
 from matrx.agents import PatrollingAgentBrain, HumanAgentBrain
+from matrx.logger.log_messages import MessageLogger
 from matrx.world_builder import WorldBuilder
 from matrx.actions import *
+from datetime import datetime
+
 
 
 def create_builder():
@@ -65,6 +68,12 @@ def create_builder():
     factory.add_object([6,7], "block", subtiles=[3,3], subtile_loc=[2,1], is_traversable=True, visualize_colour="#e67e22", visualize_shape=1)
     factory.add_object([6,7], "block", subtiles=[3,3], subtile_loc=[2,2], is_traversable=True, visualize_colour="#2e4053", visualize_shape=0)
 
+    # create some folders for logging
+    timestamp = str(datetime.today().strftime("%d-%m-%Y_%H-%M"))
+    log_folder = os.path.join("Results", "logs_" + timestamp)
+
+    # add loggers
+    factory.add_logger(MessageLogger, save_path=log_folder, file_name_prefix="messages_")
 
     return factory
 
@@ -78,6 +87,7 @@ def run_vis_test(nr_of_worlds=2):
 
     # run each world
     for world in builder.worlds(nr_of_worlds=nr_of_worlds):
+        # builder.api_info['matrx_paused'] = False
         world.run(builder.api_info)
 
     # stop MATRX scripts such as the api and visualizer (if used)

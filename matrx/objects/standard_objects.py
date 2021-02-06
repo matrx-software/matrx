@@ -10,9 +10,9 @@ class SquareBlock(EnvObject):
 
     Parameters
     ----------
-    location: tuple
+    location : tuple
         Location of door.
-    name: string. Optional, default "Block"
+    name : string. Optional, default "Block"
         Name of block, defaults to "Block"
     **custom_properties:
         Additional properties that should be added to the object.
@@ -34,13 +34,13 @@ class Door(EnvObject):
 
     Parameters
     ----------
-    location: tuple
+    location : tuple
         Location of door.
-    name: string. Optional, default "Door"
+    name : string. Optional, default "Door"
         Name of object, defaults to "Door"
-    open_colour: string. Optional, default "#006400"
+    open_colour : string. Optional, default "#006400"
         Colour when open
-    closed_colour: string. Optional, default "#640000"
+    closed_colour : string. Optional, default "#640000"
         Colour when closed
     **kwargs:
         Dict of additional properties that should be added to the object as well.
@@ -99,9 +99,9 @@ class Wall(EnvObject):
 
     Parameters
     ----------
-    location: tuple
+    location : tuple
         The location of the wall.
-    name: string. Optional, default "Wall"
+    name : string. Optional, default "Wall"
         The name, default "Wall".
     """
     def __init__(self, location, name="Wall", visualize_colour="#000000", **kwargs):
@@ -119,17 +119,17 @@ class AreaTile(EnvObject):
 
     Parameters
     ----------
-    location: tuple
+    location : tuple
         The location of the area.
-    name: string. Optional, default "AreaTile"
+    name : string. Optional, default "AreaTile"
         The name, default "AreaTile".
-    visualize_colour: string. Optional, default is "#b7b7b7"
+    visualize_colour : string. Optional, default is "#b7b7b7"
         hex colour code for tile. default is grey.
-    visualize_opacity: float. Optional, default 0.8.
+    visualize_opacity : float. Optional, default 0.8.
         Opacity of the object. By default 0.8
-    visualize_depth: int. Optional, default=101
+    visualize_depth : int. Optional, default=101
         depth of visualization. By default 101: just above agent and other objects Higher means higher priority.
-    **kwargs: Optional.
+    **kwargs : Optional.
         Set of additional properties that should be added to the object as well.
     """
     def __init__(self, location, name="AreaTile", visualize_colour="#8ca58c", visualize_depth=None,
@@ -147,15 +147,15 @@ class SmokeTile(AreaTile):
 
     Parameters
     ----------
-    location: tuple
+    location : tuple
         The location of the area.
-    name: String. Optiona, default:"SmokeTile"
+    name : String. Optional,default:"SmokeTile"
         The name, default "SmokeTile".
-    visualize_colour: string. Optional, default is "#b7b7b7"
+    visualize_colour : string. Optional, default is "#b7b7b7"
         hex colour code for tile. default is grey.
-    visualize_opacity: float. Optional, default 0.8.
+    visualize_opacity : float. Optional, default 0.8.
         Opacity of the object. By default 0.8
-    visualize_depth: int. Optional, default=101
+    visualize_depth : int. Optional, default=101
         depth of visualization. By default 101: just above agent and other objects Higher means higher priority.
     """
     def __init__(self, location, name="SmokeTile", visualize_colour="#b7b7b7", visualize_opacity=0.8,
@@ -180,7 +180,7 @@ class Battery(EnvObject):
 
     Parameters
     ----------
-    location: list
+    location : list
         The location of the battery.
     name: String (optional).
         Defaults to 'Battery'.
@@ -240,7 +240,7 @@ class Battery(EnvObject):
 class CollectionTarget(EnvObject):
     """ An invisible object that tells which objects needs collection.
 
-    This invisible object is linked to `CollectionDropTile` object(s) and is used by the `CollectionGoal` to
+    This invisible object is linked to `CollectionDropOffTile` object(s) and is used by the `CollectionGoal` to
     identify which objects should be collected and dropped off at the tiles. This object is just a regular object
     but contains three additional properties:
     - collection_objects: See parameter doc.
@@ -262,7 +262,7 @@ class CollectionTarget(EnvObject):
         order of the list matters iff the `CollectionGoal.in_order==True`, in which case the
         `CollectionGoal` will track if the dropped objects at this tile are indeed dropped in the order of the list.
     collection_zone_name : str
-        This is the name that links `CollectionDropTile` object(s) to this object. The `CollectionGoal` will check
+        This is the name that links `CollectionDropOffTile` object(s) to this object. The `CollectionGoal` will check
         all of these tiles with this name to check if all objects are already dropped and collected.
     name : str (default is "Collection_target")
         The name of this object.
@@ -270,16 +270,16 @@ class CollectionTarget(EnvObject):
     Notes
     -----
     It does not matter where this object is added in the world. However, it is good practice to add it on top of
-    the (or one of them) `CollectionDropTile` object(s). The helper method to create collection areas
+    the (or one of them) `CollectionDropOffTile` object(s). The helper method to create collection areas
     `WorldBuilder.add_collection_goal` follows this practice.
 
     See Also
     --------
-    matrx.WorldBuilder.add_collection_goal
+    matrx.world_builder.WorldBuilder.add_collection_goal
             The handy method in the `WorldBuilder` to add a collection goal to the world and required object(s).
-    matrx.goals.CollectionGoal
+    matrx.goals.goals.CollectionGoal
         The `CollectionGoal` that performs the logic of check that all object(s) are dropped at the drop off tiles.
-    matrx.objects.CollectionDropTile
+    matrx.objects.standard_objects.CollectionDropOffTile
         The tile that represents the location(s) where the object(s) need to be dropped.
     """
     def __init__(self, location, collection_objects, collection_zone_name, name="Collection_target"):
@@ -303,7 +303,7 @@ class CollectionDropOffTile(AreaTile):
         The location of this tile.
     name : str (default is "Collection_zone")
         The name of this tile.
-    collection_area_name: str (default is "Collection_zone")
+    collection_area_name : str (default is "Collection_zone")
         The name of the collection zone this collection tile belongs to. It is used by the respective CollectionGoal
         to identify where certain objects should be dropped.
     visualize_colour : String (default is "#64a064", a pale green)
@@ -313,11 +313,11 @@ class CollectionDropOffTile(AreaTile):
 
     See also
     --------
-    matrx.WorldBuilder.add_collection_goal
+    matrx.world_builder.WorldBuilder.add_collection_goal
             The handy method in the `WorldBuilder` to add a collection goal to the world and required object(s).
-    matrx.goals.CollectionGoal
+    matrx.goals.goals.CollectionGoal
         The `CollectionGoal` that performs the logic of check that all object(s) are dropped at the drop off tiles.
-    matrx.objects.CollectionTarget
+    matrx.objects.standard_objects.CollectionTarget
         The invisible object representing which object(s) need to be collected and (if needed) in which order.
     """
     def __init__(self, location, name="Collection_zone", collection_area_name="Collection zone",

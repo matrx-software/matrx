@@ -611,3 +611,14 @@ html {
         left: unset;
     }
 }
+
+/* Space between parameter name and type */
+.section dt span.classifier {
+    margin-left: 5px;
+    border-left: 2px solid grey;
+    padding-left: 5px;
+}
+
+.rst-content dl:not(.docutils) dt:first-child {
+    margin-top: 6px;
+}

@@ -1,8 +1,8 @@
 .. _Reference:
 
-================
+================================
 Reference by category
-================
+================================
 
 .. The image ratio is: width: 350px; height: 350/4 + (2x5) ~= 98px
 .. toctree::

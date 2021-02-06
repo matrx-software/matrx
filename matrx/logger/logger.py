@@ -4,6 +4,7 @@ import os
 
 
 class GridWorldLogger:
+    """ Base logger class for any MATRX Gridworld logger """
     LOG_ON_LAST_TICK = "log_last_tick"
     LOG_ON_FIRST_TICK = "log_first_tick"
     LOG_ON_GOAL_REACHED = "log_on_reached_goal"

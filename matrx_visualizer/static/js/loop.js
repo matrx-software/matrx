@@ -18,7 +18,8 @@ var lv_tick_duration = 0.5,
     lv_current_tick = 0,
     lv_grid_size_loop = [1, 1],
     lv_open_update_request = false, // whether a new request to MATRX is pending right now
-    lv_first_tick = true;
+    lv_first_tick = true,
+    lv_matrx_version = null;
 
 // save the timestamp of our first tick, which we use to match the clock of MATRX and the visualizer
 var lv_world_ID = null, // ID of the world we received when initializing
@@ -38,7 +39,7 @@ var lv_tps = 1, // placeholder value
 // MATRX API urls
 var lv_base_url = window.location.hostname,
     lv_init_url = 'http://' + lv_base_url + ':3001/get_info',
-    lv_update_url = 'http://' + lv_base_url + ':3001/get_latest_state_and_messages/',
+    lv_update_url = 'http://' + lv_base_url + ':3001/get_latest_state_and_messages',
     lv_send_userinput_url = 'http://' + lv_base_url + ':3001/send_userinput/',
     lv_agent_id = "",
     lv_agent_type = null;
@@ -163,6 +164,8 @@ function parse_initial_state(data) {
     lv_wait_for_next_tick = 0;
     lv_tps = Math.floor(1.0 / lv_tick_duration); // calc ticks per second
     lv_matrx_paused = data.matrx_paused;
+    lv_matrx_version = data.matrx_version;
+    console.log("matrx core version:", lv_matrx_version);
 }
 
 
@@ -278,6 +281,11 @@ function get_MATRX_update() {
             //        console.log("Received update request:", lv_update_request);
             lv_messages = data.messages;
             lv_chatrooms = data.chatrooms;
+
+            // view is disconnected
+            if (!Object.keys(data['states'][data['states'].length - 1]).includes(lv_agent_id)){
+                $("body").append(`<div class="disconnected_notification">View Disconnected - <span>Agent doesn't exist (anymore)</span></div>`)
+            }
 
             // decode lv_state and other info from the request
             lv_state = data['states'][data['states'].length - 1][lv_agent_id]['state'];

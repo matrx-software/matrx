@@ -256,7 +256,11 @@ class State(MutableMapping):
         return self.get_with_property({"room_name": room_name}, combined=False)
 
     def get_all_room_names(self):
-        return list({obj['room_name'] for obj in self.get_with_property("room_name", combined=False)})
+        rooms = self.get_with_property("room_name", combined=False)
+        if rooms is None:
+            return []
+        else:
+            return list({obj['room_name'] for obj in rooms})
 
     def get_room_objects(self, room_name):
         # Locate method to identify room content

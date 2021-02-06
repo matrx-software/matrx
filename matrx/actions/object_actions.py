@@ -22,9 +22,17 @@ class RemoveObject(Action):
 
         The default duration of this action in ticks during which the
         :class:`matrx.grid_world.GridWorld` blocks the agent performing other
-        actions. By default this is 1, meaning that this action will take both
-        the tick in which it was decided upon and the subsequent tick.
+        actions. By default this is 1, meaning that all actions of this type will take
+        both the tick in which it was decided upon and the subsequent tick.
+        When the agent is blocked / busy with an action, only the
+        :meth:`matrx.agents.agent_brain.AgentBrain.filter_observations` method is called for that agent, and the
+        :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method is skipped.
+        This means that agents that are busy with an action can only perceive the world but not decide on
+        a new action untill the action has completed.
 
+        An agent can overwrite the duration of an action by returning the ``action_duration`` in the ``action_kwargs``
+        in the :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method, as so:
+        ``return >action_name<, {'action_duration': >ticks<}``
     """
 
     def __init__(self, duration_in_ticks=0):
@@ -146,6 +154,15 @@ class RemoveObject(Action):
         if len(objects_in_range) == 0:  # if there are no objects in infinite range besides ourselves, we return fail
             return RemoveObjectResult(RemoveObjectResult.NO_OBJECTS_IN_RANGE.replace('remove_range'.upper(),
                                                                                      str(remove_range)), False)
+        # need an object id to remove an object
+        if 'object_id' not in kwargs:
+            return RemoveObjectResult(RemoveObjectResult.REMOVAL_FAILED.replace('object_id'.upper(),
+                                                                                str(None)), False)
+        # check if the object is actually within removal range
+        object_id = kwargs['object_id']
+        if object_id not in objects_in_range:
+            return RemoveObjectResult(RemoveObjectResult.REMOVAL_FAILED.replace('object_id'.upper(),
+                                                                                str(object_id)), False)
 
         # otherwise some instance of RemoveObject is possible, although we do not know yet IF the intended removal is
         # possible.
@@ -206,12 +223,21 @@ class GrabObject(Action):
     Parameters
     ----------
     duration_in_ticks : int
-        Optional. Default: ``1``
+        Optional, default: ``1``. Should be zero or larger.
 
-        The default duration of the action in ticks during which the
+        The default duration of this action in ticks during which the
         :class:`matrx.grid_world.GridWorld` blocks the agent performing other
-        actions. By default this is 1, meaning that the action will take both
-        the tick in which it was decided upon and the subsequent tick.
+        actions. By default this is 1, meaning that all actions of this type will take
+        both the tick in which it was decided upon and the subsequent tick.
+        When the agent is blocked / busy with an action, only the
+        :meth:`matrx.agents.agent_brain.AgentBrain.filter_observations` method is called for that agent, and the
+        :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method is skipped.
+        This means that agents that are busy with an action can only perceive the world but not decide on
+        a new action untill the action has completed.
+
+        An agent can overwrite the duration of an action by returning the ``action_duration`` in the ``action_kwargs``
+        in the :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method, as so:
+        ``return >action_name<, {'action_duration': >ticks<}``
 
     Notes
     -----
@@ -235,7 +261,7 @@ class GrabObject(Action):
         agent_id: str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id: str
+        object_id : str
             Optional. Default: ``None``
 
             The string representing the unique identifier of the
@@ -285,10 +311,10 @@ class GrabObject(Action):
         grid_world : GridWorld
             The :class:`matrx.grid_world.GridWorld` instance in which the
             object is sought according to the `object_id` parameter.
-        agent_id: str
+        agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id: str
+        object_id : str
             Optional. Default: ``None``
 
             The string representing the unique identifier of the
@@ -370,11 +396,11 @@ class GrabObjectResult(ActionResult):
 
     Parameters
     ----------
-    result: str
+    result : str
         A string representing the reason for a
         :class:`matrx.actions.object_actions.GrabObjectAction` (expected)
         success or fail.
-    succeeded: bool
+    succeeded : bool
         A boolean representing the (expected) success or fail of a
         :class:`matrx.actions.object_actions.GrabObjectAction`.
 
@@ -428,12 +454,21 @@ class DropObject(Action):
         Parameters
         ----------
         duration_in_ticks : int
-            Optional. Default: ``1``. Should be zero or larger.
+            Optional, default: ``1``. Should be zero or larger.
 
-            The default duration of the action in ticks during which the
+            The default duration of this action in ticks during which the
             :class:`matrx.grid_world.GridWorld` blocks the agent performing other
-            actions. By default this is 1, meaning that the action will take both
-            the tick in which it was decided upon and the subsequent tick.
+            actions. By default this is 1, meaning that all actions of this type will take
+            both the tick in which it was decided upon and the subsequent tick.
+            When the agent is blocked / busy with an action, only the
+            :meth:`matrx.agents.agent_brain.AgentBrain.filter_observations` method is called for that agent, and the
+            :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method is skipped.
+            This means that agents that are busy with an action can only perceive the world but not decide on
+            a new action untill the action has completed.
+
+            An agent can overwrite the duration of an action by returning the ``action_duration`` in the ``action_kwargs``
+            in the :meth:`matrx.agents.agent_brain.AgentBrain.decide_on_action` method, as so:
+            ``return >action_name<, {'action_duration': >ticks<}``
 
         Notes
         -----
@@ -454,10 +489,10 @@ class DropObject(Action):
         grid_world : GridWorld
             The :class:`matrx.grid_world.GridWorld` instance in which the
             :class:`matrx.objects.env_object.EnvObject` is dropped.
-        agent_id: str
+        agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id: str
+        object_id : str
             Optional. Default: ``None``
 
             The string representing the unique identifier of the
@@ -503,10 +538,10 @@ class DropObject(Action):
         grid_world : GridWorld
             The :class:`matrx.grid_world.GridWorld` instance in which the
             :class:`matrx.objects.env_object.EnvObject` is dropped.
-        agent_id: str
+        agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id: str
+        object_id : str
             Optional. Default: ``None``
 
             The string representing the unique identifier of the
@@ -595,10 +630,10 @@ class DropObjectResult(ActionResult):
 
     Parameters
     ----------
-    result: str
+    result : str
         A string representing the reason for the (expected) success or fail of
         an :class:`matrx.actions.object_actions.DropObjectAction`.
-    succeeded: bool
+    succeeded : bool
         A boolean representing the (expected) success or fail of a
         :class:`matrx.actions.object_actions.DropObjectAction`.
 
@@ -646,10 +681,10 @@ def _is_possible_grab(grid_world, agent_id, object_id, grab_range, max_objects):
     grid_world : GridWorld
         The :class:`matrx.grid_world.GridWorld` instance in which the
         object is sought according to the `object_id` parameter.
-    agent_id: str
+    agent_id : str
         The string representing the unique identified that represents the
          agent performing this action.
-    object_id: str
+    object_id : str
         Optional. Default: ``None``
 
         The string representing the unique identifier of the

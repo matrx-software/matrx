@@ -341,6 +341,9 @@ function parse_world_settings(world_settings) {
         }
         populate_god_agent_menu = true;
         pop_new_chat_dropdown = true;
+
+        // add MATRX version to screen on the bottom right
+        $("body").append(`<div class="matrx_core_version">MATRX Core version: ${lv_matrx_version}</div>`)
     }
     world_ID = world_settings['world_ID'];
 
