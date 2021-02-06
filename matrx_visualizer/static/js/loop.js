@@ -282,6 +282,11 @@ function get_MATRX_update() {
             lv_messages = data.messages;
             lv_chatrooms = data.chatrooms;
 
+            // view is disconnected
+            if (!Object.keys(data['states'][data['states'].length - 1]).includes(lv_agent_id)){
+                $("body").append(`<div class="disconnected_notification">View Disconnected - <span>Agent doesn't exist (anymore)</span></div>`)
+            }
+
             // decode lv_state and other info from the request
             lv_state = data['states'][data['states'].length - 1][lv_agent_id]['state'];
             var lv_new_tick = lv_state['World']['nr_ticks'];

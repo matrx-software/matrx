@@ -3,6 +3,7 @@ var matrx_url = 'http://' + window.location.hostname,
     port = "3001",
     matrx_send_message_url = "send_message";
 
+var chat_blocked = true;
 
 /*********************************************************************
  * Simulation control buttons in toolbar (start/pause etc.)
@@ -378,6 +379,12 @@ function open_chatroom(chatroom_display_name, chatroom_ID, chatroom_type) {
     // cleanup arguments
     if (chatroom_type == null) {
         chatroom_type = "global";
+    }
+
+    if (chat_blocked) {
+        document.getElementById("chat_form_input").placeholder = "Type a message..";
+        document.getElementById("chat_form_submit").disabled = false;
+        chat_blocked = false;
     }
 
     // set the chat room as selected

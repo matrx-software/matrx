@@ -2422,7 +2422,7 @@ class WorldBuilder:
         if self.run_matrx_api:
             if self.verbose:
                 print("Shutting down Matrx api")
-            _ = requests.get("http://localhost:" + str(api.port)
+            _ = requests.get("http://localhost:" + str(api._port)
                              + "/shutdown_API")
             self.api_info["api_thread"].join()
 
