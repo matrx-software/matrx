@@ -40,7 +40,6 @@ _matrx_paused = False
 _matrx_done = False
 
 
-
 """ The MATRX RESTful API that connects external scripts or visualizers to MATRX core. 
 
 Requests should be sent to >MATRX_server_IP<:3001. 
@@ -51,11 +50,12 @@ For visualization, see the seperate MATRX visualization folder / package.
 #########################################################################
 # api connection methods
 #########################################################################
-
-
+@__app.route('/get_info/', methods=['GET', 'POST'])
 @__app.route('/get_info', methods=['GET', 'POST'])
 def get_info():
     """ Provides the general information on the world, contained in the world object.
+
+    API Path: ``http://>MATRX_core_ip<:3001/get_info``
 
     Returns
         MATRX world object, containing general information on the world and scenario.
@@ -64,11 +64,13 @@ def get_info():
     _MATRX_info['matrx_paused'] = _matrx_paused
     return jsonify(_MATRX_info)
 
-
 @__app.route('/get_latest_state_and_messages/', methods=['GET', 'POST'])
+@__app.route('/get_latest_state_and_messages', methods=['GET', 'POST'])
 def get_latest_state_and_messages():
     """ Provides all most recent information from MATRX for 1 agent: The state from the latest tick, and any new
     messages and chatrooms.
+
+    API Path: ``http://>MATRX_core_ip<:3001/get_latest_state_and_messages``
 
     Parameters should be passed via GET URL parameters.
 
@@ -139,9 +141,12 @@ def get_latest_state_and_messages():
 # MATRX fetch state api calls
 #########################################################################
 
+@__app.route('/get_states/<tick>/', methods=['GET', 'POST'])
 @__app.route('/get_states/<tick>', methods=['GET', 'POST'])
 def get_states(tick):
     """ Provides the states of all agents (including the god view) from tick `tick` onwards to current tick.
+
+    API Path: ``http://>MATRX_core_ip<:3001/get_states/<tick>``
 
     Parameters
     ----------
@@ -167,9 +172,12 @@ def get_states(tick):
     return jsonify(__fetch_states(tick))
 
 
+@__app.route('/get_states/<tick>/<agent_ids>/', methods=['GET', 'POST'])
 @__app.route('/get_states/<tick>/<agent_ids>', methods=['GET', 'POST'])
 def get_states_specific_agents(tick, agent_ids):
     """ Provides the states starting from tick `tick` to current_tick, for the agents specified in `agent_ids`.
+
+    API Path: ``http://>MATRX_core_ip<:3001/get_states/<tick>/<agent_ids>``
 
     Parameters
     ----------
@@ -193,9 +201,12 @@ def get_states_specific_agents(tick, agent_ids):
     return jsonify(__fetch_states(tick, agent_ids))
 
 
+@__app.route('/get_latest_state/<agent_ids>/', methods=['GET', 'POST'])
 @__app.route('/get_latest_state/<agent_ids>', methods=['GET', 'POST'])
 def get_latest_state(agent_ids):
     """ Provides the latest state of one or multiple agents
+
+    API Path: ``http://>MATRX_core_ip<:3001/get_latest_state/<agent_ids>``
 
     Parameters
     ----------
@@ -212,6 +223,7 @@ def get_latest_state(agent_ids):
     return get_states_specific_agents(_current_tick, agent_ids)
 
 
+@__app.route('/get_filtered_latest_state/<agent_ids>/', methods=['POST'])
 @__app.route('/get_filtered_latest_state/<agent_ids>', methods=['POST'])
 def get_filtered_latest_state(agent_ids):
     """ Return a state for a set of agent IDs, filtered to only return the specified properties
@@ -246,11 +258,14 @@ def get_filtered_latest_state(agent_ids):
 # MATRX fetch messages api calls
 #########################################################################
 @__app.route('/get_messages/', methods=['GET', 'POST'])
+@__app.route('/get_messages', methods=['GET', 'POST'])
 def get_messages_apicall():
     """ Returns chatrooms and chat messages for one agent, or all agents.
 
     Per chatroom, an offset can be passed from which will only return messages with a higher index than that
      offset.
+
+    API Path: ``http://>MATRX_core_ip<:3001/get_messages/``
 
     Parameters should be passed via GET URL parameters.
 
@@ -331,9 +346,12 @@ def __get_messages(agent_id, chat_offsets):
 # MATRX user input api calls
 #########################################################################
 
+@__app.route('/send_userinput/<agent_ids>/', methods=['POST'])
 @__app.route('/send_userinput/<agent_ids>', methods=['POST'])
 def send_userinput(agent_ids):
     """ Can be used to send user input from the user (pressed keys) to the specified human agent(s) in MATRX
+
+    API Path: ``http://>MATRX_core_ip<:3001/send_userinput/<agent_ids>``
 
     Parameters
     ----------
@@ -376,11 +394,14 @@ def send_userinput(agent_ids):
     return jsonify(True)
 
 
+@__app.route('/send_message/', methods=['POST'])
 @__app.route('/send_message', methods=['POST'])
 def send_message():
     """ Send a message containing information to one or multiple specific agent, the agent's team, or all agents.
 
     Message as defined in matrx.utils.message
+
+    API Path: ``http://>MATRX_core_ip<:3001/send_message``
 
     Returns
     -------
@@ -412,9 +433,12 @@ def send_message():
 #########################################################################
 # MATRX context menu API calls
 #########################################################################
+@__app.route('/fetch_context_menu_of_self/', methods=['POST'])
 @__app.route('/fetch_context_menu_of_self', methods=['POST'])
 def fetch_context_menu_of_self():
     """ Fetch the context menu opened for a specific object/location of the agent being controlled by the user.
+
+        API Path: ``http://>MATRX_core_ip<:3001/fetch_context_menu_of_self``
     """
     # fetch the data
     data = request.json
@@ -456,9 +480,12 @@ def fetch_context_menu_of_self():
     return jsonify(context_menu)
 
 
+@__app.route('/fetch_context_menu_of_other/', methods=['POST'])
 @__app.route('/fetch_context_menu_of_other', methods=['POST'])
 def fetch_context_menu_of_other():
     """ Fetch the context menu opened for a specific object/location of the agent being controlled by the user.
+
+        API Path: ``http://>MATRX_core_ip<:3001/fetch_context_menu_of_other``
     """
     # fetch the data
     data = request.json
@@ -497,6 +524,7 @@ def fetch_context_menu_of_other():
     return jsonify(context_menu)
 
 
+@__app.route('/send_message_pickled/', methods=['POST'])
 @__app.route('/send_message_pickled', methods=['POST'])
 def send_message_pickled():
     """ This function makes it possible to send a custom message to a MATRX agent via the API as a jsonpickle object.
@@ -504,7 +532,7 @@ def send_message_pickled():
     The pre-formatted CustomMessage instance can be jsonpickled and sent via the API.
     This API call can handle that request and send the CustomMessage to the MATRX agent
 
-    Url: ``/send_message_pickled``
+    API Path: ``http://>MATRX_core_ip<:3001/send_message_pickled``
 
     Returns
     -------
@@ -535,12 +563,12 @@ def send_message_pickled():
 # MATRX control api calls
 #########################################################################
 
-
+@__app.route('/pause/', methods=['GET', 'POST'])
 @__app.route('/pause', methods=['GET', 'POST'])
 def pause_MATRX():
     """ Pause the MATRX simulation
 
-    Url: ``/pause``
+    API Path: ``http://>MATRX_core_ip<:3001/pause``
 
     Returns
         True if paused, False if already paused
@@ -554,11 +582,12 @@ def pause_MATRX():
         return jsonify(False)
 
 
+@__app.route('/start/', methods=['GET', 'POST'])
 @__app.route('/start', methods=['GET', 'POST'])
 def start_MATRX():
     """ Starts / unpauses the MATRX simulation
 
-    Url: ``/start``
+    API Path: ``http://>MATRX_core_ip<:3001/start``
 
     Returns
         True if it has been started, False if it is already running
@@ -573,11 +602,12 @@ def start_MATRX():
         return jsonify(False)
 
 
+@__app.route('/stop/', methods=['GET', 'POST'])
 @__app.route('/stop', methods=['GET', 'POST'])
 def stop_MATRX():
     """ Stops MATRX scenario
 
-    Url: ``/stop``
+    API Path: ``http://>MATRX_core_ip<:3001/stop``
 
     Returns
         True
@@ -588,16 +618,17 @@ def stop_MATRX():
     return jsonify(True)
 
 
+@__app.route('/change_tick_duration/<tick_dur>/', methods=['GET', 'POST'])
 @__app.route('/change_tick_duration/<tick_dur>', methods=['GET', 'POST'])
 def change_MATRX_speed(tick_dur):
     """ Change the tick duration / simulation speed of MATRX
 
-    Url: ``/change_tick_duration/<tick_dur>``
+    API Path: ``http://>MATRX_core_ip<:3001/change_tick_duration/<tick_dur>``
 
     Parameters
     ----------
     tick_dur
-        The duration of 1 tick
+        The duration of 1 tick in seconds
 
     Returns
     -------
@@ -616,11 +647,12 @@ def change_MATRX_speed(tick_dur):
     return jsonify(True)
 
 
+@__app.route('/shutdown_API/', methods=['GET', 'POST'])
 @__app.route('/shutdown_API', methods=['GET', 'POST'])
 def shutdown():
     """ Shuts down the api by stopping the Flask thread
 
-    Url: ``/shutdown_API``
+    API Path: ``http://>MATRX_core_ip<:3001/shutdown_API``
 
     Returns
         True

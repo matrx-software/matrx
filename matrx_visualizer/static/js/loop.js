@@ -38,7 +38,7 @@ var lv_tps = 1, // placeholder value
 // MATRX API urls
 var lv_base_url = window.location.hostname,
     lv_init_url = 'http://' + lv_base_url + ':3001/get_info',
-    lv_update_url = 'http://' + lv_base_url + ':3001/get_latest_state_and_messages/',
+    lv_update_url = 'http://' + lv_base_url + ':3001/get_latest_state_and_messages',
     lv_send_userinput_url = 'http://' + lv_base_url + ':3001/send_userinput/',
     lv_agent_id = "",
     lv_agent_type = null;
