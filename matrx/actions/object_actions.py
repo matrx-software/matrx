@@ -154,6 +154,15 @@ class RemoveObject(Action):
         if len(objects_in_range) == 0:  # if there are no objects in infinite range besides ourselves, we return fail
             return RemoveObjectResult(RemoveObjectResult.NO_OBJECTS_IN_RANGE.replace('remove_range'.upper(),
                                                                                      str(remove_range)), False)
+        # need an object id to remove an object
+        if 'object_id' not in kwargs:
+            return RemoveObjectResult(RemoveObjectResult.REMOVAL_FAILED.replace('object_id'.upper(),
+                                                                                str(None)), False)
+        # check if the object is actually within removal range
+        object_id = kwargs['object_id']
+        if object_id not in objects_in_range:
+            return RemoveObjectResult(RemoveObjectResult.REMOVAL_FAILED.replace('object_id'.upper(),
+                                                                                str(object_id)), False)
 
         # otherwise some instance of RemoveObject is possible, although we do not know yet IF the intended removal is
         # possible.
