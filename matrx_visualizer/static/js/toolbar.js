@@ -381,7 +381,7 @@ function open_chatroom(chatroom_display_name, chatroom_ID, chatroom_type) {
         chatroom_type = "global";
     }
 
-    if (chat_blocked) {
+    if (chat_blocked && lv_agent_type == "human-agent") {
         document.getElementById("chat_form_input").placeholder = "Type a message..";
         document.getElementById("chat_form_submit").disabled = false;
         chat_blocked = false;
@@ -418,6 +418,10 @@ function open_chatroom(chatroom_display_name, chatroom_ID, chatroom_type) {
             add_message(chatroom_ID, message);
         });
     }
+
+    // scroll message container to bottom
+    scrollToBottom(document.getElementById("messages"));
+
 }
 
 /*
@@ -457,8 +461,10 @@ function add_message(chatroom_ID, mssg) {
     mssgs_container.appendChild(div);
 
     // scroll to the new message
-    scrollSmoothToBottom(mssgs_container)
+//    scrollSmoothToBottom(mssgs_container)
+    scrollToBottom(mssgs_container);
 }
+
 
 /**
  * Scroll smoothly to the end of a div
@@ -467,6 +473,13 @@ function scrollSmoothToBottom (div) {
    $(div).animate({
       scrollTop: div.scrollHeight - div.clientHeight
    }, 500);
+}
+
+/**
+ * Scroll directly to the end of a div
+ */
+function scrollToBottom (div) {
+   div.scrollTo(0, div.scrollHeight);
 }
 
 /*
