@@ -194,7 +194,7 @@ class GridWorld:
                 }
 
                 # start paused
-                api._matrx_paused = True if '_matrx_paused' not in api_info else api_info['_matrx_paused']
+                api.matrx_paused = True if 'matrx_paused' not in api_info else api_info['matrx_paused']
 
             # fetch the initial state of every agent to display
             self._fetch_initial_states()
@@ -235,7 +235,7 @@ class GridWorld:
         is_done = False
         while not is_done:
 
-            if self.__run_matrx_api and api._matrx_paused:
+            if self.__run_matrx_api and api.matrx_paused:
                 print("MATRX paused through api")
                 gevent.sleep(1)
             else:

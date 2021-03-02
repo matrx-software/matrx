@@ -38,7 +38,7 @@ _temp_state = {}
 
 # variables to be read (only!) by MATRX and set (only!) through api calls
 _userinput = {}
-_matrx_paused = False
+matrx_paused = False
 _matrx_done = False
 
 
@@ -63,7 +63,7 @@ def get_info():
         MATRX world object, containing general information on the world and scenario.
     -------
     """
-    _MATRX_info['matrx_paused'] = _matrx_paused
+    _MATRX_info['matrx_paused'] = matrx_paused
     _MATRX_info['matrx_version'] = _matrx_version
     return jsonify(_MATRX_info)
 
@@ -137,7 +137,7 @@ def get_latest_state_and_messages():
     states_ = __fetch_states(_current_tick, agent_id)
     chatrooms, messages = __get_messages(agent_id, chat_offsets)
 
-    return jsonify({"matrx_paused": _matrx_paused, "states": states_, "chatrooms": chatrooms, "messages": messages})
+    return jsonify({"matrx_paused": matrx_paused, "states": states_, "chatrooms": chatrooms, "messages": messages})
 
 
 #########################################################################
@@ -577,9 +577,9 @@ def pause_MATRX():
         True if paused, False if already paused
     -------
     """
-    global _matrx_paused
-    if not _matrx_paused:
-        _matrx_paused = True
+    global matrx_paused
+    if not matrx_paused:
+        matrx_paused = True
         return jsonify(True)
     else:
         return jsonify(False)
@@ -597,9 +597,9 @@ def start_MATRX():
     -------
 
     """
-    global _matrx_paused
-    if _matrx_paused:
-        _matrx_paused = False
+    global matrx_paused
+    if matrx_paused:
+        matrx_paused = False
         return jsonify(True)
     else:
         return jsonify(False)
@@ -776,7 +776,7 @@ def __check_states_API_request(tick=None, ids=None, ids_required=False):
         return False, error_message
 
     # Don't throw an error if MATRX is paused the first tick, and thus still has no states
-    # if _current_tick is 0 and _matrx_paused:
+    # if _current_tick is 0 and matrx_paused:
     #     return True, None
 
     # if this api call requires ids, check this variable on validity as well
@@ -1005,7 +1005,7 @@ def _add_state(agent_id, state, agent_inheritence_chain, world_settings):
     if 'World' not in state:
         state['World'] = world_settings
 
-    # state['World']['matrx_paused'] = _matrx_paused
+    # state['World']['matrx_paused'] = matrx_paused
 
     # reorder and save the new state along with some meta information
     _temp_state[agent_id] = {'state': __reorder_state(state), 'agent_inheritence_chain': agent_inheritence_chain}
@@ -1051,12 +1051,12 @@ def _pop_userinput(agent_id):
 
 def _reset_api():
     """ Reset the MATRX api variables """
-    global _temp_state, _userinput, _matrx_paused, _matrx_done, __states, _current_tick, tick_duration, _grid_size, \
+    global _temp_state, _userinput, matrx_paused, _matrx_done, __states, _current_tick, tick_duration, _grid_size, \
         _nr_states_to_store
     global _MATRX_info, _next_tick_info, _received_messages, __current_world_ID
     _temp_state = {}
     _userinput = {}
-    _matrx_paused = False
+    matrx_paused = False
     _matrx_done = False
     __states = {}
     _current_tick = 0
