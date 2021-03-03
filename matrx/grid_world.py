@@ -919,13 +919,13 @@ class GridWorld:
             # Apply world mutation
             result = action.mutate(self, agent_id, **action_kwargs)
 
-            # Get agent's send_result function
-            set_action_result = self.__registered_agents[agent_id].set_action_result_func
-            # Send result of mutation to agent
-            set_action_result(result)
-
             # Update the grid
             self.__update_agent_location(agent_id)
+
+        # Get agent's send_result function
+        set_action_result = self.__registered_agents[agent_id].set_action_result_func
+        # Send result of mutation to agent
+        set_action_result(result)
 
         # Whether the action succeeded or not, we return the result
         return result

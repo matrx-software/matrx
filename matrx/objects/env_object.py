@@ -76,7 +76,7 @@ class EnvObject:
         # Obtain a unique ID based on a global object counter, if not already set as an attribute in a super class
         # spaces are not allowed
         if not hasattr(self, "obj_id"):
-            self.obj_id = f"{self.obj_name}_{_next_obj_id()}".replace(" ", "_")
+            self.obj_id = _ensure_unique_obj_ID(f"{self.obj_name}".replace(" ", "_"))
 
             if "#" in self.obj_id:
                 warnings.warn("Note: # signs are not allowed as part of an agent or object ID, as it breaks the MATRX frontend. Any hashtags will be removed from the ID..")
@@ -268,16 +268,24 @@ class EnvObject:
         """
         pass
 
+added_obj_ids = []
 
-object_counter = 0
+def _ensure_unique_obj_ID(obj_id):
+    """ Make sure every obj ID is unique by adding an increasing count to objects with duplicate names.
+    Example: three objects named "drone". The object IDs will then become "drone", "drone_1", "drone_2", etc."""
+    if obj_id in added_obj_ids:
 
+        # found the next obj ID based on the obj name + count
+        i = 1
+        while f"{obj_id}_{i}" in added_obj_ids:
+            i += 1
 
-def _next_obj_id():
-    global object_counter
-    res = object_counter
-    object_counter += 1
-    return res
+        # warnings.warn(f"There already exists an object with name {obj_id}, new object ID is: {obj_id}_{i}")
+        obj_id = f"{obj_id}_{i}"
 
+    # keep track of all object IDs we added
+    added_obj_ids.append(obj_id)
+    return obj_id
 
 def _get_inheritence_path(callable_class):
     parents = callable_class.mro()
