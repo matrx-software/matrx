@@ -174,6 +174,8 @@ class WorldBuilder:
         self.object_settings = []
         # Set our logger place holders
         self.loggers = []
+        # object IDs of all objects added so far
+        self.added_obj_IDs = []
 
         # initialize an api variables
         self.run_matrx_api = run_matrx_api
@@ -2161,6 +2163,8 @@ class WorldBuilder:
         return locs
 
     def __create_world(self):
+        # names of objects currently added
+        added_names = []
 
         # Create the world
         world = self.__create_grid_world()
@@ -2293,6 +2297,8 @@ class WorldBuilder:
 
         env_object = callable_class(**args)
 
+        # make the ID unique if it is not
+
         return env_object
 
     def __create_agent_avatar(self, settings):
@@ -2337,6 +2343,7 @@ class WorldBuilder:
 
         # We return the agent and avatar (as we will complete the initialisation of the agent when we register it)
         return agent, avatar
+
 
     def __instantiate_random_properties(self, args):
         # Checks if all given arguments in the dictionary are not None, and if they are of RandomProperty or
