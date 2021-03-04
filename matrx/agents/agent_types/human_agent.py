@@ -228,7 +228,7 @@ class HumanAgentBrain(AgentBrain):
             actual performed and the agent can perform a new action (a value
             of 0 is no wait, 1 means to wait 1 tick, etc.).
         """
-
+        action = None
         action_kwargs = {}
 
         # send a random message once in a while
