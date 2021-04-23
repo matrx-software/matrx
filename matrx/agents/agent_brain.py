@@ -217,7 +217,7 @@ class AgentBrain:
         agents = []
         for obj_id, obj in state.items():
 
-            if obj_id is "World":  # Skip the world properties
+            if obj_id == "World":  # Skip the world properties
                 continue
 
             classes = obj['class_inheritance']

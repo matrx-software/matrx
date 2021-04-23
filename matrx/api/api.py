@@ -24,11 +24,12 @@ port = 3001
 
 # variables to be set by MATRX
 # states is a list of length 'current_tick' with a dictionary containing all states of that tick, indexed by agent_id
-states = []
+states = {}
 current_tick = 0
 tick_duration = 0.5
 grid_size = [1, 1]
 MATRX_info = {}
+nr_states_to_store = 5
 next_tick_info = {}
 add_message_to_agent = None
 received_messages = {}  # messages received via the api, intended for the Gridworld
@@ -741,7 +742,7 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
             # e.g. "god"), or a list of ' f'IDs(string) for requesting states of multiple agents'}
 
         # check if the api was reset during this time
-        if len(states) is 0:
+        if len(states) == 0:
             return False, {'error_code': 400,
                            'error_message': f'api is reconnecting to a new world'}
 
@@ -774,6 +775,12 @@ def check_input(tick=None, ids=None):
                            'error_message': f'Indicated tick does not exist, has to be in range 0 - {current_tick}, '
                                             f'but is {tick}'}
 
+        # check if the tick was stored
+        if tick not in states.keys():
+            return False, {'error_code': 400,
+                           'error_message': f'Indicated tick {tick} is not stored, only the {nr_states_to_store} ticks '
+                                            f'are stored that occurred before the current tick {current_tick}'}
+
     return True, None
 
 
@@ -794,11 +801,16 @@ def __fetch_states(tick, ids=None):
         specified in `agent_ids`, indexed by their agent ID.
 
     """
+    check_passed, error_message = check_input(tick)
+    if not check_passed:
+        return False, error_message
     tick = int(tick)
 
     # return all states
     if ids is None:
-        return states[tick:]
+        # Get the right states based on the tick and return them
+        return_states = [state for t, state in states.items() if t >= tick <= current_tick]
+        return return_states
 
     # convert ints to lists so we can use 1 uniform approach
     try:
@@ -898,7 +910,7 @@ def __reorder_state(state):
     # loop through all objects in the state
     for objID, obj in state.items():
 
-        if objID is not "World":
+        if objID != "World":
             # make the sense capability JSON serializable
             if "sense_capability" in obj:
                 new_state[objID]["sense_capability"] = str(obj["sense_capability"])
@@ -943,13 +955,22 @@ def next_tick():
     -------
     """
     # save the new general info
-    global MATRX_info, next_tick_info
+    global MATRX_info, next_tick_info, states, nr_states_to_store, current_tick, stored_state_ticks
     MATRX_info = copy.copy(next_tick_info)
     next_tick_info = {}
     # print("Next ticK:", MATRX_info);
 
     # publicize the states of the previous tick
-    states.append(copy.copy(temp_state))
+    states[current_tick] = copy.copy(temp_state)
+
+    # Limit the states stored
+    if len(states) > nr_states_to_store:
+        stored_ticks = list(states.keys())
+        forget_from = current_tick - nr_states_to_store
+        for tick in stored_ticks:
+            if tick <= forget_from:
+                states.pop(tick)
+        print(len(states))
 
 
 def pop_userinput(agent_id):
@@ -971,13 +992,14 @@ def pop_userinput(agent_id):
 
 def reset_api():
     """ Reset the MATRX api variables """
-    global temp_state, userinput, matrx_paused, matrx_done, states, current_tick, tick_duration, grid_size
+    global temp_state, userinput, matrx_paused, matrx_done, states, current_tick, tick_duration, grid_size, \
+        nr_states_to_store
     global MATRX_info, next_tick_info, received_messages, current_world_ID
     temp_state = {}
     userinput = {}
     matrx_paused = False
     matrx_done = False
-    states = []
+    states = {}
     current_tick = 0
     tick_duration = 0.0
     grid_size = [1, 1]
@@ -985,6 +1007,7 @@ def reset_api():
     next_tick_info = {}
     received_messages = {}
     current_world_ID = False
+    nr_states_to_store = 5
 
 
 def register_world(world_id):

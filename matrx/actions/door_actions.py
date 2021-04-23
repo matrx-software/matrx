@@ -369,7 +369,7 @@ def _is_possible_door_open_close(grid_world, agent_id, action_result, object_id=
     objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type=Door, sense_range=door_range)
 
     # there is no Door in range, so not possible to open any door
-    if len(objects_in_range) is 0:
+    if len(objects_in_range) == 0:
         return action_result(action_result.NO_DOORS_IN_RANGE, False)
 
     # if we did not get a specific door to open, we simply return success as it is possible to open an arbitrary door
