@@ -86,9 +86,15 @@ def get_latest_state_and_messages(agent_id):
     if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
+    
 
     # fetch states and messages
     states_ = __fetch_states(current_tick, agent_id)
+    if not states_[0]:
+        error = states_[1]
+        print("error in fetching state:", error)
+        return abort(error['error_code'], description=error['error_message'])
+
     messages = gw_message_manager.fetch_messages(current_tick, current_tick, clean_input_ids(agent_id)[0])
     chatrooms = gw_message_manager.fetch_chatrooms(clean_input_ids(agent_id)[0])
 
@@ -200,6 +206,7 @@ def get_filtered_latest_state(agent_ids):
     return jsonify(filtered_states)
 
 
+
 #########################################################################
 # MATRX fetch messages api calls
 #########################################################################
@@ -223,12 +230,13 @@ def get_messages(tick):
         :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_messages` and
         :func:`~matrx.utils.message_manager.MessageManager.MyClass.fetch_chatrooms` functions.
     """
-
     # check for validity and return an error if not valid
     api_call_valid, error = check_messages_API_request(tick=tick)
     if not api_call_valid:
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
+
+    
 
     messages = gw_message_manager.fetch_messages(int(tick), current_tick)
     chatrooms = gw_message_manager.fetch_chatrooms()
@@ -689,7 +697,7 @@ def check_messages_API_request(tick=None, agent_id=None):
 
     tick = current_tick if tick is None else tick
     # check user input, such as tick
-    check_passed, error_message = check_input(tick)
+    check_passed, error_message = check_input(tick, state_should_be_stored=False)
     if not check_passed:
         return False, error_message
 
@@ -760,7 +768,7 @@ def check_states_API_request(tick=None, ids=None, ids_required=False):
     return True, None
 
 
-def check_input(tick=None, ids=None):
+def check_input(tick=None, ids=None, state_should_be_stored=True):
     # check if tick is a valid format
     if tick is not None:
         try:
@@ -774,12 +782,12 @@ def check_input(tick=None, ids=None):
             return False, {'error_code': 400,
                            'error_message': f'Indicated tick does not exist, has to be in range 0 - {current_tick}, '
                                             f'but is {tick}'}
-
-        # check if the tick was stored
-        if tick not in states.keys():
-            return False, {'error_code': 400,
-                           'error_message': f'Indicated tick {tick} is not stored, only the {nr_states_to_store} ticks '
-                                            f'are stored that occurred before the current tick {current_tick}'}
+        if state_should_be_stored:
+            # check if the tick was stored
+            if tick not in states.keys():
+                return False, {'error_code': 400,
+                            'error_message': f'Indicated tick {tick} is not stored, only the {nr_states_to_store} ticks '
+                                                f'are stored that occurred before the current tick {current_tick}'}
 
     return True, None
 
@@ -970,7 +978,7 @@ def next_tick():
         for tick in stored_ticks:
             if tick <= forget_from:
                 states.pop(tick)
-        print(len(states))
+    
 
 
 def pop_userinput(agent_id):
