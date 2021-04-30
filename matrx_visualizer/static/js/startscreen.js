@@ -1,5 +1,5 @@
 var ss_base_url = window.location.hostname,
-    ss_update_url = 'http://' + ss_base_url + ':3001/get_latest_state';
+    ss_update_url = 'http://' + ss_base_url + ':3001/get_latest_state/';
 
 
 var ss_state = null,
