@@ -2255,51 +2255,42 @@ class WorldBuilder:
                     **custom_props}
 
         else:  # else we need to check what this object's constructor requires and obtain those properties only
-            # Get all variables required by constructor
+            
+            # get required arguments of this class             
             argspecs = inspect.getfullargspec(callable_class)
             args = argspecs.args  # does not give *args or **kwargs names
             def_args = argspecs.defaults  # defaults (if any) of the last n elements in args
             varkw = argspecs.varkw  # **kwargs names
 
-            # Now assign the default values to kwargs dictionary
+            # assign specified default values to any of the required arguments
             args = OrderedDict({arg: "not_set" for arg in reversed(args[1:])})
             if def_args is not None:
                 for idx, default in enumerate(reversed(def_args)):
                     k = list(args.keys())[idx]
                     args[k] = default
 
-            # Check if all arguments are present (fails if a required argument without a default value is not given)
+            # get arguments given by the user  
+            given_args = {**mandatory_props, **custom_props}          
+            
+            # make sure all required arguments are present
             for arg, default in args.items():
-                if arg not in custom_props.keys() and arg not in mandatory_props.keys() and default == "not_set":
+                if default == "not_set" and arg not in given_args.keys():
                     raise Exception(f"Cannot create environment object of type {callable_class.__name__} with name "
                                     f"{mandatory_props['name']}, as its constructor requires the argument named {arg} "
                                     f"which is not given as a property.")
-                elif arg in custom_props.keys() and custom_props[arg] is not None:
-                    # an argument is present in custom_props, which overrides constructor defaults
-                    args[arg] = custom_props[arg]
-                elif arg in mandatory_props.keys() and mandatory_props[arg] is not None:
-                    # an argument is present in mandatory_props, which overrides constructor defaults
-                    args[arg] = mandatory_props[arg]
 
-            # We provide a warning if some custom properties are given which are not used for this class
-            kwargs = [prop_name for prop_name in custom_props.keys() if prop_name not in args.keys()]
-            if varkw is None and len(kwargs) > 0:
-                warnings.warn(f"The following properties are not used in the creation of environment object of type "
-                              f"{callable_class.__name__} with name {mandatory_props['name']}; {kwargs}, because "
-                              f"the class does not have a **kwargs argument in the constructor.")
-
-            # if a **kwargs argument was defined in the object constructor, pass all custom properties to the object
-            elif varkw is not None and len(kwargs) > 0:
-                for arg in kwargs:
-                    args[arg] = custom_props[arg]
+            # combine the given arguments and any required arguments with defaults that were not specified by the user
+            for arg, val in given_args.items():
+                if val is not None:
+                    args[arg] = val
+                
 
         args = self.__instantiate_random_properties(args)
 
         env_object = callable_class(**args)
 
-        # make the ID unique if it is not
-
         return env_object
+
 
     def __create_agent_avatar(self, settings):
 
