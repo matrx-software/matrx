@@ -125,8 +125,8 @@ class AgentBrain:
         properties and objects the agent is actually supposed to see.
 
         Currently the world returns ALL properties of ALL objects within a
-        certain range(s), as specified by :
-        class:`matrx.agents.capabilities.capability.SenseCapability`. But
+        certain range(s), as specified by
+        :class:`matrx.agents.capabilities.capability.SenseCapability`. But
         perhaps some objects are obscured because they are behind walls and
         this agent is not supposed to look through walls, or an agent is not
         able to see some properties of certain objects (e.g. colour).
