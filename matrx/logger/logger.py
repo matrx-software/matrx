@@ -10,6 +10,37 @@ class GridWorldLogger:
     LOG_ON_GOAL_REACHED = "log_on_reached_goal"
 
     def __init__(self, log_strategy=1, save_path="/logs", file_name="", file_extension=".csv", delimiter=";"):
+        """ A class to log data during a running world.
+
+        Loggers are meant to collect, process and write data to files during a running world. They can be added through
+        the :func:`matrx.world_builder.WorldBuilder.add_logger` method. We refer to that method on how to add a logger
+        to your world.
+
+        Note that a world can have multiple loggers, each resulting in their own unique log file. So you have the
+        option to create a single large log file with a single logger, or segment the data in some way over different
+        files with multiple loggers. Another reason for more then one logger is a difference in logging strategy. For
+        instance to have a logger that logs only at the start or end of the world and a logger that logs at every tick.
+
+        Parameters
+        ----------
+        log_strategy : int, str (default: 1)
+            When an integer, the logger is called every that many ticks. When a string, should be
+            GridWorldLogger.LOG_ON_LAST_TICK, GridWorldLogger.LOG_ON_FIRST_TICK or GridWorldLogger.LOG_ON_GOAL_REACHED.
+            Respectively for only logging on the last tick of the world, the first tick of the world or every time a
+            goal is reached.
+        save_path : str (default: "/logs")
+            The default path were log files are stored. If the path does not exist, it is created. Otherwise log files
+            are added to that path. If multiple worlds are ran from the same builder, the directory will contain
+            sub-folders depicting the world's number (e.g., "world_1" for the first world, "world_2" for the second,
+            etc.).
+        file_name : str (default: "")
+            The file name prefix. Every log file is always appended by the timestamp (Y-m-d_H:M:S) and the file
+            extension. When an empty string, log file names will thus be only the timestamp.
+        file_extension : str (default: ".csv")
+            The file name extension to be used.
+        delimiter : str (default: ";")
+            The column delimiter to be used in the log files.
+        """
         self.__log_strategy = log_strategy
         self.__save_path = save_path
         self.__file_name_prefix = file_name
@@ -25,9 +56,47 @@ class GridWorldLogger:
         self.__prev_goal_status = {}  # to track if a goal was accomplished since last call
 
     def log(self, grid_world, agent_data):
+        """ The main method to be overwritten by your own logger class.
+
+        This method is called according to the `log_strategy` set when the logger was added the world builder. For more
+        details on this see :func:`matrx.world_builder.WorldBuilder.add_logger`.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The entire grid world instance. Use this to log anything you require to log from the grid world.
+        agent_data : dict
+            A dictionary of all data coming from all agents' :func:`matrx.agents.agent_brain.get_log_data` methods.
+            This dictionary has as keys the agent ids of all agents. As value there is the dictionary their log methods
+            returned.
+        Returns
+        -------
+        dict
+            This method should return a dictionary where the keys are the columns and their value a single row. The
+            keys (e.g., columns) should be always the same every consecutive call. If this is not the case an exception
+            is raised.
+
+        """
         return {}
 
     def _grid_world_log(self, grid_world, agent_data, last_tick=False, goal_status=None):
+        """ A private MATRX method.
+
+        This is the actual method a grid world calls for each logger. It also performs a data check on the columns and
+        writes the dictionary to the file.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The grid world instance passed to the log method.
+        agent_data : dict
+            The agent data passed to the log method.
+        last_tick : bool (default: False)
+            Whether this is the last tick of the grid world or not.
+        goal_status : dict
+            A dictionary with all world goals (keys, WorldGoal) and whether they completed or not (value, bool)
+
+        """
         if not self._needs_to_log(grid_world, last_tick, goal_status):
             return
 
@@ -40,6 +109,30 @@ class GridWorldLogger:
         self.__write_data(data, grid_world.current_nr_ticks)
 
     def _needs_to_log(self, grid_world, last_tick, goal_status):
+        """ A private MAtRX method.
+
+        Checks if this logger's log method needs to be called given its log strategy.
+
+        Parameters
+        ----------
+        grid_world : GridWorld
+            The world instance to be logger or not.
+        last_tick : bool
+            Whether the world is at its last tick.
+        goal_status : dict
+            A dictionary with all world goals (keys, WorldGoal) and whether they completed or not (value, bool)
+
+        Returns
+        -------
+        bool
+            Returns True if the log method needs to be called, otherwise False.
+
+        Raises
+        ------
+        Exception
+            Raises a generic exception when the log strategy is not recognized as integer or of a predefined string.
+
+        """
         current_tick = grid_world.current_nr_ticks
 
         # If the strategy is a tick frequency, check if enough ticks have passed
@@ -76,6 +169,16 @@ class GridWorldLogger:
         return to_log
 
     def _set_world_nr(self, world_nr):
+        """ A private MATRX method.
+
+        Sets the current world number by creating a sub-folder in the save path with the given world number.
+
+        Parameters
+        ----------
+        world_nr : int
+            The current world number.
+
+        """
         # Set the world number
         self.__world_nr = world_nr
 
@@ -89,6 +192,28 @@ class GridWorldLogger:
         self.__file_name = f"{self.__save_path}{os.sep}{self.__file_name}"
 
     def __check_data(self, data):
+        """ A private MATRX method.
+
+        Checks if the to be logged data uses consistent columns (e.g., if the keys of the data dict are the same as the
+        one given the very first time data was logged).
+
+        Parameters
+        ----------
+        data : dict
+            The data to be logged from the log method.
+
+        Returns
+        -------
+        bool
+            Returns True if the columns are consistent with the very first time data was logged or when this is the
+            first time data is being logged. False otherwise.
+
+        Raises
+        ------
+        Exception
+            Raises two potential exceptions: When the columns are not consistent, or when the data is not a dictionary.
+
+        """
         if isinstance(data, dict):
 
             # Check if the data contains new columns, if so raise an exception that we cannot add columns on the fly
@@ -103,6 +228,18 @@ class GridWorldLogger:
             raise Exception(f"The data in this {self.__class__} should be a dictionary.")
 
     def __write_data(self, data, tick_nr):
+        """ A private MATRX method.
+
+        Writes the data to the correct file.
+
+        Parameters
+        ----------
+        data : dict
+            The data to be logged from the log method.
+        tick_nr : int
+            The tick number which is being logged.
+
+        """
 
         # We always include the world number and the tick number
         if "world_nr" not in data.keys():
