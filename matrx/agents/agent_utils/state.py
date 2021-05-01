@@ -525,15 +525,10 @@ class State(MutableMapping):
                     return obj
             return None
 
-        # try to locate it in the regular dict as an object id, this allows us to use this method also to quickly locate
-        # objects based on their object ID.
-        try:
-            return self.__state_dict[prop_value]
-        # if the prop value was not a key in the dict (or simply None), find all objects with that property and value if
+        # Find all objects with that property and value if
         # given. This uses Python's map function to bring our search to C.
-        except KeyError:
-            located = map(locate, self.__state_dict.items())
-            return [l for l in located if l is not None]  # only return the found objects
+        located = map(locate, self.__state_dict.items())
+        return [l for l in located if l is not None]  # only return the found objects
 
     @staticmethod
     def __is_iterable(arg):

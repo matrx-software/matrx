@@ -1,4 +1,6 @@
-var ss_update_url = 'http://127.0.0.1:3001/get_latest_state/';
+var ss_base_url = window.location.hostname,
+    ss_update_url = 'http://' + ss_base_url + ':3001/get_latest_state/';
+
 
 var ss_state = null,
     ss_world_settings = null,

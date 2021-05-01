@@ -60,6 +60,12 @@ class GridWorldLogger:
         self.__columns = []  # place holder for the columns in our data file
         self.__prev_goal_status = {}  # to track if a goal was accomplished since last call
 
+
+    @property
+    def file_name(self):
+        """ Make the logger filename publicly available """
+        return self.__file_name
+
     def log(self, grid_world, agent_data):
         """ The main method to be overwritten by your own logger class.
 
