@@ -2283,7 +2283,6 @@ class WorldBuilder:
             for arg, val in given_args.items():
                 if val is not None:
                     args[arg] = val
-                
 
         args = self.__instantiate_random_properties(args)
 
