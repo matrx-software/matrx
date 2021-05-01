@@ -36,13 +36,13 @@ class GridWorldLogger:
         The column delimiter to be used in the log files.
     """
 
-    "Log strategy to log on the last tick of a world."
+    """Log strategy to log on the last tick of a world."""
     LOG_ON_LAST_TICK = "log_last_tick"
 
-    "Log strategy to log on the first tick of a world."
+    """Log strategy to log on the first tick of a world."""
     LOG_ON_FIRST_TICK = "log_first_tick"
 
-    "Log strategy to log every time a goal is reached or completed."
+    """Log strategy to log every time a goal is reached or completed."""
     LOG_ON_GOAL_REACHED = "log_on_reached_goal"
 
     def __init__(self, log_strategy=1, save_path="/logs", file_name="", file_extension=".csv", delimiter=";"):
