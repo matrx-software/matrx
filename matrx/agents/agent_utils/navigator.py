@@ -8,21 +8,21 @@ from matrx.actions.move_actions import *
 
 
 class Navigator:
-    """ A navigator object that can be used for path planning and navigation
+    """ A navigator object that can be used for path planning and navigation.
 
     Parameters
     ----------
-    agent_id: string.
-        ID of the agent that wants to navigate
+    agent_id: string
+        ID of the agent that wants to navigate through a grid world.
     action_set: list
-        List of actions the agent can perform
+        List of actions the agent can perform.
     algorithm: string. Optional, default "a_star"
-        The pathplanning algorithm to use. As of now only a_star is supported.
-    is_circular: Boolean. Optional, default=False.
-        Whether to continuously navigate from point A to B, and back, until infinity.
+        The path planning algorithm to use. As of now only A* is supported.
+    is_circular: bool (Default: False)
+        When True, it will continuously navigate given waypoints, until infinity.
     """
 
-
+    """The A* algorithm parameter for path planning."""
     A_STAR_ALGORITHM = "a_star"
 
     def __init__(self, agent_id, action_set, algorithm=A_STAR_ALGORITHM, is_circular=False):
@@ -63,28 +63,106 @@ class Navigator:
         self.__occupation_map = None
 
     def add_waypoint(self, waypoint):
+        """ Adds a waypoint to the path.
+
+        Parameters
+        ----------
+        waypoint: tuple, list
+            The (x,y) coordinates of the cell.
+
+        Raises
+        ------
+        AssertError
+            When the waypoint is not a tuple or list.
+
+        """
+
         assert isinstance(waypoint, tuple) or isinstance(waypoint, list)
         wp = Waypoint(loc=waypoint, priority=self.__nr_waypoints)
         self.__nr_waypoints += 1
         self.__waypoints[wp.priority] = wp
 
     def add_waypoints(self, waypoints, is_circular=False):
+        """ Adds multiple waypoints to the path in order.
+
+        Parameters
+        ----------
+        waypoints : list
+            The list of waypoints of the form (x,y).
+        is_circular : bool
+            Whether the navigator should continuously visit all waypoints (including the ones already given before).
+
+        Raises
+        ------
+        AssertError
+            When the waypoint is not a tuple or list.
+
+        """
         self.is_circular = is_circular
 
         for waypoint in waypoints:
             self.add_waypoint(waypoint)
 
     def get_all_waypoints(self):
+        """ Returns all current waypoints stored.
+
+        Returns
+        -------
+        dict
+            A dictionary with as keys the order and as value the waypoint as (x,y) coordinate.
+
+        """
         return [(k, wp.location) for k, wp in self.__waypoints.items()]
 
     def get_upcoming_waypoints(self):
+        """ Returns all waypoints not yet visited.
+
+        Returns
+        -------
+        dict
+            A dictionary with as keys the order and as value the waypoint as (x,y) coordinate.
+
+        """
         return [(k, wp.location) for k, wp in self.__waypoints.items() if not wp.is_visited()]
 
     def get_current_waypoint(self):
+        """ Returns the current waypoint the navigator will try to visit.
+
+        Returns
+        -------
+        list
+            The (x,y) coordinate of the next waypoint.
+
+        """
         wp = self.__waypoints[self.__current_waypoint_idx]
         return wp.location
 
     def get_move_action(self, state_tracker: StateTracker):
+        """ Returns the next move action.
+
+        It applies the path planning algorithm to identify the next best move action to move closer to the next
+        waypoint.
+
+        Parameters
+        ----------
+        state_tracker : StateTracker
+            The state tracker used by the algorithm to determine what (according to what the agent observes) would be
+            the best possible next move action.
+
+        Returns
+        -------
+        str
+            The name of the move action the agent is capable of making.
+
+        Raises
+        ------
+        Warning
+            Raises a warning (not exception) to signal that no path can be found to the next waypoint.
+
+        ValueError
+            Raised when the agent's location is not found on the route found by the path planning.
+
+        """
         # If we are done, don't do anything
         if self.is_done:
             return None
@@ -124,16 +202,29 @@ class Navigator:
         return move_action
 
     def reset(self):
+        """ Resets all waypoints to not being visited.
+        """
         self.is_done = False
         self.__current_waypoint_idx = 0
         for wp in self.__waypoints.values():
             wp.reset()
 
     def reset_full(self):
+        """ Clears all waypoints to an empty Navigator.
+
+        """
         # This function resets the navigator to a new instance
         self.__init__(self.__agent_id, self.__action_set, self.__algorithm, self.is_circular)
 
     def __get_current_waypoint(self):
+        """ A private MATRX method.
+
+        Returns
+        -------
+        Waypoint
+            Returns the next waypoint object.
+
+        """
         if self.__current_waypoint_idx is None:
             self.__current_waypoint_idx = 0
 
@@ -142,12 +233,40 @@ class Navigator:
         return wp
 
     def __initialize_path_planner(self, algorithm, action_set):
+        """ A private MATRX method.
+
+        Initializes the correct path planner algorithm.
+
+        Parameters
+        ----------
+        algorithm : str
+            The name of the algorithm to be used.
+        action_set : list
+            The list of actions the agent is capable of taking.
+
+        Raises
+        ------
+        ValueError
+            When the given algorithm is not known.
+
+        """
         if algorithm == self.A_STAR_ALGORITHM:
             return AStarPlanner(action_set=action_set, metric=AStarPlanner.EUCLIDEAN_METRIC)
         else:
-            raise Exception()
+            raise ValueError(f"The path plannings algorithm {algorithm} is not known.")
 
     def __update_waypoints(self, agent_loc):
+        """ A private MATRX method.
+
+        Updates all is_visited property of waypoints based on the agent's current location. Also sets the navigator
+        to done when all waypoints are visited.
+
+        Parameters
+        ----------
+        agent_loc : list
+            The agent's current location as (x,y)
+
+        """
         wp = self.__get_current_waypoint()
         if wp.is_visited(agent_loc):
             self.__current_waypoint_idx += 1
@@ -156,6 +275,23 @@ class Navigator:
             self.is_done = True
 
     def __get_route(self, state_tracker: StateTracker):
+        """ A private MATRX method.
+
+        Applies the path planner algorithm based on the information in the given state tracker.
+
+        Parameters
+        ----------
+        state_tracker : StateTracker
+            The state tracker of the agent conducting the path planning. Used to represent all observations of the
+            agent.
+
+        Returns
+        -------
+        list
+            A list of action strings the agent should conduct to arrive at the next waypoint. This route is empty when
+            no path can be found or when all waypoints are already visited.
+
+        """
         # Get our agent's location
         agent_loc = state_tracker.get_memorized_state()[state_tracker.agent_id]['location']
 
@@ -186,6 +322,25 @@ class Navigator:
         return route
 
     def __get_route_from_path(self, agent_loc, path):
+        """ A private MATRX method.
+
+        Transforms a path of coordinates from the path planning algorithm to a series of actions.
+
+        Parameters
+        ----------
+        agent_loc : tuple
+            The agent's current location as (x,y).
+        path : list
+            List of coordinates that lead to the next waypoint.
+
+        Returns
+        -------
+        list
+            A list of strings of actions the agent is capable of taking to arrive at each path coordinate from the
+            previous one (with the first being the agent's current location).
+
+        """
+
         route = {}
         curr_loc = agent_loc
         for idx, loc in enumerate(path):
@@ -211,11 +366,40 @@ class Navigator:
 
 
 class PathPlanner:
+    """ A private MATRX class.
+
+    The empty path planner. Future path planning algorithms should implement this class.
+
+    """
 
     def __init__(self, action_set):
+        """ Initializes the planner given the actions an agent is capable of.
+
+        Parameters
+        ----------
+        action_set : list
+            The list of actions the agent is capable of performing.
+        """
         self.move_actions = get_move_actions(action_set)
 
     def plan(self, start, goal, occupation_map):
+        """ Plan a route from the start to the goal.
+
+        Parameters
+        ----------
+        start : tuple
+            The starting (x,y) coordinate.
+        goal : tuple
+            The goal (x,y) coordinate.
+        occupation_map : nparray
+            The list of lists representing which grid coordinates are blocked and which are not.
+
+        Returns
+        -------
+        list
+            A list of coordinates the agent should visit in order to reach the goal coordinate.
+
+        """
         pass
 
 
@@ -236,11 +420,25 @@ class AStarPlanner(PathPlanner):
             raise Exception(f"The distance metric {metric} for A* heuristic not known.")
 
     def plan(self, start, goal, occupation_map):
-        """
-        A star algorithm, returns the shortest path to get from goal to start.
+        """ Plan a route from the start to the goal.
+
+        A* algorithm, returns the shortest path to get from goal to start.
         Uses an 2D numpy array, with 0 being traversable, anything else (e.g. 1) not traversable
         Implementation from:
         https://www.analytics-link.com/single-post/2018/09/14/Applying-the-A-Path-Finding-Algorithm-in-Python-Part-1-2D-square-grid
+
+        Parameters
+        ----------
+        start : tuple
+            The starting (x,y) coordinate.
+        goal : tuple
+            The goal (x,y) coordinate.
+        occupation_map : list
+            The list of lists representing which grid coordinates are blocked and which are not.
+
+        Returns
+        -------
+
         """
 
         # possible movements
@@ -293,13 +491,42 @@ class AStarPlanner(PathPlanner):
 
 
 class Waypoint:
+    """ A private MATRX class.
+
+    Used to represent a navigation waypoint for the Navigator class.
+
+    """
 
     def __init__(self, loc, priority):
+        """ Creates a waypoint at a certain location with a priority.
+
+        Parameters
+        ----------
+        loc : tuple
+            The (x,y) coordinate of this waypoint.
+        priority : int
+            The priority in which this waypoint should be visited.
+        """
         self.location = loc
         self.priority = priority
         self.__is_visited = False
 
     def is_visited(self, current_loc=None):
+        """ Whether this waypoint is visited.
+
+        Parameters
+        ----------
+        current_loc : list (Default: None)
+            The (x,y) coordinate of an agent. When given, checks if this waypoint is visited by the agent on this
+            location. Otherwise, performs no check.
+
+        Returns
+        -------
+        bool
+            Returns True when this waypoint is visited (or just now visited when `current_loc` is given). False
+            otherwise.
+
+        """
         if current_loc is None:
             return self.__is_visited
         elif current_loc[0] == self.location[0] and current_loc[1] == self.location[1] and not self.__is_visited:
@@ -308,10 +535,26 @@ class Waypoint:
         return self.__is_visited
 
     def reset(self):
+        """ Sets this waypoint as not visited.
+        """
         self.__is_visited = False
 
 
 def get_move_actions(action_set):
+    """ Returns the names of all move actions in the given agent's action set.
+
+    Parameters
+    ----------
+    action_set : list
+        The names of all actions an agent can perform.
+
+    Returns
+    -------
+    dict
+        The dictionary of all move actions that are part of the agent's actions it can perform. The keys are the action
+        names and values are the delta x and y effects on an agent's location.
+
+    """
     move_actions = {}
     for action_name in action_set:
         if action_name == MoveNorth.__name__:
