@@ -97,14 +97,25 @@ class AgentBrain:
         self._state = None
 
     def initialize(self):
-        """ To initialize an agent's brain.
+        """ Method called by any world when it starts.
 
-        Method called at the start of a :class:`matrx.grid_world.GridWorld`.
+        When adding an agent to a :class:`matrx.grid_world.GridWorld`, through
+        a world builer, you only pass the class of your agent brain, not the
+        actual instance. Instead, this instance is made by the builder when
+        a new world is created and ran. At that point this method is called.
 
-        Here you can initialize everything you need for your agent to work
-        since you can't do much in the constructor as the brain needs to be
-        connected to a GridWorld first in most cases (e.g. to get an AgentID,
-        its random generator, etc.)
+        That makes this method the ideal place for any initialization or
+        reset you want your agent brain to do when starting a world or between
+        worlds.
+
+        Importantly, this method is called after the builder assigned things
+        to it such as its location, name and object ID. As this method is
+        called afterwards, it allows you to do things related to to those
+        properties.
+
+        An example is when you run the same world multiple times. In that case
+        the instance of your agent brain will have attributes with values from
+        the previous run. This method can be used to reset them.  
         """
 
     def filter_observations(self, state):
