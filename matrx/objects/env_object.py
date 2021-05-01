@@ -323,6 +323,14 @@ object_counter = 0
 
 
 def _next_obj_id():
+    """ Increments the object counter used to generate unique object IDs.
+
+    Returns
+    -------
+    int
+        The increment object counter.
+
+    """
     global object_counter
     res = object_counter
     object_counter += 1
@@ -330,6 +338,19 @@ def _next_obj_id():
 
 
 def _get_inheritence_path(callable_class):
+    """ Returns the parent's class names of the given class.
+
+    Parameters
+    ----------
+    callable_class : Class
+        The class object for which to return its parent classes.
+
+    Returns
+    -------
+    list
+        The list of names of the parent classes.
+
+    """
     parents = callable_class.mro()
     parents = [str(p.__name__) for p in parents]
     return parents
