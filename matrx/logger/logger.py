@@ -4,43 +4,48 @@ import os
 
 
 class GridWorldLogger:
-    """ Base logger class for any MATRX Gridworld logger """
+    """ A class to log data during a running world.
+
+    Loggers are meant to collect, process and write data to files during a running world. They can be added through
+    the :func:`matrx.world_builder.WorldBuilder.add_logger` method. We refer to that method on how to add a logger
+    to your world.
+
+    Note that a world can have multiple loggers, each resulting in their own unique log file. So you have the
+    option to create a single large log file with a single logger, or segment the data in some way over different
+    files with multiple loggers. Another reason for more then one logger is a difference in logging strategy. For
+    instance to have a logger that logs only at the start or end of the world and a logger that logs at every tick.
+
+    Parameters
+    ----------
+    log_strategy : int, str (default: 1)
+        When an integer, the logger is called every that many ticks. When a string, should be
+        GridWorldLogger.LOG_ON_LAST_TICK, GridWorldLogger.LOG_ON_FIRST_TICK or GridWorldLogger.LOG_ON_GOAL_REACHED.
+        Respectively for only logging on the last tick of the world, the first tick of the world or every time a
+        goal is reached.
+    save_path : str (default: "/logs")
+        The default path were log files are stored. If the path does not exist, it is created. Otherwise log files
+        are added to that path. If multiple worlds are ran from the same builder, the directory will contain
+        sub-folders depicting the world's number (e.g., "world_1" for the first world, "world_2" for the second,
+        etc.).
+    file_name : str (default: "")
+        The file name prefix. Every log file is always appended by the timestamp (Y-m-d_H:M:S) and the file
+        extension. When an empty string, log file names will thus be only the timestamp.
+    file_extension : str (default: ".csv")
+        The file name extension to be used.
+    delimiter : str (default: ";")
+        The column delimiter to be used in the log files.
+    """
+
+    "Log strategy to log on the last tick of a world."
     LOG_ON_LAST_TICK = "log_last_tick"
+
+    "Log strategy to log on the first tick of a world."
     LOG_ON_FIRST_TICK = "log_first_tick"
+
+    "Log strategy to log every time a goal is reached or completed."
     LOG_ON_GOAL_REACHED = "log_on_reached_goal"
 
     def __init__(self, log_strategy=1, save_path="/logs", file_name="", file_extension=".csv", delimiter=";"):
-        """ A class to log data during a running world.
-
-        Loggers are meant to collect, process and write data to files during a running world. They can be added through
-        the :func:`matrx.world_builder.WorldBuilder.add_logger` method. We refer to that method on how to add a logger
-        to your world.
-
-        Note that a world can have multiple loggers, each resulting in their own unique log file. So you have the
-        option to create a single large log file with a single logger, or segment the data in some way over different
-        files with multiple loggers. Another reason for more then one logger is a difference in logging strategy. For
-        instance to have a logger that logs only at the start or end of the world and a logger that logs at every tick.
-
-        Parameters
-        ----------
-        log_strategy : int, str (default: 1)
-            When an integer, the logger is called every that many ticks. When a string, should be
-            GridWorldLogger.LOG_ON_LAST_TICK, GridWorldLogger.LOG_ON_FIRST_TICK or GridWorldLogger.LOG_ON_GOAL_REACHED.
-            Respectively for only logging on the last tick of the world, the first tick of the world or every time a
-            goal is reached.
-        save_path : str (default: "/logs")
-            The default path were log files are stored. If the path does not exist, it is created. Otherwise log files
-            are added to that path. If multiple worlds are ran from the same builder, the directory will contain
-            sub-folders depicting the world's number (e.g., "world_1" for the first world, "world_2" for the second,
-            etc.).
-        file_name : str (default: "")
-            The file name prefix. Every log file is always appended by the timestamp (Y-m-d_H:M:S) and the file
-            extension. When an empty string, log file names will thus be only the timestamp.
-        file_extension : str (default: ".csv")
-            The file name extension to be used.
-        delimiter : str (default: ";")
-            The column delimiter to be used in the log files.
-        """
         self.__log_strategy = log_strategy
         self.__save_path = save_path
         self.__file_name_prefix = file_name
