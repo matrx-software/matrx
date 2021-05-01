@@ -20,6 +20,16 @@ class Navigator:
         The path planning algorithm to use. As of now only A* is supported.
     is_circular: bool (Default: False)
         When True, it will continuously navigate given waypoints, until infinity.
+
+    Warnings
+    --------
+    This class still depends on the deprecated `StateTracker` instead of the new `State`. Note that the `StateTracker`
+    is created from a state dictionary that can be obtained from a `State` instance. This is the current workaround to
+    still make the `Navigator` work with the current `State`.
+
+    Another approach is to not use `State` at all, and only rely on a `StateTracker`. See the
+    :class:`matrx.agents.agent_types.patrolling_agent.PatrollingAgentBrain` which uses this approach.
+
     """
 
     """The A* algorithm parameter for path planning."""
