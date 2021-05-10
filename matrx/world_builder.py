@@ -2102,44 +2102,6 @@ class WorldBuilder:
                           customizable_properties=area_customizable_properties,
                           **{**area_custom_properties, "room_name": name})
 
-    @staticmethod
-    def get_room_locations(room_top_left, room_width, room_height):
-        """ Returns the locations within a room, excluding walls.
-
-        .. deprecated:: 1.1.0
-          `get_room_locations` will be removed in MATRX 1.2.0, it is replaced by
-          `matrx.utils.get_room_locations`.
-
-        This is a helper function for adding objects to a room. It returns a
-        list of all (x,y) coordinates that fall within the room excluding the
-        walls.
-
-        Parameters
-        ----------
-        room_top_left : tuple, (x, y)
-            The top left coordinates of a room, as used to add that room with
-            methods such as `add_room`.
-        room_width : int
-            The width of the room.
-        room_height : int
-            The height of the room.
-
-        Returns
-        -------
-        list, [(x,y), ...]
-            A list of (x, y) coordinates that are encapsulated in the
-            rectangle, excluding walls.
-
-        See Also
-        --------
-        WorldBuilder.add_room
-
-        """
-        warnings.warn("This method is deprecated and will be removed in v1.2.0. It is replaced by"
-                      "`matrx.utils.get_room_locations` as of v1.1.0.", DeprecationWarning)
-        locs = utils.get_room_locations(room_top_left, room_width, room_height)
-        return locs
-
     def __set_world_settings(self, shape, tick_duration, simulation_goal, rnd_seed,
                              visualization_bg_clr, visualization_bg_img, verbose):
 
