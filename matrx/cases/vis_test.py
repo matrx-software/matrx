@@ -8,17 +8,21 @@ from datetime import datetime
 from matrx.objects import Door, SquareBlock, AreaTile, SmokeTile, CollectionDropOffTile
 from matrx.agents import HumanAgentBrain
 
+
 def create_builder():
     tick_dur = 0.1
     factory = WorldBuilder(random_seed=1, shape=[9, 10], tick_duration=1, verbose=False, run_matrx_api=True,
                            run_matrx_visualizer=True, visualization_bg_clr="#f0f0f0", simulation_goal=100000)
 
-    factory.add_room(top_left_location=[0, 0], width=9, height=10, name='Wall_Border', wall_visualize_opacity=0.5)
+    factory.add_room(top_left_location=[0, 0], width=9, height=10, name='Wall_Border', wall_visualize_opacity=0.5,
+                     door_locations=[(0, 1), (1, 0)], door_open_colour="#03fc0b", door_closed_colour="#fc0303",
+                     door_visualization_opacity=0.5)
     factory.add_object(location=[3,3], name="door", callable_class=Door, visualize_opacity=0.5, is_open=False)
     factory.add_object(location=[3,4], name="block", callable_class=SquareBlock, visualize_opacity=0.5)
     factory.add_object(location=[3,5], name="tile1", callable_class=AreaTile, visualize_opacity=0.5)
     factory.add_object(location=[3,6], name="tile2", callable_class=SmokeTile, visualize_opacity=0.5)
-    factory.add_object(location=[4,6], name="CollectionDropOffTile", callable_class=CollectionDropOffTile, visualize_opacity=0.5)
+    factory.add_object(location=[4,6], name="CollectionDropOffTile", callable_class=CollectionDropOffTile,
+                       visualize_opacity=0.5)
 
     factory.add_human_agent(location=[5,6], agent=HumanAgentBrain(), visualize_opacity=0.5)
 

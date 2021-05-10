@@ -1904,6 +1904,9 @@ class WorldBuilder:
 
     def add_room(self, top_left_location, width, height, name,
                  door_locations=None, with_area_tiles=False, doors_open=False,
+                 door_open_colour=None,
+                 door_closed_colour=None,
+                 door_visualization_opacity=None,
                  wall_visualize_colour=None, wall_visualize_opacity=None,
                  wall_custom_properties=None,
                  wall_customizable_properties=None,
@@ -1943,6 +1946,15 @@ class WorldBuilder:
 
         doors_open : bool (optional, False)
             Whether the doors are initially open or closed.
+
+        door_open_colour: str (optional, "#006400")
+            Colour, as hexidecimal string, when a room door is closed. Defaults to a shade of green.
+
+        door_closed_colour: str (optional, "#640000")
+            Colour, as hexidecimal string, when a room door is open. Defaults to a shade of red.
+
+        door_visualization_opacity: str (optional, 1.0)
+            Opacity of the object, as a percentge from 0.0 (fully opaque) to 1.0 (no opacity). Defaults to 1.0.
 
         wall_visualize_colour : string (optional, default None)
             The colour of the walls.
@@ -2071,6 +2083,8 @@ class WorldBuilder:
         # Add all doors
         for door_loc in door_locations:
             self.add_object(location=door_loc, name=f"{name} - door@{door_loc}", callable_class=Door,
+                            open_colour=door_open_colour, closed_colour=door_closed_colour,
+                            visualize_opacity=door_visualization_opacity,
                             is_open=doors_open, **{"room_name": name})
 
         # Add all area tiles if required
