@@ -121,7 +121,7 @@ class AgentBrain:
         self.previous_action_result = None
         self.messages_to_send = []
         self.received_messages = []
-        self._state = None
+        self._init_state()
 
     def filter_observations(self, state):
         """ Filters the world state before deciding on an action.
