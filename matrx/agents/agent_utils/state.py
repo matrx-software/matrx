@@ -232,6 +232,9 @@ class State(MutableMapping):
     def as_dict(self):
         return self.__state_dict
 
+    def _add_world_info(self, world_info_dict):
+        self.__state_dict["World"] = world_info_dict
+
     ###############################################
     #     Some helpful getters for the state      #
     ###############################################

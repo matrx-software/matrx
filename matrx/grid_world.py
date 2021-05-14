@@ -8,6 +8,7 @@ import copy
 import gevent
 
 from matrx.actions.object_actions import *
+from matrx.agents.agent_utils.state import State
 from matrx.logger.logger import GridWorldLogger
 from matrx.objects.env_object import EnvObject
 from matrx.objects.standard_objects import AreaTile
@@ -807,15 +808,19 @@ class GridWorld:
         :return: state with all objects and agents on the grid
         """
 
-        # create a state with all objects and agents
-        state = {}
+        # create a state dict with all objects and agents
+        state_dict = {}
         for obj_id, obj in self.__environment_objects.items():
-            state[obj.obj_id] = obj.properties
+            state_dict[obj.obj_id] = obj.properties
         for agent_id, agent in self.__registered_agents.items():
-            state[agent.obj_id] = agent.properties
+            state_dict[agent.obj_id] = agent.properties
+
+        # Create State
+        state = State(own_id=None)
+        state.state_update(state_dict)
 
         # Append generic properties (e.g. number of ticks, size of grid, etc.}
-        state["World"] = {
+        world_info = {
             "nr_ticks": self.__current_nr_ticks,
             "curr_tick_timestamp": int(round(time.time() * 1000)),
             "grid_shape": self.__shape,
@@ -826,6 +831,9 @@ class GridWorld:
                 "vis_bg_img": self.__visualization_bg_img
             }
         }
+
+        # Add world info to State
+        state._add_world_info(world_info)
 
         return state
 
@@ -859,15 +867,19 @@ class GridWorld:
             if type(wildcard_obj) not in sense_capabilities.keys():
                 objs_in_range[wildcard_obj_id] = wildcard_obj
 
-        state = {}
+        state_dict = {}
         # Save all properties of the sensed objects in a state dictionary
         for env_obj in objs_in_range:
-            state[env_obj] = objs_in_range[env_obj].properties
+            state_dict[env_obj] = objs_in_range[env_obj].properties
+
+        # Create State object out of state dict
+        state = State(agent_obj.obj_id)
+        state.state_update(state_dict)
 
         # Append generic properties (e.g. number of ticks, fellow team members, etc.}
         team_members = [agent_id for agent_id, other_agent in self.__registered_agents.items()
                         if agent_obj.team == other_agent.team]
-        state["World"] = {
+        world_info = {
             "nr_ticks": self.__current_nr_ticks,
             "curr_tick_timestamp": int(round(time.time() * 1000)),
             "grid_shape": self.__shape,
@@ -879,6 +891,9 @@ class GridWorld:
                 "vis_bg_img": self.__visualization_bg_img
             }
         }
+
+        # Add it to State
+        state._add_world_info(world_info)
 
         return state
 

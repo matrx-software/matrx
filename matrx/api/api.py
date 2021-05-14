@@ -134,7 +134,7 @@ def get_latest_state_and_messages():
         return abort(error['error_code'], description=error['error_message'])
 
     # fetch states, chatrooms and messages
-    states_ = __fetch_states(_current_tick, agent_id)
+    states_ = __fetch_state_dicts(_current_tick, agent_id)
     chatrooms, messages = __get_messages(agent_id, chat_offsets)
 
     return jsonify({"matrx_paused": matrx_paused, "states": states_, "chatrooms": chatrooms, "messages": messages})
@@ -172,7 +172,7 @@ def get_states(tick):
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    return jsonify(__fetch_states(tick))
+    return jsonify(__fetch_state_dicts(tick))
 
 
 @__app.route('/get_states/<tick>/<agent_ids>/', methods=['GET', 'POST'])
@@ -201,7 +201,7 @@ def get_states_specific_agents(tick, agent_ids):
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    return jsonify(__fetch_states(tick, agent_ids))
+    return jsonify(__fetch_state_dicts(tick, agent_ids))
 
 
 @__app.route('/get_latest_state/<agent_ids>/', methods=['GET', 'POST'])
@@ -239,7 +239,7 @@ def get_filtered_latest_state(agent_ids):
         return abort(error['error_code'], description=error['error_message'])
 
     # Get the agent states
-    agent_states = __fetch_states(_current_tick, agent_ids)[0]
+    agent_states = __fetch_state_dicts(_current_tick, agent_ids)[0]
 
     # Filter the agent states based on the received properties list
     props = request.json['properties']
@@ -850,7 +850,7 @@ def __check_input(tick=None, ids=None):
     return True, None
 
 
-def __fetch_states(tick, ids=None):
+def __fetch_state_dicts(tick, ids=None):
     """ This private function fetches, filters and orders the states as specified by the tick and agent ids.
 
     Parameters
@@ -894,6 +894,7 @@ def __fetch_states(tick, ids=None):
         # add each agent's state for this tick
         for agent_id in ids:
             if agent_id in __states[t]:
+                # Get state at tick t and of agent agent_id
                 states_this_tick[agent_id] = __states[t][agent_id]
 
         # save the states of all filtered agents for this tick
@@ -967,7 +968,7 @@ def __reorder_state(state):
     -------
         The world state, JSON serializable
     """
-    new_state = copy.copy(state)
+    new_state = copy.copy(state.as_dict())
 
     # loop through all objects in the state
     for objID, obj in state.items():

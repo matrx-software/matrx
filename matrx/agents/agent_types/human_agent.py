@@ -175,12 +175,9 @@ class HumanAgentBrain(AgentBrain):
         # did.
         self.previous_action = action
 
-        # Get the dictionary from the State object
-        filtered_state = self.state.as_dict()
-
         # Return the filtered state, the (updated) properties, the intended
         # actions and any keyword arguments for that action if needed.
-        return filtered_state, self.agent_properties, action, action_kwargs
+        return self.state, self.agent_properties, action, action_kwargs
 
     def decide_on_action(self, state, user_input):
         """ Contains the decision logic of the agent.

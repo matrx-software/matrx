@@ -10,7 +10,7 @@ class CollectBlock(EnvObject):
 
 class SignalBlock(EnvObject):
 
-    def __init__(self, location, drop_zone_name, rank):
+    def __init__(self, location, drop_zone_name, rank, name="Signal Block"):
         """
         """
 
