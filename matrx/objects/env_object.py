@@ -74,6 +74,8 @@ class EnvObject:
         is used by the Visualizer to draw objects in layers.
     visualize_opacity : Integer. Optional, default obtained from defaults.py
         Opacity of the object. From 0.0 to 1.0.
+    visualize_from_center: Boolean. Optional, by default True. 
+        Whether an object should be visualized and scaled from its center point, or top left point. 
     **custom_properties : Dict. Optional
         Any other keyword arguments. All these are treated as custom attributes.
         For example the property 'heat'=2.4 of an EnvObject representing a fire.
@@ -82,7 +84,7 @@ class EnvObject:
     def __init__(self, location, name, class_callable, customizable_properties=None,
                  is_traversable=None, is_movable=None,
                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
-                 visualize_opacity=None, **custom_properties):
+                 visualize_opacity=None, visualize_from_center=None, **custom_properties):
 
         # Set the object's name.
         self.obj_name = name
@@ -136,6 +138,8 @@ class EnvObject:
             visualize_depth = defaults.ENVOBJECT_VIS_DEPTH
         if is_movable is None:
             is_movable = defaults.ENVOBJECT_IS_MOVABLE
+        if visualize_from_center is None:
+            visualize_from_center = defaults.ENVOBJECT_VIS_FROM_CENTER
 
 
         # Set the mandatory properties
@@ -146,6 +150,7 @@ class EnvObject:
         self.visualize_size = visualize_size
         self.is_traversable = is_traversable
         self.is_movable = is_movable
+        self.visualize_from_center = visualize_from_center
 
         # Since carried_by cannot be defined beforehand (it contains the unique id's of objects that carry this object)
         # we set it to an empty list by default.
@@ -228,6 +233,8 @@ class EnvObject:
             elif property_name == "is_movable":
                 assert isinstance(property_value, bool)
                 self.is_movable = property_value
+            elif property_name == visualize_from_center:
+                self.visualize_from_center = property_value
 
         return self.properties
 
@@ -306,7 +313,8 @@ class EnvObject:
             "shape": self.visualize_shape,
             "colour": self.visualize_colour,
             "depth": self.visualize_depth,
-            "opacity": self.visualize_opacity
+            "opacity": self.visualize_opacity, 
+            "visualize_from_center": self.visualize_from_center
         }
 
         return properties

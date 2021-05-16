@@ -793,7 +793,7 @@ def __check_states_API_request(tick=None, ids=None, ids_required=False):
             # e.g. "god"), or a list of ' f'IDs(string) for requesting states of multiple agents'}
 
         # check if the api was reset during this time
-        if len(__states) is 0:
+        if len(__states) == 0:
             return False, {'error_code': 400,
                            'error_message': f'api is reconnecting to a new world'}
 
@@ -974,7 +974,7 @@ def __reorder_state(state):
     # loop through all objects in the state
     for objID, obj in state.items():
 
-        if objID is not "World":
+        if objID != "World":
             # make the sense capability JSON serializable
             if "sense_capability" in obj:
                 new_state[objID]["sense_capability"] = str(obj["sense_capability"])
