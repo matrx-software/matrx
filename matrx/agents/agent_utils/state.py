@@ -461,7 +461,8 @@ class State(MutableMapping):
 
         # For each prop_name, prop_value combination, find the relevant objects. If there are more than one allowable
         # property value, search for those as well.
-        found = [[self.__find(name, val) for val in vals] for name, vals in props.items()]
+        found = [[self.__find(name, val) for val in vals] if name != "location" else [self.__find(name, vals)]
+                 for name, vals in props.items()]
 
         # Check if we searched for more than one property
         if len(props) > 1:
