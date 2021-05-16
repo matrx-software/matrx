@@ -134,10 +134,10 @@ def add_agents(builder, block_sense_range, other_sense_range, memorize_for_ticks
     # the Human Agent.
     loc = (2, 1)
     brain = BlockWorldAgent()
-    builder.add_agent(loc, brain, team=team_name, name=f"Agent Smith 1", sense_capability=sense_capability)
+    builder.add_agent(loc, brain, team=team_name, name=f"Agent Smith #1", sense_capability=sense_capability)
     loc = (3, 1)
     brain = BlockWorldAgent()
-    builder.add_agent(loc, brain, team=team_name, name=f"Agent Smith 2", sense_capability=sense_capability)
+    builder.add_agent(loc, brain, team=team_name, name=f"Agent Smith #2", sense_capability=sense_capability)
 
 
 def add_rooms(builder):
@@ -176,13 +176,13 @@ def create_builder():
                            visualization_bg_img="")
 
     # Add the world bounds (not needed, as agents cannot 'walk off' the grid, but for visual effect)
-    # builder.add_room(top_left_location=(0, 0), width=world_size[0], height=world_size[1], name="world_bounds")
+    builder.add_room(top_left_location=(0, 0), width=world_size[0], height=world_size[1], name="world_bounds")
 
     # Create the rooms
-    # room_locations = add_rooms(builder)
+    room_locations = add_rooms(builder)
 
     # Add the blocks the agents need to collect, we do so probabilistically so each world will contain different blocks
-    # add_blocks(builder, room_locations, block_colours)
+    add_blocks(builder, room_locations, block_colours)
 
     # Create the drop-off zones, this includes generating the random colour/shape combinations to collect.
     add_drop_off_zone(builder, world_size, block_colours, nr_blocks_to_collect=2)
