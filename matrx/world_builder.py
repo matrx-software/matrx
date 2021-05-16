@@ -1123,10 +1123,6 @@ class WorldBuilder:
                           f"{(int(location[0]), int(location[1]))}")
             location = (int(location[0]), int(location[1]))
 
-        # Load default parameters if not passed
-        if is_movable is None:
-            is_movable = defaults.ENVOBJECT_IS_MOVABLE
-
         # If default variables are not given, assign them (most empty, except
         # of sense_capability that defaults to all objects with infinite
         # range).
