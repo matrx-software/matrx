@@ -62,14 +62,19 @@ class State(MutableMapping):
         # Check for non-zero decays and flag them for keeping (this now also
         # includes all new_ids as we just added them).
         to_keep_ids = []
+        to_remove_ids = []
         for obj_id, decay in self.__decays.items():
             if decay > 0:
                 to_keep_ids.append(obj_id)
-            # remove all zero decay objects, this reduces
+            # tag all zero decay objects, this reduces
             # the self.__decays of growing with zero decays
             else:
-                self.__decays.pop(obj_id)
+                to_remove_ids.append(obj_id)
         to_keep_ids = set(to_keep_ids)
+        
+        # Remove zero decay items
+        for obj_id in to_remove_ids:
+            self.__decays.pop(obj_id, None)
 
         # Create new state
         new_state = {}
