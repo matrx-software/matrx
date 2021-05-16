@@ -703,9 +703,12 @@ class GridWorld:
                 else:
                     self.__message_buffer[mssg.to_id].append(mssg)
 
+        # Get the world/god state
+        world_state = self.__get_complete_state()
+
         # save the god view state
         if self.__run_matrx_api:
-            api._add_state(agent_id="god", state=self.__get_complete_state(), agent_inheritence_chain="god",
+            api._add_state(agent_id="god", state=world_state, agent_inheritence_chain="god",
                           world_settings=self.__get_complete_state()['World'])
 
             # make the information of this tick available via the api, after all
@@ -726,7 +729,7 @@ class GridWorld:
                 action_kwargs = {}
 
             # Actually perform the action (if possible), also sets the result in the agent's brain
-            self.__perform_action(agent_id, action_class_name, action_kwargs)
+            self.__perform_action(agent_id, action_class_name, action_kwargs, world_state)
 
             # Update the grid
             self.__update_grid()
@@ -897,7 +900,7 @@ class GridWorld:
 
         return state
 
-    def __check_action_is_possible(self, agent_id, action_name, action_kwargs):
+    def __check_action_is_possible(self, agent_id, action_name, action_kwargs, world_state):
         # If the action_name is None, the agent idles
         if action_name is None:
             result = ActionResult(ActionResult.IDLE_ACTION, succeeded=True)
@@ -924,7 +927,7 @@ class GridWorld:
             action = action_class()
             # Check if action is possible, if so we can perform the action otherwise we send an ActionResult that it was
             # not possible.
-            result = action.is_possible(self, agent_id, **action_kwargs)
+            result = action.is_possible(self, agent_id, world_state=world_state, **action_kwargs)
 
         else:  # If the action is not known
             warnings.warn(f"The action with name {action_name} was not found when checking whether this action is "
@@ -933,10 +936,10 @@ class GridWorld:
 
         return result
 
-    def __perform_action(self, agent_id, action_name, action_kwargs):
+    def __perform_action(self, agent_id, action_name, action_kwargs, world_state):
 
         # Check if the action will succeed
-        result = self.__check_action_is_possible(agent_id, action_name, action_kwargs)
+        result = self.__check_action_is_possible(agent_id, action_name, action_kwargs, world_state)
 
         # If it will succeed, perform it.
         if result.succeeded:
@@ -950,7 +953,7 @@ class GridWorld:
             # Make instance of action
             action = action_class()
             # Apply world mutation
-            result = action.mutate(self, agent_id, **action_kwargs)
+            result = action.mutate(self, agent_id, world_state=world_state, **action_kwargs)
 
             # Update the grid
             self.__update_agent_location(agent_id)

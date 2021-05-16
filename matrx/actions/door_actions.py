@@ -32,7 +32,7 @@ class OpenDoorAction(Action):
     def __init__(self, duration_in_ticks=0):
         super().__init__(duration_in_ticks)
 
-    def mutate(self, grid_world, agent_id, **kwargs):
+    def mutate(self, grid_world, agent_id, world_state, **kwargs):
         """ Opens a door in the world.
 
         Mutates the `door_status` of an
@@ -50,11 +50,14 @@ class OpenDoorAction(Action):
         agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id : st
-            Optional. Default: ``None``
-
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when performing an
+            action. Note that this is the State of the entire world, not
+            that of the agent performing the action.
+        object_id : str (Optional. Default: None)
             The string representing the unique identifier of the door that
-            should be opened.
+            should be opened. If none is given, the closest door is selected.
         door_range : int
             Optional. Default: ``np.inf``
 
@@ -89,7 +92,7 @@ class OpenDoorAction(Action):
         result = OpenDoorActionResult(OpenDoorActionResult.RESULT_SUCCESS, True)
         return result
 
-    def is_possible(self, grid_world, agent_id, **kwargs):
+    def is_possible(self, grid_world, agent_id, world_state, **kwargs):
         """ Check if the OpenDoorAction is possible.
 
         Parameters
@@ -100,11 +103,14 @@ class OpenDoorAction(Action):
         agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id : str
-            Optional. Default: ``None``
-
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when checking if an
+            action can be performed. Note that this is the State of the
+            entire world, not that of the agent performing the action.
+        object_id : str (Optional. Default: None)
             The string representing the unique identifier of the door that
-            should be opened.
+            should be opened. If none is given, the closest door is selected.
         door_range : int
             Optional. Default: ``np.inf``
 
@@ -157,7 +163,7 @@ class CloseDoorAction(Action):
     def __init__(self, duration_in_ticks=0):
         super().__init__(duration_in_ticks)
 
-    def mutate(self, grid_world, agent_id, **kwargs):
+    def mutate(self, grid_world, agent_id, world_state, **kwargs):
         """ Closes a door in the world.
 
         Mutates the `door_status` of an
@@ -175,11 +181,14 @@ class CloseDoorAction(Action):
         agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id : st
-            Optional. Default: ``None``
-
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when performing an
+            action. Note that this is the State of the entire world, not
+            that of the agent performing the action.
+        object_id : str (Optional. Default: None)
             The string representing the unique identifier of the door that
-            should be closed.
+            should be opened. If none is given, the closest door is selected.
         door_range : int
             Optional. Default: ``np.inf``
 
@@ -211,7 +220,7 @@ class CloseDoorAction(Action):
         result = CloseDoorActionResult(CloseDoorActionResult.RESULT_SUCCESS, True)
         return result
 
-    def is_possible(self, grid_world, agent_id, **kwargs):
+    def is_possible(self, grid_world, agent_id, world_state, **kwargs):
         """Check if the CloseDoorAction is possible.
 
         Parameters
@@ -222,11 +231,14 @@ class CloseDoorAction(Action):
         agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id : str
-            Optional. Default: ``None``
-
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when checking if an
+            action can be performed. Note that this is the State of the
+            entire world, not that of the agent performing the action.
+        object_id : str (Optional. Default: None)
             The string representing the unique identifier of the door that
-            should be closed.
+            should be opened. If none is given, the closest door is selected.
         door_range : int
             Optional. Default: ``np.inf``
 
@@ -381,7 +393,7 @@ def _is_possible_door_open_close(grid_world, agent_id, action_result, object_id=
     objects_in_range = grid_world.get_objects_in_range(loc_agent, object_type=Door, sense_range=door_range)
 
     # there is no Door in range, so not possible to open any door
-    if len(objects_in_range) is 0:
+    if len(objects_in_range) == 0:
         return action_result(action_result.NO_DOORS_IN_RANGE, False)
 
     # if we did not get a specific door to open, we simply return success as it is possible to open an arbitrary door
