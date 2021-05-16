@@ -134,10 +134,10 @@ def add_agents(builder, block_sense_range, other_sense_range, memorize_for_ticks
     # the Human Agent.
     loc = (2, 1)
     brain = BlockWorldAgent()
-    builder.add_agent(loc, brain, team=team_name, name=f"Agent Smith #1", sense_capability=sense_capability)
+    builder.add_agent(loc, brain, team=team_name, name=f"Agent Smith 1", sense_capability=sense_capability)
     loc = (3, 1)
     brain = BlockWorldAgent()
-    builder.add_agent(loc, brain, team=team_name, name=f"Agent Smith #2", sense_capability=sense_capability)
+    builder.add_agent(loc, brain, team=team_name, name=f"Agent Smith 2", sense_capability=sense_capability)
 
 
 def add_rooms(builder):
