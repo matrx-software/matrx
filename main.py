@@ -8,5 +8,5 @@ if __name__ == "__main__":
     # cases.run_simple_case()
     # cases.run_test_navigators()
     cases.run_bw4t()
+    # cases.run_logger_test()
     # cases.run_arg_test()
-

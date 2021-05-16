@@ -8,7 +8,9 @@ import copy
 import gevent
 
 from matrx.actions.object_actions import *
-from matrx.logger.logger import GridWorldLogger
+from matrx.goals import WorldGoalV2
+from matrx.logger.logger import GridWorldLogger, GridWorldLoggerV2
+from matrx.agents.agent_utils.state import State
 from matrx.objects.env_object import EnvObject
 from matrx.objects.standard_objects import AreaTile
 from matrx.messages.message_manager import MessageManager
@@ -613,8 +615,11 @@ class GridWorld:
         # Set tick start of current tick
         start_time_current_tick = datetime.datetime.now()
 
+        # Get the world state
+        world_state = self.__get_complete_state()
+
         # Check if we are done based on our global goal assessment function
-        self.__is_done, goal_status = self.__check_simulation_goal()
+        self.__is_done, goal_status = self.__check_simulation_goal(world_state)
 
         # Log the data if we have any loggers
         for logger in self.__loggers:
@@ -622,8 +627,13 @@ class GridWorld:
             for agent_id, agent_body in self.__registered_agents.items():
                 agent_data_dict[agent_id] = agent_body.get_log_data()
 
-            logger._grid_world_log(grid_world=self, agent_data=agent_data_dict,
-                                   last_tick=self.__is_done, goal_status=goal_status)
+            # Check if the logger is an old or V2 version.
+            if isinstance(logger, GridWorldLoggerV2):
+                logger._grid_world_log(world_state=world_state, agent_data=agent_data_dict, grid_world=self,
+                                       last_tick=self.__is_done, goal_status=goal_status)
+            else:
+                logger._grid_world_log(agent_data=agent_data_dict, grid_world=self,
+                                       last_tick=self.__is_done, goal_status=goal_status)
 
         # If this grid_world is done, we return immediately
         if self.__is_done:
@@ -661,8 +671,8 @@ class GridWorld:
                 # save the current agent's state for the api
                 if self.__run_matrx_api:
                     api._add_state(agent_id=agent_id, state=filtered_agent_state,
-                                  agent_inheritence_chain=agent_obj.class_inheritance,
-                                  world_settings=self.__get_complete_state()['World'])
+                                   agent_inheritence_chain=agent_obj.class_inheritance,
+                                   world_settings=world_state['World'])
 
             else:  # agent is not busy
 
@@ -712,8 +722,8 @@ class GridWorld:
             # save the current agent's state for the api
             if self.__run_matrx_api:
                 api._add_state(agent_id=agent_id, state=filtered_agent_state,
-                              agent_inheritence_chain=agent_obj.class_inheritance,
-                              world_settings=self.__get_complete_state()['World'])
+                               agent_inheritence_chain=agent_obj.class_inheritance,
+                               world_settings=world_state['World'])
 
             # if this agent is at its last tick of waiting on its action duration, we want to actually perform the
             # action
@@ -733,8 +743,8 @@ class GridWorld:
 
         # save the god view state
         if self.__run_matrx_api:
-            api._add_state(agent_id="god", state=self.__get_complete_state(), agent_inheritence_chain="god",
-                          world_settings=self.__get_complete_state()['World'])
+            api._add_state(agent_id="god", state=world_state, agent_inheritence_chain="god",
+                           world_settings=world_state['World'])
 
             # make the information of this tick available via the api, after all
             # agents have been updated
@@ -754,7 +764,7 @@ class GridWorld:
                 action_kwargs = {}
 
             # Actually perform the action (if possible), also sets the result in the agent's brain
-            self.__perform_action(agent_id, action_class_name, action_kwargs)
+            self.__perform_action(agent_id, action_class_name, action_kwargs, world_state)
 
             # Update the grid
             self.__update_grid()
@@ -794,16 +804,27 @@ class GridWorld:
 
         return self.__is_done, self.__curr_tick_duration
 
-    def __check_simulation_goal(self):
+    def __check_simulation_goal(self, world_state):
 
         goal_status = {}
         if self.__simulation_goal is not None:
             if isinstance(self.__simulation_goal, (list, tuple)):  # edited this check to include tuples
                 for sim_goal in self.__simulation_goal:
-                    is_done = sim_goal.goal_reached(self)
+
+                    # Check if the goal is a new V2 goal
+                    if isinstance(sim_goal, WorldGoalV2):
+                        is_done = sim_goal.goal_reached(world_state, self)
+                    else:
+                        is_done = sim_goal.goal_reached(self)
+
+                    # Store goal status
                     goal_status[sim_goal] = is_done
             else:
-                is_done = self.__simulation_goal.goal_reached(self)
+                # Check if the goal is a new V2 goal
+                if isinstance(self.__simulation_goal, WorldGoalV2):
+                    is_done = self.__simulation_goal.goal_reached(world_state, self)
+                else:
+                    is_done = self.__simulation_goal.goal_reached(self)
                 goal_status[self.__simulation_goal] = is_done
 
         is_done = np.array(list(goal_status.values())).all()
@@ -836,15 +857,19 @@ class GridWorld:
         :return: state with all objects and agents on the grid
         """
 
-        # create a state with all objects and agents
-        state = {}
+        # create a state dict with all objects and agents
+        state_dict = {}
         for obj_id, obj in self.__environment_objects.items():
-            state[obj.obj_id] = obj.properties
+            state_dict[obj.obj_id] = obj.properties
         for agent_id, agent in self.__registered_agents.items():
-            state[agent.obj_id] = agent.properties
+            state_dict[agent.obj_id] = agent.properties
+
+        # Create State
+        state = State(own_id=None)
+        state.state_update(state_dict)
 
         # Append generic properties (e.g. number of ticks, size of grid, etc.}
-        state["World"] = {
+        world_info = {
             "nr_ticks": self.__current_nr_ticks,
             "curr_tick_timestamp": int(round(time.time() * 1000)),
             "grid_shape": self.__shape,
@@ -855,6 +880,9 @@ class GridWorld:
                 "vis_bg_img": self.__visualization_bg_img
             }
         }
+
+        # Add world info to State
+        state._add_world_info(world_info)
 
         return state
 
@@ -888,15 +916,19 @@ class GridWorld:
             if type(wildcard_obj) not in sense_capabilities.keys():
                 objs_in_range[wildcard_obj_id] = wildcard_obj
 
-        state = {}
+        state_dict = {}
         # Save all properties of the sensed objects in a state dictionary
         for env_obj in objs_in_range:
-            state[env_obj] = objs_in_range[env_obj].properties
+            state_dict[env_obj] = objs_in_range[env_obj].properties
+
+        # Create State object out of state dict
+        state = State(agent_obj.obj_id)
+        state.state_update(state_dict)
 
         # Append generic properties (e.g. number of ticks, fellow team members, etc.}
         team_members = [agent_id for agent_id, other_agent in self.__registered_agents.items()
                         if agent_obj.team == other_agent.team]
-        state["World"] = {
+        world_info = {
             "nr_ticks": self.__current_nr_ticks,
             "curr_tick_timestamp": int(round(time.time() * 1000)),
             "grid_shape": self.__shape,
@@ -909,9 +941,12 @@ class GridWorld:
             }
         }
 
+        # Add it to State
+        state._add_world_info(world_info)
+
         return state
 
-    def __check_action_is_possible(self, agent_id, action_name, action_kwargs):
+    def __check_action_is_possible(self, agent_id, action_name, action_kwargs, world_state):
         # If the action_name is None, the agent idles
         if action_name is None:
             result = ActionResult(ActionResult.IDLE_ACTION, succeeded=True)
@@ -938,7 +973,7 @@ class GridWorld:
             action = action_class()
             # Check if action is possible, if so we can perform the action otherwise we send an ActionResult that it was
             # not possible.
-            result = action.is_possible(self, agent_id, **action_kwargs)
+            result = action.is_possible(self, agent_id, world_state=world_state, **action_kwargs)
 
         else:  # If the action is not known
             warnings.warn(f"The action with name {action_name} was not found when checking whether this action is "
@@ -947,10 +982,10 @@ class GridWorld:
 
         return result
 
-    def __perform_action(self, agent_id, action_name, action_kwargs):
+    def __perform_action(self, agent_id, action_name, action_kwargs, world_state):
 
         # Check if the action will succeed
-        result = self.__check_action_is_possible(agent_id, action_name, action_kwargs)
+        result = self.__check_action_is_possible(agent_id, action_name, action_kwargs, world_state)
 
         # If it will succeed, perform it.
         if result.succeeded:
@@ -964,7 +999,7 @@ class GridWorld:
             # Make instance of action
             action = action_class()
             # Apply world mutation
-            result = action.mutate(self, agent_id, **action_kwargs)
+            result = action.mutate(self, agent_id, world_state=world_state, **action_kwargs)
 
             # Update the grid
             self.__update_agent_location(agent_id)

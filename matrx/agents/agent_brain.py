@@ -563,7 +563,7 @@ class AgentBrain:
         self.agent_properties = agent_properties
 
         # Update the state property of an agent with the GridWorld's state dictionary
-        self.state.state_update(state)
+        self.state.state_update(state.as_dict())
 
         # Call the filter method to filter the observation
         self.state = self.filter_observations(self.state)
@@ -574,18 +574,14 @@ class AgentBrain:
         # Store the action so in the next call the agent still knows what it did
         self.previous_action = action
 
-        # Get the dictionary from the State object
-        filtered_state = self.state.as_dict()
-
         # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
         # action if needed.
-        return filtered_state, self.agent_properties, action, action_kwargs
+        return self.state, self.agent_properties, action, action_kwargs
 
-    def _fetch_state(self, state_dict):
-        self.state.state_update(state_dict)
-        state = self.filter_observations(self.state)
-        filtered_state_dict = state.as_dict()
-        return filtered_state_dict
+    def _fetch_state(self, state):
+        self.state.state_update(state.as_dict())
+        filtered_state = self.filter_observations(self.state)
+        return filtered_state
 
     def _get_log_data(self):
         return self.get_log_data()

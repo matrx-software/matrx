@@ -245,7 +245,7 @@ class Move(Action):
         self.dx = 0
         self.dy = 0
 
-    def is_possible(self, grid_world, agent_id, **kwargs):
+    def is_possible(self, grid_world, agent_id, world_state, **kwargs):
         """ Checks if the move is possible.
 
         Checks for the following:
@@ -263,6 +263,11 @@ class Move(Action):
         agent_id : str
             The unique identifier for the agent whose location should be
             changed.
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when checking if an
+            action can be performed. Note that this is the State of the
+            entire world, not that of the agent performing the action.
         **kwargs : dict
             Not used.
 
@@ -278,7 +283,7 @@ class Move(Action):
         result = _is_possible_movement(grid_world, agent_id=agent_id, dx=self.dx, dy=self.dy)
         return result
 
-    def mutate(self, grid_world, agent_id, **kwargs):
+    def mutate(self, grid_world, agent_id, world_state, **kwargs):
         """ Mutates an agent's location
 
         Changes an agent's location property based on the attributes `dx` and
@@ -289,6 +294,11 @@ class Move(Action):
         grid_world : GridWorld
             The :class:`matrx.grid_world.GridWorld` instance in which the
             agent resides whose location should be updated.
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when performing an
+            action. Note that this is the State of the entire world, not
+            that of the agent performing the action.
         agent_id : str
             The unique identifier for the agent whose location should be
             changed.

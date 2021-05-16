@@ -10,4 +10,6 @@ from matrx.cases.bw4t.bw4t import create_builder as create_bw4t
 from matrx.cases.bw4t.bw4t import run as run_bw4t
 from matrx.cases.test_navigators import create_builder as create_test_navigators
 from matrx.cases.test_navigators import run_test_navigators
+from matrx.cases.logger_test import run_logger_test
 from matrx.cases.test_obj_arguments import run_arg_test
+

@@ -34,7 +34,7 @@ class Action:
         # number of ticks the action takes to complete
         self.duration_in_ticks = duration_in_ticks
 
-    def mutate(self, grid_world, agent_id, **kwargs):
+    def mutate(self, grid_world, agent_id, world_state, **kwargs):
         """ Method that mutates the world.
 
         This method is allowed to mutate a :class:`matrx.grid_world.GridWorld`
@@ -44,11 +44,16 @@ class Action:
 
         Parameters
         ----------
-        grid_world
+        grid_world : GridWorld
             The GridWorld instance that should be mutated according to the
             Action's intended purpose.
         agent_id : string
             The unique identifier of the agent performing this action.
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when performing an
+            action. Note that this is the State of the entire world, not
+            that of the agent performing the action.
         **kwargs
             The set of keyword arguments provided by the agent that decided
             upon this action. When overriding this method and setting required
@@ -98,7 +103,7 @@ class Action:
         """
         return None
 
-    def is_possible(self, grid_world, agent_id, **kwargs):
+    def is_possible(self, grid_world, agent_id, world_state, **kwargs):
         """ Checks if the Action is possible.
 
         This method analyses a :class:`matrx.grid_world.GridWorld` instance
@@ -112,6 +117,11 @@ class Action:
             is possible.
         agent_id : string
             The unique identifier of the agent performing this action.
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when checking if an
+            action can be performed. Note that this is the State of the
+            entire world, not that of the agent performing the action.
         kwargs : dictionary
             The set of keyword arguments provided by the Agent that decided
             upon this action. When overriding this method and setting required
