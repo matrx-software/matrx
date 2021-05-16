@@ -119,7 +119,8 @@ function draw(state, world_settings, new_messages, accessible_chatrooms, new_tic
             "opacity": obj['visualization']['opacity'],
             "dimension": tile_size, // width / height of the tile
             "busy": (show_busy_condition ? obj['is_blocked_by_action'] : false), // show busy if available and requested
-            "selected": (object_selected == objID ? true : false)
+            "selected": (object_selected == objID ? true : false),
+            "visualize_from_center": obj['visualization']['visualize_from_center']
         };
 
         // Check if any subtiles have been defined and include them in the ob_vis_settings if so
@@ -457,9 +458,12 @@ function gen_rectangle(obj_vis_settings, obj_element, element_type = "div") {
 
     // no subtiles defined, place the rectangle in the usual manner
     } else {
-        // coords of top left corner, such that it is centered in our tile
-        shape.style.left = ((1 - size) * 0.5 * tile_size) + "px";
-        shape.style.top = ((1 - size) * 0.5 * tile_size) + "px";
+        // there is a specific setting for rendering objects from the top left instead of center
+        if (!("visualize_from_center" in obj_vis_settings && obj_vis_settings['visualize_from_center'] == false)) {
+            // coords of top left corner, such that it is centered in our tile
+            shape.style.left = ((1 - size) * 0.5 * tile_size) + "px";
+            shape.style.top = ((1 - size) * 0.5 * tile_size) + "px";
+        }
 
         // width and height of rectangle
         shape.style.width = size * tile_size + "px";
