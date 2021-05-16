@@ -92,8 +92,8 @@ class EnvObject:
         if not hasattr(self, "obj_id"):
             # remove double spaces
             tmp_obj_name = " ".join(name.split())
-            # append a object ID to the end of the object name
-            self.obj_id = _ensure_unique_obj_ID(f"{tmp_obj_name}".replace(" ", "_"))
+            # create the object ID based on the object name 
+            self.obj_id = f"{tmp_obj_name}".replace(" ", "_")
 
             # prevent breaking of the frontend
             if "#" in self.obj_id:
@@ -317,29 +317,6 @@ class EnvObject:
         Here to protect the 'properties' variable. It does not do anything and should not do anything!
         """
         pass
-
-
-
-# keep track of all obj IDs added so far
-added_obj_ids = []
-
-def _ensure_unique_obj_ID(obj_id):
-    """ Make sure every obj ID is unique by adding an increasing count to objects with duplicate names.
-    Example: three objects named "drone". The object IDs will then become "drone", "drone_1", "drone_2", etc."""
-    if obj_id in added_obj_ids:
-
-        # found the next obj ID based on the obj name + count
-        i = 1
-        while f"{obj_id}_{i}" in added_obj_ids:
-            i += 1
-
-        # warnings.warn(f"There already exists an object with name {obj_id}, new object ID is: {obj_id}_{i}")
-        obj_id = f"{obj_id}_{i}"
-
-    # keep track of all object IDs we added
-    added_obj_ids.append(obj_id)
-    return obj_id
-
 
 def _get_inheritence_path(callable_class):
     """ Returns the parent's class names of the given class.
