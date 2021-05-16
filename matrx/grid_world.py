@@ -87,6 +87,7 @@ class GridWorld:
         self.__teams = {}  # dictionary with team names (keys), and agents in those teams (values)
         self.__registered_agents = OrderedDict()  # The dictionary of all existing agents in the GridWorld
         self.__environment_objects = OrderedDict()  # The dictionary of all existing objects in the GridWorld
+        self.__obj_indices = {} # keeps track of all obj_ids added, indexed by their (preprocessed) obj name
 
         # Load about file and fetch MATRX version
         about = {}
@@ -94,7 +95,8 @@ class GridWorld:
         with open(about_file, 'r') as f:
             exec(f.read(), about)
         self.__matrx_version = about['__version__']
-        print(f"Running MATRX version {self.__matrx_version}")
+        if self.__verbose:
+            print(f"Running MATRX version {self.__matrx_version}")
 
         # The simulation goal, the simulation ends when this/these are reached.
         # Copy and reset all simulation goals, this to make sure that this world has its own goals independent of any
@@ -513,6 +515,8 @@ class GridWorld:
         # check if the object can be succesfully placed at that location
         self.__validate_obj_placement(env_object)
 
+        env_object.obj_id = self.__ensure_unique_obj_name(env_object.obj_id)
+
         # Assign id to environment sparse dictionary grid
         self.__environment_objects[env_object.obj_id] = env_object
 
@@ -520,6 +524,31 @@ class GridWorld:
             print(f"@{__file__}: Created an environment object with id {env_object.obj_id}.")
 
         return env_object.obj_id
+
+    def __ensure_unique_obj_name(self, obj_id):
+        """ Make sure every obj ID is unique by adding an increasing count to objects with duplicate IDs.
+        Example: three objects named "drone". The object IDs will then become "drone", "drone_1", "drone_2", etc."""
+
+        # check if an object by this name was already added, and gen a unique ID if so 
+        if obj_id in self.__obj_indices.keys():
+
+            # get the latest index we are at for this obj, e.g. wall #10
+            n = self.__obj_indices[obj_id] 
+            self.__obj_indices[obj_id] += 1
+
+            # double check that the new id is unique or increment until it is 
+            while f"{obj_id}_{n}" in self.__obj_indices.keys():
+                n = self.__obj_indices[obj_id]
+                self.__obj_indices[obj_id] += 1
+
+            # set the new id 
+            obj_id = f"{obj_id}_{n}"
+
+        # otherwise obj name can be used as obj id 
+        else:
+            self.__obj_indices[obj_id] = 1
+
+        return obj_id
 
     def _register_teams(self):
         """ Register all teams and who is in those teams.
