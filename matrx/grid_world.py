@@ -8,6 +8,7 @@ import copy
 import gevent
 
 from matrx.actions.object_actions import *
+from matrx.goals import WorldGoalV2
 from matrx.logger.logger import GridWorldLogger, GridWorldLoggerV2
 from matrx.agents.agent_utils.state import State
 from matrx.objects.env_object import EnvObject
@@ -585,11 +586,11 @@ class GridWorld:
         # Set tick start of current tick
         start_time_current_tick = datetime.datetime.now()
 
-        # Check if we are done based on our global goal assessment function
-        self.__is_done, goal_status = self.__check_simulation_goal()
-
         # Get the world state
         world_state = self.__get_complete_state()
+
+        # Check if we are done based on our global goal assessment function
+        self.__is_done, goal_status = self.__check_simulation_goal(world_state)
 
         # Log the data if we have any loggers
         for logger in self.__loggers:
@@ -774,16 +775,27 @@ class GridWorld:
 
         return self.__is_done, self.__curr_tick_duration
 
-    def __check_simulation_goal(self):
+    def __check_simulation_goal(self, world_state):
 
         goal_status = {}
         if self.__simulation_goal is not None:
             if isinstance(self.__simulation_goal, (list, tuple)):  # edited this check to include tuples
                 for sim_goal in self.__simulation_goal:
-                    is_done = sim_goal.goal_reached(self)
+
+                    # Check if the goal is a new V2 goal
+                    if isinstance(sim_goal, WorldGoalV2):
+                        is_done = sim_goal.goal_reached(world_state, self)
+                    else:
+                        is_done = sim_goal.goal_reached(self)
+
+                    # Store goal status
                     goal_status[sim_goal] = is_done
             else:
-                is_done = self.__simulation_goal.goal_reached(self)
+                # Check if the goal is a new V2 goal
+                if isinstance(self.__simulation_goal, WorldGoalV2):
+                    is_done = self.__simulation_goal.goal_reached(world_state, self)
+                else:
+                    is_done = self.__simulation_goal.goal_reached(self)
                 goal_status[self.__simulation_goal] = is_done
 
         is_done = np.array(list(goal_status.values())).all()
