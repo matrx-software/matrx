@@ -1900,6 +1900,9 @@ class WorldBuilder:
 
     def add_room(self, top_left_location, width, height, name,
                  door_locations=None, with_area_tiles=False, doors_open=False,
+                 door_open_colour=None,
+                 door_closed_colour=None,
+                 door_visualization_opacity=None,
                  wall_visualize_colour=None, wall_visualize_opacity=None,
                  wall_custom_properties=None,
                  wall_customizable_properties=None,
@@ -1939,6 +1942,15 @@ class WorldBuilder:
 
         doors_open : bool (optional, False)
             Whether the doors are initially open or closed.
+
+        door_open_colour: str (optional, "#006400")
+            Colour, as hexidecimal string, when a room door is closed. Defaults to a shade of green.
+
+        door_closed_colour: str (optional, "#640000")
+            Colour, as hexidecimal string, when a room door is open. Defaults to a shade of red.
+
+        door_visualization_opacity: str (optional, 1.0)
+            Opacity of the object, as a percentge from 0.0 (fully opaque) to 1.0 (no opacity). Defaults to 1.0.
 
         wall_visualize_colour : string (optional, default None)
             The colour of the walls.
@@ -2067,6 +2079,8 @@ class WorldBuilder:
         # Add all doors
         for door_loc in door_locations:
             self.add_object(location=door_loc, name=f"{name} - door@{door_loc}", callable_class=Door,
+                            open_colour=door_open_colour, closed_colour=door_closed_colour,
+                            visualize_opacity=door_visualization_opacity,
                             is_open=doors_open, **{"room_name": name})
 
         # Add all area tiles if required
@@ -2083,44 +2097,6 @@ class WorldBuilder:
                           visualize_colour=area_visualize_colour, visualize_opacity=area_visualize_opacity,
                           customizable_properties=area_customizable_properties,
                           **{**area_custom_properties, "room_name": name})
-
-    @staticmethod
-    def get_room_locations(room_top_left, room_width, room_height):
-        """ Returns the locations within a room, excluding walls.
-
-        .. deprecated:: 1.1.0
-          `get_room_locations` will be removed in MATRX 1.2.0, it is replaced by
-          `matrx.utils.get_room_locations`.
-
-        This is a helper function for adding objects to a room. It returns a
-        list of all (x,y) coordinates that fall within the room excluding the
-        walls.
-
-        Parameters
-        ----------
-        room_top_left : tuple, (x, y)
-            The top left coordinates of a room, as used to add that room with
-            methods such as `add_room`.
-        room_width : int
-            The width of the room.
-        room_height : int
-            The height of the room.
-
-        Returns
-        -------
-        list, [(x,y), ...]
-            A list of (x, y) coordinates that are encapsulated in the
-            rectangle, excluding walls.
-
-        See Also
-        --------
-        WorldBuilder.add_room
-
-        """
-        warnings.warn("This method is deprecated and will be removed in v1.2.0. It is replaced by"
-                      "`matrx.utils.get_room_locations` as of v1.1.0.", DeprecationWarning)
-        locs = utils.get_room_locations(room_top_left, room_width, room_height)
-        return locs
 
     def __set_world_settings(self, shape, tick_duration, simulation_goal, rnd_seed,
                              visualization_bg_clr, visualization_bg_img, verbose):

@@ -1048,3 +1048,7 @@ class GridWorld:
         """float: the desired duration of one tick. The real tick_duration might be longer due to a large amount of
          processing that needs to be done each tick by one or multiple agents. """
         return self.__tick_duration
+
+    @property
+    def loggers(self):
+        return self.__loggers

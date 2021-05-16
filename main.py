@@ -9,3 +9,4 @@ if __name__ == "__main__":
     # cases.run_test_navigators()
     cases.run_bw4t()
     # cases.run_arg_test()
+

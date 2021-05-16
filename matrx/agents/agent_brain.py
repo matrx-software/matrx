@@ -117,6 +117,11 @@ class AgentBrain:
         the instance of your agent brain will have attributes with values from
         the previous run. This method can be used to reset them.  
         """
+        self.previous_action = None
+        self.previous_action_result = None
+        self.messages_to_send = []
+        self.received_messages = []
+        self._init_state()
 
     def filter_observations(self, state):
         """ Filters the world state before deciding on an action.
