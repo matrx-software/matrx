@@ -1123,10 +1123,6 @@ class WorldBuilder:
                           f"{(int(location[0]), int(location[1]))}")
             location = (int(location[0]), int(location[1]))
 
-        # Load default parameters if not passed
-        if is_movable is None:
-            is_movable = defaults.ENVOBJECT_IS_MOVABLE
-
         # If default variables are not given, assign them (most empty, except
         # of sense_capability that defaults to all objects with infinite
         # range).
@@ -2149,7 +2145,8 @@ class WorldBuilder:
         for idx, obj_settings in enumerate(self.object_settings):
             # Print progress (so user knows what is going on)
             if idx % max(10, int(len(self.object_settings) * 0.1)) == 0:
-                print(f"Creating objects... @{np.round(idx / len(self.object_settings) * 100, 0)}%")
+                if self.verbose:
+                    print(f"Creating objects... @{np.round(idx / len(self.object_settings) * 100, 0)}%")
 
             env_object = self.__create_env_object(obj_settings)
             if env_object is not None:
@@ -2160,7 +2157,8 @@ class WorldBuilder:
         for idx, agent_settings in enumerate(self.agent_settings):
             # Print progress (so user knows what is going on)
             if idx % max(10, int(len(self.agent_settings) * 0.1)) == 0:
-                print(f"Creating agents... @{np.round(idx / len(self.agent_settings) * 100, 0)}%")
+                if self.verbose:
+                    print(f"Creating agents... @{np.round(idx / len(self.agent_settings) * 100, 0)}%")
 
             agent, agent_avatar = self.__create_agent_avatar(agent_settings)
             if agent_avatar is not None:
@@ -2170,7 +2168,8 @@ class WorldBuilder:
         for idx, env_object in enumerate(objs):
             # Print progress (so user knows what is going on)
             if idx % max(10, int(len(objs) * 0.1)) == 0:
-                print(f"Adding objects... @{np.round(idx / len(objs) * 100, 0)}%")
+                if self.verbose:
+                    print(f"Adding objects... @{np.round(idx / len(objs) * 100, 0)}%")
 
             world._register_env_object(env_object)
 
@@ -2178,7 +2177,8 @@ class WorldBuilder:
         for idx, agent in enumerate(avatars):
             # Print progress (so user knows what is going on)
             if idx % max(10, int(len(objs) * 0.1)) == 0:
-                print(f"Adding agents... @{np.round(idx / len(avatars) * 100, 0)}%")
+                if self.verbose:
+                    print(f"Adding agents... @{np.round(idx / len(avatars) * 100, 0)}%")
             world._register_agent(agent[0], agent[1])
 
         # Register all teams and who is in them
@@ -2259,7 +2259,6 @@ class WorldBuilder:
             for arg, val in given_args.items():
                 if val is not None:
                     args[arg] = val
-                
 
         args = self.__instantiate_random_properties(args)
 
