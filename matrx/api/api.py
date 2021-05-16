@@ -7,6 +7,7 @@ from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
 from matrx.messages.message import Message
+from matrx.agents.agent_utils.state import State
 
 _debug = True
 
@@ -1009,7 +1010,8 @@ def _add_state(agent_id, state, agent_inheritence_chain, world_settings):
     # state['World']['matrx_paused'] = matrx_paused
 
     # reorder and save the new state along with some meta information
-    _temp_state[agent_id] = {'state': __reorder_state(state), 'agent_inheritence_chain': agent_inheritence_chain}
+    reordered_state = __reorder_state(state)
+    _temp_state[agent_id] = {'state': reordered_state, 'agent_inheritence_chain': agent_inheritence_chain}
 
 
 def _next_tick():

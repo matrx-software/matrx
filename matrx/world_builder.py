@@ -12,7 +12,7 @@ from matrx.agents.agent_brain import AgentBrain
 from matrx.agents.capabilities.capability import SenseCapability
 from matrx.agents.agent_types.human_agent import HumanAgentBrain
 from matrx.grid_world import GridWorld
-from matrx.logger.logger import GridWorldLogger
+from matrx.logger.logger import GridWorldLogger, GridWorldLoggerV2
 from matrx.objects.agent_body import AgentBody
 from matrx.objects.env_object import EnvObject, _get_inheritence_path
 from matrx import utils
@@ -352,7 +352,7 @@ class WorldBuilder:
 
         """
 
-        if issubclass(logger_class, GridWorldLogger):
+        if issubclass(logger_class, GridWorldLogger) or issubclass(logger_class, GridWorldLoggerV2):
 
             set_params = {'log_strategy': log_strategy, 'save_path': save_path,
                           'file_name': file_name,

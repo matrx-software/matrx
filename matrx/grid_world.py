@@ -8,8 +8,8 @@ import copy
 import gevent
 
 from matrx.actions.object_actions import *
+from matrx.logger.logger import GridWorldLogger, GridWorldLoggerV2
 from matrx.agents.agent_utils.state import State
-from matrx.logger.logger import GridWorldLogger
 from matrx.objects.env_object import EnvObject
 from matrx.objects.standard_objects import AreaTile
 from matrx.messages.message_manager import MessageManager
@@ -588,14 +588,22 @@ class GridWorld:
         # Check if we are done based on our global goal assessment function
         self.__is_done, goal_status = self.__check_simulation_goal()
 
+        # Get the world state
+        world_state = self.__get_complete_state()
+
         # Log the data if we have any loggers
         for logger in self.__loggers:
             agent_data_dict = {}
             for agent_id, agent_body in self.__registered_agents.items():
                 agent_data_dict[agent_id] = agent_body.get_log_data()
 
-            logger._grid_world_log(grid_world=self, agent_data=agent_data_dict,
-                                   last_tick=self.__is_done, goal_status=goal_status)
+            # Check if the logger is an old or V2 version.
+            if isinstance(logger, GridWorldLoggerV2):
+                logger._grid_world_log(world_state=world_state, agent_data=agent_data_dict, grid_world=self,
+                                       last_tick=self.__is_done, goal_status=goal_status)
+            else:
+                logger._grid_world_log(agent_data=agent_data_dict, grid_world=self,
+                                       last_tick=self.__is_done, goal_status=goal_status)
 
         # If this grid_world is done, we return immediately
         if self.__is_done:
@@ -633,8 +641,8 @@ class GridWorld:
                 # save the current agent's state for the api
                 if self.__run_matrx_api:
                     api._add_state(agent_id=agent_id, state=filtered_agent_state,
-                                  agent_inheritence_chain=agent_obj.class_inheritance,
-                                  world_settings=self.__get_complete_state()['World'])
+                                   agent_inheritence_chain=agent_obj.class_inheritance,
+                                   world_settings=world_state['World'])
 
             else:  # agent is not busy
 
@@ -684,8 +692,8 @@ class GridWorld:
             # save the current agent's state for the api
             if self.__run_matrx_api:
                 api._add_state(agent_id=agent_id, state=filtered_agent_state,
-                              agent_inheritence_chain=agent_obj.class_inheritance,
-                              world_settings=self.__get_complete_state()['World'])
+                               agent_inheritence_chain=agent_obj.class_inheritance,
+                               world_settings=world_state['World'])
 
             # if this agent is at its last tick of waiting on its action duration, we want to actually perform the
             # action
@@ -703,13 +711,10 @@ class GridWorld:
                 else:
                     self.__message_buffer[mssg.to_id].append(mssg)
 
-        # Get the world/god state
-        world_state = self.__get_complete_state()
-
         # save the god view state
         if self.__run_matrx_api:
             api._add_state(agent_id="god", state=world_state, agent_inheritence_chain="god",
-                          world_settings=self.__get_complete_state()['World'])
+                           world_settings=world_state['World'])
 
             # make the information of this tick available via the api, after all
             # agents have been updated
