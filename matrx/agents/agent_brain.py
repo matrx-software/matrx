@@ -563,7 +563,7 @@ class AgentBrain:
         self.agent_properties = agent_properties
 
         # Update the state property of an agent with the GridWorld's state dictionary
-        self.state.state_update(state)
+        self.state.state_update(state.as_dict())
 
         # Call the filter method to filter the observation
         self.state = self.filter_observations(self.state)
