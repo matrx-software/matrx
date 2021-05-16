@@ -895,6 +895,10 @@ def __fetch_state_dicts(tick, ids=None):
         # add each agent's state for this tick
         for agent_id in ids:
             if agent_id in __states[t]:
+                # double check the state is of type dict and not a State object
+                if not isinstance(__states[t][agent_id]['state'], dict):
+                    __states[t][agent_id]['state'] = __states[t][agent_id]['state'].as_dict()
+                
                 # Get state at tick t and of agent agent_id
                 states_this_tick[agent_id] = __states[t][agent_id]
 
