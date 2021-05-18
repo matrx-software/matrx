@@ -3,23 +3,20 @@ from matrx.objects import EnvObject
 
 class CollectBlock(EnvObject):
 
-    def __init__(self, location, visualize_colour):
-        name = "Collect block"
+    def __init__(self, location, visualize_colour, name="Collect block"):
         super().__init__(location, name, class_callable=SignalBlock, is_traversable=True, is_movable=True,
                          visualize_shape=0, visualize_colour=visualize_colour)
 
 
 class SignalBlock(EnvObject):
 
-    def __init__(self, location, drop_zone_name, rank):
-        """
-        """
+
+    def __init__(self, location, drop_zone_name, rank, name="Signal Block"):
 
         self.__is_set = False
         self.__rank = rank
         self.__drop_zone_name = drop_zone_name
 
-        name = "Signal block"
         visualize_colour = "#ffffff"
         visualize_opacity = 0.0
         # customizable_properties = ["visualize_colour", "visualize_opacity"]

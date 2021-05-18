@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 
 from matrx.utils import get_distance
@@ -6,8 +8,38 @@ from matrx.agents.agent_utils.fov import _field_of_view
 
 
 class StateTracker:
+    """ The tracker of agent observations over ticks.
+
+    .. deprecated:: 2.0.7
+        `StateTracker` will be removed in a future MATRX version where it will be fully replaced by `State`.
+
+    """
 
     def __init__(self, agent_id, knowledge_decay=10, fov_occlusion=True):
+        """ Create an instance to track an agent's observations over ticks.
+
+        Parameters
+        ----------
+        agent_id : str
+            The agent id this tracker is linked to.
+        knowledge_decay : int
+            For how many ticks observations need to be remembered when not observed.
+        fov_occlusion : bool
+            Whether intraversable objects should block the agent's field of view or not.
+
+        .. deprecated:: 2.0.7
+            `StateTracker` will be removed in MATRX v2.2 and fully replaced by `State`.
+
+        Warnings
+        --------
+        The `fov_occlusion` is a very unstable feature not fully tested. Use at your own risk!
+
+        """
+
+        warnings.warn(
+            "The StateTracker will be deprecated in a future version of MATRX, replaced by State.",
+            PendingDeprecationWarning
+        )
 
         # The amount with which we forget known knowledge (we do so linearly)
         if knowledge_decay > 1.0:
@@ -33,12 +65,43 @@ class StateTracker:
         self.__decay_values = {}
 
     def set_knowledge_decay(self, knowledge_decay):
+        """ Sets the number of ticks the tracker should memorize unobserved objects.
+
+        Parameters
+        ----------
+        knowledge_decay : int
+            The number of ticks an unobserved object is memorized.
+
+        """
         self.__decay = knowledge_decay
 
     def get_memorized_state(self):
+        """ Returns the memorized state so far.
+
+        Returns
+        -------
+        dict
+            The dictionary containing all current and memorized observations.
+
+        """
         return self.__memorized_state.copy()
 
     def update(self, state):
+        """ Updates this tracker with the new observations.
+
+        This method also removes any past observations that are needed to be forgotten by now.
+
+        Parameters
+        ----------
+        state : dict
+            The state dictionary containing an agent's current observations.
+
+        Returns
+        -------
+        dict
+            The dictionary containing all current and memorized observations.
+
+        """
         # Decay all objects in our memory
         for obj_id in self.__decay_values.keys():
             self.__decay_values[obj_id] -= self.__decay
@@ -87,6 +150,30 @@ class StateTracker:
         return self.get_memorized_state()
 
     def get_traversability_map(self, inverted=False, state=None):
+        """ Returns a map where the agent can move to.
+
+        This map is based on the provided state dictionary that might represent the observations of an agent. Since
+        these observations can be limited in sense of range and accuracy, the map might not be truthful to what is
+        actually possible. This mimics the fact that an agent only knows what it can observe and infer from those
+        observations.
+
+        Parameters
+        ----------
+        inverted : bool (Default: False)
+            Whether the map should be inverted (signalling where the agent cannot move to).
+        state : dict
+            The dictionary representing the agent's (memorized) observations to be used to create the map.
+
+        Returns
+        -------
+        array
+            An array of shape (width,height) equal to the grid world's size. Contains a 1 on each (x,y) coordinate where
+            the agent can move to (a 0 when inverted) and a 0 where it cannot move to (a 1 when inverted).
+        list
+            A list of lists with the width and height of the gird world as size. Contains on each (x,y) coordinate the
+            object ID if any according to the provided state dictionary.
+
+        """
 
         if state is None:
             state = self.__memorized_state
@@ -115,6 +202,21 @@ class StateTracker:
         return traverse_map, obj_grid
 
     def __get_occluded_objects(self, state):
+        """ A private MATRX method.
+
+        Applies the Field of View (FOV) algorithm.
+
+        Parameters
+        ----------
+        state : dict
+            The dictionary representing the agent's (memorized) observations to be used to create the map.
+
+        Returns
+        -------
+        list
+            The list of objects that are being occluded by other objects.
+
+        """
         loc = state[self.agent_id]["location"]
         map_size = state['World']['grid_shape']
 

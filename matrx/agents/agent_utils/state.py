@@ -22,6 +22,14 @@ class State(MutableMapping):
 
     def state_update(self, state_dict):
 
+        # Check if the given state dict is indeed a dict, otherwise throw
+        if not isinstance(state_dict, dict):
+            if isinstance(state_dict, State):
+                raise ValueError(f"A State object can only be updated with a dictionary. Try "
+                                 f"'state.state_update(old_state.as_dict())'.")
+            else:
+                raise ValueError(f"A State object can only be updated with a dictionary.")
+
         # If decay does not matter, we simply use the given dictionary
         if self.__decay_val <= 0.0:
             # Set the previous and new state
@@ -29,7 +37,7 @@ class State(MutableMapping):
             self.__state_dict = state_dict.copy()
 
             # Set the "me"
-            self.__me = self.get_self()
+            self.__me = self.get_self()[0]
 
             # Return self
             return self
@@ -62,14 +70,19 @@ class State(MutableMapping):
         # Check for non-zero decays and flag them for keeping (this now also
         # includes all new_ids as we just added them).
         to_keep_ids = []
+        to_remove_ids = []
         for obj_id, decay in self.__decays.items():
             if decay > 0:
                 to_keep_ids.append(obj_id)
-            # remove all zero decay objects, this reduces
+            # tag all zero decay objects, this reduces
             # the self.__decays of growing with zero decays
             else:
-                self.__decays.pop(obj_id)
+                to_remove_ids.append(obj_id)
         to_keep_ids = set(to_keep_ids)
+        
+        # Remove zero decay items
+        for obj_id in to_remove_ids:
+            self.__decays.pop(obj_id, None)
 
         # Create new state
         new_state = {}
@@ -90,7 +103,7 @@ class State(MutableMapping):
         self.__state_dict = new_state
 
         # Set the "me"
-        self.__me = self.get_self()
+        self.__me = self.get_self()[0]
 
         # Return self
         return self
@@ -232,6 +245,9 @@ class State(MutableMapping):
     def as_dict(self):
         return self.__state_dict
 
+    def _add_world_info(self, world_info_dict):
+        self.__state_dict["World"] = world_info_dict
+
     ###############################################
     #     Some helpful getters for the state      #
     ###############################################
@@ -322,7 +338,7 @@ class State(MutableMapping):
             if self.__me is not None:
                 team_name = self.__me['team']
             else:
-                team_name = self.get_self()['team']
+                team_name = self.get_self()[0]['team']
         team_members = self.get_agents_with_property({'team': team_name})
         return team_members
 
@@ -394,7 +410,7 @@ class State(MutableMapping):
         if self.__me is not None:
             loc = self.__me['location']
         else:
-            loc = self.get_self()['location']
+            loc = self.get_self()[0]['location']
 
         def distance(coord):
             return utils.get_distance(loc, coord)
@@ -416,7 +432,7 @@ class State(MutableMapping):
         if self.__me is not None:
             my_loc = self.__me['location']
         else:
-            my_loc = self.get_self()['location']
+            my_loc = self.get_self()[0]['location']
 
         def distance(x):
             loc = x['location']
@@ -456,7 +472,8 @@ class State(MutableMapping):
 
         # For each prop_name, prop_value combination, find the relevant objects. If there are more than one allowable
         # property value, search for those as well.
-        found = [[self.__find(name, val) for val in vals] for name, vals in props.items()]
+        found = [[self.__find(name, val) for val in vals] if name != "location" else [self.__find(name, vals)]
+                 for name, vals in props.items()]
 
         # Check if we searched for more than one property
         if len(props) > 1:

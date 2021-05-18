@@ -12,7 +12,7 @@ from matrx.agents.agent_brain import AgentBrain
 from matrx.agents.capabilities.capability import SenseCapability
 from matrx.agents.agent_types.human_agent import HumanAgentBrain
 from matrx.grid_world import GridWorld
-from matrx.logger.logger import GridWorldLogger
+from matrx.logger.logger import GridWorldLogger, GridWorldLoggerV2
 from matrx.objects.agent_body import AgentBody
 from matrx.objects.env_object import EnvObject, _get_inheritence_path
 from matrx import utils
@@ -352,7 +352,7 @@ class WorldBuilder:
 
         """
 
-        if issubclass(logger_class, GridWorldLogger):
+        if issubclass(logger_class, GridWorldLogger) or issubclass(logger_class, GridWorldLoggerV2):
 
             set_params = {'log_strategy': log_strategy, 'save_path': save_path,
                           'file_name': file_name,
@@ -1122,10 +1122,6 @@ class WorldBuilder:
                           f"integers resulting in "
                           f"{(int(location[0]), int(location[1]))}")
             location = (int(location[0]), int(location[1]))
-
-        # Load default parameters if not passed
-        if is_movable is None:
-            is_movable = defaults.ENVOBJECT_IS_MOVABLE
 
         # If default variables are not given, assign them (most empty, except
         # of sense_capability that defaults to all objects with infinite
@@ -1904,6 +1900,9 @@ class WorldBuilder:
 
     def add_room(self, top_left_location, width, height, name,
                  door_locations=None, with_area_tiles=False, doors_open=False,
+                 door_open_colour=None,
+                 door_closed_colour=None,
+                 door_visualization_opacity=None,
                  wall_visualize_colour=None, wall_visualize_opacity=None,
                  wall_custom_properties=None,
                  wall_customizable_properties=None,
@@ -1943,6 +1942,15 @@ class WorldBuilder:
 
         doors_open : bool (optional, False)
             Whether the doors are initially open or closed.
+
+        door_open_colour: str (optional, "#006400")
+            Colour, as hexidecimal string, when a room door is closed. Defaults to a shade of green.
+
+        door_closed_colour: str (optional, "#640000")
+            Colour, as hexidecimal string, when a room door is open. Defaults to a shade of red.
+
+        door_visualization_opacity: str (optional, 1.0)
+            Opacity of the object, as a percentge from 0.0 (fully opaque) to 1.0 (no opacity). Defaults to 1.0.
 
         wall_visualize_colour : string (optional, default None)
             The colour of the walls.
@@ -2071,6 +2079,8 @@ class WorldBuilder:
         # Add all doors
         for door_loc in door_locations:
             self.add_object(location=door_loc, name=f"{name} - door@{door_loc}", callable_class=Door,
+                            open_colour=door_open_colour, closed_colour=door_closed_colour,
+                            visualize_opacity=door_visualization_opacity,
                             is_open=doors_open, **{"room_name": name})
 
         # Add all area tiles if required
@@ -2087,44 +2097,6 @@ class WorldBuilder:
                           visualize_colour=area_visualize_colour, visualize_opacity=area_visualize_opacity,
                           customizable_properties=area_customizable_properties,
                           **{**area_custom_properties, "room_name": name})
-
-    @staticmethod
-    def get_room_locations(room_top_left, room_width, room_height):
-        """ Returns the locations within a room, excluding walls.
-
-        .. deprecated:: 1.1.0
-          `get_room_locations` will be removed in MATRX 1.2.0, it is replaced by
-          `matrx.utils.get_room_locations`.
-
-        This is a helper function for adding objects to a room. It returns a
-        list of all (x,y) coordinates that fall within the room excluding the
-        walls.
-
-        Parameters
-        ----------
-        room_top_left : tuple, (x, y)
-            The top left coordinates of a room, as used to add that room with
-            methods such as `add_room`.
-        room_width : int
-            The width of the room.
-        room_height : int
-            The height of the room.
-
-        Returns
-        -------
-        list, [(x,y), ...]
-            A list of (x, y) coordinates that are encapsulated in the
-            rectangle, excluding walls.
-
-        See Also
-        --------
-        WorldBuilder.add_room
-
-        """
-        warnings.warn("This method is deprecated and will be removed in v1.2.0. It is replaced by"
-                      "`matrx.utils.get_room_locations` as of v1.1.0.", DeprecationWarning)
-        locs = utils.get_room_locations(room_top_left, room_width, room_height)
-        return locs
 
     def __set_world_settings(self, shape, tick_duration, simulation_goal, rnd_seed,
                              visualization_bg_clr, visualization_bg_img, verbose):
@@ -2173,7 +2145,8 @@ class WorldBuilder:
         for idx, obj_settings in enumerate(self.object_settings):
             # Print progress (so user knows what is going on)
             if idx % max(10, int(len(self.object_settings) * 0.1)) == 0:
-                print(f"Creating objects... @{np.round(idx / len(self.object_settings) * 100, 0)}%")
+                if self.verbose:
+                    print(f"Creating objects... @{np.round(idx / len(self.object_settings) * 100, 0)}%")
 
             env_object = self.__create_env_object(obj_settings)
             if env_object is not None:
@@ -2184,7 +2157,8 @@ class WorldBuilder:
         for idx, agent_settings in enumerate(self.agent_settings):
             # Print progress (so user knows what is going on)
             if idx % max(10, int(len(self.agent_settings) * 0.1)) == 0:
-                print(f"Creating agents... @{np.round(idx / len(self.agent_settings) * 100, 0)}%")
+                if self.verbose:
+                    print(f"Creating agents... @{np.round(idx / len(self.agent_settings) * 100, 0)}%")
 
             agent, agent_avatar = self.__create_agent_avatar(agent_settings)
             if agent_avatar is not None:
@@ -2194,7 +2168,8 @@ class WorldBuilder:
         for idx, env_object in enumerate(objs):
             # Print progress (so user knows what is going on)
             if idx % max(10, int(len(objs) * 0.1)) == 0:
-                print(f"Adding objects... @{np.round(idx / len(objs) * 100, 0)}%")
+                if self.verbose:
+                    print(f"Adding objects... @{np.round(idx / len(objs) * 100, 0)}%")
 
             world._register_env_object(env_object)
 
@@ -2202,7 +2177,8 @@ class WorldBuilder:
         for idx, agent in enumerate(avatars):
             # Print progress (so user knows what is going on)
             if idx % max(10, int(len(objs) * 0.1)) == 0:
-                print(f"Adding agents... @{np.round(idx / len(avatars) * 100, 0)}%")
+                if self.verbose:
+                    print(f"Adding agents... @{np.round(idx / len(avatars) * 100, 0)}%")
             world._register_agent(agent[0], agent[1])
 
         # Register all teams and who is in them
@@ -2255,51 +2231,41 @@ class WorldBuilder:
                     **custom_props}
 
         else:  # else we need to check what this object's constructor requires and obtain those properties only
-            # Get all variables required by constructor
+            
+            # get required arguments of this class             
             argspecs = inspect.getfullargspec(callable_class)
             args = argspecs.args  # does not give *args or **kwargs names
             def_args = argspecs.defaults  # defaults (if any) of the last n elements in args
             varkw = argspecs.varkw  # **kwargs names
 
-            # Now assign the default values to kwargs dictionary
+            # assign specified default values to any of the required arguments
             args = OrderedDict({arg: "not_set" for arg in reversed(args[1:])})
             if def_args is not None:
                 for idx, default in enumerate(reversed(def_args)):
                     k = list(args.keys())[idx]
                     args[k] = default
 
-            # Check if all arguments are present (fails if a required argument without a default value is not given)
+            # get arguments given by the user  
+            given_args = {**mandatory_props, **custom_props}          
+            
+            # make sure all required arguments are present
             for arg, default in args.items():
-                if arg not in custom_props.keys() and arg not in mandatory_props.keys() and default == "not_set":
+                if default == "not_set" and arg not in given_args.keys():
                     raise Exception(f"Cannot create environment object of type {callable_class.__name__} with name "
                                     f"{mandatory_props['name']}, as its constructor requires the argument named {arg} "
                                     f"which is not given as a property.")
-                elif arg in custom_props.keys() and custom_props[arg] is not None:
-                    # an argument is present in custom_props, which overrides constructor defaults
-                    args[arg] = custom_props[arg]
-                elif arg in mandatory_props.keys() and mandatory_props[arg] is not None:
-                    # an argument is present in mandatory_props, which overrides constructor defaults
-                    args[arg] = mandatory_props[arg]
 
-            # We provide a warning if some custom properties are given which are not used for this class
-            kwargs = [prop_name for prop_name in custom_props.keys() if prop_name not in args.keys()]
-            if varkw is None and len(kwargs) > 0:
-                warnings.warn(f"The following properties are not used in the creation of environment object of type "
-                              f"{callable_class.__name__} with name {mandatory_props['name']}; {kwargs}, because "
-                              f"the class does not have a **kwargs argument in the constructor.")
-
-            # if a **kwargs argument was defined in the object constructor, pass all custom properties to the object
-            elif varkw is not None and len(kwargs) > 0:
-                for arg in kwargs:
-                    args[arg] = custom_props[arg]
+            # combine the given arguments and any required arguments with defaults that were not specified by the user
+            for arg, val in given_args.items():
+                if val is not None:
+                    args[arg] = val
 
         args = self.__instantiate_random_properties(args)
 
         env_object = callable_class(**args)
 
-        # make the ID unique if it is not
-
         return env_object
+
 
     def __create_agent_avatar(self, settings):
 
