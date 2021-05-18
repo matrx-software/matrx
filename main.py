@@ -10,3 +10,4 @@ if __name__ == "__main__":
     cases.run_bw4t()
     # cases.run_logger_test()
     # cases.run_arg_test()
+    # cases.run_test_human_agent()

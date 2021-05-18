@@ -22,6 +22,14 @@ class State(MutableMapping):
 
     def state_update(self, state_dict):
 
+        # Check if the given state dict is indeed a dict, otherwise throw
+        if not isinstance(state_dict, dict):
+            if isinstance(state_dict, State):
+                raise ValueError(f"A State object can only be updated with a dictionary. Try "
+                                 f"'state.state_update(old_state.to_dict())'.")
+            else:
+                raise ValueError(f"A State object can only be updated with a dictionary.")
+
         # If decay does not matter, we simply use the given dictionary
         if self.__decay_val <= 0.0:
             # Set the previous and new state
