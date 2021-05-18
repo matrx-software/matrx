@@ -26,7 +26,7 @@ class State(MutableMapping):
         if not isinstance(state_dict, dict):
             if isinstance(state_dict, State):
                 raise ValueError(f"A State object can only be updated with a dictionary. Try "
-                                 f"'state.state_update(old_state.to_dict())'.")
+                                 f"'state.state_update(old_state.as_dict())'.")
             else:
                 raise ValueError(f"A State object can only be updated with a dictionary.")
 
