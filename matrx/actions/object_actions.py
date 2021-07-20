@@ -38,7 +38,7 @@ class RemoveObject(Action):
     def __init__(self, duration_in_ticks=0):
         super().__init__(duration_in_ticks)
 
-    def mutate(self, grid_world, agent_id, **kwargs):
+    def mutate(self, grid_world, agent_id, world_state, **kwargs):
         """ Removes the specified object.
 
         Removes a specific :class:`matrx.objects.env_object.EnvObject` from
@@ -53,17 +53,19 @@ class RemoveObject(Action):
         agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id : str
-            Optional. Default: ``None``
-
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when performing an
+            action. Note that this is the State of the entire world, not
+            that of the agent performing the action.
+        object_id: str (Optional. Default: None)
             The string representing the unique identifier of the
             :class:`matrx.objects.env_object.EnvObject` that should be
+            removed. If not given, the closest object is selected.
             removed.
-        remove_range : int
-            Optional. Default: ``1``
-
-            The range in which the to be removed
-            :class:`matrx.objects.env_object.EnvObject` should be in.
+        remove_range : int (Optional. Default: 1)
+            The range in which the :class:`matrx.objects.env_object.EnvObject`
+            should be in for it to be removed.
 
         Returns
         -------
@@ -118,17 +120,18 @@ class RemoveObject(Action):
         agent_id: str
             The string representing the unique identified that represents the
             agent performing this action.
-        object_id: str
-            Optional. Default: ``None``
-
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when checking if an
+            action can be performed. Note that this is the State of the
+            entire world, not that of the agent performing the action.
+        object_id: str (Optional. Default: None)
             The string representing the unique identifier of the
             :class:`matrx.objects.env_object.EnvObject` that should be
-            removed.
-        remove_range : int
-            Optional. Default: ``1``
-
-            The range in which the to be removed
-            :class:`matrx.objects.env_object.EnvObject` should be in.
+            removed. If not given, the closest object is selected.
+        remove_range : int (Optional. Default: 1)
+            The range in which the :class:`matrx.objects.env_object.EnvObject`
+            should be in for it to be removed.
 
         Returns
         -------
@@ -250,7 +253,7 @@ class GrabObject(Action):
     def __init__(self, duration_in_ticks=0):
         super().__init__(duration_in_ticks)
 
-    def is_possible(self, grid_world, agent_id, **kwargs):
+    def is_possible(self, grid_world, agent_id, world_state, **kwargs):
         """ Checks if the object can be grabbed.
 
         Parameters
@@ -261,20 +264,19 @@ class GrabObject(Action):
         agent_id: str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id : str
-            Optional. Default: ``None``
-
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when checking if an
+            action can be performed. Note that this is the State of the
+            entire world, not that of the agent performing the action.
+        object_id : str (Optional. Default: None)
             The string representing the unique identifier of the
             :class:`matrx.objects.env_object.EnvObject` that should be
             grabbed. When not given, a random object within range is selected.
-        grab_range : int
-            Optional. Default: ``np.inf``
-
-            The range in which the to be grabbed
-            :class:`matrx.objects.env_object.EnvObject` should be in.
-        max_objects : int
-            Optional. Default: ``np.inf``
-
+        grab_range : int (Optional. Default: np.inf)
+            The range in which the :class:`matrx.objects.env_object.EnvObject`
+            should be in to be grabbed.
+        max_objects : int (Optional. Default: np.inf)
             The maximum of objects the agent can carry.
 
         Returns
@@ -295,7 +297,7 @@ class GrabObject(Action):
         return _is_possible_grab(grid_world, agent_id=agent_id, object_id=object_id, grab_range=grab_range,
                                  max_objects=max_objects)
 
-    def mutate(self, grid_world, agent_id, **kwargs):
+    def mutate(self, grid_world, agent_id, world_state, **kwargs):
         """ Grabs an object.
 
         Alters the properties of the agent doing the grabbing, and the object
@@ -314,20 +316,19 @@ class GrabObject(Action):
         agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id : str
-            Optional. Default: ``None``
-
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when performing an
+            action. Note that this is the State of the entire world, not
+            that of the agent performing the action.
+        object_id : str (Optional. Default: None)
             The string representing the unique identifier of the
             :class:`matrx.objects.env_object.EnvObject` that should be
             grabbed. When not given, a random object within range is selected.
-        grab_range : int
-            Optional. Default: ``np.inf``
-
-            The range in which the to be grabbed
-            :class:`matrx.objects.env_object.EnvObject` should be in.
-        max_objects : int
-            Optional. Default: ``np.inf``
-
+        grab_range : int (Optional. Default: np.inf)
+            The range in which the :class:`matrx.objects.env_object.EnvObject`
+            should be in to be grabbed.
+        max_objects : int (Optional. Default: np.inf)
             The maximum of objects the agent can carry.
 
         Returns
@@ -481,7 +482,7 @@ class DropObject(Action):
     def __init__(self, duration_in_ticks=0):
         super().__init__(duration_in_ticks)
 
-    def is_possible(self, grid_world, agent_id, **kwargs):
+    def is_possible(self, grid_world, agent_id, world_state, **kwargs):
         """ Checks if the object can be dropped.
 
         Parameters
@@ -492,17 +493,17 @@ class DropObject(Action):
         agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id : str
-            Optional. Default: ``None``
-
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when checking if an
+            action can be performed. Note that this is the State of the
+            entire world, not that of the agent performing the action.
+        object_id : str (Optional. Default: None)
             The string representing the unique identifier of the
             :class:`matrx.objects.env_object.EnvObject` that should be
+            dropped. When not given the last object that was grabbed is
             dropped.
-
-            When not given the last object that was grabbed is dropped.
-        drop_range : int
-            Optional. Default: ``np.inf``
-
+        drop_range : int (Optional. Default: np.inf)
             The range in which the object can be dropped, with the agent's
             location at its center.
 
@@ -530,7 +531,7 @@ class DropObject(Action):
 
         return _possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id, drop_range=drop_range)
 
-    def mutate(self, grid_world, agent_id, **kwargs):
+    def mutate(self, grid_world, agent_id, world_state, **kwargs):
         """ Drops the carried object.
 
         Parameters
@@ -541,18 +542,19 @@ class DropObject(Action):
         agent_id : str
             The string representing the unique identifier that represents the
             agent performing this action.
-        object_id : str
-            Optional. Default: ``None``
-
+        world_state : State
+            The State object representing the entire world. Can be used to
+            simplify search of objects and properties when performing an
+            action. Note that this is the State of the entire world, not
+            that of the agent performing the action.
+        object_id : str (Optional. Default: None)
             The string representing the unique identifier of the
             :class:`matrx.objects.env_object.EnvObject` that should be
+            dropped. When not given the last object that was grabbed is
             dropped.
-
-            When not given the last object that was grabbed is dropped.
-        drop_range : int
-            Optional. Default: ``np.inf``
-
-            The range in which the object can be dropped.
+        drop_range : int (Optional. Default: np.inf)
+            The range in which the object can be dropped, with the agent's
+            location at its center.
 
         Returns
         -------

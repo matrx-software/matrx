@@ -129,7 +129,7 @@ class HumanAgentBrain(AgentBrain):
 
         Parameters
         ----------
-        state : dict
+        state : State
             A state description containing all properties of EnvObject that
             are within a certain range as defined by self.sense_capability.
             It is a list of properties in a dictionary
@@ -160,7 +160,7 @@ class HumanAgentBrain(AgentBrain):
 
         # Update the state property of an agent with the GridWorld's state
         # dictionary
-        self.state.state_update(state)
+        self.state.state_update(state.as_dict())
 
         # Call the filter method to filter the observation
         self.state = self.filter_observations(self.state)
@@ -175,12 +175,9 @@ class HumanAgentBrain(AgentBrain):
         # did.
         self.previous_action = action
 
-        # Get the dictionary from the State object
-        filtered_state = self.state.as_dict()
-
         # Return the filtered state, the (updated) properties, the intended
         # actions and any keyword arguments for that action if needed.
-        return filtered_state, self.agent_properties, action, action_kwargs
+        return self.state, self.agent_properties, action, action_kwargs
 
     def decide_on_action(self, state, user_input):
         """ Contains the decision logic of the agent.

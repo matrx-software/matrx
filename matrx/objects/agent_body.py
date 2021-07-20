@@ -418,26 +418,48 @@ class AgentBody(EnvObject):
 
     @property
     def current_action(self):
+        """The current action the agent is performing."""
         return self.__current_action
 
     @property
     def current_action_duration_in_ticks(self):
+        """The duration as number of ticks of the current action this agent is performing."""
         return self.__last_action_duration_data["duration_in_ticks"]
 
     @property
     def current_action_tick_started(self):
+        """The tick number at which the agent started its current action."""
         return self.__last_action_duration_data["tick"]
 
     @property
     def current_action_args(self):
+        """The arguments used for the current action this agent is performing."""
         return self.__current_action_args
 
     @property
     def is_blocked(self):
+        """Whether this agent is busy performing an action, thus not being able to select a new action."""
         return self.__is_blocked
 
 
 def _get_all_classes(class_, omit_super_class=False):
+    """ A private MATRX method.
+
+    Returns all classes inheriting from the given class that are currently imported.
+
+    Parameters
+    ----------
+    class_ : Class
+        The class object to search for its children.
+    omit_super_class : bool (Default: False)
+        Whether the given parent class should be included or not.
+
+    Returns
+    -------
+    dict
+        A dictionary of class names (keys, strings) and the actual class object (values, Class).
+
+    """
     # Include given class or not
     if omit_super_class:
         subclasses = set()

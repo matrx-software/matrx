@@ -97,15 +97,31 @@ class AgentBrain:
         self._state = None
 
     def initialize(self):
-        """ To initialize an agent's brain.
+        """ Method called by any world when it starts.
 
-        Method called at the start of a :class:`matrx.grid_world.GridWorld`.
+        When adding an agent to a :class:`matrx.grid_world.GridWorld`, through
+        a world builer, you only pass the class of your agent brain, not the
+        actual instance. Instead, this instance is made by the builder when
+        a new world is created and ran. At that point this method is called.
 
-        Here you can initialize everything you need for your agent to work
-        since you can't do much in the constructor as the brain needs to be
-        connected to a GridWorld first in most cases (e.g. to get an AgentID,
-        its random generator, etc.)
+        That makes this method the ideal place for any initialization or
+        reset you want your agent brain to do when starting a world or between
+        worlds.
+
+        Importantly, this method is called after the builder assigned things
+        to it such as its location, name and object ID. As this method is
+        called afterwards, it allows you to do things related to to those
+        properties.
+
+        An example is when you run the same world multiple times. In that case
+        the instance of your agent brain will have attributes with values from
+        the previous run. This method can be used to reset them.  
         """
+        self.previous_action = None
+        self.previous_action_result = None
+        self.messages_to_send = []
+        self.received_messages = []
+        self._init_state()
 
     def filter_observations(self, state):
         """ Filters the world state before deciding on an action.
@@ -114,8 +130,8 @@ class AgentBrain:
         properties and objects the agent is actually supposed to see.
 
         Currently the world returns ALL properties of ALL objects within a
-        certain range(s), as specified by :
-        class:`matrx.agents.capabilities.capability.SenseCapability`. But
+        certain range(s), as specified by
+        :class:`matrx.agents.capabilities.capability.SenseCapability`. But
         perhaps some objects are obscured because they are behind walls and
         this agent is not supposed to look through walls, or an agent is not
         able to see some properties of certain objects (e.g. colour).
@@ -547,7 +563,7 @@ class AgentBrain:
         self.agent_properties = agent_properties
 
         # Update the state property of an agent with the GridWorld's state dictionary
-        self.state.state_update(state)
+        self.state.state_update(state.as_dict())
 
         # Call the filter method to filter the observation
         self.state = self.filter_observations(self.state)
@@ -558,18 +574,14 @@ class AgentBrain:
         # Store the action so in the next call the agent still knows what it did
         self.previous_action = action
 
-        # Get the dictionary from the State object
-        filtered_state = self.state.as_dict()
-
         # Return the filtered state, the (updated) properties, the intended actions and any keyword arguments for that
         # action if needed.
-        return filtered_state, self.agent_properties, action, action_kwargs
+        return self.state, self.agent_properties, action, action_kwargs
 
-    def _fetch_state(self, state_dict):
-        self.state.state_update(state_dict)
-        state = self.filter_observations(self.state)
-        filtered_state_dict = state.as_dict()
-        return filtered_state_dict
+    def _fetch_state(self, state):
+        self.state.state_update(state.as_dict())
+        filtered_state = self.filter_observations(self.state)
+        return filtered_state
 
     def _get_log_data(self):
         return self.get_log_data()

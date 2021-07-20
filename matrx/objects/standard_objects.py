@@ -14,13 +14,17 @@ class SquareBlock(EnvObject):
         Location of door.
     name : string. Optional, default "Block"
         Name of block, defaults to "Block"
-    **custom_properties:
+    **kwargs:
         Additional properties that should be added to the object.
     """
 
-    def __init__(self, location, name="Block", visualize_colour="#4286f4", **custom_properties):
-        super().__init__(name=name, location=location, visualize_shape=0, is_traversable=False,
-                         class_callable=SquareBlock, visualize_colour=visualize_colour, **custom_properties)
+    def __init__(self, location, name="Block", visualize_colour="#4286f4", **kwargs):
+        # hardcoded props 
+        kwargs['is_traversable'] = False 
+        kwargs['visualize_shape'] = 0
+
+        super().__init__(name=name, location=location, class_callable=SquareBlock, 
+                        visualize_colour=visualize_colour, **kwargs)
 
 
 class Door(EnvObject):
@@ -61,9 +65,11 @@ class Door(EnvObject):
         # If the door is open or closed also determines its is_traversable property
         is_traversable = self.is_open
 
+        # hardcoded prop
+        kwargs['is_movable'] = False 
+
         super().__init__(location=location, name=name, is_traversable=is_traversable, visualize_colour=current_color,
-                         is_open=self.is_open, class_callable=Door, is_movable=False,
-                         customizable_properties=['is_open'], **kwargs)
+                         is_open=self.is_open, class_callable=Door, customizable_properties=['is_open'], **kwargs)
 
     def open_door(self):
         """ Opens the door, changes the colour and sets the properties as such.
@@ -103,13 +109,20 @@ class Wall(EnvObject):
         The location of the wall.
     name : string. Optional, default "Wall"
         The name, default "Wall".
+    visualize_colour: string. Optional, default "#000000" (black)
+        A Hex string indicating the colour of the wall. 
+    kwargs: dict (optional)
+        A dictionary of keyword arguments that can be used to add additional properties
     """
     def __init__(self, location, name="Wall", visualize_colour="#000000", **kwargs):
 
-        is_traversable = False  # All walls are always not traversable
-        super().__init__(name=name, location=location, visualize_colour=visualize_colour,
-                         is_traversable=is_traversable, class_callable=Wall, is_movable=False,
-                         **kwargs)
+        # a wall is immovable and impassable 
+        kwargs['is_traversable'] = False 
+        kwargs['is_movable'] = False
+
+        is_traversable = False  # Walls are never traversable
+        super().__init__(name=name, location=location, visualize_colour=visualize_colour, class_callable=Wall,
+                        **kwargs)
 
 
 class AreaTile(EnvObject):
@@ -134,8 +147,11 @@ class AreaTile(EnvObject):
     """
     def __init__(self, location, name="AreaTile", visualize_colour="#8ca58c", visualize_depth=None,
                  visualize_opacity=1.0, **kwargs):
-        super().__init__(name=name, location=location, visualize_colour=visualize_colour,
-                         is_traversable=True, is_movable=False, class_callable=AreaTile,
+        # a floor is always passable and immovable
+        kwargs['is_traversable'] = True 
+        kwargs['is_movable'] = False
+
+        super().__init__(name=name, location=location, visualize_colour=visualize_colour, class_callable=AreaTile,
                          visualize_depth=visualize_depth, visualize_opacity=visualize_opacity,
                          **kwargs)
 
@@ -157,12 +173,14 @@ class SmokeTile(AreaTile):
         Opacity of the object. By default 0.8
     visualize_depth : int. Optional, default=101
         depth of visualization. By default 101: just above agent and other objects Higher means higher priority.
+    kwargs: dict (optional)
+        A dictionary of keyword arguments that can be used to add additional properties
     """
     def __init__(self, location, name="SmokeTile", visualize_colour="#b7b7b7", visualize_opacity=0.8,
-                 visualize_depth=101):
-        visualize_depth = 101 if visualize_depth is None else visualize_depth
+                 visualize_depth=101, **kwargs):        
         super().__init__(name=name, location=location, visualize_colour=visualize_colour,
-                         visualize_opacity=visualize_opacity, visualize_depth=visualize_depth)
+                         visualize_opacity=visualize_opacity, visualize_depth=visualize_depth, 
+                         **kwargs)
 
 
 class Battery(EnvObject):
@@ -310,6 +328,8 @@ class CollectionDropOffTile(AreaTile):
         The colour of this tile.
     visualize_opacity : Float (default is 1.0)
         The opacity of this tile. Should be between 0.0 and 1.0.
+    kwargs: dict (optional)
+        A dictionary of keyword arguments that can be used to add additional properties
 
     See also
     --------
@@ -322,6 +342,9 @@ class CollectionDropOffTile(AreaTile):
     """
     def __init__(self, location, name="Collection_zone", collection_area_name="Collection zone",
                  visualize_colour="#64a064", visualize_opacity=1.0, **kwargs):
-        super().__init__(location, name=name, visualize_colour=visualize_colour, visualize_depth=None,
-                         visualize_opacity=visualize_opacity, is_drop_off=True,
-                         collection_area_name=collection_area_name, **kwargs)
+        # hardcoded props
+        kwargs['is_drop_off'] = True 
+        kwargs['visualize_depth'] = None
+        super().__init__(location, name=name, visualize_colour=visualize_colour,
+                         visualize_opacity=visualize_opacity, collection_area_name=collection_area_name, 
+                         **kwargs)

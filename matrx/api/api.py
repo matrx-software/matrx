@@ -7,6 +7,7 @@ from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
 from matrx.messages.message import Message
+from matrx.agents.agent_utils.state import State
 
 _debug = True
 
@@ -134,7 +135,7 @@ def get_latest_state_and_messages():
         return abort(error['error_code'], description=error['error_message'])
 
     # fetch states, chatrooms and messages
-    states_ = __fetch_states(_current_tick, agent_id)
+    states_ = __fetch_state_dicts(_current_tick, agent_id)
     chatrooms, messages = __get_messages(agent_id, chat_offsets)
 
     return jsonify({"matrx_paused": matrx_paused, "states": states_, "chatrooms": chatrooms, "messages": messages})
@@ -172,7 +173,7 @@ def get_states(tick):
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    return jsonify(__fetch_states(tick))
+    return jsonify(__fetch_state_dicts(tick))
 
 
 @__app.route('/get_states/<tick>/<agent_ids>/', methods=['GET', 'POST'])
@@ -201,7 +202,7 @@ def get_states_specific_agents(tick, agent_ids):
         print("api request not valid:", error)
         return abort(error['error_code'], description=error['error_message'])
 
-    return jsonify(__fetch_states(tick, agent_ids))
+    return jsonify(__fetch_state_dicts(tick, agent_ids))
 
 
 @__app.route('/get_latest_state/<agent_ids>/', methods=['GET', 'POST'])
@@ -239,7 +240,7 @@ def get_filtered_latest_state(agent_ids):
         return abort(error['error_code'], description=error['error_message'])
 
     # Get the agent states
-    agent_states = __fetch_states(_current_tick, agent_ids)[0]
+    agent_states = __fetch_state_dicts(_current_tick, agent_ids)[0]
 
     # Filter the agent states based on the received properties list
     props = request.json['properties']
@@ -792,7 +793,7 @@ def __check_states_API_request(tick=None, ids=None, ids_required=False):
             # e.g. "god"), or a list of ' f'IDs(string) for requesting states of multiple agents'}
 
         # check if the api was reset during this time
-        if len(__states) is 0:
+        if len(__states) == 0:
             return False, {'error_code': 400,
                            'error_message': f'api is reconnecting to a new world'}
 
@@ -850,7 +851,7 @@ def __check_input(tick=None, ids=None):
     return True, None
 
 
-def __fetch_states(tick, ids=None):
+def __fetch_state_dicts(tick, ids=None):
     """ This private function fetches, filters and orders the states as specified by the tick and agent ids.
 
     Parameters
@@ -894,6 +895,11 @@ def __fetch_states(tick, ids=None):
         # add each agent's state for this tick
         for agent_id in ids:
             if agent_id in __states[t]:
+                # double check the state is of type dict and not a State object
+                if not isinstance(__states[t][agent_id]['state'], dict):
+                    __states[t][agent_id]['state'] = __states[t][agent_id]['state'].as_dict()
+                
+                # Get state at tick t and of agent agent_id
                 states_this_tick[agent_id] = __states[t][agent_id]
 
         # save the states of all filtered agents for this tick
@@ -967,12 +973,12 @@ def __reorder_state(state):
     -------
         The world state, JSON serializable
     """
-    new_state = copy.copy(state)
+    new_state = copy.copy(state.as_dict())
 
     # loop through all objects in the state
     for objID, obj in state.items():
 
-        if objID is not "World":
+        if objID != "World":
             # make the sense capability JSON serializable
             if "sense_capability" in obj:
                 new_state[objID]["sense_capability"] = str(obj["sense_capability"])
@@ -1008,7 +1014,8 @@ def _add_state(agent_id, state, agent_inheritence_chain, world_settings):
     # state['World']['matrx_paused'] = matrx_paused
 
     # reorder and save the new state along with some meta information
-    _temp_state[agent_id] = {'state': __reorder_state(state), 'agent_inheritence_chain': agent_inheritence_chain}
+    reordered_state = __reorder_state(state)
+    _temp_state[agent_id] = {'state': reordered_state, 'agent_inheritence_chain': agent_inheritence_chain}
 
 
 def _next_tick():
