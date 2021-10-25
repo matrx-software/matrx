@@ -279,27 +279,58 @@ class State(MutableMapping):
             return list({obj['room_name'] for obj in rooms})
 
     def get_room_objects(self, room_name):
-        # Locate method to identify room content
-        def is_content(obj):
-            if 'class_inheritance' in obj.keys():
-                chain = obj['class_inheritance']
-                if not (Wall.__name__ in chain or Door.__name__ in chain or AreaTile in chain) \
-                        and obj['room_name'] == room_name:
-                    return obj
-            else:  # the object is a Wall, Door or AreaTile
-                return None
-
-        # Get all room objects
+        """ This function finds all objects in a rectengular room. 
+        Only works for rectengular rooms.
+        This is done by finding all objects with the `"room_name":room_name`
+        property (such as walls, doors, and areatiles), getting their locations, 
+        and finding any other objects on those locations. 
+        All objects are returned, including walls, doors, and areatiles.
+        """
+        # Get all room objects with the {"room_name":room_name} property
         room_objs = self.get_room(room_name)
 
         if room_objs is None:  # No room with room_name was found
             return None
 
-        # Filter out all area's, walls and doors
-        content = map(is_content, room_objs)
-        content = [c for c in content if c is not None]
+        # get locations of all room objects 
+        room_locations = [obj['location'] for obj in room_objs]
 
+        top_left = room_locations[0]
+        bottom_right = room_locations[0]
+        for loc in room_locations:
+            if loc[0] < top_left[0] or loc[1] < top_left[1]:
+                top_left = loc 
+            elif loc[0] > bottom_right[0] or loc[1] > bottom_right[1]:
+                bottom_right = loc
+
+        content = self.get_objects_in_area(top_left=top_left, width=5, height=6)#bottom_right=bottom_right)
+        
         return content
+
+    def get_objects_in_area(self, top_left, width=None, height=None, bottom_right=None):
+        """ Find all objects within a designated area """
+        # convert width and height to bottom_right coordinate if passed 
+        if bottom_right is None:
+            if not width or not height:
+                raise Exception("Either a bottom_right coordinate, or width and height are required.")
+            else:
+                bottom_right = (top_left[0] + width, top_left[1] + height)
+        
+        # Check if object within area
+        def within_area(obj):
+            if "location" not in obj.keys():
+                return None 
+            # object is within the room
+            elif obj['location'][0] >= top_left[0] and obj['location'][1] >= top_left[1] and obj['location'][0] <= bottom_right[0] and obj['location'][1] <= bottom_right[1]:
+                return obj
+            else: 
+                return None 
+
+        # Filter out all objects not within the room
+        objs_in_area = map(within_area, self.__state_dict.values())
+        objs_in_area = [c for c in objs_in_area if c is not None]
+
+        return objs_in_area
 
     def get_room_doors(self, room_name):
         # Locate method to identify doors of the right room
