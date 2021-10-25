@@ -1903,6 +1903,8 @@ class WorldBuilder:
                  door_open_colour=None,
                  door_closed_colour=None,
                  door_visualization_opacity=None,
+                 door_custom_properties=None,
+                 door_customizable_properties=None,
                  wall_visualize_colour=None, wall_visualize_opacity=None,
                  wall_custom_properties=None,
                  wall_customizable_properties=None,
@@ -1951,6 +1953,14 @@ class WorldBuilder:
 
         door_visualization_opacity: str (optional, 1.0)
             Opacity of the object, as a percentge from 0.0 (fully opaque) to 1.0 (no opacity). Defaults to 1.0.
+
+        door_custom_properties : dict (optional, default None)
+            A dictionary of custom properties and their values passed to every
+            door object.
+
+        door_customizable_properties : list (optional, default None)
+            A list of property names that other objects and agents are allowed
+            to adjust.
 
         wall_visualize_colour : string (optional, default None)
             The colour of the walls.
@@ -2057,6 +2067,7 @@ class WorldBuilder:
         # those wall locations
         door_locations = [] if door_locations is None else door_locations
         for door_loc in door_locations:
+            door_loc = tuple(door_loc)
             if door_loc in all_:
                 all_.remove(door_loc)
             else:
@@ -2078,10 +2089,15 @@ class WorldBuilder:
 
         # Add all doors
         for door_loc in door_locations:
+            if door_custom_properties is None:
+                door_custom_properties = {"room_name": name}
+            else:
+                door_custom_properties = {**door_custom_properties, "room_name": name}
             self.add_object(location=door_loc, name=f"{name} - door@{door_loc}", callable_class=Door,
                             open_colour=door_open_colour, closed_colour=door_closed_colour,
                             visualize_opacity=door_visualization_opacity,
-                            is_open=doors_open, **{"room_name": name})
+                            is_open=doors_open, custom_properties=door_custom_properties,
+                            customizable_properties=door_customizable_properties)
 
         # Add all area tiles if required
         if with_area_tiles:
