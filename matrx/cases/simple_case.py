@@ -12,7 +12,7 @@ def create_builder():
 
     factory.add_logger(logger_class=LogActions, save_path="log_data/")
 
-    factory.add_room(top_left_location=[0, 0], width=15, height=15, name="world_bounds")
+    factory.add_room(top_left_location=[0, 0], width=15, height=15, name="world_bounds", door_locations=[[11,0]], door_custom_properties={"img_name": "fire.gif"})
 
     n_agent = 1
 
