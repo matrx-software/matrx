@@ -162,7 +162,10 @@ class AgentBody(EnvObject):
                                             "action_result": None}
 
         # We set a placeholder for the 'team' property so that it can be found in self.properties
-        self.team = ""
+        if team is not None:
+            self.team = ""
+        else:
+            self.team = team
 
         # Call the super constructor (we do this here because then we have access to all of EnvObject, including a
         # unique id
