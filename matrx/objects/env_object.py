@@ -144,6 +144,13 @@ class EnvObject:
         # Go through the custom properties that were given (if any) and set them to the custom_properties dictionary
         self.custom_properties = {}
         for k, v in custom_properties.items():
+            if k == "customizable_properties":
+                warnings.warn(
+                    f"Usage of customizable_properties is depreceated and can be removed. All properties are now customizable.",
+                    DeprecationWarning,
+                )
+                continue
+
             self.custom_properties[k] = v
 
         # location should be set at the end (due to the dependency of its setter on the other properties (e.g. in
