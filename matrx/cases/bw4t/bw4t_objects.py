@@ -25,7 +25,7 @@ class SignalBlock(EnvObject):
                          is_traversable=False, is_movable=False, visualize_shape=0, visualize_colour=visualize_colour,
                          visualize_opacity=visualize_opacity, rank=self.__rank, drop_zone_name=self.__drop_zone_name)
 
-    def update(self, grid_world):
+    def update(self, grid_world, state):
         if not self.__is_set:
             all_objs = grid_world.environment_objects
             for obj_id, obj in all_objs.items():
