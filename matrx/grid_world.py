@@ -780,8 +780,9 @@ class GridWorld:
         self.__message_buffer = {}
 
         # Perform the update method of all objects
+        compl_state = self.__get_complete_state()
         for env_obj in self.__environment_objects.values():
-            env_obj.update(self)
+            env_obj.update(self, compl_state)
 
         # Increment the number of tick we performed
         self.__current_nr_ticks += 1
