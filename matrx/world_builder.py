@@ -387,7 +387,9 @@ class WorldBuilder:
                   visualize_shape: Union[float, str] = None,
                   visualize_colour: str = None, visualize_depth: int = None,
                   visualize_opacity: float = None,
-                  visualize_when_busy: bool = None, **custom_properties):
+                  visualize_when_busy: bool = None, 
+                  customizable_properties: Union[tuple, list] = None,
+                  **custom_properties):
         """ Adds a single agent to the world's blueprint.
 
         This methods adds an agent body to every created world at the specified
@@ -502,6 +504,11 @@ class WorldBuilder:
         >>> builder.add_agent((5, 5), brain, name="Agent", foo="bar")
 
         """
+        if customizable_properties is not None:
+            warnings.warn(
+                f"Usage of customizable_properties is depreceated and can be removed. All properties are now customizable.",
+                DeprecationWarning,
+            )
 
         # Check if location and agent are of correct type
         if not isinstance(location, list) \
@@ -590,6 +597,7 @@ class WorldBuilder:
     def add_team(self, agent_brains: Union[list, tuple],
                  locations: Union[list, tuple], team_name,
                  custom_properties=None, sense_capability=None,
+                 customizable_properties=None,
                  is_traversable=None,
                  visualize_size=None, visualize_shape=None,
                  visualize_colour=None, visualize_opacity=None,
@@ -679,6 +687,12 @@ class WorldBuilder:
         >>> builder.add_team(brains, locs, "The A Team")
 
         """
+        if customizable_properties is not None:
+            warnings.warn(
+                f"Usage of customizable_properties is depreceated and can be removed. All properties are now customizable.",
+                DeprecationWarning,
+            )
+
         self.add_multiple_agents(agent_brains, locations,
                                  custom_properties=custom_properties,
                                  sense_capabilities=sense_capability,
@@ -692,6 +706,7 @@ class WorldBuilder:
 
     def add_multiple_agents(self, agents, locations, custom_properties=None,
                             sense_capabilities=None,
+                            customizable_properties=None,
                             is_traversable=None,
                             teams=None, visualize_sizes=None,
                             visualize_shapes=None,
@@ -783,6 +798,11 @@ class WorldBuilder:
         >>> builder.add_team(brains, locs, "The A Team")
 
         """
+        if customizable_properties is not None:
+            warnings.warn(
+                f"Usage of customizable_properties is depreceated and can be removed. All properties are now customizable.",
+                DeprecationWarning,
+            )
 
         # If any of the lists are not given, fill them with None and if they
         # are a single value of its expected type we copy it in a list. A none
@@ -852,7 +872,7 @@ class WorldBuilder:
                            **custom_properties[idx])
 
     def add_agent_prospect(self, location, agent, probability, name="Agent",
-                           sense_capability=None,
+                           customizable_properties=None, sense_capability=None,
                            is_traversable=None, team=None,
                            possible_actions=None, is_movable=None,
                            visualize_size=None, visualize_shape=None,
@@ -971,6 +991,11 @@ class WorldBuilder:
         >>>     foo="bar")
 
         """
+        if customizable_properties is not None:
+            warnings.warn(
+                f"Usage of customizable_properties is depreceated and can be removed. All properties are now customizable.",
+                DeprecationWarning,
+            )
 
         # Add agent as normal
         self.add_agent(location, agent, name,
@@ -984,7 +1009,7 @@ class WorldBuilder:
         self.agent_settings[-1]['probability'] = probability
 
     def add_object(self, location, name, callable_class=None,
-                   is_traversable=None,
+                   customizable_properties=None, is_traversable=None,
                    is_movable=None, visualize_size=None, visualize_shape=None,
                    visualize_colour=None, visualize_depth=None,
                    visualize_opacity=None, **custom_properties):
@@ -1062,6 +1087,11 @@ class WorldBuilder:
         >>> builder.add_object((4, 4), "Object", EnvObject)
 
         """
+        if customizable_properties is not None:
+            warnings.warn(
+                f"Usage of customizable_properties is depreceated and can be removed. All properties are now customizable.",
+                DeprecationWarning,
+            )
 
         if callable_class is None:
             callable_class = EnvObject
@@ -1104,7 +1134,7 @@ class WorldBuilder:
         self.object_settings.append(object_setting)
 
     def add_object_prospect(self, location, name, probability,
-                            callable_class=None,
+                            callable_class=None, customizable_properties=None,
                             is_traversable=None, is_movable=None,
                             visualize_size=None, visualize_shape=None,
                             visualize_colour=None, visualize_depth=None,
@@ -1191,6 +1221,11 @@ class WorldBuilder:
         >>> builder.add_object_prospect((4, 4), "Object", 0.5, EnvObject)
 
         """
+        if customizable_properties is not None:
+            warnings.warn(
+                f"Usage of customizable_properties is depreceated and can be removed. All properties are now customizable.",
+                DeprecationWarning,
+            )
 
         # Add object as normal
         self.add_object(location, name, callable_class,
@@ -1204,7 +1239,7 @@ class WorldBuilder:
 
     def add_multiple_objects(self, locations, names=None,
                              callable_classes=None, custom_properties=None,
-                             is_traversable=None,
+                             customizable_properties=None, is_traversable=None,
                              visualize_sizes=None, visualize_shapes=None,
                              visualize_colours=None, visualize_depths=None,
                              visualize_opacities=None, is_movable=None):
@@ -1287,6 +1322,11 @@ class WorldBuilder:
         >>> builder.add_multiple_objects(locs, "Object", EnvObject)
 
         """
+        if customizable_properties is not None:
+            warnings.warn(
+                f"Usage of customizable_properties is depreceated and can be removed. All properties are now customizable.",
+                DeprecationWarning,
+            )
 
         # If any of the lists are not given, fill them with None and if they
         # are a single value of its expected type we copy it in a list. A none
@@ -1350,6 +1390,7 @@ class WorldBuilder:
                             visualize_opacity=visualize_opacities[idx], **custom_properties[idx])
 
     def add_human_agent(self, location, agent, name="HumanAgent",
+                        customizable_properties=None,
                         sense_capability=None,
                         is_traversable=None, team=None, possible_actions=None,
                         is_movable=None, visualize_size=None,
@@ -1478,6 +1519,11 @@ class WorldBuilder:
         >>>     key_action_map=keymap)
 
         """
+        if customizable_properties is not None:
+            warnings.warn(
+                f"Usage of customizable_properties is depreceated and can be removed. All properties are now customizable.",
+                DeprecationWarning,
+            )
 
         # Check if location and agent are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
@@ -1548,6 +1594,7 @@ class WorldBuilder:
         self.agent_settings.append(hu_ag_setting)
 
     def add_area(self, top_left_location, width, height, name,
+                 customizable_properties=None,
                  visualize_colour=None,
                  visualize_opacity=None, **custom_properties):
         """ Adds an area of tiles/surface.
@@ -1604,6 +1651,11 @@ class WorldBuilder:
         >>> builder.add_area((3,3), 3, 3, "Grass", visualize_colour="#00a000")
 
         """
+        if customizable_properties is not None:
+            warnings.warn(
+                f"Usage of customizable_properties is depreceated and can be removed. All properties are now customizable.",
+                DeprecationWarning,
+            )
 
         # Check if width and height are large enough to make an actual room
         # (with content)
@@ -1712,6 +1764,7 @@ class WorldBuilder:
                  is_traversable=None,
                  is_movable=None, visualize_size=None, visualize_shape=None,
                  visualize_colour=None, visualize_depth=None,
+                 customizable_properties=None,
                  visualize_opacity=None, **custom_properties):
         """ Adds a line of objects to the blueprint.
 
@@ -1793,6 +1846,11 @@ class WorldBuilder:
         >>> builder.add_line((10, 0), (0, 10), "Line 2")
 
         """
+        if customizable_properties is not None:
+            warnings.warn(
+                f"Usage of customizable_properties is depreceated and can be removed. All properties are now customizable.",
+                DeprecationWarning,
+            )
 
         # Get the coordinates on the given line
         line_coords = _get_line_coords(start, end)
@@ -1821,7 +1879,10 @@ class WorldBuilder:
                  wall_visualize_colour=None, wall_visualize_opacity=None,
                  wall_custom_properties=None,
                  area_custom_properties=None,
-                 area_visualize_colour=None, area_visualize_opacity=None):
+                 area_visualize_colour=None, area_visualize_opacity=None,
+                 wall_customizable_properties=None,
+                 area_customizable_properties=None,
+                 door_customizable_properties=None,):
         """ Adds a rectangular room withs walls and doors.
 
         This method allows you to create an area surrounded with walls and
@@ -1913,6 +1974,11 @@ class WorldBuilder:
         >>>     with_area_tiles=True, area_visualize_colour="#00a000")
 
         """
+        if wall_customizable_properties is not None or area_customizable_properties is not None or door_customizable_properties is not None:
+            warnings.warn(
+                f"Usage of customizable_properties is depreceated and can be removed. All properties are now customizable.",
+                DeprecationWarning,
+            )
 
         # Check if width and height are large enough to make an actual room
         # (with content)
