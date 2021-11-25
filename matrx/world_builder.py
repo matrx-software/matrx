@@ -1388,7 +1388,7 @@ class WorldBuilder:
 
         if visualize_opacities is None:
             visualize_opacities = [None for _ in range(len(locations))]
-        elif isinstance(visualize_opacities, float) or isinstance(visualize_opacities, RandomProperty):
+        elif isinstance(visualize_opacities, float) or isinstance(visualize_opacities, int) or isinstance(visualize_opacities, RandomProperty):
             visualize_opacities = [visualize_opacities for _ in range(len(locations))]
 
         if visualize_depths is None:
