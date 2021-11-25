@@ -69,7 +69,7 @@ class Door(EnvObject):
         kwargs['is_movable'] = False 
 
         super().__init__(location=location, name=name, is_traversable=is_traversable, visualize_colour=current_color,
-                         is_open=self.is_open, class_callable=Door, customizable_properties=['is_open'], **kwargs)
+                         is_open=self.is_open, class_callable=Door, **kwargs)
 
     def open_door(self):
         """ Opens the door, changes the colour and sets the properties as such.
@@ -215,7 +215,6 @@ class Battery(EnvObject):
         super().__init__(name=name, location=location,
                          visualize_shape=0,  # a battery is always square
                          visualize_size=0.25,  # a battery is always 1/4th of a grid square of the visualization
-                         customizable_properties=["current_energy_level"],  # the current energy level can be changed
                          visualize_colour="#32b432",
                          energy_decay=self.energy_decay,
                          current_energy_level=self.current_energy_level,
@@ -302,7 +301,7 @@ class CollectionTarget(EnvObject):
     """
     def __init__(self, location, collection_objects, collection_zone_name, name="Collection_target"):
 
-        super().__init__(location=location, name=name, class_callable=CollectionTarget, customizable_properties=None,
+        super().__init__(location=location, name=name, class_callable=CollectionTarget,
                          is_traversable=True, is_movable=False, visualize_size=0, visualize_shape=0,
                          is_drop_off_target=True, visualize_colour=None, visualize_depth=None, visualize_opacity=0.0,
                          collection_objects=collection_objects, collection_zone_name=collection_zone_name,

@@ -10,12 +10,7 @@ class EnvObject:
      An EnvObject always needs a location and a name. Since we have no idea where you want to put the object or how
      you want to call it.
 
-     In addition agents may alter properties of objects, but only if they are specifically told to be customizable.
-     This is done by providing a list of property names in the customizable_properties list.
-     Any custom property is allowed to be customizable if in that list, but any keyword argument (e.g.
-     is_traversable) may only be influenced by an Action indirectly. For example, the is_traversable property cannot
-     be changed in any way, whereas the location property can only be changed indirectly through the PickUpObject
-     action.
+     In addition agents may alter properties of objects.
 
      A few properties are mandatory for the GridWorld, some Actions and the Visualizer to function. These are
      keyword arguments (e.g. is_traversable). If these are not set, they are obtained from the defaults.py file.
@@ -46,9 +41,6 @@ class EnvObject:
         The name of object, does not need to be unique.
     location : List or tuple of length two
         The location of the object in the grid world.
-    customizable_properties : List. Optional, default obtained from defaults.py
-        The list of attribute names
-        that can be customized by other objects (including AgentAvatars and as an extension any Agent).
     is_traversable : Boolean. Optional, default obtained from defaults.py
         Signals whether other objects can be placed on top of this object.
     carried_by : List. Optional, default obtained from defaults.py
@@ -81,8 +73,7 @@ class EnvObject:
         For example the property 'heat'=2.4 of an EnvObject representing a fire.
      """
 
-    def __init__(self, location, name, class_callable, customizable_properties=None,
-                 is_traversable=None, is_movable=None,
+    def __init__(self, location, name, class_callable, is_traversable=None, is_movable=None,
                  visualize_size=None, visualize_shape=None, visualize_colour=None, visualize_depth=None,
                  visualize_opacity=None, visualize_from_center=None, **custom_properties):
 
@@ -108,12 +99,6 @@ class EnvObject:
                                 "object ID, as it breaks the MATRX frontend. Any double " +
                                 "underscores will be removed from the ID..")
                 self.obj_id = re.sub('_+', '_', self.obj_id)
-
-        # Make customizable_properties mutable if not given.
-        if customizable_properties is None:
-            self.customizable_properties = []
-        else:
-            self.customizable_properties = customizable_properties
 
         # Set the class trace based on the given callable class object. This is required to make a distinction between
         # what kind of object is actually seen or visualized. The last element is always the lowest level class Object,
@@ -199,42 +184,43 @@ class EnvObject:
         The new properties.
         """
 
+        # check if property_name is a mandatory class attribute that is also a property
+        if property_name == "is_traversable":
+            assert isinstance(property_value, bool)
+            self.is_traversable = property_value
+        elif property_name == "name":
+            assert isinstance(property_value, str)
+            self.obj_name = property_value
+        elif property_name == "location":
+            assert isinstance(property_value, list) or isinstance(property_value, tuple)
+            self.location = property_value
+        elif property_name == "class_inheritance":
+            assert isinstance(property_value, list)
+            self.class_inheritance = property_value
+        elif property_name == "visualize_size" or property_name == "visualization_size":
+            assert isinstance(property_value, int)
+            self.visualize_size = property_value
+        elif property_name == "visualize_colour" or property_name == "visualization_colour":
+            assert isinstance(property_value, str)
+            self.visualize_colour = property_value
+        elif property_name == "visualize_opacity" or property_name == "visualization_opacity":
+            assert isinstance(property_value, float)
+            self.visualize_opacity = property_value
+        elif property_name == "visualize_shape" or property_name == "visualization_shape":
+            assert isinstance(property_value, int)
+            self.visualize_shape = property_value
+        elif property_name == "visualize_depth" or property_name == "visualization_depth":
+            assert isinstance(property_value, int)
+            self.visualize_depth = property_value
+        elif property_name == "is_movable":
+            assert isinstance(property_value, bool)
+            self.is_movable = property_value
+        elif property_name == "visualize_from_center":
+            self.visualize_from_center = property_value
+        
         # We check if it is a custom property and if so change it simply in the dictionary
-        if property_name in self.customizable_properties:
+        else: 
             self.custom_properties[property_name] = property_value
-        else:  # else we need to check if property_name is a mandatory class attribute that is also a property
-            if property_name == "is_traversable":
-                assert isinstance(property_value, bool)
-                self.is_traversable = property_value
-            elif property_name == "name":
-                assert isinstance(property_value, str)
-                self.obj_name = property_value
-            elif property_name == "location":
-                assert isinstance(property_value, list) or isinstance(property_value, tuple)
-                self.location = property_value
-            elif property_name == "class_inheritance":
-                assert isinstance(property_value, list)
-                self.class_inheritance = property_value
-            elif property_name == "visualize_size" or property_name == "visualization_size":
-                assert isinstance(property_value, int)
-                self.visualize_size = property_value
-            elif property_name == "visualize_colour" or property_name == "visualization_colour":
-                assert isinstance(property_value, str)
-                self.visualize_colour = property_value
-            elif property_name == "visualize_opacity" or property_name == "visualization_opacity":
-                assert isinstance(property_value, float)
-                self.visualize_opacity = property_value
-            elif property_name == "visualize_shape" or property_name == "visualization_shape":
-                assert isinstance(property_value, int)
-                self.visualize_shape = property_value
-            elif property_name == "visualize_depth" or property_name == "visualization_depth":
-                assert isinstance(property_value, int)
-                self.visualize_depth = property_value
-            elif property_name == "is_movable":
-                assert isinstance(property_value, bool)
-                self.is_movable = property_value
-            elif property_name == visualize_from_center:
-                self.visualize_from_center = property_value
 
         return self.properties
 
@@ -252,9 +238,8 @@ class EnvObject:
         if property_name in self.custom_properties:
             raise Exception("Attribute already exists, alter value with change_property instead")
         else:
-            # We always add it as a custom property which is also customizable (since we can add it)
+            # We always add it as a custom property
             self.custom_properties[property_name] = property_value
-            self.customizable_properties.append(property_name)
 
     @property
     def location(self):

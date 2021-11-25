@@ -68,9 +68,6 @@ class AgentBody(EnvObject):
     is_human_agent : Boolean. Optional, default=False.
         Boolean to signal that the agent represented by this Agent's
         body is a human controlled agent.
-    customizable_properties : List. Optional, default=obtained from defaults.py.
-        The list of attribute names
-        that can be customized by other objects (including Agent's body and as an extension any Agent).
     is_traversable : Boolean. Optional, default obtained from defaults.py.
         Signals whether other objects can be placed on top of this object.
     carried_by : List. Optional, default obtained from defaults.py.
@@ -108,8 +105,7 @@ class AgentBody(EnvObject):
                  callback_agent_log, callback_create_context_menu_for_other, callback_create_context_menu_for_self,
                  visualize_size, visualize_shape, visualize_colour, visualize_depth, visualize_opacity,
                  visualize_when_busy, is_traversable, team, name, is_movable,
-                 is_human_agent, customizable_properties,
-                 **custom_properties):
+                 is_human_agent, **custom_properties):
 
         # A list of EnvObjects or any class that inherits from it. Denotes all objects the Agent's body is currently
         # carrying. Note that these objects do not exist on the WorldGrid anymore, so removing them in this list deletes
@@ -169,7 +165,7 @@ class AgentBody(EnvObject):
 
         # Call the super constructor (we do this here because then we have access to all of EnvObject, including a
         # unique id
-        super().__init__(location, name, customizable_properties=customizable_properties, is_traversable=is_traversable,
+        super().__init__(location, name, is_traversable=is_traversable,
                          class_callable=class_callable,
                          visualize_size=visualize_size, visualize_shape=visualize_shape,
                          visualize_colour=visualize_colour, visualize_depth=visualize_depth,
@@ -225,7 +221,7 @@ class AgentBody(EnvObject):
     def _set_agent_changed_properties(self, props: dict):
         """
         The Agent has possibly changed some of its properties during its OODA loop. Here the agent properties are also
-        updated in the Agent's body, if it is allowed to change them as defined in 'customizable_properties' list.
+        updated in the Agent's body.
         """
         # get all agent properties of this Agent's body in one dictionary
         body_properties = self.properties
@@ -239,10 +235,6 @@ class AgentBody(EnvObject):
             # check if the property has changed, and skip if not the case
             if props[prop] == body_properties[prop]:
                 continue
-
-            # if the agent has changed the property, check if the agent has permission to do so
-            if prop not in self.customizable_properties:
-                raise Exception(f"Agent {self.obj_id} tried to change a non-writable property: {prop}.")
 
             # The agent changed the property and the agent had permission to do so
             # update special properties

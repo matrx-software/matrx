@@ -380,8 +380,7 @@ class WorldBuilder:
                              f"{GridWorldLogger.__name__}.")
 
     def add_agent(self, location: Union[tuple, list], agent_brain: AgentBrain,
-                  name, customizable_properties: Union[tuple, list] = None,
-                  sense_capability: SenseCapability = None,
+                  name, sense_capability: SenseCapability = None,
                   is_traversable: bool = True, team: str = None,
                   possible_actions: list = None, is_movable: bool = None,
                   visualize_size: float = None,
@@ -409,12 +408,6 @@ class WorldBuilder:
             The name of the agent, should be unique to allow the visualisation
             to have a single web page per agent. If the name is already used,
             an exception is thrown.
-
-        customizable_properties : list (optional, None)
-            A list or tuple of names of properties for this agent that can be
-            altered or customized. Either by the agent itself or by other
-            agents or objects. If a property value gets changed that is not
-            in this list than an exception is thrown.
 
         sense_capability : SenseCapability (optional, None)
             The SenseCapability object belonging this this agent's AgentBody.
@@ -479,8 +472,7 @@ class WorldBuilder:
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
-            objects or which can be used or altered (if allowed to by the
-            customizable_properties list) by the AgentBrain or others.
+            objects or which can be used or altered by the AgentBrain or others.
 
         Raises
         ------
@@ -561,8 +553,6 @@ class WorldBuilder:
         if sense_capability is None:
             # Create sense capability that perceives all
             sense_capability = create_sense_capability([], [])
-        if customizable_properties is None:
-            customizable_properties = []
 
         # Check if the agent is not of HumanAgent, if so; use the add_human_
         # agent method
@@ -576,7 +566,6 @@ class WorldBuilder:
         # an agent to the GridWorld
         agent_setting = {"agent": agent_brain,
                          "custom_properties": custom_properties,
-                         "customizable_properties": customizable_properties,
                          "sense_capability": sense_capability,
                          "mandatory_properties": {
                              "name": name,
@@ -601,7 +590,7 @@ class WorldBuilder:
     def add_team(self, agent_brains: Union[list, tuple],
                  locations: Union[list, tuple], team_name,
                  custom_properties=None, sense_capability=None,
-                 customizable_properties=None, is_traversable=None,
+                 is_traversable=None,
                  visualize_size=None, visualize_shape=None,
                  visualize_colour=None, visualize_opacity=None,
                  visualize_when_busy=None):
@@ -632,11 +621,6 @@ class WorldBuilder:
         sense_capability : SenseCapability or list (optional, default None)
             A single `SenseCapability` used for every agent, or a list of those
             for every given agent.
-
-        customizable_properties : list (optional, default None)
-            A list of property names that each agent can edit. When it is a
-            list of listed properties, it denotes a unique set of customizable
-            properties for every agent.
 
         is_traversable : bool or list (optional, default None)
             A list of booleans or a single boolean denoting either for each
@@ -698,7 +682,6 @@ class WorldBuilder:
         self.add_multiple_agents(agent_brains, locations,
                                  custom_properties=custom_properties,
                                  sense_capabilities=sense_capability,
-                                 customizable_properties=customizable_properties,
                                  is_traversable=is_traversable,
                                  teams=team_name,
                                  visualize_sizes=visualize_size,
@@ -709,7 +692,6 @@ class WorldBuilder:
 
     def add_multiple_agents(self, agents, locations, custom_properties=None,
                             sense_capabilities=None,
-                            customizable_properties=None,
                             is_traversable=None,
                             teams=None, visualize_sizes=None,
                             visualize_shapes=None,
@@ -734,11 +716,6 @@ class WorldBuilder:
         sense_capability : SenseCapability or list (optional, default None)
             A single `SenseCapability` used for every agent, or a list of those
             for every given agent.
-
-        customizable_properties : list (optional, default None)
-            A list of property names that each agent can edit. When it is a
-            list of listed properties, it denotes a unique set of customizable
-            properties for every agent.
 
         is_traversable : bool or list (optional, default None)
             A list of booleans or a single boolean denoting either for each
@@ -820,11 +797,6 @@ class WorldBuilder:
         elif isinstance(sense_capabilities, SenseCapability):
             sense_capabilities = [sense_capabilities for _ in range(len(agents))]
 
-        if customizable_properties is None:
-            customizable_properties = [None for _ in range(len(agents))]
-        elif not any(isinstance(el, list) for el in customizable_properties):
-            customizable_properties = [customizable_properties for _ in range(len(agents))]
-
         if is_traversable is None:
             is_traversable = [None for _ in range(len(agents))]
         elif isinstance(is_traversable, bool):
@@ -869,7 +841,6 @@ class WorldBuilder:
         for idx, agent in enumerate(agents):
             self.add_agent(locations[idx], agent,
                            sense_capability=sense_capabilities[idx],
-                           customizable_properties=customizable_properties[idx],
                            is_traversable=is_traversable[idx],
                            team=teams[idx],
                            visualize_size=visualize_sizes[idx],
@@ -881,7 +852,7 @@ class WorldBuilder:
                            **custom_properties[idx])
 
     def add_agent_prospect(self, location, agent, probability, name="Agent",
-                           customizable_properties=None, sense_capability=None,
+                           sense_capability=None,
                            is_traversable=None, team=None,
                            possible_actions=None, is_movable=None,
                            visualize_size=None, visualize_shape=None,
@@ -915,12 +886,6 @@ class WorldBuilder:
             The name of the agent, should be unique to allow the visualisation
             to have a single web page per agent. If the name is already used,
             an exception is thrown.
-
-        customizable_properties : list (optional, None)
-            A list or tuple of names of properties for this agent that can be
-            altered or customized. Either by the agent itself or by other
-            agents or objects. If a property value gets changed that is not
-            in this list than an exception is thrown.
 
         sense_capability : SenseCapability (optional, None)
             The SenseCapability object belonging this this agent's AgentBody.
@@ -985,8 +950,7 @@ class WorldBuilder:
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
-            objects or which can be used or altered (if allowed to by the
-            customizable_properties list) by the AgentBrain or others.
+            objects or which can be used or altered by the AgentBrain or others.
 
         Raises
         ------
@@ -1009,7 +973,7 @@ class WorldBuilder:
         """
 
         # Add agent as normal
-        self.add_agent(location, agent, name, customizable_properties,
+        self.add_agent(location, agent, name,
                        sense_capability, is_traversable, team,
                        possible_actions, is_movable, visualize_size,
                        visualize_shape, visualize_colour, visualize_depth,
@@ -1020,7 +984,7 @@ class WorldBuilder:
         self.agent_settings[-1]['probability'] = probability
 
     def add_object(self, location, name, callable_class=None,
-                   customizable_properties=None, is_traversable=None,
+                   is_traversable=None,
                    is_movable=None, visualize_size=None, visualize_shape=None,
                    visualize_colour=None, visualize_depth=None,
                    visualize_opacity=None, **custom_properties):
@@ -1043,12 +1007,6 @@ class WorldBuilder:
         callable_class : class
             A class object of the to be added object. Should be `EnvObject` or
             any class that inherits from this.
-
-        customizable_properties : list (optional, None)
-            A list or tuple of names of properties for this object that can be
-            altered or customized. Either by an agent, itself or other objects.
-            If a property value gets changed that is not in this list than an
-            exception is thrown.
 
         is_traversable : bool (optional, default None)
             Whether this object allows other (traversable) agents and objects
@@ -1087,8 +1045,7 @@ class WorldBuilder:
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
-            objects or which can be used or altered (if allowed to by the
-            customizable_properties list) by the AgentBrain or others.
+            objects or which can be used or altered by the AgentBrain or others.
 
         Raises
         ------
@@ -1128,14 +1085,11 @@ class WorldBuilder:
         # range).
         if custom_properties is None:
             custom_properties = {}
-        if customizable_properties is None:
-            customizable_properties = []
 
         # Define a settings dictionary with all we need to register and add
         # an agent to the GridWorld
         object_setting = {"callable_class": callable_class,
                           "custom_properties": custom_properties,
-                          "customizable_properties": customizable_properties,
                           "mandatory_properties": {
                               "name": name,
                               "is_traversable": is_traversable,
@@ -1150,7 +1104,7 @@ class WorldBuilder:
         self.object_settings.append(object_setting)
 
     def add_object_prospect(self, location, name, probability,
-                            callable_class=None, customizable_properties=None,
+                            callable_class=None,
                             is_traversable=None, is_movable=None,
                             visualize_size=None, visualize_shape=None,
                             visualize_colour=None, visualize_depth=None,
@@ -1181,11 +1135,7 @@ class WorldBuilder:
             A class object of the to be added object. Should be `EnvObject` or
             any class that inherits from this.
 
-        customizable_properties : list (optional, None)
-            A list or tuple of names of properties for this object that can be
-            altered or customized. Either by an agent, itself or other objects.
-            If a property value gets changed that is not in this list than an
-            exception is thrown.
+        
 
         is_traversable : bool (optional, default None)
             Whether this obejct allows other (traversable) agents and objects
@@ -1224,8 +1174,7 @@ class WorldBuilder:
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
-            objects or which can be used or altered (if allowed to by the
-            customizable_properties list) by the AgentBrain or others.
+            objects or which can be used or altered by the AgentBrain or others.
 
         Raises
         ------
@@ -1245,7 +1194,7 @@ class WorldBuilder:
 
         # Add object as normal
         self.add_object(location, name, callable_class,
-                        customizable_properties, is_traversable, is_movable,
+                        is_traversable, is_movable,
                         visualize_size, visualize_shape, visualize_colour,
                         visualize_depth, visualize_opacity,
                         **custom_properties)
@@ -1255,7 +1204,7 @@ class WorldBuilder:
 
     def add_multiple_objects(self, locations, names=None,
                              callable_classes=None, custom_properties=None,
-                             customizable_properties=None, is_traversable=None,
+                             is_traversable=None,
                              visualize_sizes=None, visualize_shapes=None,
                              visualize_colours=None, visualize_depths=None,
                              visualize_opacities=None, is_movable=None):
@@ -1284,10 +1233,6 @@ class WorldBuilder:
         custom_properties : dict or list (optional, None)
             A dictionary containing all custom property names and their values
             of a list of such dictionaries for every object.
-
-        customizable_properties : list (optional, None)
-            A list of properties that agents and objects are allowed to change
-            or a list of such lists for every object.
 
         is_traversable : bool or list (optional, None)
             Whether all objects are traversable or a list of such booleans to
@@ -1361,11 +1306,6 @@ class WorldBuilder:
         elif isinstance(names, str) or isinstance(names, RandomProperty):
             names = [names for _ in range(len(locations))]
 
-        if customizable_properties is None:
-            customizable_properties = [None for _ in range(len(locations))]
-        elif not any(isinstance(el, list) for el in customizable_properties):
-            customizable_properties = [customizable_properties for _ in range(len(locations))]
-
         if is_traversable is None:
             is_traversable = [None for _ in range(len(locations))]
         elif isinstance(is_traversable, bool) or isinstance(is_traversable, RandomProperty):
@@ -1404,14 +1344,13 @@ class WorldBuilder:
         # Loop through all agents and add them
         for idx in range(len(locations)):
             self.add_object(location=locations[idx], name=names[idx], callable_class=callable_classes[idx],
-                            customizable_properties=customizable_properties[idx],
                             is_traversable=is_traversable[idx], is_movable=is_movable[idx],
                             visualize_size=visualize_sizes[idx], visualize_shape=visualize_shapes[idx],
                             visualize_colour=visualize_colours[idx], visualize_depth=visualize_depths[idx],
                             visualize_opacity=visualize_opacities[idx], **custom_properties[idx])
 
     def add_human_agent(self, location, agent, name="HumanAgent",
-                        customizable_properties=None, sense_capability=None,
+                        sense_capability=None,
                         is_traversable=None, team=None, possible_actions=None,
                         is_movable=None, visualize_size=None,
                         visualize_shape=None, visualize_colour=None,
@@ -1440,12 +1379,6 @@ class WorldBuilder:
             The name of the agent, should be unique to allow the visualisation
             to have a single web page per agent. If the name is already used,
             an exception is raised.
-
-        customizable_properties : list (optional, None)
-            A list or tuple of names of properties for this agent that can be
-            altered or customized. Either by the agent itself or by other
-            agents or objects. If a property value gets changed that is not
-            in this list than an exception is thrown.
 
         sense_capability : SenseCapability (optional, None)
             The SenseCapability object belonging this this agent's AgentBody.
@@ -1515,8 +1448,7 @@ class WorldBuilder:
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
-            objects or which can be used or altered (if allowed to by the
-            customizable_properties list) by the AgentBrain or others.
+            objects or which can be used or altered by the AgentBrain or others.
 
         Raises
         ------
@@ -1583,8 +1515,6 @@ class WorldBuilder:
             custom_properties = {}
         if sense_capability is None:
             sense_capability = create_sense_capability([], [])  # Create sense capability that perceives all
-        if customizable_properties is None:
-            customizable_properties = []
 
         # Check if the agent is of HumanAgent, if not; use the add_agent method
         inh_path = _get_inheritence_path(agent.__class__)
@@ -1598,7 +1528,6 @@ class WorldBuilder:
         # Define a settings dictionary with all we need to register and add an agent to the GridWorld
         hu_ag_setting = {"agent": agent,
                          "custom_properties": custom_properties,
-                         "customizable_properties": customizable_properties,
                          "sense_capability": sense_capability,
                          "mandatory_properties": {
                              "name": name,
@@ -1619,7 +1548,7 @@ class WorldBuilder:
         self.agent_settings.append(hu_ag_setting)
 
     def add_area(self, top_left_location, width, height, name,
-                 customizable_properties=None, visualize_colour=None,
+                 visualize_colour=None,
                  visualize_opacity=None, **custom_properties):
         """ Adds an area of tiles/surface.
 
@@ -1644,10 +1573,6 @@ class WorldBuilder:
         name : string
             The name of the area.
 
-        customizable_properties : list (optional, default None)
-            The properties that agents and objects can modify in all the
-            created tiles.
-
         visualize_colour : string (optional, default None)
             The colour of the tiles as a hexidecimal string.
 
@@ -1659,8 +1584,7 @@ class WorldBuilder:
         Any additional given keyword arguments will be encapsulated in
         this dictionary. These will be added to all the tiles as
         custom_properties which can be perceived by other agents and
-        objects or which can be used or altered (if allowed to by the
-        customizable_properties list) by agents or objects.
+        objects or which can be used or altered by agents or objects.
 
         Raises
         ------
@@ -1694,7 +1618,6 @@ class WorldBuilder:
         # Add all area objects
         self.add_multiple_objects(locations=locs, callable_classes=AreaTile,
                                   names=name,
-                                  customizable_properties=customizable_properties,
                                   visualize_colours=visualize_colour,
                                   visualize_opacities=visualize_opacity,
                                   custom_properties=custom_properties)
@@ -1735,8 +1658,7 @@ class WorldBuilder:
         Any additional given keyword arguments will be encapsulated in
         this dictionary. These will be added to all the tiles as
         custom_properties which can be perceived by other agents and
-        objects or which can be used or altered (if allowed to by the
-        customizable_properties list) by agents or objects.
+        objects or which can be used or altered by agents or objects.
 
         Raises
         ------
@@ -1787,7 +1709,7 @@ class WorldBuilder:
                                 **custom_properties)
 
     def add_line(self, start, end, name, callable_class=None,
-                 customizable_properties=None, is_traversable=None,
+                 is_traversable=None,
                  is_movable=None, visualize_size=None, visualize_shape=None,
                  visualize_colour=None, visualize_depth=None,
                  visualize_opacity=None, **custom_properties):
@@ -1813,12 +1735,6 @@ class WorldBuilder:
             The object class denoting the objects that should be added. This
             is `EnvObject` by default or must be any other class or inherit
             from this class.
-
-        customizable_properties : list (optional, None)
-            A list or tuple of names of properties for these objects that can
-            be altered or customized. Either by an agent, itself or other
-            objects. If a property value gets changed that is not in this list,
-            an exception is thrown.
 
         is_traversable : bool (optional, default None)
             Whether this object allows other (traversable) agents and objects
@@ -1860,8 +1776,7 @@ class WorldBuilder:
             Any additional given keyword arguments will be encapsulated in
             this dictionary. These will be added to the AgentBody as
             custom_properties which can be perceived by other agents and
-            objects or which can be used or altered (if allowed to by the
-            customizable_properties list) by the AgentBrain or others.
+            objects or which can be used or altered by the AgentBrain or others.
 
         Raises
         ------
@@ -1889,7 +1804,6 @@ class WorldBuilder:
         self.add_multiple_objects(locations=line_coords, names=names,
                                   callable_classes=callable_class,
                                   custom_properties=custom_properties,
-                                  customizable_properties=customizable_properties,
                                   is_traversable=is_traversable,
                                   visualize_sizes=visualize_size,
                                   visualize_shapes=visualize_shape,
@@ -1904,12 +1818,9 @@ class WorldBuilder:
                  door_closed_colour=None,
                  door_visualization_opacity=None,
                  door_custom_properties=None,
-                 door_customizable_properties=None,
                  wall_visualize_colour=None, wall_visualize_opacity=None,
                  wall_custom_properties=None,
-                 wall_customizable_properties=None,
                  area_custom_properties=None,
-                 area_customizable_properties=None,
                  area_visualize_colour=None, area_visualize_opacity=None):
         """ Adds a rectangular room withs walls and doors.
 
@@ -1958,10 +1869,6 @@ class WorldBuilder:
             A dictionary of custom properties and their values passed to every
             door object.
 
-        door_customizable_properties : list (optional, default None)
-            A list of property names that other objects and agents are allowed
-            to adjust.
-
         wall_visualize_colour : string (optional, default None)
             The colour of the walls.
 
@@ -1972,17 +1879,9 @@ class WorldBuilder:
             A dictionary of custom properties and their values passed to every
             wall object.
 
-        wall_customizable_properties : list (optional, default None)
-            A list of property names that other objects and agents are allowed
-            to adjust.
-
         area_custom_properties :  (optional, default None)
             A dictionary of custom properties and their values passed to every
             area object. Only used when area tiles are added.
-
-        area_customizable_properties :  (optional, default None)
-            A list of property names that other objects and agents are allowed
-            to adjust. Only used when area tiles are added.
 
         area_visualize_colour :  (optional, default None)
             The colour of the areas as a hexadeciamal string. Only used when
@@ -2026,7 +1925,6 @@ class WorldBuilder:
         # given
         if with_area_tiles is False and (
                 area_custom_properties is not None or
-                area_customizable_properties is not None or
                 area_visualize_colour is not None or
                 area_visualize_opacity is not None):
             warnings.warn(f"While adding room {name} : The boolean with_area_"
@@ -2084,8 +1982,7 @@ class WorldBuilder:
         self.add_multiple_objects(locations=all_, names=names, callable_classes=Wall,
                                   visualize_colours=wall_visualize_colour,
                                   visualize_opacities=wall_visualize_opacity,
-                                  custom_properties=wall_custom_properties,
-                                  customizable_properties=wall_customizable_properties)
+                                  custom_properties=wall_custom_properties)
 
         # Add all doors
         for door_loc in door_locations:
@@ -2096,8 +1993,7 @@ class WorldBuilder:
             self.add_object(location=door_loc, name=f"{name} - door@{door_loc}", callable_class=Door,
                             open_colour=door_open_colour, closed_colour=door_closed_colour,
                             visualize_opacity=door_visualization_opacity,
-                            is_open=doors_open, custom_properties=door_custom_properties,
-                            customizable_properties=door_customizable_properties)
+                            is_open=doors_open, custom_properties=door_custom_properties)
 
         # Add all area tiles if required
         if with_area_tiles:
@@ -2111,7 +2007,6 @@ class WorldBuilder:
 
             self.add_area(top_left_location=area_top_left, width=area_width, height=area_height, name=f"{name}_area",
                           visualize_colour=area_visualize_colour, visualize_opacity=area_visualize_opacity,
-                          customizable_properties=area_customizable_properties,
                           **{**area_custom_properties, "room_name": name})
 
     def __set_world_settings(self, shape, tick_duration, simulation_goal, rnd_seed,
@@ -2228,7 +2123,6 @@ class WorldBuilder:
 
         callable_class = settings['callable_class']
         custom_props = settings['custom_properties']
-        customizable_props = settings['customizable_properties']
         mandatory_props = settings['mandatory_properties']
 
         if callable_class == EnvObject:  # If it is a 'normal' EnvObject we do not treat it differently
@@ -2236,7 +2130,6 @@ class WorldBuilder:
             args = {'location': mandatory_props['location'],
                     'name': mandatory_props['name'],
                     'class_callable': callable_class,
-                    'customizable_properties': customizable_props,
                     'is_traversable': mandatory_props['is_traversable'],
                     'is_movable': mandatory_props['is_movable'],
                     'visualize_size': mandatory_props['visualize_size'],
@@ -2297,7 +2190,6 @@ class WorldBuilder:
 
         sense_capability = settings['sense_capability']
         custom_props = settings['custom_properties']
-        customizable_props = settings['customizable_properties']
         mandatory_props = settings['mandatory_properties']
 
         # This is a function unique to the human agent, so only set it if the agent is a human agent
@@ -2316,7 +2208,6 @@ class WorldBuilder:
                 'callback_agent_initialize': agent.initialize,
                 'callback_create_context_menu_for_other': agent.create_context_menu_for_other,
                 'callback_create_context_menu_for_self': cb_create_context_menu_self,
-                'customizable_properties': customizable_props,
                 **custom_props}
 
         # Parse arguments and create the AgentAvatar
