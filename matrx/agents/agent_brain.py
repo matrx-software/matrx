@@ -324,7 +324,6 @@ class AgentBrain:
 
         # if we randomly chose to do a open or close door action, find a door to open/close
         elif action == OpenDoorAction.__name__ or action == CloseDoorAction.__name__:
-
             action_kwargs['door_range'] = 1  # np.inf
             action_kwargs['object_id'] = None
 
@@ -662,18 +661,14 @@ class AgentBrain:
         # We empty all received messages as this is from the previous tick
         # self.received_messages = []
 
-        # Loop through all messages and create a Message object out of the dictionaries.
+        # Loop through all messages and store them
         for mssg in messages:
 
             # Check if the message is of type Message (its content contains the actual message)
             AgentBrain.__check_message(mssg, self.agent_id)
 
-            # Since each message is secretly wrapped inside a Message (as its content), we unpack its content and
-            # set that as the actual received message.
-            received_message = mssg.content
-
             # Add the message object to the received messages
-            self.received_messages.append(received_message)
+            self.received_messages.append(mssg)
 
     def _init_state(self):
         self._state = State(memorize_for_ticks=self.memorize_for_ticks,
