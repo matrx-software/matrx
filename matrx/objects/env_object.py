@@ -233,7 +233,7 @@ class EnvObject:
             elif property_name == "is_movable":
                 assert isinstance(property_value, bool)
                 self.is_movable = property_value
-            elif property_name == visualize_from_center:
+            elif property_name == "visualize_from_center":
                 self.visualize_from_center = property_value
 
         return self.properties
