@@ -2096,8 +2096,8 @@ class WorldBuilder:
             self.add_object(location=door_loc, name=f"{name} - door@{door_loc}", callable_class=Door,
                             open_colour=door_open_colour, closed_colour=door_closed_colour,
                             visualize_opacity=door_visualization_opacity,
-                            is_open=doors_open, custom_properties=door_custom_properties,
-                            customizable_properties=door_customizable_properties)
+                            is_open=doors_open, customizable_properties=door_customizable_properties, 
+                            **door_custom_properties)
 
         # Add all area tiles if required
         if with_area_tiles:
