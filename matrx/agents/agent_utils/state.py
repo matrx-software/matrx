@@ -37,7 +37,7 @@ class State(MutableMapping):
             self.__state_dict = state_dict.copy()
 
             # Set the "me"
-            self.__me = self.get_self()[0]
+            self.__me = self.get_self()
 
             # Return self
             return self
@@ -103,7 +103,7 @@ class State(MutableMapping):
         self.__state_dict = new_state
 
         # Set the "me"
-        self.__me = self.get_self()[0]
+        self.__me = self.get_self()
 
         # Return self
         return self
@@ -369,7 +369,7 @@ class State(MutableMapping):
             if self.__me is not None:
                 team_name = self.__me['team']
             else:
-                team_name = self.get_self()[0]['team']
+                team_name = self.get_self()['team']
         team_members = self.get_agents_with_property({'team': team_name})
         return team_members
 
@@ -419,7 +419,7 @@ class State(MutableMapping):
         return closest_agents
 
     def get_self(self):
-        me = self.__find_object(props={'obj_id': self.__own_id}, combined=True)
+        me = self.__find_object(props={'obj_id': self.__own_id}, combined=True)[0]
         return me
 
     ###############################################
@@ -441,7 +441,7 @@ class State(MutableMapping):
         if self.__me is not None:
             loc = self.__me['location']
         else:
-            loc = self.get_self()[0]['location']
+            loc = self.get_self()['location']
 
         def distance(coord):
             return utils.get_distance(loc, coord)
@@ -463,7 +463,7 @@ class State(MutableMapping):
         if self.__me is not None:
             my_loc = self.__me['location']
         else:
-            my_loc = self.get_self()[0]['location']
+            my_loc = self.get_self()['location']
 
         def distance(x):
             loc = x['location']
