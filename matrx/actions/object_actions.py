@@ -811,9 +811,9 @@ def _act_drop(grid_world, agent, env_obj, drop_loc):
     agent.is_carrying.remove(env_obj)
     env_obj.carried_by.remove(agent.obj_id)
 
-    # We return the object to the grid location we are standing at
+    # We return the object to the grid location we are standing at without registering a new ID
     env_obj.location = drop_loc
-    grid_world._register_env_object(env_obj)
+    grid_world._register_env_object(env_obj, ensure_unique_id=False)
 
     return DropObjectResult(DropObjectResult.RESULT_SUCCESS, True)
 

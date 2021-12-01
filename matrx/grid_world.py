@@ -89,7 +89,7 @@ class GridWorld:
         self.__teams = {}  # dictionary with team names (keys), and agents in those teams (values)
         self.__registered_agents = OrderedDict()  # The dictionary of all existing agents in the GridWorld
         self.__environment_objects = OrderedDict()  # The dictionary of all existing objects in the GridWorld
-        self.__obj_indices = {} # keeps track of all obj_ids added, indexed by their (preprocessed) obj name
+        self.__obj_indices = {} # keeps track of all obj_ids added, indexed by their (preprocessed) obj ID
 
         # Load about file and fetch MATRX version
         about = {}
@@ -511,13 +511,14 @@ class GridWorld:
 
         return agent_body.obj_id
 
-    def _register_env_object(self, env_object: EnvObject):
-        """ this function adds the objects """
+    def _register_env_object(self, env_object: EnvObject, ensure_unique_id=True):
+        """ this function adds the object to the gridworld """
 
         # check if the object can be succesfully placed at that location
         self.__validate_obj_placement(env_object)
 
-        env_object.obj_id = self.__ensure_unique_obj_name(env_object.obj_id)
+        if ensure_unique_id:
+            env_object.obj_id = self.__ensure_unique_obj_name(env_object.obj_id)
 
         # Assign id to environment sparse dictionary grid
         self.__environment_objects[env_object.obj_id] = env_object
@@ -779,8 +780,9 @@ class GridWorld:
         self.__message_buffer = {}
 
         # Perform the update method of all objects
+        compl_state = self.__get_complete_state()
         for env_obj in self.__environment_objects.values():
-            env_obj.update(self)
+            env_obj.update(self, compl_state)
 
         # Increment the number of tick we performed
         self.__current_nr_ticks += 1

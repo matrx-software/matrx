@@ -397,7 +397,8 @@ class AgentBody(EnvObject):
             "colour": self.visualize_colour,
             "depth": self.visualize_depth,
             "opacity": self.visualize_opacity,
-            "show_busy": self.visualize_when_busy
+            "show_busy": self.visualize_when_busy,
+            "visualize_from_center": self.visualize_from_center
         }
 
         # Add the current action and all of its data

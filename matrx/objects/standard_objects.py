@@ -221,7 +221,7 @@ class Battery(EnvObject):
                          current_energy_level=self.current_energy_level,
                          class_callable=Battery)
 
-    def update(self, grid_world):
+    def update(self, grid_world, state):
         """
         Updates the current energy level, changes the property accordingly, and also change the visualization color.
 

@@ -165,7 +165,7 @@ class EnvObject:
         # AgentAvatar)
         self.location = location
 
-    def update(self, grid_world):
+    def update(self, grid_world, state):
         """
         Used to update some properties of this object if needed. For example a 'status' property that changes over time.
         It can also be used to update something in the GridWorld. For example a Fire object that damages other objects
@@ -233,7 +233,7 @@ class EnvObject:
             elif property_name == "is_movable":
                 assert isinstance(property_value, bool)
                 self.is_movable = property_value
-            elif property_name == visualize_from_center:
+            elif property_name == "visualize_from_center":
                 self.visualize_from_center = property_value
 
         return self.properties
