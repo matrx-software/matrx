@@ -113,7 +113,7 @@ class Navigator:
         for waypoint in waypoints:
             self.add_waypoint(waypoint)
 
-    def get_all_waypoints(self):
+    def get_all_waypoints(self, state_tracker: StateTracker=None):
         """ Returns all current waypoints stored.
 
         Returns
@@ -122,9 +122,12 @@ class Navigator:
             A dictionary with as keys the order and as value the waypoint as (x,y) coordinate.
 
         """
+        # Update our waypoints based on agent's current location (if arrived at our current waypoint)
+        self.__update_waypoints(state_tracker)
+
         return [(k, wp.location) for k, wp in self.__waypoints.items()]
 
-    def get_upcoming_waypoints(self):
+    def get_upcoming_waypoints(self, state_tracker: StateTracker=None):
         """ Returns all waypoints not yet visited.
 
         Returns
@@ -133,9 +136,12 @@ class Navigator:
             A dictionary with as keys the order and as value the waypoint as (x,y) coordinate.
 
         """
+        # Update our waypoints based on agent's current location (if arrived at our current waypoint)
+        self.__update_waypoints(state_tracker)
+
         return [(k, wp.location) for k, wp in self.__waypoints.items() if not wp.is_visited()]
 
-    def get_current_waypoint(self):
+    def get_current_waypoint(self, state_tracker: StateTracker=None):
         """ Returns the current waypoint the navigator will try to visit.
 
         Returns
@@ -144,6 +150,9 @@ class Navigator:
             The (x,y) coordinate of the next waypoint.
 
         """
+        # Update our waypoints based on agent's current location (if arrived at our current waypoint)
+        self.__update_waypoints(state_tracker)
+        
         wp = self.__waypoints[self.__current_waypoint_idx]
         return wp.location
 
@@ -265,7 +274,7 @@ class Navigator:
         else:
             raise ValueError(f"The path plannings algorithm {algorithm} is not known.")
 
-    def __update_waypoints(self, agent_loc):
+    def __update_waypoints(self, state_tracker: StateTracker = None):
         """ A private MATRX method.
 
         Updates all is_visited property of waypoints based on the agent's current location. Also sets the navigator
@@ -277,6 +286,13 @@ class Navigator:
             The agent's current location as (x,y)
 
         """
+        if state_tracker is None:
+            warnings.warn("Using the navigator without providing the `self.state_tracker` as a parameter to navigator functions is depreceated, as without it returns outdated waypoint information. Also see https://github.com/matrx-software/matrx/issues/316", DeprecationWarning)
+            return False 
+        else:
+            # Get our agent's location
+            agent_loc = state_tracker.get_memorized_state()[state_tracker.agent_id]['location']
+
         wp = self.__get_current_waypoint()
         if wp.is_visited(agent_loc):
             self.__current_waypoint_idx += 1
@@ -302,11 +318,10 @@ class Navigator:
             no path can be found or when all waypoints are already visited.
 
         """
-        # Get our agent's location
         agent_loc = state_tracker.get_memorized_state()[state_tracker.agent_id]['location']
 
         # Update our waypoints based on agent's current location (if arrived at our current waypoint)
-        self.__update_waypoints(agent_loc)
+        self.__update_waypoints(state_tracker)
 
         # If we are done, we do nothing or start over if the path is circular
         if self.is_done:
