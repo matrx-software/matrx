@@ -1,6 +1,6 @@
 from matrx.agents import AgentBrain
-from matrx.agents.agent_utils.navigator import Navigator, AStarPlanner, WeightedAStarPlanner
-from matrx.agents.agent_utils.state_tracker import StateTracker, get_weighted_traversability_map
+from matrx.agents.agent_utils.navigator import Navigator
+from matrx.agents.agent_utils.state_tracker import StateTracker
 
 
 class PatrollingAgentBrain(AgentBrain):
@@ -35,10 +35,7 @@ class PatrollingAgentBrain(AgentBrain):
         # Initialize this agent's state tracker
         self.state_tracker = StateTracker(agent_id=self.agent_id)
 
-        self.navigator = Navigator(agent_id=self.agent_id, action_set=self.action_set, algorithm=Navigator.WEIGHTED_A_STAR_ALGORITHM)
-                                #    algorithm="sterretje", custom_algorithm_class=WeightedAStarPlanner, 
-                                #    traversability_map_func=get_weighted_traversability_map,
-                                #    algorithm_settings={"traversability_penalty_multiplier": 20})
+        self.navigator = Navigator(agent_id=self.agent_id, action_set=self.action_set)
 
         self.navigator.add_waypoints(self.waypoints, is_circular=True)
 
@@ -80,9 +77,6 @@ class PatrollingAgentBrain(AgentBrain):
 
         """
         from matrx.messages.message import Message
-
-        print("\nCurrent location:", self.agent_properties['location'])
-        print("upcoming waypoints:", self.navigator.get_upcoming_waypoints(self.state_tracker))
 
         move_action = self.navigator.get_move_action(self.state_tracker)
 

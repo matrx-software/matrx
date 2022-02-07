@@ -1,4 +1,3 @@
-from distutils.fancy_getopt import fancy_getopt
 import os
 
 from matrx.agents.agent_types.patrolling_agent import PatrollingAgentBrain
@@ -8,47 +7,12 @@ from matrx.world_builder import WorldBuilder
 
 def create_builder():
     tick_dur = 0.2
-    factory = WorldBuilder(random_seed=1, shape=[15, 15], tick_duration=0.001, verbose=False, run_matrx_api=True,
-                           run_matrx_visualizer=True, simulation_goal=100000)
+    factory = WorldBuilder(random_seed=1, shape=[15, 15], tick_duration=tick_dur, verbose=True, run_matrx_api=True,
+                           run_matrx_visualizer=True, simulation_goal=int(300/tick_dur))
 
     factory.add_logger(logger_class=LogActions, save_path="log_data/")
 
-    # factory.add_room(top_left_location=[0, 0], width=15, height=15, name="world_bounds", door_locations=[[11,0]], door_custom_properties={"img_name": "/static/images/fire.gif"})
-
-    # blocked 
-    factory.add_object([0,5], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([1,5], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([2,5], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([3,5], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([4,5], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([3,6], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([4,6], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([3,4], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([4,4], name="obj", visualize_colour="#000000", is_traversable=False)
-
-    factory.add_object([8,5], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([9,5], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([10,5], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([11,5], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([12,5], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([13,5], name="obj", visualize_colour="#00FF00", is_traversable=True)
-
-    factory.add_object([8,4], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([9,4], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([8,6], name="obj", visualize_colour="#000000", is_traversable=False)
-    factory.add_object([9,6], name="obj", visualize_colour="#000000", is_traversable=False)
-
-    factory.add_object([5,5], name="modder", visualize_colour="#FFFFFF", is_traversable=True, traversability_penalty=0.6)
-    factory.add_object([5,6], name="modder",  visualize_colour="#FFFFFF", is_traversable=True, traversability_penalty=0.6)
-    factory.add_object([5,4], name="modder",  visualize_colour="#FFFFFF", is_traversable=True, traversability_penalty=0.6)
-
-    factory.add_object([6,6], name="modder",  visualize_colour="#FFFFFF", is_traversable=True, traversability_penalty=0.8)
-    factory.add_object([6,5], name="modder", visualize_colour="#FFFFFF", is_traversable=True, traversability_penalty=0.8)
-    factory.add_object([6,4], name="modder", visualize_colour="#FFFFFF", is_traversable=True, traversability_penalty=0.8)
-
-    factory.add_object([7,5], name="modder",  visualize_colour="#FFFFFF", is_traversable=True, traversability_penalty=0.4)
-    factory.add_object([7,6], name="modder",  visualize_colour="#FFFFFF", is_traversable=True, traversability_penalty=0.4)
-    factory.add_object([7,4], name="modder",  visualize_colour="#FFFFFF", is_traversable=True, traversability_penalty=0.4)
+    factory.add_room(top_left_location=[0, 0], width=15, height=15, name="world_bounds", door_locations=[[11,0]], door_custom_properties={"img_name": "/static/images/fire.gif"})
 
     n_agent = 1
 
