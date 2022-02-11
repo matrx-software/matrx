@@ -3,7 +3,7 @@ import warnings
 from collections import OrderedDict
 
 import numpy as np
-from matrx.agents.agent_utils.state_tracker import StateTracker
+from matrx.agents.agent_utils.state_tracker import StateTracker, get_traversability_map, get_weighted_traversability_map
 from matrx.actions.move_actions import *
 
 
@@ -34,8 +34,10 @@ class Navigator:
 
     """The A* algorithm parameter for path planning."""
     A_STAR_ALGORITHM = "a_star"
+    WEIGHTED_A_STAR_ALGORITHM = "weighted_a_star"
 
-    def __init__(self, agent_id, action_set, algorithm=A_STAR_ALGORITHM, is_circular=False):
+    def __init__(self, agent_id, action_set, algorithm=A_STAR_ALGORITHM, custom_algorithm_class=None, traversability_map_func=get_traversability_map, 
+                algorithm_settings={"metric": "euclidean"}, is_circular=False):
         # Set action set
         self.__action_set = action_set
 
@@ -48,8 +50,11 @@ class Navigator:
         # Set the agent ID
         self.__agent_id = agent_id
 
+        # The function which calculates the traversability for a given state 
+        self.__traversability_map_func = traversability_map_func
+        
         # Initialize path plannings algorithm
-        self.__path_planning_algo = self.__initialize_path_planner(algorithm=self.__algorithm, action_set=action_set)
+        self.__path_planning_algo = self.__initialize_path_planner(algorithm=self.__algorithm, action_set=action_set, custom_algorithm_class=custom_algorithm_class, algorithm_settings=algorithm_settings)
 
         # An ordered dict to store all added waypoints
         self.__waypoints = OrderedDict()
@@ -71,6 +76,7 @@ class Navigator:
 
         # Current traversability map
         self.__occupation_map = None
+
 
     def add_waypoint(self, waypoint):
         """ Adds a waypoint to the path.
@@ -113,7 +119,7 @@ class Navigator:
         for waypoint in waypoints:
             self.add_waypoint(waypoint)
 
-    def get_all_waypoints(self):
+    def get_all_waypoints(self, state_tracker: StateTracker=None):
         """ Returns all current waypoints stored.
 
         Returns
@@ -122,9 +128,12 @@ class Navigator:
             A dictionary with as keys the order and as value the waypoint as (x,y) coordinate.
 
         """
+        # Update our waypoints based on agent's current location (if arrived at our current waypoint)
+        self.__update_waypoints(state_tracker)
+
         return [(k, wp.location) for k, wp in self.__waypoints.items()]
 
-    def get_upcoming_waypoints(self):
+    def get_upcoming_waypoints(self, state_tracker: StateTracker=None):
         """ Returns all waypoints not yet visited.
 
         Returns
@@ -133,9 +142,12 @@ class Navigator:
             A dictionary with as keys the order and as value the waypoint as (x,y) coordinate.
 
         """
+        # Update our waypoints based on agent's current location (if arrived at our current waypoint)
+        self.__update_waypoints(state_tracker)
+
         return [(k, wp.location) for k, wp in self.__waypoints.items() if not wp.is_visited()]
 
-    def get_current_waypoint(self):
+    def get_current_waypoint(self, state_tracker: StateTracker=None):
         """ Returns the current waypoint the navigator will try to visit.
 
         Returns
@@ -144,6 +156,9 @@ class Navigator:
             The (x,y) coordinate of the next waypoint.
 
         """
+        # Update our waypoints based on agent's current location (if arrived at our current waypoint)
+        self.__update_waypoints(state_tracker)
+        
         wp = self.__waypoints[self.__current_waypoint_idx]
         return wp.location
 
@@ -174,7 +189,7 @@ class Navigator:
 
         """
         # If we are done, don't do anything
-        if self.is_done:
+        if self.is_done and not self.is_circular:
             return None
 
         # Check if the state tracker is for the right agent
@@ -238,11 +253,14 @@ class Navigator:
         if self.__current_waypoint_idx is None:
             self.__current_waypoint_idx = 0
 
+        if self.__current_waypoint_idx >= len(self.__waypoints):
+            return None
+
         wp = self.__waypoints[self.__current_waypoint_idx]
 
         return wp
 
-    def __initialize_path_planner(self, algorithm, action_set):
+    def __initialize_path_planner(self, algorithm, action_set, custom_algorithm_class=None, algorithm_settings={}):
         """ A private MATRX method.
 
         Initializes the correct path planner algorithm.
@@ -261,11 +279,21 @@ class Navigator:
 
         """
         if algorithm == self.A_STAR_ALGORITHM:
-            return AStarPlanner(action_set=action_set, metric=AStarPlanner.EUCLIDEAN_METRIC)
+            self.__traversability_map_func = get_traversability_map
+            return AStarPlanner(action_set=action_set, settings=algorithm_settings)
+        elif algorithm == self.WEIGHTED_A_STAR_ALGORITHM:
+            self.__traversability_map_func = get_weighted_traversability_map
+            return WeightedAStarPlanner(action_set=action_set, settings=algorithm_settings)
+        elif algorithm != "" and custom_algorithm_class is not None:
+            return custom_algorithm_class(action_set=action_set, settings=algorithm_settings)
+        elif algorithm is None:
+            raise ValueError(f"No path plannings algorithm was specified.")
+        elif custom_algorithm_class is None:
+            raise ValueError(f"A custom path planning algorithm called '{algorithm}' was specified, but no corresponding custom algorithm class was provided.")
         else:
-            raise ValueError(f"The path plannings algorithm {algorithm} is not known.")
+            raise ValueError(f"Unknown path planning algorithm and/or path planning algorithm class was provided.")
 
-    def __update_waypoints(self, agent_loc):
+    def __update_waypoints(self, state_tracker: StateTracker = None):
         """ A private MATRX method.
 
         Updates all is_visited property of waypoints based on the agent's current location. Also sets the navigator
@@ -277,8 +305,15 @@ class Navigator:
             The agent's current location as (x,y)
 
         """
+        if state_tracker is None:
+            warnings.warn("Using the navigator without providing the `self.state_tracker` as a parameter to navigator functions is deprecated, as without it returns outdated waypoint information. Also see https://github.com/matrx-software/matrx/issues/316", DeprecationWarning)
+            return False 
+        else:
+            # Get our agent's location
+            agent_loc = state_tracker.get_memorized_state()[state_tracker.agent_id]['location']
+
         wp = self.__get_current_waypoint()
-        if wp.is_visited(agent_loc):
+        if wp is not None and wp.is_visited(agent_loc):
             self.__current_waypoint_idx += 1
 
         if self.__current_waypoint_idx >= self.__nr_waypoints:
@@ -302,11 +337,10 @@ class Navigator:
             no path can be found or when all waypoints are already visited.
 
         """
-        # Get our agent's location
         agent_loc = state_tracker.get_memorized_state()[state_tracker.agent_id]['location']
 
         # Update our waypoints based on agent's current location (if arrived at our current waypoint)
-        self.__update_waypoints(agent_loc)
+        self.__update_waypoints(state_tracker)
 
         # If we are done, we do nothing or start over if the path is circular
         if self.is_done:
@@ -316,7 +350,7 @@ class Navigator:
                 return []
 
         # Get our occupation map
-        self.__occupation_map, obj_grid = state_tracker.get_traversability_map(inverted=True)
+        self.__occupation_map, obj_grid = self.__traversability_map_func(state=state_tracker.get_memorized_state())
 
         # Get our current waypoint
         current_wp = self.__get_current_waypoint()
@@ -382,15 +416,18 @@ class PathPlanner:
 
     """
 
-    def __init__(self, action_set):
+    def __init__(self, action_set, settings):
         """ Initializes the planner given the actions an agent is capable of.
 
         Parameters
         ----------
         action_set : list
             The list of actions the agent is capable of performing.
+        settings : dict 
+            A dict with settings for the pathplanner
         """
         self.move_actions = get_move_actions(action_set)
+        self.settings = settings
 
     def plan(self, start, goal, occupation_map):
         """ Plan a route from the start to the goal.
@@ -420,8 +457,13 @@ class AStarPlanner(PathPlanner):
     EUCLIDEAN_METRIC = "euclidean"
     MANHATTAN_METRIC = "manhattan"
 
-    def __init__(self, action_set, metric=EUCLIDEAN_METRIC):
-        super().__init__(action_set)
+    def __init__(self, action_set, settings):
+        super().__init__(action_set, settings)
+
+        metric = self.EUCLIDEAN_METRIC 
+        if "metric" in settings:
+            metric = settings['metric']
+        
         if metric == self.EUCLIDEAN_METRIC:
             self.heuristic = lambda p1, p2: np.sqrt(np.sum((np.array(p1) - np.array(p2)) ** 2, axis=0))
         elif metric == self.MANHATTAN_METRIC:
@@ -448,6 +490,7 @@ class AStarPlanner(PathPlanner):
 
         Returns
         -------
+        The list of coordinates to move to from start to finish.
 
         """
 
@@ -486,6 +529,106 @@ class AStarPlanner(PathPlanner):
                 else:
                     # array bound x walls
                     continue
+
+                if neighbor in close_set and tentative_g_score >= gscore.get(neighbor, 0):
+                    continue
+
+                if tentative_g_score < gscore.get(neighbor, 0) or neighbor not in [i[1] for i in oheap]:
+                    came_from[neighbor] = current
+                    gscore[neighbor] = tentative_g_score
+                    fscore[neighbor] = tentative_g_score + self.heuristic(neighbor, goal)
+                    heapq.heappush(oheap, (fscore[neighbor], neighbor))
+
+        # If no path is available we stay put
+        return [start]
+
+
+class WeightedAStarPlanner(PathPlanner):
+    """ Weighted A* algorithm for path planning.
+    """
+
+    EUCLIDEAN_METRIC = "euclidean"
+    MANHATTAN_METRIC = "manhattan"
+
+    def __init__(self, action_set, settings):
+        super().__init__(action_set, settings)
+            
+        # parse settings 
+        metric = self.EUCLIDEAN_METRIC if "metric" not in settings else settings['metric']
+        self.traversability_penalty_multiplier = 10 if "traversability_penalty_multiplier" not in settings else settings['traversability_penalty_multiplier']
+
+        if metric == self.EUCLIDEAN_METRIC:
+            self.heuristic = lambda p1, p2: np.sqrt(np.sum((np.array(p1) - np.array(p2)) ** 2, axis=0))
+        elif metric == self.MANHATTAN_METRIC:
+            self.heuristic = lambda p1, p2: np.abs(p1[0] - p2[0]) + np.abs(p1[1] - p2[1])
+        else:
+            raise Exception(f"The distance metric {metric} for A* heuristic not known.")
+
+    def plan(self, start, goal, occupation_map):
+        """ Plan a route from the start to the goal.
+
+        A* algorithm, returns the shortest path to get from goal to start.
+        Uses an 2D numpy array, with 0 being traversable, anything else (e.g. 1) not traversable
+        Implementation from:
+        https://www.analytics-link.com/single-post/2018/09/14/Applying-the-A-Path-Finding-Algorithm-in-Python-Part-1-2D-square-grid
+
+        Parameters
+        ----------
+        start : tuple
+            The starting (x,y) coordinate.
+        goal : tuple
+            The goal (x,y) coordinate.
+        occupation_map : list
+            The list of lists representing which grid coordinates are blocked and which are not.
+
+        Returns
+        -------
+        The list of coordinates to move to from start to finish.
+        """
+
+        # possible movements
+        neighbors = list(self.move_actions.values())
+
+        close_set = set()
+        came_from = {}
+        gscore = {start: 0}
+        fscore = {start: self.heuristic(start, goal)}
+        oheap = []
+
+        heapq.heappush(oheap, (fscore[start], start))
+
+        while oheap:
+            current = heapq.heappop(oheap)[1]
+
+            if current == goal:
+                path = []
+                while current in came_from:
+                    path.append(current)
+                    current = came_from[current]
+                return path[::-1]
+
+            close_set.add(current)
+            for i, j in neighbors:
+                neighbor = current[0] + i, current[1] + j
+                if 0 <= neighbor[0] < occupation_map.shape[0]:
+                    if 0 <= neighbor[1] < occupation_map.shape[1]:
+                        if occupation_map[neighbor[0]][neighbor[1]] == 1:
+                            continue
+                    else:
+                        # array bound y walls
+                        continue
+                else:
+                    # array bound x walls
+                    continue
+                
+
+                # calc the cost of this route
+                cost_multiplier = 1
+                neighbor_traversability = occupation_map[neighbor[0]][neighbor[1]]
+                # if the traversability is between 1 and 0, it indicates a preference. Higher scores should be avoided
+                if neighbor_traversability < 1 and neighbor_traversability > 0:
+                    cost_multiplier = self.traversability_penalty_multiplier * neighbor_traversability
+                tentative_g_score = gscore[current] + (self.heuristic(current, neighbor) * cost_multiplier)
 
                 if neighbor in close_set and tentative_g_score >= gscore.get(neighbor, 0):
                     continue

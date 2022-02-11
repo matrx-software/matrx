@@ -1,3 +1,4 @@
+from distutils.sysconfig import customize_compiler
 from matrx.objects.env_object import EnvObject
 
 """ A number of standard, often used objects. """
@@ -50,7 +51,7 @@ class Door(EnvObject):
         Dict of additional properties that should be added to the object as well.
     """
     def __init__(self, location, is_open, name="Door", open_colour="#006400", closed_colour="#640000",
-                 **kwargs):
+                customizable_properties=["is_open"], **kwargs):
 
         # Whether the door is by default open or closed is stored in the defaults.py and obtained like this;
         self.is_open = is_open
@@ -65,11 +66,15 @@ class Door(EnvObject):
         # If the door is open or closed also determines its is_traversable property
         is_traversable = self.is_open
 
+        # extend the customizable properties list to include is_open
+        if "is_open" not in customizable_properties: 
+            customizable_properties.append('is_open')
+
         # hardcoded prop
         kwargs['is_movable'] = False 
 
         super().__init__(location=location, name=name, is_traversable=is_traversable, visualize_colour=current_color,
-                         is_open=self.is_open, class_callable=Door, customizable_properties=['is_open'], **kwargs)
+                         is_open=self.is_open, class_callable=Door, customizable_properties=customizable_properties, **kwargs)
 
     def open_door(self):
         """ Opens the door, changes the colour and sets the properties as such.

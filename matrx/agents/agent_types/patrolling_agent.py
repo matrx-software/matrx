@@ -35,8 +35,7 @@ class PatrollingAgentBrain(AgentBrain):
         # Initialize this agent's state tracker
         self.state_tracker = StateTracker(agent_id=self.agent_id)
 
-        self.navigator = Navigator(agent_id=self.agent_id, action_set=self.action_set,
-                                   algorithm=Navigator.A_STAR_ALGORITHM)
+        self.navigator = Navigator(agent_id=self.agent_id, action_set=self.action_set)
 
         self.navigator.add_waypoints(self.waypoints, is_circular=True)
 
