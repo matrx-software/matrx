@@ -1096,6 +1096,7 @@ class WorldBuilder:
         if callable_class is None:
             callable_class = EnvObject
 
+        
         # Check if location and agent are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
         assert isinstance(callable_class, Callable)
@@ -1228,10 +1229,10 @@ class WorldBuilder:
             )
 
         # Add object as normal
-        self.add_object(location, name, callable_class,
-                        is_traversable, is_movable,
-                        visualize_size, visualize_shape, visualize_colour,
-                        visualize_depth, visualize_opacity,
+        self.add_object(location, name, callable_class=callable_class,
+                        is_traversable=is_traversable, is_movable=is_movable,
+                        visualize_size=visualize_size, visualize_shape=visualize_shape, visualize_colour=visualize_colour,
+                        visualize_depth=visualize_depth, visualize_opacity=visualize_opacity,
                         **custom_properties)
 
         # Get the last settings (which we just added) and add the probability
@@ -2233,11 +2234,15 @@ class WorldBuilder:
             # combine the given arguments and any required arguments with defaults that were not specified by the user
             for arg, val in given_args.items():
                 if val is not None:
-                    args[arg] = val
-
+                    # if a argument passed by the user is not accepted by the object, throw an exception
+                    if arg not in args.keys() and varkw is None:
+                        raise Exception(f"Cannot pass property {arg} to object of class {callable_class.__name__}, as objects of that type "
+                            f"do not accept the argument and does not have a **kwargs property set in its constructor.")
+                    else:
+                        args[arg] = val
+                
         args = self.__instantiate_random_properties(args)
 
-        print("Callable_class name:", callable_class.__name__)
         env_object = callable_class(**args)
 
         return env_object
