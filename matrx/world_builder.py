@@ -2237,6 +2237,7 @@ class WorldBuilder:
 
         args = self.__instantiate_random_properties(args)
 
+        print("Callable_class name:", callable_class.__name__)
         env_object = callable_class(**args)
 
         return env_object

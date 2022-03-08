@@ -50,7 +50,7 @@ class Door(EnvObject):
     **kwargs:
         Dict of additional properties that should be added to the object as well.
     """
-    def __init__(self, location, is_open, name="Door", open_colour="#006400", closed_colour="#640000", **kwargs):
+    def __init__(self, location, is_open=False, name="Door", open_colour="#006400", closed_colour="#640000", **kwargs):
 
         # Whether the door is by default open or closed is stored in the defaults.py and obtained like this;
         self.is_open = is_open
