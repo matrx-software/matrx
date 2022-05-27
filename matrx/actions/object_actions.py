@@ -147,20 +147,25 @@ class RemoveObject(Action):
         assert agent_avatar is not None  # check if we actually exist
         agent_loc = agent_avatar.location  # get our location
 
-        remove_range = np.inf  # we do not know the intended range, so assume infinite
-        # get all objects within infinite range
+        # need an object id to remove an object
+        if 'object_id' not in kwargs:
+            return RemoveObjectResult(RemoveObjectResult.REMOVAL_FAILED.replace('object_id'.upper(),
+                                                                                str(None)), False)
+        remove_range = 1  # default remove range
+        if 'remove_range' in kwargs.keys():  # if remove range is present
+            assert isinstance(kwargs['remove_range'], int)  # should be of integer
+            assert kwargs['remove_range'] >= 0  # should be equal or larger than 0
+            remove_range = kwargs['remove_range']  # assign
+
+        # get all objects within remove range
         objects_in_range = grid_world.get_objects_in_range(agent_loc, object_type="*", sense_range=remove_range)
 
         # You can't remove yourself
         objects_in_range.pop(agent_avatar.obj_id)
 
-        if len(objects_in_range) == 0:  # if there are no objects in infinite range besides ourselves, we return fail
+        if len(objects_in_range) == 0:  # if there are no objects in remove range besides ourselves, we return fail
             return RemoveObjectResult(RemoveObjectResult.NO_OBJECTS_IN_RANGE.replace('remove_range'.upper(),
                                                                                      str(remove_range)), False)
-        # need an object id to remove an object
-        if 'object_id' not in kwargs:
-            return RemoveObjectResult(RemoveObjectResult.REMOVAL_FAILED.replace('object_id'.upper(),
-                                                                                str(None)), False)
         # check if the object is actually within removal range
         object_id = kwargs['object_id']
         if object_id not in objects_in_range:
