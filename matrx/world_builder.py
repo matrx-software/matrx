@@ -1391,7 +1391,7 @@ class WorldBuilder:
                             visualize_colour=visualize_colours[idx], visualize_depth=visualize_depths[idx],
                             visualize_opacity=visualize_opacities[idx], **custom_properties[idx])
 
-    def add_human_agent(self, location, agent, name="HumanAgent",
+    def add_human_agent(self, location, agent_brain, name="HumanAgent",
                         customizable_properties=None,
                         sense_capability=None,
                         is_traversable=None, team=None, possible_actions=None,
@@ -1414,7 +1414,7 @@ class WorldBuilder:
         location : tuple or list
             The location (x,y) of the to be added agent.
 
-        agent : HumanAgentBrain
+        agent_brain : HumanAgentBrain
             The human agent brain that is linked to this agent. Should be of
             type `HumanAgentBrain` or inherit from it.
 
@@ -1527,9 +1527,9 @@ class WorldBuilder:
                 DeprecationWarning,
             )
 
-        # Check if location and agent are of correct type
+        # Check if location and agent_brain are of correct type
         assert isinstance(location, list) or isinstance(location, tuple)
-        assert isinstance(agent, HumanAgentBrain)
+        assert isinstance(agent_brain, HumanAgentBrain)
 
         for existingAgent in self.agent_settings:
             if existingAgent["mandatory_properties"]["name"] == name:
@@ -1565,7 +1565,7 @@ class WorldBuilder:
             sense_capability = create_sense_capability([], [])  # Create sense capability that perceives all
 
         # Check if the agent is of HumanAgent, if not; use the add_agent method
-        inh_path = _get_inheritence_path(agent.__class__)
+        inh_path = _get_inheritence_path(agent_brain.__class__)
         if 'HumanAgent' not in inh_path:
             ValueError(f"You are adding an agent that does not inherit from HumanAgent with the name {name}. Use "
                        f"factory.add_agent to add autonomous agents.")
@@ -1574,7 +1574,7 @@ class WorldBuilder:
         custom_properties["key_action_map"] = key_action_map
 
         # Define a settings dictionary with all we need to register and add an agent to the GridWorld
-        hu_ag_setting = {"agent": agent,
+        hu_ag_setting = {"agent": agent_brain,
                          "custom_properties": custom_properties,
                          "sense_capability": sense_capability,
                          "mandatory_properties": {
