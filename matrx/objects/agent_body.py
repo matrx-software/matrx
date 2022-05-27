@@ -256,57 +256,62 @@ class AgentBody(EnvObject):
         The new properties
         """
 
+
+        # we need to check if property_name is a mandatory class attribute that is also a property
+        if property_name == "is_traversable":
+            assert isinstance(property_value, bool)
+            self.is_traversable = property_value
+        elif property_name == "name":
+            assert isinstance(property_value, str)
+            self.obj_name = property_value
+        elif property_name == "location":
+            assert isinstance(property_value, list) or isinstance(property_value, tuple)
+            self.location = property_value
+        elif property_name == "class_inheritance":
+            assert isinstance(property_value, list)
+            self.class_inheritance = property_value
+        elif property_name == "visualize_size":
+            assert isinstance(property_value, int)
+            self.visualize_size = property_value
+        elif property_name == "visualize_colour":
+            assert isinstance(property_value, str)
+            self.visualize_colour = property_value
+        elif property_name == "visualize_opacity":
+            assert isinstance(property_value, int)
+            self.visualize_opacity = property_value
+        elif property_name == "visualize_when_busy":
+            assert isinstance(property_value, bool)
+            self.visualize_when_busy = property_value
+        elif property_name == "visualize_shape":
+            assert isinstance(property_value, int)
+            self.visualize_shape = property_value
+        elif property_name == "visualize_depth":
+            assert isinstance(property_value, int)
+            self.visualize_depth = property_value
+        elif property_name == "team":
+            assert isinstance(property_value, str)
+            self.team = property_value
+        elif property_name == "sense_capability":
+            assert isinstance(property_value, SenseCapability)
+            self.sense_capability = property_value
+        elif property_name == "is_human_agent":
+            assert isinstance(property_value, bool)
+            self.is_human_agent = property_value
+        elif property_name == "action_set":
+            assert isinstance(property_value, list)
+            self.action_set = property_value
+        elif property_name == "is_movable":
+            assert isinstance(property_value, bool)
+            self.is_movable = property_value
+        # We deliberately ignore the current_action property, and several others such as agent_id as these can never
+        # be altered as they are governed by the GridWorld
+
         # We check if it is a custom property and if so change it simply in the dictionary
-        if property_name in self.custom_properties.keys():
+        elif property_name in self.custom_properties.keys():
             self.custom_properties[property_name] = property_value
-        else:  # else we need to check if property_name is a mandatory class attribute that is also a property
-            if property_name == "is_traversable":
-                assert isinstance(property_value, bool)
-                self.is_traversable = property_value
-            elif property_name == "name":
-                assert isinstance(property_value, str)
-                self.obj_name = property_value
-            elif property_name == "location":
-                assert isinstance(property_value, list) or isinstance(property_value, tuple)
-                self.location = property_value
-            elif property_name == "class_inheritance":
-                assert isinstance(property_value, list)
-                self.class_inheritance = property_value
-            elif property_name == "visualize_size":
-                assert isinstance(property_value, int)
-                self.visualize_size = property_value
-            elif property_name == "visualize_colour":
-                assert isinstance(property_value, str)
-                self.visualize_colour = property_value
-            elif property_name == "visualize_opacity":
-                assert isinstance(property_value, int)
-                self.visualize_opacity = property_value
-            elif property_name == "visualize_when_busy":
-                assert isinstance(property_value, bool)
-                self.visualize_when_busy = property_value
-            elif property_name == "visualize_shape":
-                assert isinstance(property_value, int)
-                self.visualize_shape = property_value
-            elif property_name == "visualize_depth":
-                assert isinstance(property_value, int)
-                self.visualize_depth = property_value
-            elif property_name == "team":
-                assert isinstance(property_value, str)
-                self.team = property_value
-            elif property_name == "sense_capability":
-                assert isinstance(property_value, SenseCapability)
-                self.sense_capability = property_value
-            elif property_name == "is_human_agent":
-                assert isinstance(property_value, bool)
-                self.is_human_agent = property_value
-            elif property_name == "action_set":
-                assert isinstance(property_value, list)
-                self.action_set = property_value
-            elif property_name == "is_movable":
-                assert isinstance(property_value, bool)
-                self.is_movable = property_value
-            # We deliberately ignore the current_action property, and several others such as agent_id as these can never
-            # be altered as they are governed by the GridWorld
+        else:
+            raise Exception(f"Couldn't change property {property_name} for object with ID {self.obj_id} as it doesn't exist (use `add_property()` instead) or isn't allowed to be changed.")
+
 
         return self.properties
 

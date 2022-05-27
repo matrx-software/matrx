@@ -1,7 +1,7 @@
 # Ignore pycharm project folder
 .idea/
 .vscode/
-.code-workspace
+*.code-workspace
 
 # Ignore build related folders and files
 build/

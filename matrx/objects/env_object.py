@@ -191,6 +191,10 @@ class EnvObject:
         The new properties.
         """
 
+        # We check if it is a custom property and if so change it simply in the dictionary
+        if property_name in self.custom_properties.keys():
+            self.custom_properties[property_name] = property_value
+
         # check if property_name is a mandatory class attribute that is also a property
         if property_name == "is_traversable":
             assert isinstance(property_value, bool)
@@ -227,7 +231,7 @@ class EnvObject:
         
         # We check if it is a custom property and if so change it simply in the dictionary
         else: 
-            self.custom_properties[property_name] = property_value
+            raise Exception(f"Couldn't change property {property_name} for object with ID {self.obj_id} as it doesn't exist (use `add_property()` instead) or isn't allowed to be changed.")
         
         return self.properties
 
@@ -243,7 +247,7 @@ class EnvObject:
             The value of the property.
         """
         if property_name in self.custom_properties:
-            raise Exception("Attribute already exists, alter value with change_property instead")
+            raise Exception(f"Attribute {property_name} already exists for object with ID {self.obj_id}, alter value with change_property() instead.")
         else:
             # We always add it as a custom property
             self.custom_properties[property_name] = property_value
