@@ -649,6 +649,10 @@ class GridWorld:
                 api._MATRX_info = {}
                 api._next_tick_info = {}
 
+        # Get all agents we have, as we need these to process all messages that are send to all agents
+        all_agent_ids = self.__registered_agents.keys()
+    
+        
         # Go over all agents, detect what each can detect, figure out what actions are possible and send these to
         # that agent. Then receive the action back and store the action in a buffer.
         # Also, update the local copy of the agent properties, and save the agent's state for the GUI.
@@ -699,24 +703,20 @@ class GridWorld:
                 # would be killing...)
                 self.__set_agent_busy(action_name=action_class_name, action_kwargs=action_kwargs, agent_id=agent_id)
 
-                # Get all agents we have, as we need these to process all messages that are send to all agents
-                all_agent_ids = self.__registered_agents.keys()
+            # Obtain all communication messages if the agent has something to say to others
+            agent_messages = agent_obj.get_messages_func(all_agent_ids)
 
-                # Obtain all communication messages if the agent has something to say to others (only comes here when
-                # the agent is NOT busy)
-                agent_messages = agent_obj.get_messages_func(all_agent_ids)
+            # add any messages received from the api sent by this agent
+            if self.__run_matrx_api:
+                if agent_id in api._received_messages:
+                    agent_messages += copy.copy(api._received_messages[agent_id])
 
-                # add any messages received from the api sent by this agent
-                if self.__run_matrx_api:
-                    if agent_id in api._received_messages:
-                        agent_messages += copy.copy(api._received_messages[agent_id])
+                    # clear the messages for the next tick
+                    del api._received_messages[agent_id]
 
-                        # clear the messages for the next tick
-                        del api._received_messages[agent_id]
-
-                # preprocess all messages of the current tick of this agent
-                self.message_manager.preprocess_messages(self.__current_nr_ticks, agent_messages,
-                                                         all_agent_ids, self.__teams)
+            # preprocess all messages of the current tick of this agent
+            self.message_manager.preprocess_messages(self.__current_nr_ticks, agent_messages,
+                                                        all_agent_ids, self.__teams)
 
             # save the current agent's state for the api
             if self.__run_matrx_api:
