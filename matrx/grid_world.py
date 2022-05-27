@@ -957,9 +957,6 @@ class GridWorld:
             result = ActionResult(ActionResult.AGENT_WAS_REMOVED.replace("{AGENT_ID}", agent_id), succeeded=False)
             return result
 
-        if action_name is None:  # If action is None, we send an action result that no action was given (and succeeded)
-            result = ActionResult(ActionResult.NO_ACTION_GIVEN, succeeded=True)
-
         # action known, but agent not capable of performing it
         elif action_name in self.__all_actions.keys() and \
                 action_name not in self.__registered_agents[agent_id].action_set:
