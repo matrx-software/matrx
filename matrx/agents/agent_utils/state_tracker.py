@@ -149,58 +149,6 @@ class StateTracker:
 
         return self.get_memorized_state()
 
-    def get_traversability_map(self, inverted=False, state=None):
-        """ Returns a map where the agent can move to.
-
-        This map is based on the provided state dictionary that might represent the observations of an agent. Since
-        these observations can be limited in sense of range and accuracy, the map might not be truthful to what is
-        actually possible. This mimics the fact that an agent only knows what it can observe and infer from those
-        observations.
-
-        Parameters
-        ----------
-        inverted : bool (Default: False)
-            Whether the map should be inverted (signalling where the agent cannot move to).
-        state : dict
-            The dictionary representing the agent's (memorized) observations to be used to create the map.
-
-        Returns
-        -------
-        array
-            An array of shape (width,height) equal to the grid world's size. Contains a 1 on each (x,y) coordinate where
-            the agent can move to (a 0 when inverted) and a 0 where it cannot move to (a 1 when inverted).
-        list
-            A list of lists with the width and height of the gird world as size. Contains on each (x,y) coordinate the
-            object ID if any according to the provided state dictionary.
-
-        """
-
-        if state is None:
-            state = self.__memorized_state
-
-        map_size = state['World']['grid_shape']  # (width, height)
-        traverse_map = np.array([[int(not inverted) for _ in range(map_size[1])] for _ in range(map_size[0])])
-        obj_grid = [[[] for _ in range(map_size[1])] for _ in range(map_size[0])]
-
-        for obj_id, properties in state.items():
-
-            if obj_id == "World":
-                continue
-
-            loc = properties['location']
-
-            # we store that there is an object there
-            obj_grid[loc[0]][loc[1]].append(obj_id)
-
-            # if another object on that location is intraversable, don't overwrite it
-            if (traverse_map[loc[0], loc[1]] == 0 and not inverted) or (traverse_map[loc[0], loc[1]] == 1 and inverted):
-                continue
-
-            traverse_map[loc[0], loc[1]] = int(properties['is_traversable']) \
-                if not inverted else int(not (properties['is_traversable']))
-
-        return traverse_map, obj_grid
-
     def __get_occluded_objects(self, state):
         """ A private MATRX method.
 
@@ -242,3 +190,108 @@ class StateTracker:
         occluded_objects = [obj_id for obj_id in all_objects if obj_id not in objects_seen]
 
         return occluded_objects
+
+def get_traversability_map(state=None, inverted=True):
+    """ Returns a map where the agent can move to. Traversability is binary.
+
+    This map is based on the provided state dictionary that might represent the observations of an agent. Since
+    these observations can be limited in sense of range and accuracy, the map might not be truthful to what is
+    actually possible. This mimics the fact that an agent only knows what it can observe and infer from those
+    observations.
+
+    Parameters
+    ----------
+    inverted : bool (Default: False)
+        Whether the map should be inverted (signalling where the agent cannot move to).
+    state : dict
+        The dictionary representing the agent's (memorized) observations to be used to create the map.
+
+    Returns
+    -------
+    array
+        An array of shape (width,height) equal to the grid world's size. Contains a 1 on each (x,y) coordinate where
+        the agent can move to (a 0 when inverted) and a 0 where it cannot move to (a 1 when inverted).
+    list
+        A list of lists with the width and height of the gird world as size. Contains on each (x,y) coordinate the
+        object ID if any according to the provided state dictionary.
+
+    """
+
+    map_size = state['World']['grid_shape']  # (width, height)
+    traverse_map = np.array([[int(not inverted) for _ in range(map_size[1])] for _ in range(map_size[0])])
+    obj_grid = [[[] for _ in range(map_size[1])] for _ in range(map_size[0])]
+
+    for obj_id, properties in state.items():
+
+        if obj_id == "World":
+            continue
+
+        loc = properties['location']
+
+        # we store that there is an object there
+        obj_grid[loc[0]][loc[1]].append(obj_id)
+
+        # if another object on that location is intraversable, don't overwrite it
+        if (traverse_map[loc[0], loc[1]] == 0 and not inverted) or (traverse_map[loc[0], loc[1]] == 1 and inverted):
+            continue
+
+        traverse_map[loc[0], loc[1]] = int(properties['is_traversable']) \
+            if not inverted else int(not (properties['is_traversable']))
+
+    return traverse_map, obj_grid
+
+def get_weighted_traversability_map(state=None):
+    """ Returns a weighted map where the agent can move to. 
+
+    This map is based on the provided state dictionary that might represent the observations of an agent. Since
+    these observations can be limited in sense of range and accuracy, the map might not be truthful to what is
+    actually possible. This mimics the fact that an agent only knows what it can observe and infer from those
+    observations.
+    Traversability is weighted based on the the traversability of that object, and in addition the `traversability_penatly` property 
+    (if available) which describes the (speed) penatly of moving over this object. The `traversability_penatly` is between 0 (no penalty) and 1 (max penalty)
+
+    Parameters
+    ----------
+    inverted : bool (Default: False)
+        Whether the map should be inverted (signalling where the agent cannot move to).
+    state : dict
+        The dictionary representing the agent's (memorized) observations to be used to create the map.
+
+    Returns
+    -------
+    array
+        An array of shape (width,height) equal to the grid world's size. Contains a 0 on each (x,y) coordinate where
+        the agent can move to 1 where it cannot move to. Contains any integer between 0 and 1 that indicates a preference.
+    list
+        A list of lists with the width and height of the gird world as size. Contains on each (x,y) coordinate the
+        object ID if any according to the provided state dictionary.
+
+    """
+
+    map_size = state['World']['grid_shape']  # (width, height)
+    traverse_map = np.array([[0.0 for _ in range(map_size[1])] for _ in range(map_size[0])])
+    obj_grid = [[[] for _ in range(map_size[1])] for _ in range(map_size[0])]
+
+    for obj_id, properties in state.items():
+
+        if obj_id == "World":
+            continue
+
+        loc = properties['location']
+
+        # we store that there is an object there
+        obj_grid[loc[0]][loc[1]].append(obj_id)
+        
+        # check if the object is traversable
+        traversability = int(not properties['is_traversable']) * 1.0
+
+        # if it is traversable, check if the user specified a preference with the `traversability_penatly` property for this object 
+        # higher penalty is less preferable 
+        if (traversability < 1) and ('traversability_penalty' in properties):
+            traversability = properties['traversability_penalty']
+
+        # the traversability of a location is equal to its least traversable object on there 
+        if traversability > traverse_map[loc[0], loc[1]]:
+            traverse_map[loc[0], loc[1]] = traversability
+
+    return traverse_map, obj_grid

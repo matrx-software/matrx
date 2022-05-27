@@ -4,6 +4,7 @@ from matrx.agents import PatrollingAgentBrain, HumanAgentBrain
 from matrx.logger.log_messages import MessageLogger
 from matrx.world_builder import WorldBuilder
 from matrx.actions import *
+from matrx.objects import *
 from datetime import datetime
 
 
@@ -15,6 +16,8 @@ def create_builder():
                            visualization_bg_img='/static/images/restaurant_bg.png')
 
     factory.add_room(top_left_location=[0, 0], width=14, height=20, name="world_bounds")
+
+    factory.add_object(location=[5,15], name="door", callable_class=Door)
 
     n_agent = 5
 
@@ -49,7 +52,9 @@ def create_builder():
         'd': MoveEast.__name__,
         's': MoveSouth.__name__,
         'a': MoveWest.__name__,
-        'r': RemoveObject.__name__
+        'r': RemoveObject.__name__,
+        'o': OpenDoorAction.__name__,
+        'c': CloseDoorAction.__name__
     }
     factory.add_human_agent([5, 5], HumanAgentBrain(), name="human",
                             key_action_map=key_action_map, img_name="/static/images/transparent.png")

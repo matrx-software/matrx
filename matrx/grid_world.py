@@ -495,7 +495,6 @@ class GridWorld:
                                       action_set=agent_body.action_set,
                                       sense_capability=agent_body.sense_capability,
                                       agent_properties=avatar_props,
-                                      customizable_properties=agent_body.customizable_properties,
                                       callback_is_action_possible=self.__check_action_is_possible,
                                       rnd_seed=agent_seed)
         else:  # if the agent is a human agent, we also assign its user input action map
@@ -504,7 +503,6 @@ class GridWorld:
                                       action_set=agent_body.action_set,
                                       sense_capability=agent_body.sense_capability,
                                       agent_properties=avatar_props,
-                                      customizable_properties=agent_body.customizable_properties,
                                       callback_is_action_possible=self.__check_action_is_possible,
                                       rnd_seed=agent_seed,
                                       key_action_map=agent_body.properties["key_action_map"])

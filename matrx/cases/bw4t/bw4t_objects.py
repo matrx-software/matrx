@@ -19,9 +19,8 @@ class SignalBlock(EnvObject):
 
         visualize_colour = "#ffffff"
         visualize_opacity = 0.0
-        # customizable_properties = ["visualize_colour", "visualize_opacity"]
 
-        super().__init__(location, name, class_callable=SignalBlock, customizable_properties=[],
+        super().__init__(location, name, class_callable=SignalBlock,
                          is_traversable=False, is_movable=False, visualize_shape=0, visualize_colour=visualize_colour,
                          visualize_opacity=visualize_opacity, rank=self.__rank, drop_zone_name=self.__drop_zone_name)
 
