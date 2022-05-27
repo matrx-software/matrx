@@ -18,7 +18,7 @@ from matrx.objects.env_object import EnvObject, _get_inheritence_path
 from matrx import utils
 from matrx.agents.capabilities.capability import create_sense_capability
 from matrx.objects.standard_objects import Wall, Door, AreaTile, SmokeTile, CollectionDropOffTile, CollectionTarget
-from matrx.goals.goals import LimitedTimeGoal, WorldGoal, CollectionGoal
+from matrx.goals.goals import LimitedTimeGoal, WorldGoal, CollectionGoal, WorldGoalV2
 
 import matrx.defaults as defaults
 
@@ -125,8 +125,9 @@ class WorldBuilder:
 
         # Check if the simulation_goal is a SimulationGoal, an int or a list
         # or tuple of SimulationGoal
-        if not isinstance(simulation_goal, WorldGoal) and \
-                not isinstance(simulation_goal, int) \
+        if not isinstance(simulation_goal, WorldGoal) \
+                and not isinstance(simulation_goal, WorldGoalV2) \
+                and not isinstance(simulation_goal, int) \
                 and not (isinstance(simulation_goal, Iterable)
                          and (sum(1 for _ in simulation_goal)) > 0):
             raise ValueError(f"The given simulation_goal {simulation_goal} "
