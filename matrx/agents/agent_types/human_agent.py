@@ -216,6 +216,8 @@ class HumanAgentBrain(AgentBrain):
         action = None
         action_kwargs = {}
 
+        action_kwargs['action_duration'] = 50
+
         # send a random message once in a while
         if self.rnd_gen.random() < 0.1:
             # Get all agents in our state.
@@ -228,13 +230,13 @@ class HumanAgentBrain(AgentBrain):
             agents = state[{"isAgent": True}]
 
             # If we found multiple agents, randomly select the ID of one of them or otherwise the ID of the only agent
-            to_id = self.rnd_gen.choice(agents)['obj_id'] if isinstance(agents, list) else agents['obj_id']
+            to_id = self.rnd_gen.choice(agents)['obj_id'] if isinstance(
+                agents, list) else agents['obj_id']
 
-            self.send_message(Message(content=f"Hello, my name is (human agent) {self.agent_name} and I sent this message at "
-                                              f"tick {state['World']['nr_ticks']}",
-                                      from_id=self.agent_id,
-                                      to_id=to_id))
-
+            # self.send_message(Message(content=f"Hello, my name is (human agent) {self.agent_name} and I sent this message at "
+            #                                   f"tick {state['World']['nr_ticks']}",
+            #                           from_id=self.agent_id,
+            #                           to_id=to_id))
 
         # if no keys were pressed, do nothing
         if user_input is None or user_input == []:
