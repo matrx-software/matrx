@@ -1,4 +1,7 @@
 # The MATRX Software
+
+[![DOI](https://zenodo.org/badge/243515218.svg)](https://zenodo.org/badge/latestdoi/243515218)
+
 ### Human-Agent Teaming Rapid Experimentation Software
 
 The field of human-agent teaming (HAT) research aims to improve the collaboration between humans and intelligent agents. Small tasks are often designed to do research in agent development and perform evaluations with human experiments. Currently there is no dedicated library of such tasks. Current tasks are build and maintained independent of each other, making it difficult to benchmark research or explore research to different type of tasks.
