@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/243515218.svg)](https://zenodo.org/badge/latestdoi/243515218)
 
-### Human-Agent Teaming Rapid Experimentation Software
+## Human-Agent Teaming Rapid Experimentation Software
 
 The field of human-agent teaming (HAT) research aims to improve the collaboration between humans and intelligent agents. Small tasks are often designed to do research in agent development and perform evaluations with human experiments. Currently there is no dedicated library of such tasks. Current tasks are build and maintained independent of each other, making it difficult to benchmark research or explore research to different type of tasks.
 
@@ -16,3 +16,18 @@ This all is made possible by MATRX.
 
 Feel free to try some tasks or to browse our official [webpage](https://matrx-software.com/). This also includes a set of elaborate [tutorials](https://matrx-software.com/tutorials/), [documentation](http://docs.matrx-software.com/en/latest/) and [contribution guide](https://matrx-software.com/contribution_guide/).
 .
+
+## Citation
+If you use this software in your work, consider citing it as follows:
+
+  _van der Waa, J.S & Haije, T (2023). MATRX: Human Agent Teaming Rapid Experimentation software. Zenodo._
+
+    @software{matrx_2023,
+    author       = {Jasper van der Waa, Tjalling Haije},
+    title        = {MATRX: Human Agent Teaming Rapid Experimentation software},
+    month        = {July},
+    year         = {2023},
+    publisher    = {Zenodo},
+    version      = {2.3.2},
+    doi          = {10.5281/zenodo.8154912},
+    url          = {https://doi.org/10.5281/zenodo.8154912}}
