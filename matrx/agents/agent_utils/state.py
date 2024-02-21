@@ -1,5 +1,5 @@
 import copy
-from collections import Iterable, MutableMapping
+from collections.abc import Iterable, MutableMapping
 
 from matrx import utils
 from matrx.objects import Door, AreaTile, Wall

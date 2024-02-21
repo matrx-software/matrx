@@ -257,13 +257,12 @@ class HumanAgentBrain(AgentBrain):
 
             obj_id = \
                 self.__select_random_obj_in_range(state,
-                                                  range_=self.__grab_range,
-                                                  property_to_check="is_movable")
+                                                  range_=self.__grab_range)
             action_kwargs['object_id'] = obj_id
 
         # If the user chose to drop an object in its inventory
         elif action == DropObject.__name__:
-            # Assign it to the arguments list
+            # Assign it to the arguments list__remove_range
             # Set drop range
             action_kwargs['drop_range'] = self.__drop_range
 
@@ -275,9 +274,12 @@ class HumanAgentBrain(AgentBrain):
 
             obj_id = \
                 self.__select_random_obj_in_range(state,
-                                                  range_=self.__remove_range,
-                                                  property_to_check="is_movable")
+                                                  range_=self.__remove_range)
             action_kwargs['object_id'] = obj_id
+            if obj_id is None: 
+                print("Found no removable (non-agent) objects in the surrounding")
+            else:
+                print(f"Removing object {obj_id}")
 
         # if the user chose to do an open or close door action, find a door to
         # open/close within range

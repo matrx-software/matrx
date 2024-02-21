@@ -11,6 +11,7 @@ For visualization, see the seperate MATRX visualization folder / package.
 '''
 
 debug = True
+host = '0.0.0.0'
 port = 3000
 app = Flask(__name__, template_folder='templates')
 
@@ -136,7 +137,9 @@ def _flask_thread():
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
 
-    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
+    print(f"Serving GUI at http://127.0.0.1:{port}")
+
+    app.run(host=host, port=port, debug=False, use_reloader=False)
 
 def run_matrx_visualizer(verbose, media_folder):
     """
