@@ -6,20 +6,20 @@ from matrx.agents import PatrollingAgentBrain
 
 def create_builder():
     tick_dur = 0.5
-    builder = WorldBuilder(random_seed=1, shape=[3, 2],
+    builder = WorldBuilder(random_seed=1, shape=[10, 10],
                            tick_duration=tick_dur, verbose=False,
                            simulation_goal=int(300 / tick_dur),
                            run_matrx_api=True, run_matrx_visualizer=True)
 
     start = (0, 0)
-    waypoints = [(0, 0), (0, 1)]
+    waypoints = [[0,0], [9,9]]
     agent = PatrollingAgentBrain(waypoints)
     builder.add_agent(start, agent, name="Navigate", visualize_shape=0,
                       has_menu=True, is_traversable=False)
 
 
     start = (0, 1)
-    waypoints = [(0, 1)]
+    waypoints = [(9, 9)]
     agent = PatrollingAgentBrain(waypoints)
     builder.add_agent(start, agent, name="Navigate 2", visualize_shape=1,
                       has_menu=True, is_traversable=False)
