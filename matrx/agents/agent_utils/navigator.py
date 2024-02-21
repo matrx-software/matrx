@@ -94,7 +94,7 @@ class Navigator:
         """
 
         assert isinstance(waypoint, tuple) or isinstance(waypoint, list)
-        wp = Waypoint(loc=waypoint, priority=self.__nr_waypoints)
+        wp = Waypoint(loc=tuple(waypoint), priority=self.__nr_waypoints)
         self.__nr_waypoints += 1
         self.__waypoints[wp.priority] = wp
 

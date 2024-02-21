@@ -20,7 +20,7 @@ def create_builder2():
     factory.add_object(location=[3,6], name="tile2", callable_class=SmokeTile, visualize_opacity=0.5)
     factory.add_object(location=[4,6], name="CollectionDropOffTile", callable_class=CollectionDropOffTile, visualize_opacity=0.5)
 
-    factory.add_human_agent(location=[5,6], agent=HumanAgentBrain(), visualize_opacity=0.5)
+    factory.add_human_agent(location=[5,6], agent_brain=HumanAgentBrain(), visualize_opacity=0.5)
 
     return factory
 
